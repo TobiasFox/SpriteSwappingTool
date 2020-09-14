@@ -22,10 +22,16 @@ namespace SpriteSorting
         private SpriteSortingAnalysisResult result;
         private bool analyzeButtonWasClicked;
         private ReorderableList reordableSpriteSortingList;
+
         private SerializedObject serializedResult;
-        private SpriteSortingReordableList reordableSO;
-        private PreviewRenderUtility previewRenderUtility;
-        private Shader transparentUnlitShader;
+
+        // private SpriteSortingReordableList reordableSO;
+        // private PreviewRenderUtility previewRenderUtility;
+        // private Shader transparentUnlitShader;
+        private bool isPreviewVisible = true;
+
+        private GameObject previewGameObject;
+        private Editor previewEditor;
 
         [MenuItem("Window/Sprite Sorting")]
         public static void ShowWindow()
@@ -37,29 +43,50 @@ namespace SpriteSorting
 
         private void Init()
         {
-            reordableSO = CreateInstance<SpriteSortingReordableList>();
-            serializedResult = new SerializedObject(reordableSO);
-            if (previewRenderUtility == null)
-            {
-                previewRenderUtility = new PreviewRenderUtility();
-            }
+            // reordableSO = CreateInstance<SpriteSortingReordableList>();
+            // serializedResult = new SerializedObject(reordableSO);
+            // if (previewRenderUtility == null)
+            // {
+            //     previewRenderUtility = new PreviewRenderUtility();
+            // }
         }
 
         private void OnEnable()
         {
-            if (previewRenderUtility == null)
-            {
-                previewRenderUtility = new PreviewRenderUtility();
-            }
+            // if (previewRenderUtility == null)
+            // {
+            //     previewRenderUtility = new PreviewRenderUtility();
+            // }
 
-            if (transparentUnlitShader == null)
-            {
-                transparentUnlitShader = Shader.Find("Unlit/Transparent");
-            }
+            // if (transparentUnlitShader == null)
+            // {
+            //     transparentUnlitShader = Shader.Find("Unlit/Transparent");
+            // }
         }
+
+        // private GameObject gameObject;
+        // private Editor gameObjectEditor;
 
         private void OnGUI()
         {
+            // gameObject = (GameObject) EditorGUILayout.ObjectField(gameObject, typeof(GameObject), true);
+            //
+            // var bgColor2 = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
+            //
+            // if (gameObject != null)
+            // {
+            //     if (gameObjectEditor == null)
+            //     {
+            //         gameObjectEditor = Editor.CreateEditor(gameObject);
+            //     }
+            //
+            //     gameObjectEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(256, 256), bgColor2);
+            // }
+            // else
+            // {
+            //     gameObjectEditor = null;
+            // }
+
             GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
             ignoreAlphaOfSprites = EditorGUILayout.Toggle("ignore Alpha Of Sprites", ignoreAlphaOfSprites);
             cameraProjectionType =
@@ -132,72 +159,139 @@ namespace SpriteSorting
 
             EditorGUI.EndDisabledGroup();
 
-            serializedResult.Update();
+            // serializedResult.Update();
             reordableSpriteSortingList.DoLayoutList();
-            serializedResult.ApplyModifiedProperties();
+            // serializedResult.ApplyModifiedProperties();
 
             if (GUILayout.Button("Confirm and continue searching"))
             {
                 Debug.Log("sort sprites");
                 analyzeButtonWasClicked = false;
                 result.overlappingItems = null;
+                CleanUpPreview();
                 return;
             }
 
-            if (Event.current.type == EventType.Repaint && result.overlappingItems != null &&
-                result.overlappingItems.Count > 0)
+            CreatePreview();
+
+            // if (Event.current.type == EventType.Repaint && result.overlappingItems != null &&
+            //     result.overlappingItems.Count > 0)
+            // {
+            //     var lastRect = GUILayoutUtility.GetLastRect();
+            //     var previewRect = new Rect(2, lastRect.y + lastRect.height + 5, position.width, 200);
+            //
+            //     previewRenderUtility.BeginPreview(previewRect, GUIStyle.none);
+            //
+            //     var collectedOverlappingBounds = new Bounds();
+            //     for (var i = 0; i < result.overlappingItems.Count; i++)
+            //     {
+            //         var renderer = result.overlappingItems[i].spriteRenderer;
+            //         var bounds = renderer.bounds;
+            //
+            //         var mesh = GenerateQuadMesh(renderer);
+            //         var material = new Material(transparentUnlitShader) {mainTexture = renderer.sprite.texture};
+            //         var meshPosition = new Vector3(bounds.center.x - bounds.extents.x,
+            //             bounds.center.y - bounds.extents.y, 0);
+            //
+            //
+            //         if (renderer.name.Equals("4"))
+            //         {
+            //             meshPosition = new Vector3(meshPosition.x, meshPosition.y, 1);
+            //         }
+            //
+            //         //TODO: consider rotation
+            //         previewRenderUtility.DrawMesh(mesh, meshPosition, Quaternion.identity, material, 0);
+            //         Debug.Log(renderer.name + " " + meshPosition);
+            //
+            //         if (i == 0)
+            //         {
+            //             collectedOverlappingBounds = new Bounds(renderer.bounds.center, bounds.size);
+            //         }
+            //         else
+            //         {
+            //             collectedOverlappingBounds.Encapsulate(bounds);
+            //         }
+            //     }
+            //
+            //     //TODO: auto adjust camera distance to sprites 
+            //     previewRenderUtility.camera.transform.position = new Vector3(collectedOverlappingBounds.center.x,
+            //         collectedOverlappingBounds.center.y, -150);
+            //     previewRenderUtility.camera.transform.rotation = Quaternion.identity;
+            //     previewRenderUtility.camera.farClipPlane = 300;
+            //
+            //     previewRenderUtility.Render();
+            //     GUI.DrawTexture(previewRect, previewRenderUtility.EndPreview());
+            //
+            //     // Debug.Log(previewRenderUtility.camera.transform.position + " rot " +
+            //     // previewRenderUtility.camera.transform.rotation);
+            // }
+        }
+
+        private void CreatePreview()
+        {
+            isPreviewVisible = EditorGUILayout.Foldout(isPreviewVisible, "Preview", true);
+
+            if (isPreviewVisible)
             {
-                var lastRect = GUILayoutUtility.GetLastRect();
-                var previewRect = new Rect(2, lastRect.y + lastRect.height + 5, position.width, 200);
-
-                previewRenderUtility.BeginPreview(previewRect, GUIStyle.none);
-
-                var collectedOverlappingBounds = new Bounds();
-                for (var i = 0; i < result.overlappingItems.Count; i++)
+                if (previewGameObject == null)
                 {
-                    var renderer = result.overlappingItems[i].spriteRenderer;
-                    var bounds = renderer.bounds;
-                    
-                    var mesh = GenerateQuadMesh(renderer);
-                    var material = new Material(transparentUnlitShader) {mainTexture = renderer.sprite.texture};
-                    var meshPosition = new Vector3(bounds.center.x - bounds.extents.x,
-                        bounds.center.y - bounds.extents.y, 0);
+                    GeneratePreviewGameObject();
+                }
 
-                    previewRenderUtility.DrawMesh(mesh, meshPosition, Quaternion.identity, material, 0);
-                    // Debug.Log(renderer.name + " " + meshPosition);
+                if (previewEditor == null)
+                {
+                    previewEditor = Editor.CreateEditor(previewGameObject);
+                }
 
-                    if (i == 0)
+                if (GUILayout.Button("reset rotation"))
+                {
+                    DestroyImmediate(previewEditor);
+                    previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
+                    previewEditor = Editor.CreateEditor(previewGameObject);
+                }
+
+                var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
+                previewEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(256, 256), bgColor);
+            }
+        }
+
+        private void CleanUpPreview()
+        {
+            if (previewGameObject != null)
+            {
+                var transformChildCount = previewGameObject.transform.childCount;
+                for (int i = 0; i < transformChildCount; i++)
+                {
+                    var transform = previewGameObject.transform.GetChild(0);
+                    if (transform != null)
                     {
-                        collectedOverlappingBounds = new Bounds(renderer.bounds.center, bounds.size);
-                    }
-                    else
-                    {
-                        collectedOverlappingBounds.Encapsulate(bounds);
+                        DestroyImmediate(transform.gameObject);
                     }
                 }
 
-                previewRenderUtility.camera.transform.position = new Vector3(collectedOverlappingBounds.center.x,
-                    collectedOverlappingBounds.center.y, -150);
-                previewRenderUtility.camera.transform.rotation = Quaternion.identity;
-                previewRenderUtility.camera.farClipPlane = 300;
-
-                // var renderer = result.overlappingItems[0].spriteRenderer;
-                // var mesh = GenerateQuadMesh(renderer);
-                // var material = new Material(transparentUnlitShader) {mainTexture = renderer.sprite.texture};
-                //
-                // var renderer2 = result.overlappingItems[1].spriteRenderer;
-                // var mesh2 = GenerateQuadMesh(renderer2);
-                // var material2 = new Material(transparentUnlitShader) {mainTexture = renderer2.sprite.texture};
-                //
-                // previewRenderUtility.DrawMesh(mesh, new Vector3(-10, -5, 0), Quaternion.identity, material, 0);
-                // previewRenderUtility.DrawMesh(mesh2, new Vector3(0,-5, 0), Quaternion.identity, material2, 0);
-                previewRenderUtility.Render();
-
-                GUI.DrawTexture(previewRect, previewRenderUtility.EndPreview());
-
-                // Debug.Log(previewRenderUtility.camera.transform.position + " rot " +
-                // previewRenderUtility.camera.transform.rotation);
+                DestroyImmediate(previewGameObject);
             }
+
+            previewEditor = null;
+        }
+
+        private void GeneratePreviewGameObject()
+        {
+            previewGameObject = new GameObject();
+            previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
+
+            foreach (var overlappingItem in result.overlappingItems)
+            {
+                var spriteGameObject = new GameObject(overlappingItem.spriteRenderer.name);
+                ComponentUtility.CopyComponent(overlappingItem.spriteRenderer.transform);
+                ComponentUtility.PasteComponentValues(spriteGameObject.transform);
+                ComponentUtility.CopyComponent(overlappingItem.spriteRenderer);
+                ComponentUtility.PasteComponentAsNew(spriteGameObject);
+                spriteGameObject.transform.SetParent(previewGameObject.transform);
+                spriteGameObject.hideFlags = HideFlags.HideAndDontSave;
+            }
+
+            previewGameObject.hideFlags = HideFlags.HideAndDontSave;
         }
 
         private Mesh GenerateQuadMesh(SpriteRenderer renderer)
@@ -357,8 +451,8 @@ namespace SpriteSorting
                     SceneView.lastActiveSceneView.Frame(element.spriteRenderer.bounds);
                 }
             };
-            reordableSO.reordableSpriteSortingItems = result.overlappingItems;
-            serializedResult = new SerializedObject(reordableSO);
+            // reordableSO.reordableSpriteSortingItems = result.overlappingItems;
+            // serializedResult = new SerializedObject(reordableSO);
             Repaint();
         }
 
@@ -379,12 +473,14 @@ namespace SpriteSorting
 
         private void OnDisable()
         {
-            previewRenderUtility.Cleanup();
+            // previewRenderUtility.Cleanup();
+            // gameObjectEditor = null;
+            CleanUpPreview();
         }
 
         private void OnDestroy()
         {
-            DestroyImmediate(reordableSO);
+            // DestroyImmediate(reordableSO);
         }
     }
 }
