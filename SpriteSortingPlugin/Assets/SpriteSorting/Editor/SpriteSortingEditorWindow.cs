@@ -26,8 +26,6 @@ namespace SpriteSorting
         private SerializedObject serializedResult;
 
         // private SpriteSortingReordableList reordableSO;
-        // private PreviewRenderUtility previewRenderUtility;
-        // private Shader transparentUnlitShader;
         private bool isPreviewVisible = true;
 
         private GameObject previewGameObject;
@@ -45,48 +43,14 @@ namespace SpriteSorting
         {
             // reordableSO = CreateInstance<SpriteSortingReordableList>();
             // serializedResult = new SerializedObject(reordableSO);
-            // if (previewRenderUtility == null)
-            // {
-            //     previewRenderUtility = new PreviewRenderUtility();
-            // }
         }
 
         private void OnEnable()
         {
-            // if (previewRenderUtility == null)
-            // {
-            //     previewRenderUtility = new PreviewRenderUtility();
-            // }
-
-            // if (transparentUnlitShader == null)
-            // {
-            //     transparentUnlitShader = Shader.Find("Unlit/Transparent");
-            // }
         }
-
-        // private GameObject gameObject;
-        // private Editor gameObjectEditor;
 
         private void OnGUI()
         {
-            // gameObject = (GameObject) EditorGUILayout.ObjectField(gameObject, typeof(GameObject), true);
-            //
-            // var bgColor2 = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
-            //
-            // if (gameObject != null)
-            // {
-            //     if (gameObjectEditor == null)
-            //     {
-            //         gameObjectEditor = Editor.CreateEditor(gameObject);
-            //     }
-            //
-            //     gameObjectEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(256, 256), bgColor2);
-            // }
-            // else
-            // {
-            //     gameObjectEditor = null;
-            // }
-
             GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
             ignoreAlphaOfSprites = EditorGUILayout.Toggle("ignore Alpha Of Sprites", ignoreAlphaOfSprites);
             cameraProjectionType =
@@ -173,58 +137,6 @@ namespace SpriteSorting
             }
 
             CreatePreview();
-
-            // if (Event.current.type == EventType.Repaint && result.overlappingItems != null &&
-            //     result.overlappingItems.Count > 0)
-            // {
-            //     var lastRect = GUILayoutUtility.GetLastRect();
-            //     var previewRect = new Rect(2, lastRect.y + lastRect.height + 5, position.width, 200);
-            //
-            //     previewRenderUtility.BeginPreview(previewRect, GUIStyle.none);
-            //
-            //     var collectedOverlappingBounds = new Bounds();
-            //     for (var i = 0; i < result.overlappingItems.Count; i++)
-            //     {
-            //         var renderer = result.overlappingItems[i].spriteRenderer;
-            //         var bounds = renderer.bounds;
-            //
-            //         var mesh = GenerateQuadMesh(renderer);
-            //         var material = new Material(transparentUnlitShader) {mainTexture = renderer.sprite.texture};
-            //         var meshPosition = new Vector3(bounds.center.x - bounds.extents.x,
-            //             bounds.center.y - bounds.extents.y, 0);
-            //
-            //
-            //         if (renderer.name.Equals("4"))
-            //         {
-            //             meshPosition = new Vector3(meshPosition.x, meshPosition.y, 1);
-            //         }
-            //
-            //         //TODO: consider rotation
-            //         previewRenderUtility.DrawMesh(mesh, meshPosition, Quaternion.identity, material, 0);
-            //         Debug.Log(renderer.name + " " + meshPosition);
-            //
-            //         if (i == 0)
-            //         {
-            //             collectedOverlappingBounds = new Bounds(renderer.bounds.center, bounds.size);
-            //         }
-            //         else
-            //         {
-            //             collectedOverlappingBounds.Encapsulate(bounds);
-            //         }
-            //     }
-            //
-            //     //TODO: auto adjust camera distance to sprites 
-            //     previewRenderUtility.camera.transform.position = new Vector3(collectedOverlappingBounds.center.x,
-            //         collectedOverlappingBounds.center.y, -150);
-            //     previewRenderUtility.camera.transform.rotation = Quaternion.identity;
-            //     previewRenderUtility.camera.farClipPlane = 300;
-            //
-            //     previewRenderUtility.Render();
-            //     GUI.DrawTexture(previewRect, previewRenderUtility.EndPreview());
-            //
-            //     // Debug.Log(previewRenderUtility.camera.transform.position + " rot " +
-            //     // previewRenderUtility.camera.transform.rotation);
-            // }
         }
 
         private void CreatePreview()
@@ -292,54 +204,6 @@ namespace SpriteSorting
             }
 
             previewGameObject.hideFlags = HideFlags.HideAndDontSave;
-        }
-
-        private Mesh GenerateQuadMesh(SpriteRenderer renderer)
-        {
-            var width = renderer.bounds.size.x;
-            var height = renderer.bounds.size.y;
-
-            var mesh = new Mesh();
-
-            var vertices = new Vector3[4];
-            vertices[0] = new Vector3(0, 0, 0);
-            vertices[1] = new Vector3(width, 0, 0);
-            vertices[2] = new Vector3(0, height, 0);
-            vertices[3] = new Vector3(width, height, 0);
-
-            mesh.vertices = vertices;
-
-            var tri = new int[6];
-
-            tri[0] = 0;
-            tri[1] = 2;
-            tri[2] = 1;
-
-            tri[3] = 2;
-            tri[4] = 3;
-            tri[5] = 1;
-
-            mesh.triangles = tri;
-
-            var normals = new Vector3[4];
-
-            normals[0] = -Vector3.forward;
-            normals[1] = -Vector3.forward;
-            normals[2] = -Vector3.forward;
-            normals[3] = -Vector3.forward;
-
-            mesh.normals = normals;
-
-            var uv = new Vector2[4];
-
-            uv[0] = new Vector2(0, 0);
-            uv[1] = new Vector2(1, 0);
-            uv[2] = new Vector2(0, 1);
-            uv[3] = new Vector2(1, 1);
-
-            mesh.uv = uv;
-
-            return mesh;
         }
 
         private void ShowSortingLayers()
@@ -473,8 +337,6 @@ namespace SpriteSorting
 
         private void OnDisable()
         {
-            // previewRenderUtility.Cleanup();
-            // gameObjectEditor = null;
             CleanUpPreview();
         }
 
