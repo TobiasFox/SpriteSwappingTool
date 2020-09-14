@@ -9,11 +9,11 @@ namespace SpriteSorting
 {
     public class SpriteSortingEditorWindow : EditorWindow
     {
-        [SerializeField] private bool ignoreAlphaOfSprites;
-        [SerializeField] private CameraProjectionType cameraProjectionType;
-        [SerializeField] private SortingType sortingType;
-        [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private SortingGroup sortingGroup;
+        private bool ignoreAlphaOfSprites;
+        private CameraProjectionType cameraProjectionType;
+        private SortingType sortingType;
+        private SpriteRenderer spriteRenderer;
+        private SortingGroup sortingGroup;
 
         private int selectedSortingLayers;
         private string[] sortingLayerNames;
@@ -24,10 +24,9 @@ namespace SpriteSorting
         private ReorderableList reordableSpriteSortingList;
 
         // private SerializedObject serializedResult;
-
         // private SpriteSortingReordableList reordableSO;
+        
         private bool isPreviewVisible = true;
-
         private GameObject previewGameObject;
         private Editor previewEditor;
 
@@ -172,6 +171,7 @@ namespace SpriteSorting
                 UpdatePreviewEditor();
             }
 
+            //hack for not seeing the previewGameObject in the scene view 
             previewGameObject.SetActive(true);
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
             previewEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(position.width, 256), bgColor);
@@ -255,7 +255,16 @@ namespace SpriteSorting
 
             if (selectedLayers == null)
             {
-                selectedSortingLayers = 1 << 0;
+                int defaultIndex = 0;
+                for (var i = 0; i < sortingLayerNames.Length; i++)
+                {
+                    if (sortingLayerNames[i].Equals("Default"))
+                    {
+                        defaultIndex = i;
+                    }
+                }
+
+                selectedSortingLayers = 1 << defaultIndex;
                 selectedLayers = new List<int>();
             }
 
@@ -341,10 +350,10 @@ namespace SpriteSorting
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 90, EditorGUIUtility.singleLineHeight),
                     element.originSpriteRenderer.name);
 
-                EditorGUIUtility.labelWidth = 50;
+                EditorGUIUtility.labelWidth = 35;
                 EditorGUI.BeginChangeCheck();
                 element.sortingLayer = EditorGUI.Popup(
-                    new Rect(rect.x + 90 + 10, rect.y, 150, EditorGUIUtility.singleLineHeight),
+                    new Rect(rect.x + 90 + 10, rect.y, 135, EditorGUIUtility.singleLineHeight),
                     "Layer", element.sortingLayer, sortingLayerNames);
 
                 if (EditorGUI.EndChangeCheck())
@@ -355,12 +364,12 @@ namespace SpriteSorting
                 }
 
                 //TODO: dynamic spacing depending on number of digits of sorting order
-                EditorGUIUtility.labelWidth = 110;
+                EditorGUIUtility.labelWidth = 70;
 
                 EditorGUI.BeginChangeCheck();
                 element.sortingOrder = EditorGUI.IntField(
-                    new Rect(rect.x + 90 + 10 + 150 + 10, rect.y, 150, EditorGUIUtility.singleLineHeight),
-                    "current order " + element.originSortingOrder + " +", element.sortingOrder);
+                    new Rect(rect.x + 90 + 10 + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
+                    "Order " + element.originSortingOrder + " +", element.sortingOrder);
 
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -370,7 +379,7 @@ namespace SpriteSorting
                 }
 
                 if (GUI.Button(
-                    new Rect(rect.x + 90 + 10 + 150 + 10 + 150 + 10, rect.y, 60, EditorGUIUtility.singleLineHeight),
+                    new Rect(rect.x + 90 + 10 + 135 + 10 + 120 + 10, rect.y, 55, EditorGUIUtility.singleLineHeight),
                     "Select"))
                 {
                     Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
