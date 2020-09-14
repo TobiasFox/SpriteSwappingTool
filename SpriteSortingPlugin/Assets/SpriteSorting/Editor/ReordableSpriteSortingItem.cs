@@ -17,6 +17,8 @@ namespace SpriteSorting
         public int sortingOrder;
         public int sortingLayer;
 
+        public bool IsItemSelected { get; set; }
+
         public ReordableSpriteSortingItem(SpriteRenderer originSpriteRenderer)
         {
             this.originSpriteRenderer = originSpriteRenderer;

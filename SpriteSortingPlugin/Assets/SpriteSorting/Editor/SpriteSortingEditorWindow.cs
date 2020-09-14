@@ -25,7 +25,7 @@ namespace SpriteSorting
 
         // private SerializedObject serializedResult;
         // private SpriteSortingReordableList reordableSO;
-        
+
         private bool isPreviewVisible = true;
         private GameObject previewGameObject;
         private Editor previewEditor;
@@ -46,6 +46,28 @@ namespace SpriteSorting
 
         private void OnEnable()
         {
+            SceneView.duringSceneGui += OnSceneGUI;
+        }
+
+        private void OnSceneGUI(SceneView sceneView)
+        {
+            if (result.overlappingItems == null)
+            {
+                return;
+            }
+
+            foreach (ReordableSpriteSortingItem item in reordableSpriteSortingList.list)
+            {
+                Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
+                var bounds = item.originSpriteRenderer.bounds;
+                //TODO: consider rotated bounds
+                Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
+            }
+
+            if (reordableSpriteSortingList.count > 0)
+            {
+                sceneView.Repaint();
+            }
         }
 
         private void OnGUI()
@@ -394,6 +416,15 @@ namespace SpriteSorting
             // reordableSO.reordableSpriteSortingItems = result.overlappingItems;
             // serializedResult = new SerializedObject(reordableSO);
             // Repaint();
+
+            reordableSpriteSortingList.onSelectCallback = (ReorderableList list) =>
+            {
+                for (var i = 0; i < list.count; i++)
+                {
+                    var item = (ReordableSpriteSortingItem) list.list[i];
+                    item.IsItemSelected = i == list.index;
+                }
+            };
         }
 
         private int GetLayerNameIndex(int layerId)
@@ -413,6 +444,7 @@ namespace SpriteSorting
         private void OnDisable()
         {
             CleanUpPreview();
+            SceneView.duringSceneGui -= OnSceneGUI;
         }
 
         private void OnDestroy()
