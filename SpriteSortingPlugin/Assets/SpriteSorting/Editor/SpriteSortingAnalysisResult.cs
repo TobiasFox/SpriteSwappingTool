@@ -8,6 +8,6 @@ namespace SpriteSorting
     {
         public List<SpriteRenderer> overlappingRenderers;
         public List<SortingGroup> overlappingSortingGroups;
-        public List<SpriteSortingReordableList.ReordableSpriteSortingItem> overlappingItems;
+        public List<ReordableSpriteSortingItem> overlappingItems;
     }
 }

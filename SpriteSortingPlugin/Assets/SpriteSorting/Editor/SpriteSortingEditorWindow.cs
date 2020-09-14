@@ -23,7 +23,7 @@ namespace SpriteSorting
         private bool analyzeButtonWasClicked;
         private ReorderableList reordableSpriteSortingList;
 
-        private SerializedObject serializedResult;
+        // private SerializedObject serializedResult;
 
         // private SpriteSortingReordableList reordableSO;
         private bool isPreviewVisible = true;
@@ -86,9 +86,12 @@ namespace SpriteSorting
                     break;
             }
 
+            bool isAnalyzedButtonClickedThisFrame = false;
+
             if (GUILayout.Button("Analyze"))
             {
                 Analyze();
+                isAnalyzedButtonClickedThisFrame = true;
             }
 
             if (!analyzeButtonWasClicked)
@@ -102,22 +105,22 @@ namespace SpriteSorting
                     "No sorting order issues with overlapping sprites were found in the currently loaded scenes.",
                     EditorStyles.boldLabel);
                 reordableSpriteSortingList = null;
-                serializedResult = null;
+                // serializedResult = null;
                 return;
             }
 
             EditorGUI.BeginDisabledGroup(true);
             foreach (var overlappingRenderer in result.overlappingItems)
             {
-                if (overlappingRenderer.spriteRenderer != null)
+                if (overlappingRenderer.originSpriteRenderer != null)
                 {
-                    EditorGUILayout.ObjectField("Sprite", overlappingRenderer.spriteRenderer, typeof(SpriteRenderer),
-                        true, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                    EditorGUILayout.ObjectField("Sprite", overlappingRenderer.originSpriteRenderer,
+                        typeof(SpriteRenderer), true, GUILayout.Height(EditorGUIUtility.singleLineHeight));
                 }
-                else if (overlappingRenderer.sortingGroup != null)
+                else if (overlappingRenderer.originSortingGroup != null)
                 {
-                    EditorGUILayout.ObjectField("Sorting Group", overlappingRenderer.sortingGroup, typeof(SortingGroup),
-                        true, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                    EditorGUILayout.ObjectField("Sorting Group", overlappingRenderer.originSortingGroup,
+                        typeof(SortingGroup), true, GUILayout.Height(EditorGUIUtility.singleLineHeight));
                 }
             }
 
@@ -136,35 +139,55 @@ namespace SpriteSorting
                 return;
             }
 
-            CreatePreview();
+            CreatePreview(isAnalyzedButtonClickedThisFrame);
         }
 
-        private void CreatePreview()
+        private void CreatePreview(bool isUpdatePreview)
         {
             isPreviewVisible = EditorGUILayout.Foldout(isPreviewVisible, "Preview", true);
 
-            if (isPreviewVisible)
+            if (!isPreviewVisible)
             {
-                if (previewGameObject == null)
-                {
-                    GeneratePreviewGameObject();
-                }
-
-                if (previewEditor == null)
-                {
-                    previewEditor = Editor.CreateEditor(previewGameObject);
-                }
-
-                if (GUILayout.Button("reset rotation"))
-                {
-                    DestroyImmediate(previewEditor);
-                    previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
-                    previewEditor = Editor.CreateEditor(previewGameObject);
-                }
-
-                var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
-                previewEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(256, 256), bgColor);
+                return;
             }
+
+            if (isUpdatePreview)
+            {
+                CleanUpPreview();
+            }
+
+            if (previewGameObject == null)
+            {
+                GeneratePreviewGameObject();
+            }
+
+            if (previewEditor == null)
+            {
+                UpdatePreviewEditor();
+            }
+
+            if (GUILayout.Button("reset rotation"))
+            {
+                previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
+                UpdatePreviewEditor();
+            }
+
+            previewGameObject.SetActive(true);
+            var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
+            previewEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(position.width, 256), bgColor);
+            previewGameObject.SetActive(false);
+            // Debug.Log(previewGameObject.transform.rotation);
+        }
+
+        private void UpdatePreviewEditor()
+        {
+            if (!isPreviewVisible)
+            {
+                return;
+            }
+
+            DestroyImmediate(previewEditor);
+            previewEditor = Editor.CreateEditor(previewGameObject);
         }
 
         private void CleanUpPreview()
@@ -182,6 +205,7 @@ namespace SpriteSorting
                 }
 
                 DestroyImmediate(previewGameObject);
+                previewGameObject = null;
             }
 
             previewEditor = null;
@@ -194,11 +218,26 @@ namespace SpriteSorting
 
             foreach (var overlappingItem in result.overlappingItems)
             {
-                var spriteGameObject = new GameObject(overlappingItem.spriteRenderer.name);
-                ComponentUtility.CopyComponent(overlappingItem.spriteRenderer.transform);
+                var spriteGameObject = new GameObject(overlappingItem.originSpriteRenderer.name);
+                ComponentUtility.CopyComponent(overlappingItem.originSpriteRenderer.transform);
                 ComponentUtility.PasteComponentValues(spriteGameObject.transform);
-                ComponentUtility.CopyComponent(overlappingItem.spriteRenderer);
-                ComponentUtility.PasteComponentAsNew(spriteGameObject);
+
+                //TODO: conside SortingOrder and SpriteRenderer components
+
+                if (overlappingItem.originSpriteRenderer != null)
+                {
+                    ComponentUtility.CopyComponent(overlappingItem.originSpriteRenderer);
+                    ComponentUtility.PasteComponentAsNew(spriteGameObject);
+                    overlappingItem.tempSpriteRenderer = spriteGameObject.GetComponent<SpriteRenderer>();
+                }
+
+                if (overlappingItem.originSortingGroup != null)
+                {
+                    ComponentUtility.CopyComponent(overlappingItem.originSortingGroup);
+                    ComponentUtility.PasteComponentAsNew(spriteGameObject);
+                    overlappingItem.tempSortingGroup = spriteGameObject.GetComponent<SortingGroup>();
+                }
+
                 spriteGameObject.transform.SetParent(previewGameObject.transform);
                 spriteGameObject.hideFlags = HideFlags.HideAndDontSave;
             }
@@ -267,18 +306,24 @@ namespace SpriteSorting
         private void AnalyzeLayer()
         {
             UpdateSelectedLayers();
-            // foreach (var sortingLayer in SortingLayer.layers)
-            // {
-            //     Debug.Log(sortingLayer.name + " " + sortingLayer.id);
-            // }
-            //
-            // Debug.Log(SortingLayer.NameToID("Test2"));
 
             result = SpriteSortingUtility.AnalyzeSpriteSorting(new SpriteSortingData
                 {selectedLayers = selectedLayers, cameraProjectionType = cameraProjectionType});
 
+            if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
+            {
+                return;
+            }
+
+            int sortingLayerIndex = GetLayerNameIndex(result.overlappingItems[0].originSortingLayer);
+
+            foreach (var overlappingItem in result.overlappingItems)
+            {
+                overlappingItem.sortingLayer = sortingLayerIndex;
+            }
+
             reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
-                typeof(SpriteSortingReordableList.ReordableSpriteSortingItem), true, true, false, false);
+                typeof(ReordableSpriteSortingItem), true, true, false, false);
             // reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
             // typeof(SpriteSortingReordableList.ReordableSpriteSortingItem), true, true, false, false);
 
@@ -290,43 +335,64 @@ namespace SpriteSorting
             reordableSpriteSortingList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 var element = result.overlappingItems[index];
+                bool isPreviewUpdating = false;
                 rect.y += 2;
 
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 90, EditorGUIUtility.singleLineHeight),
-                    element.spriteRenderer.name);
+                    element.originSpriteRenderer.name);
 
                 EditorGUIUtility.labelWidth = 50;
+                EditorGUI.BeginChangeCheck();
                 element.sortingLayer = EditorGUI.Popup(
                     new Rect(rect.x + 90 + 10, rect.y, 150, EditorGUIUtility.singleLineHeight),
                     "Layer", element.sortingLayer, sortingLayerNames);
 
+                if (EditorGUI.EndChangeCheck())
+                {
+                    element.tempSpriteRenderer.sortingLayerName = sortingLayerNames[element.sortingLayer];
+                    // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
+                    isPreviewUpdating = true;
+                }
+
                 //TODO: dynamic spacing depending on number of digits of sorting order
                 EditorGUIUtility.labelWidth = 110;
+
+                EditorGUI.BeginChangeCheck();
                 element.sortingOrder = EditorGUI.IntField(
                     new Rect(rect.x + 90 + 10 + 150 + 10, rect.y, 150, EditorGUIUtility.singleLineHeight),
-                    "current order " + element.spriteRenderer.sortingOrder + " +", element.sortingOrder);
+                    "current order " + element.originSortingOrder + " +", element.sortingOrder);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    element.tempSpriteRenderer.sortingOrder = element.originSortingOrder + element.sortingOrder;
+                    // Debug.Log("new order to " + element.tempSpriteRenderer.sortingOrder);
+                    isPreviewUpdating = true;
+                }
 
                 if (GUI.Button(
                     new Rect(rect.x + 90 + 10 + 150 + 10 + 150 + 10, rect.y, 60, EditorGUIUtility.singleLineHeight),
                     "Select"))
                 {
-                    Debug.Log("select " + element.spriteRenderer.name);
-                    Selection.objects = new Object[] {element.spriteRenderer.gameObject};
-                    SceneView.lastActiveSceneView.Frame(element.spriteRenderer.bounds);
+                    Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
+                    SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
+                }
+
+                if (isPreviewUpdating)
+                {
+                    UpdatePreviewEditor();
                 }
             };
             // reordableSO.reordableSpriteSortingItems = result.overlappingItems;
             // serializedResult = new SerializedObject(reordableSO);
-            Repaint();
+            // Repaint();
         }
 
-        private int GetCurrentIndexFromLayerNames(int currentLayerId)
+        private int GetLayerNameIndex(int layerId)
         {
-            var layerName = SortingLayer.IDToName(currentLayerId);
-
-            for (var i = 0; i < SortingLayer.layers.Length; i++)
+            var layerNameToFind = SortingLayer.IDToName(layerId);
+            for (var i = 0; i < sortingLayerNames.Length; i++)
             {
-                if (layerName.Equals(SortingLayer.layers[i].name))
+                if (sortingLayerNames[i].Equals(layerNameToFind))
                 {
                     return i;
                 }
