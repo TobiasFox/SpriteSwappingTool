@@ -134,23 +134,6 @@ namespace SpriteSorting
                 return;
             }
 
-            // EditorGUI.BeginDisabledGroup(true);
-            // foreach (var overlappingRenderer in result.overlappingItems)
-            // {
-            //     if (overlappingRenderer.originSpriteRenderer != null)
-            //     {
-            //         EditorGUILayout.ObjectField("Sprite", overlappingRenderer.originSpriteRenderer,
-            //             typeof(SpriteRenderer), true, GUILayout.Height(EditorGUIUtility.singleLineHeight));
-            //     }
-            //     else if (overlappingRenderer.originSortingGroup != null)
-            //     {
-            //         EditorGUILayout.ObjectField("Sorting Group", overlappingRenderer.originSortingGroup,
-            //             typeof(SortingGroup), true, GUILayout.Height(EditorGUIUtility.singleLineHeight));
-            //     }
-            // }
-            //
-            // EditorGUI.EndDisabledGroup();
-
             // serializedResult.Update();
             reordableSpriteSortingList.DoLayoutList();
             // serializedResult.ApplyModifiedProperties();
@@ -177,7 +160,6 @@ namespace SpriteSorting
             reordableSpriteSortingList.drawHeaderCallback = null;
             reordableSpriteSortingList.drawElementCallback = null;
             reordableSpriteSortingList.onSelectCallback = null;
-            // reordableSpriteSortingList.elementHeightCallback = null;
             reordableSpriteSortingList = null;
         }
 
@@ -205,7 +187,7 @@ namespace SpriteSorting
                 UpdatePreviewEditor();
             }
 
-            if (GUILayout.Button("reset rotation"))
+            if (GUILayout.Button("Reset rotation"))
             {
                 previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
                 UpdatePreviewEditor();
@@ -216,7 +198,6 @@ namespace SpriteSorting
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
             previewEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(position.width, 256), bgColor);
             previewGameObject.SetActive(false);
-            // Debug.Log(previewGameObject.transform.rotation);
         }
 
         private void UpdatePreviewEditor()
@@ -365,14 +346,7 @@ namespace SpriteSorting
                 return;
             }
 
-            int sortingLayerIndex = GetLayerNameIndex(result.overlappingItems[0].originSortingLayer);
-
-            for (var i = 0; i < result.overlappingItems.Count; i++)
-            {
-                var overlappingItem = result.overlappingItems[i];
-                overlappingItem.sortingLayer = sortingLayerIndex;
-                overlappingItem.sortingOrder = result.overlappingItems.Count - (i + 1);
-            }
+            InitOverlappingItems(false);
 
             reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
                 typeof(ReordableSpriteSortingItem), true, true, false, false);
@@ -382,7 +356,6 @@ namespace SpriteSorting
             reordableSpriteSortingList.drawHeaderCallback = DrawHeaderCallback;
             reordableSpriteSortingList.drawElementCallback = DrawElementCallback;
             reordableSpriteSortingList.onSelectCallback = OnSelectCallback;
-            // reordableSpriteSortingList.elementHeightCallback = OnElementHeightCallback;
 
             // reordableSO.reordableSpriteSortingItems = result.overlappingItems;
             // serializedResult = new SerializedObject(reordableSO);
@@ -420,9 +393,36 @@ namespace SpriteSorting
             //     };
         }
 
-        private float OnElementHeightCallback(int index)
+        private void InitOverlappingItems(bool isReset)
         {
-            return EditorGUIUtility.singleLineHeight * 1.2f;
+            int sortingLayerIndex = GetLayerNameIndex(result.overlappingItems[0].originSortingLayer);
+
+            for (var i = 0; i < result.overlappingItems.Count; i++)
+            {
+                var overlappingItem = result.overlappingItems[i];
+                overlappingItem.sortingLayer = sortingLayerIndex;
+
+                if (!isReset)
+                {
+                    overlappingItem.OriginSortedIndex = i;
+                }
+
+                overlappingItem.sortingOrder = result.overlappingItems.Count - (i + 1);
+
+                if (overlappingItem.tempSpriteRenderer != null)
+                {
+                    overlappingItem.tempSpriteRenderer.sortingOrder = overlappingItem.sortingOrder;
+                    overlappingItem.tempSpriteRenderer.sortingLayerID =
+                        overlappingItem.originSpriteRenderer.sortingLayerID;
+                }
+
+                if (overlappingItem.tempSortingGroup != null)
+                {
+                    overlappingItem.tempSortingGroup.sortingOrder = overlappingItem.sortingOrder;
+                    overlappingItem.tempSpriteRenderer.sortingLayerID =
+                        overlappingItem.originSortingGroup.sortingLayerID;
+                }
+            }
         }
 
         private void OnSelectCallback(ReorderableList list)
@@ -469,10 +469,9 @@ namespace SpriteSorting
 
             if (EditorGUI.EndChangeCheck())
             {
-                element.tempSpriteRenderer.sortingOrder = element.originSortingOrder + element.sortingOrder;
                 // Debug.Log("new order to " + element.tempSpriteRenderer.sortingOrder);
                 isPreviewUpdating = true;
-                isCurrentIndexUpdated = UpdateSortingOrder(index);
+                isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(
@@ -481,7 +480,7 @@ namespace SpriteSorting
             {
                 element.sortingOrder++;
                 isPreviewUpdating = true;
-                isCurrentIndexUpdated = UpdateSortingOrder(index);
+                isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(
@@ -490,7 +489,7 @@ namespace SpriteSorting
             {
                 element.sortingOrder--;
                 isPreviewUpdating = true;
-                isCurrentIndexUpdated = UpdateSortingOrder(index);
+                isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(
@@ -514,8 +513,15 @@ namespace SpriteSorting
             }
         }
 
-        private bool UpdateSortingOrder(int currentIndex)
+        private bool UpdateSortingOrder(int currentIndex, ReordableSpriteSortingItem element)
         {
+            if (currentIndex < 0 || element == null)
+            {
+                return false;
+            }
+
+            element.tempSpriteRenderer.sortingOrder = element.originSortingOrder + element.sortingOrder;
+
             var indexToSwitch = GetIndexToSwitch(currentIndex);
             if (indexToSwitch < 0)
             {
@@ -535,9 +541,7 @@ namespace SpriteSorting
         private int GetIndexToSwitch(int currentIndex)
         {
             int newSortingOrder = result.overlappingItems[currentIndex].sortingOrder;
-            // int currentIndex = reordableSpriteSortingList.index;
             int itemsCount = result.overlappingItems.Count;
-
 
             if (currentIndex > 0 && result.overlappingItems[currentIndex - 1].sortingOrder <= newSortingOrder)
             {
@@ -574,53 +578,34 @@ namespace SpriteSorting
                     {
                         break;
                     }
-
-                    // if (newSortingOrder >= order)
-                    // {
-                    // return i;
                 }
 
                 return tempIndex;
             }
 
             return -1;
-
-            // direction = -1;
-
-            // return -1;
-            // return -1;
         }
-
-        // for (int i = 0; i < result.overlappingItems.Count; i++)
-        // {
-        //     if (i == reordableSpriteSortingList.index)
-        //     {
-        //         continue;
-        //     }
-        //
-        //     if (newSortingOrder >= result.overlappingItems[i].sortingOrder)
-        //     {
-        //         return i;
-        //     }
-        // }
-        //
-        // if (newSortingOrder < result.overlappingItems[result.overlappingItems.Count - 1].sortingOrder)
-        // {
-        // }
-        //
-        // return -1;
 
         private void DrawHeaderCallback(Rect rect)
         {
             EditorGUI.LabelField(rect, "Overlapping Items");
+
+            if (GUI.Button(new Rect(rect.width - 35, rect.y, 45, EditorGUIUtility.singleLineHeight), "Reset"))
+            {
+                result.overlappingItems.Sort((item1, item2) =>
+                    item1.OriginSortedIndex.CompareTo(item2.OriginSortedIndex));
+
+                InitOverlappingItems(true);
+
+                reordableSpriteSortingList.list = result.overlappingItems;
+                Repaint();
+            }
         }
 
         private int GetLayerNameIndex(int layerId)
         {
             var layerNameToFind = SortingLayer.IDToName(layerId);
-            for (var i = 0;
-                i < sortingLayerNames.Length;
-                i++)
+            for (var i = 0; i < sortingLayerNames.Length; i++)
             {
                 if (sortingLayerNames[i].Equals(layerNameToFind))
                 {

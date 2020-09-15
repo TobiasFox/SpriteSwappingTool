@@ -11,13 +11,14 @@ namespace SpriteSorting
         public SortingGroup originSortingGroup;
         public int originSortingOrder;
         public int originSortingLayer;
-        
+
         public SpriteRenderer tempSpriteRenderer;
         public SortingGroup tempSortingGroup;
         public int sortingOrder;
         public int sortingLayer;
 
         public bool IsItemSelected { get; set; }
+        public int OriginSortedIndex { get; set; }
 
         public ReordableSpriteSortingItem(SpriteRenderer originSpriteRenderer)
         {
