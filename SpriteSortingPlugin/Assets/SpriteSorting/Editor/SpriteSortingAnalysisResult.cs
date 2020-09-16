@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace SpriteSorting
 {
+    [Serializable]
     public struct SpriteSortingAnalysisResult
     {
         public List<SpriteRenderer> overlappingRenderers;

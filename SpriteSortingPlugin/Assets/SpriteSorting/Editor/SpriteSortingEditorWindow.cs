@@ -30,7 +30,7 @@ namespace SpriteSorting
         private GameObject previewGameObject;
         private Editor previewEditor;
 
-        [MenuItem("Window/Sprite Sorting")]
+        [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
         {
             var window = GetWindow<SpriteSortingEditorWindow>();
@@ -47,6 +47,11 @@ namespace SpriteSorting
         private void OnEnable()
         {
             // SceneView.duringSceneGui += OnSceneGUI;
+
+            if (analyzeButtonWasClicked && result.overlappingItems != null && result.overlappingItems.Count > 0)
+            {
+                InitReordableList();
+            }
         }
 
         //TODO: add with OnFocus and OnFocusLeft
@@ -182,7 +187,7 @@ namespace SpriteSorting
 
             if (previewEditor == null)
             {
-                UpdatePreviewEditor();
+                previewEditor = Editor.CreateEditor(previewGameObject);
             }
 
             if (GUILayout.Button("Reset rotation"))
@@ -205,8 +210,9 @@ namespace SpriteSorting
                 return;
             }
 
-            DestroyImmediate(previewEditor);
-            previewEditor = Editor.CreateEditor(previewGameObject);
+            previewGameObject.SetActive(true);
+            previewEditor.ReloadPreviewInstances();
+            previewGameObject.SetActive(false);
         }
 
         private void CleanUpPreview()
@@ -355,18 +361,25 @@ namespace SpriteSorting
 
             InitOverlappingItems(false);
 
-            reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
-                typeof(ReordableSpriteSortingItem), true, true, false, false);
+            InitReordableList();
+
             // reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
             // typeof(SpriteSortingReordableList.ReordableSpriteSortingItem), true, true, false, false);
-
-            reordableSpriteSortingList.drawHeaderCallback = DrawHeaderCallback;
-            reordableSpriteSortingList.drawElementCallback = DrawElementCallback;
-            reordableSpriteSortingList.onSelectCallback = OnSelectCallback;
 
             // reordableSO.reordableSpriteSortingItems = result.overlappingItems;
             // serializedResult = new SerializedObject(reordableSO);
             // Repaint();
+        }
+
+        private void InitReordableList()
+        {
+            reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
+                typeof(ReordableSpriteSortingItem), true, true, false, false)
+            {
+                drawHeaderCallback = DrawHeaderCallback,
+                drawElementCallback = DrawElementCallback,
+                onSelectCallback = OnSelectCallback
+            };
 
             // reordableSpriteSortingList.onMouseUpCallback = (ReorderableList list) =>
             // {
@@ -624,13 +637,14 @@ namespace SpriteSorting
 
         private void OnDisable()
         {
-            CleanUpPreview();
-            CleanUpReordableList();
             // SceneView.duringSceneGui -= OnSceneGUI;
+            CleanUpReordableList();
         }
 
         private void OnDestroy()
         {
+            CleanUpPreview();
+
 // DestroyImmediate(reordableSO);
         }
     }

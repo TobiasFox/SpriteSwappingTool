@@ -35,15 +35,15 @@ namespace SpriteSorting
         }
 
         private int layer;
-        
+
         private void DrawElementCallback(Rect rect, int index, bool isActive, bool isfocused)
         {
-             EditorGUI.LabelField(new Rect(rect.x, rect.y, 90, EditorGUIUtility.singleLineHeight),"Test");
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, 90, EditorGUIUtility.singleLineHeight), "Test");
 
             EditorGUIUtility.labelWidth = 35;
             EditorGUI.BeginChangeCheck();
-                            EditorGUI.Popup(new Rect(rect.x + 90 + 10, rect.y, 135, EditorGUIUtility.singleLineHeight), "Layer",
-                    layer, new string[]{"default", "test"});
+            layer = EditorGUI.Popup(new Rect(rect.x + 90 + 10, rect.y, 135, EditorGUIUtility.singleLineHeight), "Layer",
+                layer, new string[] {"default", "test"});
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -61,7 +61,7 @@ namespace SpriteSorting
             if (EditorGUI.EndChangeCheck())
             {
                 var currentEvent = Event.current;
-                Debug.Log(currentEvent.type+" "+currentEvent.rawType);
+                Debug.Log(currentEvent.type + " " + currentEvent.rawType);
                 if (currentEvent.type == EventType.MouseUp)
                 {
                     Debug.Log("mouse up");
@@ -80,7 +80,6 @@ namespace SpriteSorting
                 // result.overlappingItems.Insert(0, tempItem);
                 // reordableSpriteSortingList.list = result.overlappingItems;
             }
-            
         }
 
         private void DrawHeaderCallback(Rect rect)
