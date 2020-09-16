@@ -29,6 +29,8 @@ namespace SpriteSorting
         private bool isPreviewVisible = true;
         private GameObject previewGameObject;
         private Editor previewEditor;
+        private bool isVisualizingBoundsInScene;
+        private bool isSceneVisualizingDelegateIsAdded;
 
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
@@ -46,35 +48,35 @@ namespace SpriteSorting
 
         private void OnEnable()
         {
-            // SceneView.duringSceneGui += OnSceneGUI;
-
             if (analyzeButtonWasClicked && result.overlappingItems != null && result.overlappingItems.Count > 0)
             {
                 InitReordableList();
             }
+
+            EnableSceneVisualization(true);
         }
 
         //TODO: add with OnFocus and OnFocusLeft
-        // private void OnSceneGUI(SceneView sceneView)
-        // {
-        //     if (result.overlappingItems == null)
-        //     {
-        //         return;
-        //     }
-        //
-        //     foreach (ReordableSpriteSortingItem item in reordableSpriteSortingList.list)
-        //     {
-        //         Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
-        //         var bounds = item.originSpriteRenderer.bounds;
-        //         //TODO: consider rotated bounds
-        //         Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
-        //     }
-        //
-        //     if (reordableSpriteSortingList.count > 0)
-        //     {
-        //         sceneView.Repaint();
-        //     }
-        // }
+        private void OnSceneGUI(SceneView sceneView)
+        {
+            if (result.overlappingItems == null)
+            {
+                return;
+            }
+
+            foreach (ReordableSpriteSortingItem item in reordableSpriteSortingList.list)
+            {
+                Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
+                var bounds = item.originSpriteRenderer.bounds;
+                //TODO: consider rotated bounds
+                Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
+            }
+
+            if (reordableSpriteSortingList.count > 0)
+            {
+                sceneView.Repaint();
+            }
+        }
 
         private void OnGUI()
         {
@@ -190,17 +192,59 @@ namespace SpriteSorting
                 previewEditor = Editor.CreateEditor(previewGameObject);
             }
 
-            if (GUILayout.Button("Reset rotation"))
+            var horizontalRect = EditorGUILayout.BeginHorizontal();
+
+            EditorGUIUtility.labelWidth = 180;
+            EditorGUI.indentLevel++;
+
+            var rectHalfWidth = horizontalRect.width / 2;
+            EditorGUI.BeginChangeCheck();
+            isVisualizingBoundsInScene = EditorGUI.ToggleLeft(
+                new Rect(horizontalRect.x, horizontalRect.y, rectHalfWidth, EditorGUIUtility.singleLineHeight),
+                "Visualize Bounds in Scene ", isVisualizingBoundsInScene);
+            if (EditorGUI.EndChangeCheck())
+            {
+                EnableSceneVisualization(isVisualizingBoundsInScene);
+            }
+
+            EditorGUIUtility.labelWidth = -1;
+            if (GUI.Button(
+                new Rect(horizontalRect.x + rectHalfWidth, horizontalRect.y, rectHalfWidth,
+                    EditorGUIUtility.singleLineHeight),
+                "Reset rotation"))
             {
                 previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
                 UpdatePreviewEditor();
             }
 
+            EditorGUILayout.EndHorizontal();
+
             //hack for not seeing the previewGameObject in the scene view 
             previewGameObject.SetActive(true);
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
-            previewEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(position.width, 256), bgColor);
+            previewEditor.OnInteractivePreviewGUI(new Rect(horizontalRect.x + 15,
+                horizontalRect.y + (EditorGUIUtility.singleLineHeight * 1.3f), position.width - 17.5f, 256), bgColor);
             previewGameObject.SetActive(false);
+        }
+
+        private void EnableSceneVisualization(bool isEnabled)
+        {
+            if (isEnabled && isVisualizingBoundsInScene)
+            {
+                if (!isSceneVisualizingDelegateIsAdded)
+                {
+                    isSceneVisualizingDelegateIsAdded = true;
+                    SceneView.duringSceneGui += OnSceneGUI;
+                }
+
+                return;
+            }
+
+            if (isSceneVisualizingDelegateIsAdded)
+            {
+                isSceneVisualizingDelegateIsAdded = false;
+                SceneView.duringSceneGui -= OnSceneGUI;
+            }
         }
 
         private void UpdatePreviewEditor()
@@ -637,7 +681,8 @@ namespace SpriteSorting
 
         private void OnDisable()
         {
-            // SceneView.duringSceneGui -= OnSceneGUI;
+            EnableSceneVisualization(false);
+
             CleanUpReordableList();
         }
 
