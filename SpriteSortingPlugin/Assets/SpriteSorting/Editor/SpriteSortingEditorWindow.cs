@@ -193,11 +193,10 @@ namespace SpriteSorting
             }
 
             var horizontalRect = EditorGUILayout.BeginHorizontal();
-
-            EditorGUIUtility.labelWidth = 180;
+            var rectHalfWidth = horizontalRect.width / 2;
             EditorGUI.indentLevel++;
 
-            var rectHalfWidth = horizontalRect.width / 2;
+            EditorGUIUtility.labelWidth = 180;
             EditorGUI.BeginChangeCheck();
             isVisualizingBoundsInScene = EditorGUI.ToggleLeft(
                 new Rect(horizontalRect.x, horizontalRect.y, rectHalfWidth, EditorGUIUtility.singleLineHeight),
@@ -210,11 +209,11 @@ namespace SpriteSorting
             EditorGUIUtility.labelWidth = -1;
             if (GUI.Button(
                 new Rect(horizontalRect.x + rectHalfWidth, horizontalRect.y, rectHalfWidth,
-                    EditorGUIUtility.singleLineHeight),
-                "Reset rotation"))
+                    EditorGUIUtility.singleLineHeight), "Reset rotation"))
             {
                 previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
-                UpdatePreviewEditor();
+                DestroyImmediate(previewEditor);
+                previewEditor = Editor.CreateEditor(previewGameObject);
             }
 
             EditorGUILayout.EndHorizontal();
