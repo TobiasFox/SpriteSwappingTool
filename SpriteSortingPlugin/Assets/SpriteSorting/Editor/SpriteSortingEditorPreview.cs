@@ -53,23 +53,20 @@ namespace SpriteSorting
             }
 
             var horizontalRect = EditorGUILayout.BeginHorizontal();
-            var rectHalfWidth = horizontalRect.width / 2;
             EditorGUI.indentLevel++;
 
             EditorGUIUtility.labelWidth = 180;
             EditorGUI.BeginChangeCheck();
-            isVisualizingBoundsInScene = EditorGUI.ToggleLeft(
-                new Rect(horizontalRect.x, horizontalRect.y, rectHalfWidth, EditorGUIUtility.singleLineHeight),
-                "Visualize Bounds in Scene ", isVisualizingBoundsInScene);
+            isVisualizingBoundsInScene =
+                EditorGUILayout.Toggle("Visualize Bounds in Scene ", isVisualizingBoundsInScene);
             if (EditorGUI.EndChangeCheck())
             {
                 EnableSceneVisualization(isVisualizingBoundsInScene);
             }
 
             EditorGUIUtility.labelWidth = -1;
-            if (GUI.Button(
-                new Rect(horizontalRect.x + rectHalfWidth, horizontalRect.y, rectHalfWidth - 2.5f,
-                    EditorGUIUtility.singleLineHeight), "Reset rotation"))
+
+            if (GUILayout.Button("Reset rotation"))
             {
                 previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
                 Object.DestroyImmediate(previewEditor);
@@ -79,8 +76,8 @@ namespace SpriteSorting
             EditorGUILayout.EndHorizontal();
 
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
-            var previewRect = EditorGUILayout.GetControlRect(false, 256);
-            
+            var previewRect = EditorGUILayout.GetControlRect(false, 256 + horizontalRect.height);
+
             //hack for not seeing the previewGameObject in the scene view 
             previewGameObject.SetActive(true);
             previewEditor.OnInteractivePreviewGUI(previewRect, bgColor);
