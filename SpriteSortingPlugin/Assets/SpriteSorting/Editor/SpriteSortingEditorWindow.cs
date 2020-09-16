@@ -71,8 +71,6 @@ namespace SpriteSorting
         //     }
         // }
 
-        private int test;
-
         private void OnGUI()
         {
             GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
@@ -218,10 +216,10 @@ namespace SpriteSorting
                 var transformChildCount = previewGameObject.transform.childCount;
                 for (int i = 0; i < transformChildCount; i++)
                 {
-                    var transform = previewGameObject.transform.GetChild(0);
-                    if (transform != null)
+                    var childTransform = previewGameObject.transform.GetChild(0);
+                    if (childTransform != null)
                     {
-                        DestroyImmediate(transform.gameObject);
+                        DestroyImmediate(childTransform.gameObject);
                     }
                 }
 
@@ -229,17 +227,26 @@ namespace SpriteSorting
                 previewGameObject = null;
             }
 
-            previewEditor = null;
+            if (previewEditor != null)
+            {
+                DestroyImmediate(previewEditor);
+            }
         }
 
         private void GeneratePreviewGameObject()
         {
-            previewGameObject = new GameObject();
+            previewGameObject = new GameObject
+            {
+                hideFlags = HideFlags.DontSave
+            };
             previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
 
             foreach (var overlappingItem in result.overlappingItems)
             {
-                var spriteGameObject = new GameObject(overlappingItem.originSpriteRenderer.name);
+                var spriteGameObject = new GameObject(overlappingItem.originSpriteRenderer.name)
+                {
+                    hideFlags = HideFlags.DontSave
+                };
                 ComponentUtility.CopyComponent(overlappingItem.originSpriteRenderer.transform);
                 ComponentUtility.PasteComponentValues(spriteGameObject.transform);
 
@@ -531,7 +538,6 @@ namespace SpriteSorting
             var tempItem = result.overlappingItems[currentIndex];
             result.overlappingItems.RemoveAt(currentIndex);
             result.overlappingItems.Insert(indexToSwitch, tempItem);
-            reordableSpriteSortingList.list = result.overlappingItems;
             Debug.Log("switch " + currentIndex + " with " + indexToSwitch);
             reordableSpriteSortingList.index = indexToSwitch;
 
