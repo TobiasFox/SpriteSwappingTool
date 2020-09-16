@@ -68,7 +68,7 @@ namespace SpriteSorting
 
             EditorGUIUtility.labelWidth = -1;
             if (GUI.Button(
-                new Rect(horizontalRect.x + rectHalfWidth, horizontalRect.y, rectHalfWidth,
+                new Rect(horizontalRect.x + rectHalfWidth, horizontalRect.y, rectHalfWidth - 2.5f,
                     EditorGUIUtility.singleLineHeight), "Reset rotation"))
             {
                 previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
@@ -78,12 +78,12 @@ namespace SpriteSorting
 
             EditorGUILayout.EndHorizontal();
 
+            var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
+            var previewRect = EditorGUILayout.GetControlRect(false, 256);
+            
             //hack for not seeing the previewGameObject in the scene view 
             previewGameObject.SetActive(true);
-            var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
-            var rect = new Rect(horizontalRect.x + 15, horizontalRect.y + (EditorGUIUtility.singleLineHeight * 1.3f),
-                currentEditorWidth - 17.5f, 256);
-            previewEditor.OnInteractivePreviewGUI(rect, bgColor);
+            previewEditor.OnInteractivePreviewGUI(previewRect, bgColor);
             previewGameObject.SetActive(false);
         }
 

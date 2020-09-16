@@ -9,6 +9,8 @@ namespace SpriteSorting
 {
     public class SpriteSortingEditorWindow : EditorWindow
     {
+        private Vector2 scrollPosition = Vector2.zero;
+        
         private bool ignoreAlphaOfSprites;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
@@ -22,6 +24,12 @@ namespace SpriteSorting
         private SpriteSortingAnalysisResult result;
         private bool analyzeButtonWasClicked;
         private ReorderableList reordableSpriteSortingList;
+        private bool hasChangedLayer;
+        private bool isAnalyzingWithChangedLayerFirst;
+
+        private ReorderableList reordableListForSortingGroup;
+        private List<ReordableSpriteSortingItem> itemsForSortingGroup;
+        private bool isCreatingNewSortingGroup;
 
         // private SerializedObject serializedResult;
         // private SpriteSortingReordableList reordableSO;
@@ -40,13 +48,22 @@ namespace SpriteSorting
         {
             // reordableSO = CreateInstance<SpriteSortingReordableList>();
             // serializedResult = new SerializedObject(reordableSO);
+            int i = 0;
         }
 
         private void OnEnable()
         {
-            if (analyzeButtonWasClicked && result.overlappingItems != null && result.overlappingItems.Count > 0)
+            if (analyzeButtonWasClicked)
             {
-                InitReordableList();
+                if (result.overlappingItems != null && result.overlappingItems.Count > 0)
+                {
+                    InitReordableList();
+                }
+
+                if (itemsForSortingGroup != null)
+                {
+                    InitReordableListForNewSortingGroup();
+                }
             }
 
             preview?.EnableSceneVisualization(true);
@@ -55,6 +72,8 @@ namespace SpriteSorting
 
         private void OnGUI()
         {
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+
             GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
             ignoreAlphaOfSprites = EditorGUILayout.Toggle("ignore Alpha Of Sprites", ignoreAlphaOfSprites);
             cameraProjectionType =
@@ -100,6 +119,7 @@ namespace SpriteSorting
 
             if (!analyzeButtonWasClicked)
             {
+                EndScrollRect();
                 return;
             }
 
@@ -111,6 +131,7 @@ namespace SpriteSorting
                 CleanUpReordableList();
 
                 // serializedResult = null;
+                EndScrollRect();
                 return;
             }
 
@@ -118,16 +139,52 @@ namespace SpriteSorting
             reordableSpriteSortingList.DoLayoutList();
             // serializedResult.ApplyModifiedProperties();
 
+            isCreatingNewSortingGroup =
+                EditorGUILayout.Foldout(isCreatingNewSortingGroup, "Create new Sorting Group?", true);
+
+            if (isCreatingNewSortingGroup)
+            {
+                EditorGUI.indentLevel++;
+                var rectForReordableList =
+                    EditorGUILayout.GetControlRect(false, reordableListForSortingGroup.GetHeight());
+                reordableListForSortingGroup.DoList(new Rect(rectForReordableList.x + 12.5f, rectForReordableList.y,
+                    rectForReordableList.width - 12.5f, rectForReordableList.height));
+
+                EditorGUI.indentLevel--;
+                EditorGUILayout.Space();
+            }
+            else
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.Space();
+            }
+
+            if (hasChangedLayer)
+            {
+                isAnalyzingWithChangedLayerFirst = EditorGUILayout.ToggleLeft(
+                    "Analyse Sprites / Sorting Groups with changed Layer first?", isAnalyzingWithChangedLayerFirst);
+            }
+
             if (GUILayout.Button("Confirm and continue searching"))
             {
                 Debug.Log("sort sprites");
                 analyzeButtonWasClicked = false;
                 result.overlappingItems = null;
                 preview?.CleanUpPreview();
+
+                //TODO: check isAnalyzingWithChangedLayerFirst
+                EndScrollRect();
                 return;
             }
 
             preview.DoPreview(isAnalyzedButtonClickedThisFrame, position.width);
+
+            EndScrollRect();
+        }
+
+        private void EndScrollRect()
+        {
+            EditorGUILayout.EndScrollView();
         }
 
         private void CleanUpReordableList()
@@ -141,7 +198,17 @@ namespace SpriteSorting
             reordableSpriteSortingList.drawElementCallback = null;
             reordableSpriteSortingList.onSelectCallback = null;
             reordableSpriteSortingList = null;
+
+            if (reordableListForSortingGroup == null)
+            {
+                return;
+            }
+
+            reordableListForSortingGroup.drawHeaderCallback = null;
+            reordableListForSortingGroup.drawElementCallback = null;
+            reordableListForSortingGroup = null;
         }
+
 
         private void ShowSortingLayers()
         {
@@ -235,12 +302,128 @@ namespace SpriteSorting
                 preview.UpdateOverlappingItems(result.overlappingItems);
             }
 
+            if (result.overlappingItems.Count > 2)
+            {
+                InitReordableListForNewSortingGroup();
+            }
+
             // reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
             // typeof(SpriteSortingReordableList.ReordableSpriteSortingItem), true, true, false, false);
 
             // reordableSO.reordableSpriteSortingItems = result.overlappingItems;
             // serializedResult = new SerializedObject(reordableSO);
             // Repaint();
+        }
+
+        private void InitReordableListForNewSortingGroup()
+        {
+            itemsForSortingGroup = new List<ReordableSpriteSortingItem>();
+            reordableListForSortingGroup = new ReorderableList(itemsForSortingGroup,
+                typeof(ReordableSpriteSortingItem), true, true, false, true)
+            {
+                drawHeaderCallback = DrawHeaderForNewSortingGroupCallback,
+                drawElementCallback = DrawElementForNewSortingGroupCallback
+            };
+        }
+
+        private void DrawElementForNewSortingGroupCallback(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            var element = itemsForSortingGroup[index];
+            bool isPreviewUpdating = false;
+            bool isCurrentIndexUpdated = false;
+            rect.y += 2;
+
+            EditorGUI.LabelField(new Rect(rect.x + 15, rect.y, 90, EditorGUIUtility.singleLineHeight),
+                element.originSpriteRenderer.name);
+
+            EditorGUIUtility.labelWidth = 35;
+            EditorGUI.BeginChangeCheck();
+            element.sortingLayer =
+                EditorGUI.Popup(new Rect(rect.x + 15 + 90 + 10, rect.y, 135, EditorGUIUtility.singleLineHeight),
+                    "Layer",
+                    element.sortingLayer, sortingLayerNames);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                element.tempSpriteRenderer.sortingLayerName = sortingLayerNames[element.sortingLayer];
+                // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
+                isPreviewUpdating = true;
+            }
+
+            //TODO: dynamic spacing depending on number of digits of sorting order
+            EditorGUIUtility.labelWidth = 70;
+
+            EditorGUI.BeginChangeCheck();
+            element.sortingOrder =
+                EditorGUI.DelayedIntField(
+                    new Rect(rect.x + 15 + 90 + 10 + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
+                    "Order " + element.originSortingOrder + " +", element.sortingOrder);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                // Debug.Log("new order to " + element.tempSpriteRenderer.sortingOrder);
+                isPreviewUpdating = true;
+                isCurrentIndexUpdated = UpdateSortingOrder(index, element);
+            }
+
+            if (GUI.Button(
+                new Rect(rect.x + 15 + 90 + 10 + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
+                "+1"))
+            {
+                element.sortingOrder++;
+                isPreviewUpdating = true;
+                isCurrentIndexUpdated = UpdateSortingOrder(index, element);
+            }
+
+            if (GUI.Button(
+                new Rect(rect.x + 15 + 90 + 10 + 135 + 10 + 120 + 10 + 25 + 10, rect.y, 25,
+                    EditorGUIUtility.singleLineHeight), "-1"))
+            {
+                element.sortingOrder--;
+                isPreviewUpdating = true;
+                isCurrentIndexUpdated = UpdateSortingOrder(index, element);
+            }
+
+            if (GUI.Button(
+                new Rect(rect.x + 15 + 90 + 10 + 135 + 10 + 120 + 10 + 25 + 10 + 25 + 10, rect.y, 55,
+                    EditorGUIUtility.singleLineHeight), "Select"))
+            {
+                Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
+                SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
+            }
+
+            if (isPreviewUpdating)
+            {
+                if (!isCurrentIndexUpdated)
+                {
+                    reordableSpriteSortingList.index = index;
+                }
+
+                OnSelectCallback(reordableSpriteSortingList);
+
+                preview.UpdatePreviewEditor();
+            }
+        }
+
+        private void DrawHeaderForNewSortingGroupCallback(Rect rect)
+        {
+            EditorGUI.LabelField(rect, "Items For new Sorting Group");
+
+            var hasElements = itemsForSortingGroup != null && itemsForSortingGroup.Count > 0;
+
+            if (!hasElements)
+            {
+                EditorGUI.BeginDisabledGroup(true);
+            }
+
+            if (GUI.Button(new Rect(rect.width - 53, rect.y, 80, EditorGUIUtility.singleLineHeight), "Remove All"))
+            {
+            }
+
+            if (!hasElements)
+            {
+                EditorGUI.EndDisabledGroup();
+            }
         }
 
         private void InitReordableList()
@@ -348,6 +531,8 @@ namespace SpriteSorting
                 element.tempSpriteRenderer.sortingLayerName = sortingLayerNames[element.sortingLayer];
                 // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
+
+                CheckChangedLayers();
             }
 
             //TODO: dynamic spacing depending on number of digits of sorting order
@@ -403,6 +588,22 @@ namespace SpriteSorting
 
                 preview.UpdatePreviewEditor();
             }
+        }
+
+        private void CheckChangedLayers()
+        {
+            foreach (var item in result.overlappingItems)
+            {
+                if (item.originSortingLayer == SortingLayer.NameToID(sortingLayerNames[item.sortingLayer]))
+                {
+                    continue;
+                }
+
+                hasChangedLayer = true;
+                return;
+            }
+
+            hasChangedLayer = false;
         }
 
         private bool UpdateSortingOrder(int currentIndex, ReordableSpriteSortingItem element)
