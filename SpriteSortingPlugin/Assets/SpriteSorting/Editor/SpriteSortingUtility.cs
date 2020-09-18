@@ -28,7 +28,7 @@ namespace SpriteSorting
             foreach (var filteredSpriteRenderer in filteredSpriteRenderers)
             {
                 if (CheckOverlappingSprites(data.cameraProjectionType, filteredSpriteRenderers, filteredSpriteRenderer,
-                    out List<ReordableSpriteSortingItem> overlappingSprites))
+                    out List<OverlappingItem> overlappingSprites))
                 {
                     result.overlappingItems = overlappingSprites;
                     break;
@@ -40,9 +40,9 @@ namespace SpriteSorting
 
         private static bool CheckOverlappingSprites(CameraProjectionType cameraProjectionType,
             List<SpriteRenderer> filteredSpriteRenderers, SpriteRenderer spriteRendererToCheck,
-            out List<ReordableSpriteSortingItem> overlappingSprites)
+            out List<OverlappingItem> overlappingSprites)
         {
-            overlappingSprites = new List<ReordableSpriteSortingItem>();
+            overlappingSprites = new List<OverlappingItem>();
             Debug.Log("start search in " + filteredSpriteRenderers.Count + " sprite renderers for an overlap with " +
                       spriteRendererToCheck.name);
             foreach (var filteredSpriteRenderer in filteredSpriteRenderers)
@@ -62,7 +62,7 @@ namespace SpriteSorting
                 }
 
                 overlappingSprites.Add(
-                    new ReordableSpriteSortingItem(filteredSpriteRenderer));
+                    new OverlappingItem(filteredSpriteRenderer));
             }
 
             if (overlappingSprites.Count <= 0)
@@ -70,7 +70,7 @@ namespace SpriteSorting
                 return false;
             }
 
-            overlappingSprites.Add(new ReordableSpriteSortingItem(spriteRendererToCheck));
+            overlappingSprites.Add(new OverlappingItem(spriteRendererToCheck));
             Debug.Log("found overlapping with " + overlappingSprites.Count + " sprites");
             return true;
         }

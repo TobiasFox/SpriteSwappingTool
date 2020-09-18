@@ -16,15 +16,15 @@ namespace SpriteSorting
         private Editor previewEditor;
         private bool isVisualizingBoundsInScene;
         private bool isSceneVisualizingDelegateIsAdded;
-        private List<ReordableSpriteSortingItem> overlappingItems;
+        private List<OverlappingItem> overlappingItems;
         private bool isShowingAllSpritesOfSortingGroups;
 
-        public SpriteSortingEditorPreview(List<ReordableSpriteSortingItem> overlappingItems)
+        public SpriteSortingEditorPreview(List<OverlappingItem> overlappingItems)
         {
             this.overlappingItems = overlappingItems;
         }
 
-        public void UpdateOverlappingItems(List<ReordableSpriteSortingItem> overlappingItems)
+        public void UpdateOverlappingItems(List<OverlappingItem> overlappingItems)
         {
             this.overlappingItems = overlappingItems;
         }
@@ -108,15 +108,15 @@ namespace SpriteSorting
                 {
                     ComponentUtility.CopyComponent(overlappingItem.originSpriteRenderer);
                     ComponentUtility.PasteComponentAsNew(spriteGameObject);
-                    overlappingItem.tempSpriteRenderer = spriteGameObject.GetComponent<SpriteRenderer>();
-                    overlappingItem.tempSpriteRenderer.sortingOrder = overlappingItem.sortingOrder;
+                    overlappingItem.previewSpriteRenderer = spriteGameObject.GetComponent<SpriteRenderer>();
+                    overlappingItem.previewSpriteRenderer.sortingOrder = overlappingItem.sortingOrder;
                 }
 
                 if (overlappingItem.originSortingGroup != null)
                 {
                     ComponentUtility.CopyComponent(overlappingItem.originSortingGroup);
                     ComponentUtility.PasteComponentAsNew(spriteGameObject);
-                    overlappingItem.tempSortingGroup = spriteGameObject.GetComponent<SortingGroup>();
+                    overlappingItem.previewSortingGroup = spriteGameObject.GetComponent<SortingGroup>();
                 }
 
                 spriteGameObject.transform.SetParent(previewGameObject.transform);

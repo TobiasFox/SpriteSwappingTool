@@ -5,6 +5,6 @@ namespace SpriteSorting
 {
     public class SpriteSortingReordableList : ScriptableObject
     {
-        public List<ReordableSpriteSortingItem> reordableSpriteSortingItems = new List<ReordableSpriteSortingItem>();
+        public List<OverlappingItem> reordableSpriteSortingItems = new List<OverlappingItem>();
     }
 }

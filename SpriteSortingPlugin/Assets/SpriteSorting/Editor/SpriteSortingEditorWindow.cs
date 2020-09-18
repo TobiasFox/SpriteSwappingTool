@@ -10,7 +10,7 @@ namespace SpriteSorting
     public class SpriteSortingEditorWindow : EditorWindow
     {
         private Vector2 scrollPosition = Vector2.zero;
-        
+
         private bool ignoreAlphaOfSprites;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
@@ -28,7 +28,7 @@ namespace SpriteSorting
         private bool isAnalyzingWithChangedLayerFirst;
 
         private ReorderableList reordableListForSortingGroup;
-        private List<ReordableSpriteSortingItem> itemsForSortingGroup;
+        private List<OverlappingItem> itemsForSortingGroup;
         private bool isCreatingNewSortingGroup;
 
         private SpriteSortingEditorPreview preview;
@@ -302,9 +302,9 @@ namespace SpriteSorting
 
         private void InitReordableListForNewSortingGroup()
         {
-            itemsForSortingGroup = new List<ReordableSpriteSortingItem>();
+            itemsForSortingGroup = new List<OverlappingItem>();
             reordableListForSortingGroup = new ReorderableList(itemsForSortingGroup,
-                typeof(ReordableSpriteSortingItem), true, true, false, true)
+                typeof(OverlappingItem), true, true, false, true)
             {
                 drawHeaderCallback = DrawHeaderForNewSortingGroupCallback,
                 drawElementCallback = DrawElementForNewSortingGroupCallback
@@ -330,7 +330,7 @@ namespace SpriteSorting
 
             if (EditorGUI.EndChangeCheck())
             {
-                element.tempSpriteRenderer.sortingLayerName = sortingLayerNames[element.sortingLayer];
+                element.UpdatePreviewSortingLayer(sortingLayerNames[element.sortingLayer]);
                 // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
             }
@@ -414,7 +414,7 @@ namespace SpriteSorting
         private void InitReordableList()
         {
             reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
-                typeof(ReordableSpriteSortingItem), true, true, false, false)
+                typeof(OverlappingItem), true, true, false, false)
             {
                 drawHeaderCallback = DrawHeaderCallback,
                 drawElementCallback = DrawElementCallback,
@@ -469,19 +469,8 @@ namespace SpriteSorting
 
                 overlappingItem.sortingOrder = result.overlappingItems.Count - (i + 1);
 
-                if (overlappingItem.tempSpriteRenderer != null)
-                {
-                    overlappingItem.tempSpriteRenderer.sortingOrder = overlappingItem.sortingOrder;
-                    overlappingItem.tempSpriteRenderer.sortingLayerID =
-                        overlappingItem.originSpriteRenderer.sortingLayerID;
-                }
-
-                if (overlappingItem.tempSortingGroup != null)
-                {
-                    overlappingItem.tempSortingGroup.sortingOrder = overlappingItem.sortingOrder;
-                    overlappingItem.tempSpriteRenderer.sortingLayerID =
-                        overlappingItem.originSortingGroup.sortingLayerID;
-                }
+                overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
+                overlappingItem.UpdatePreviewSortingLayer(sortingLayerNames[overlappingItem.sortingLayer]);
             }
         }
 
@@ -490,7 +479,7 @@ namespace SpriteSorting
             // Debug.Log("on select");
             for (var i = 0; i < list.count; i++)
             {
-                var item = (ReordableSpriteSortingItem) list.list[i];
+                var item = (OverlappingItem) list.list[i];
                 item.IsItemSelected = i == list.index;
             }
         }
@@ -513,7 +502,7 @@ namespace SpriteSorting
 
             if (EditorGUI.EndChangeCheck())
             {
-                element.tempSpriteRenderer.sortingLayerName = sortingLayerNames[element.sortingLayer];
+                element.previewSpriteRenderer.sortingLayerName = sortingLayerNames[element.sortingLayer];
                 // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
 
@@ -591,14 +580,14 @@ namespace SpriteSorting
             hasChangedLayer = false;
         }
 
-        private bool UpdateSortingOrder(int currentIndex, ReordableSpriteSortingItem element)
+        private bool UpdateSortingOrder(int currentIndex, OverlappingItem element)
         {
             if (currentIndex < 0 || element == null)
             {
                 return false;
             }
 
-            element.tempSpriteRenderer.sortingOrder = element.originSortingOrder + element.sortingOrder;
+            element.UpdatePreviewSortingOrderWithExistingOrder();
 
             var indexToSwitch = GetIndexToSwitch(currentIndex);
             if (indexToSwitch < 0)
@@ -674,7 +663,7 @@ namespace SpriteSorting
 
                 InitOverlappingItems(true);
 
-                reordableSpriteSortingList.list = result.overlappingItems;
+                preview.UpdatePreviewEditor();
                 Repaint();
             }
         }
