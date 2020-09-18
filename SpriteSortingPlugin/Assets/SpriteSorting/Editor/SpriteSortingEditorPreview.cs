@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace SpriteSorting
@@ -95,32 +93,7 @@ namespace SpriteSorting
 
             foreach (var overlappingItem in overlappingItems)
             {
-                var spriteGameObject = new GameObject(overlappingItem.originSpriteRenderer.name)
-                {
-                    hideFlags = HideFlags.DontSave
-                };
-                ComponentUtility.CopyComponent(overlappingItem.originSpriteRenderer.transform);
-                ComponentUtility.PasteComponentValues(spriteGameObject.transform);
-
-                //TODO: conside SortingOrder and SpriteRenderer components
-
-                if (overlappingItem.originSpriteRenderer != null)
-                {
-                    ComponentUtility.CopyComponent(overlappingItem.originSpriteRenderer);
-                    ComponentUtility.PasteComponentAsNew(spriteGameObject);
-                    overlappingItem.previewSpriteRenderer = spriteGameObject.GetComponent<SpriteRenderer>();
-                    overlappingItem.previewSpriteRenderer.sortingOrder = overlappingItem.sortingOrder;
-                }
-
-                if (overlappingItem.originSortingGroup != null)
-                {
-                    ComponentUtility.CopyComponent(overlappingItem.originSortingGroup);
-                    ComponentUtility.PasteComponentAsNew(spriteGameObject);
-                    overlappingItem.previewSortingGroup = spriteGameObject.GetComponent<SortingGroup>();
-                }
-
-                spriteGameObject.transform.SetParent(previewGameObject.transform);
-                spriteGameObject.hideFlags = HideFlags.HideAndDontSave;
+                overlappingItem.GeneratePreview(previewGameObject.transform);
             }
 
             previewGameObject.hideFlags = HideFlags.HideAndDontSave;
@@ -183,14 +156,9 @@ namespace SpriteSorting
         {
             if (previewGameObject != null)
             {
-                var transformChildCount = previewGameObject.transform.childCount;
-                for (int i = 0; i < transformChildCount; i++)
+                foreach (var overlappingItem in overlappingItems)
                 {
-                    var childTransform = previewGameObject.transform.GetChild(0);
-                    if (childTransform != null)
-                    {
-                        Object.DestroyImmediate(childTransform.gameObject);
-                    }
+                    overlappingItem.CleanUpPreview();
                 }
 
                 Object.DestroyImmediate(previewGameObject);

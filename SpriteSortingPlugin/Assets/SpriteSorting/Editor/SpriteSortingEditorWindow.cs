@@ -118,7 +118,8 @@ namespace SpriteSorting
                 return;
             }
 
-            if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
+            if (result.overlappingItems == null || (result.overlappingItems.Count <= 0 && itemsForSortingGroup == null))
+                // if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
             {
                 GUILayout.Label(
                     "No sorting order issues with overlapping sprites were found in the currently loaded scenes.",
@@ -502,7 +503,7 @@ namespace SpriteSorting
 
             if (EditorGUI.EndChangeCheck())
             {
-                element.previewSpriteRenderer.sortingLayerName = sortingLayerNames[element.sortingLayer];
+                element.UpdatePreviewSortingLayer(sortingLayerNames[element.sortingLayer]);
                 // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
 
