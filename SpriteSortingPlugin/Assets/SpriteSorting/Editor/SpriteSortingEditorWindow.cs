@@ -31,9 +31,6 @@ namespace SpriteSorting
         private List<ReordableSpriteSortingItem> itemsForSortingGroup;
         private bool isCreatingNewSortingGroup;
 
-        // private SerializedObject serializedResult;
-        // private SpriteSortingReordableList reordableSO;
-
         private SpriteSortingEditorPreview preview;
 
         [MenuItem("Window/Sprite Sorting %q")]
@@ -46,8 +43,6 @@ namespace SpriteSorting
 
         private void Init()
         {
-            // reordableSO = CreateInstance<SpriteSortingReordableList>();
-            // serializedResult = new SerializedObject(reordableSO);
             int i = 0;
         }
 
@@ -130,14 +125,11 @@ namespace SpriteSorting
                     EditorStyles.boldLabel);
                 CleanUpReordableList();
 
-                // serializedResult = null;
                 EndScrollRect();
                 return;
             }
 
-            // serializedResult.Update();
             reordableSpriteSortingList.DoLayoutList();
-            // serializedResult.ApplyModifiedProperties();
 
             isCreatingNewSortingGroup =
                 EditorGUILayout.Foldout(isCreatingNewSortingGroup, "Create new Sorting Group?", true);
@@ -306,13 +298,6 @@ namespace SpriteSorting
             {
                 InitReordableListForNewSortingGroup();
             }
-
-            // reordableSpriteSortingList = new ReorderableList(result.overlappingItems,
-            // typeof(SpriteSortingReordableList.ReordableSpriteSortingItem), true, true, false, false);
-
-            // reordableSO.reordableSpriteSortingItems = result.overlappingItems;
-            // serializedResult = new SerializedObject(reordableSO);
-            // Repaint();
         }
 
         private void InitReordableListForNewSortingGroup()

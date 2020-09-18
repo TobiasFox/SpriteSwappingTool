@@ -17,6 +17,7 @@ namespace SpriteSorting
         private bool isVisualizingBoundsInScene;
         private bool isSceneVisualizingDelegateIsAdded;
         private List<ReordableSpriteSortingItem> overlappingItems;
+        private bool isShowingAllSpritesOfSortingGroups;
 
         public SpriteSortingEditorPreview(List<ReordableSpriteSortingItem> overlappingItems)
         {
@@ -55,16 +56,13 @@ namespace SpriteSorting
             var horizontalRect = EditorGUILayout.BeginHorizontal();
             EditorGUI.indentLevel++;
 
-            EditorGUIUtility.labelWidth = 180;
             EditorGUI.BeginChangeCheck();
             isVisualizingBoundsInScene =
-                EditorGUILayout.Toggle("Visualize Bounds in Scene ", isVisualizingBoundsInScene);
+                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene ", isVisualizingBoundsInScene);
             if (EditorGUI.EndChangeCheck())
             {
                 EnableSceneVisualization(isVisualizingBoundsInScene);
             }
-
-            EditorGUIUtility.labelWidth = -1;
 
             if (GUILayout.Button("Reset rotation"))
             {
@@ -75,6 +73,9 @@ namespace SpriteSorting
 
             EditorGUILayout.EndHorizontal();
 
+            isShowingAllSpritesOfSortingGroups = EditorGUILayout.ToggleLeft("Show all Sprites Of Sorting Groups",
+                isShowingAllSpritesOfSortingGroups);
+            
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
             var previewRect = EditorGUILayout.GetControlRect(false, 256 + horizontalRect.height);
 
