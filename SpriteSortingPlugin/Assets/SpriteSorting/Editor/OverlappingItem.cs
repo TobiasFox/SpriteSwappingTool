@@ -115,7 +115,7 @@ namespace SpriteSorting
 
         public void CleanUpPreview()
         {
-            Object.DestroyImmediate(originSpriteRenderer.gameObject);
+            Object.DestroyImmediate(previewSpriteRenderer.gameObject);
         }
     }
 }
