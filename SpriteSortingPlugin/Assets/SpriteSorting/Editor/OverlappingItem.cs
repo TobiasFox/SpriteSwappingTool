@@ -15,7 +15,9 @@ namespace SpriteSorting
         public int originSortingLayer;
 
         public SpriteRenderer previewSpriteRenderer;
+
         public SortingGroup previewSortingGroup;
+
         // public GameObject sortingGroupChildren;
         public int sortingOrder;
         public int sortingLayer;
@@ -70,8 +72,15 @@ namespace SpriteSorting
             {
                 hideFlags = HideFlags.DontSave
             };
-            ComponentUtility.CopyComponent(originSpriteRenderer.transform);
-            ComponentUtility.PasteComponentValues(spriteGameObject.transform);
+
+            var spriteRendererTransform = originSpriteRenderer.transform;
+            spriteGameObject.transform.position = spriteRendererTransform.position;
+            spriteGameObject.transform.rotation = spriteRendererTransform.rotation;
+            spriteGameObject.transform.localScale = spriteRendererTransform.lossyScale;
+
+            //TODO: check transform, position may be changed due to gameobject between sorting group and spriterenderer
+            // ComponentUtility.CopyComponent(originSpriteRenderer.transform);
+            // ComponentUtility.PasteComponentValues(spriteGameObject.transform);
 
             if (originSpriteRenderer != null)
             {
@@ -115,7 +124,10 @@ namespace SpriteSorting
 
         public void CleanUpPreview()
         {
-            Object.DestroyImmediate(previewSpriteRenderer.gameObject);
+            if (previewSpriteRenderer != null)
+            {
+                Object.DestroyImmediate(previewSpriteRenderer.gameObject);
+            }
         }
     }
 }
