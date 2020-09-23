@@ -16,21 +16,51 @@ namespace SpriteSorting
 
             //TODO: consider prefab scene
             var spriteRenderers = Object.FindObjectsOfType<SpriteRenderer>();
-
-            var sortingGroupParents = new Dictionary<int, SortingGroup[]>();
-            foreach (var spriteRenderer in spriteRenderers)
+            if (spriteRenderers.Length < 2)
             {
-                var sortingGroups = spriteRenderer.GetComponentsInParent<SortingGroup>();
-                if (sortingGroups.Length > 0)
-                {
-                    sortingGroupParents.Add(spriteRenderer.GetInstanceID(), sortingGroups);
-                }
+                return result;
             }
 
-            foreach (var spriteRendererToCheck in spriteRenderers)
+            var filteredSortingComponents = new List<SortingComponent>();
+            
+            foreach (var spriteRenderer in spriteRenderers)
             {
-                if (CheckOverlappingSprites(data, spriteRenderers, sortingGroupParents, spriteRendererToCheck,
-                    out List<OverlappingItem> overlappingSprites))
+                if (!spriteRenderer.enabled)
+                {
+                    continue;
+                }
+
+                var sortingGroupArray = spriteRenderer.GetComponentsInParent<SortingGroup>();
+                var sortingGroups = FilterSortingGroups(sortingGroupArray);
+
+                if (sortingGroups.Count <= 0)
+                {
+                    if (!data.selectedLayers.Contains(spriteRenderer.sortingLayerID))
+                    {
+                        continue;
+                    }
+
+                    filteredSortingComponents.Add(new SortingComponent(spriteRenderer));
+                    continue;
+                }
+
+                var outmostSortingGroup = sortingGroups[sortingGroups.Count - 1];
+                if (!data.selectedLayers.Contains(outmostSortingGroup.sortingLayerID))
+                {
+                    continue;
+                }
+
+                filteredSortingComponents.Add(new SortingComponent(spriteRenderer, outmostSortingGroup));
+            }
+
+            Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Length +
+                      " to " + filteredSortingComponents.Count);
+
+            //TODO: optimize foreach
+            foreach (var sortingComponent in filteredSortingComponents)
+            {
+                if (CheckOverlappingSprites(data, filteredSortingComponents, sortingComponent,
+                    out var overlappingSprites))
                 {
                     result.overlappingItems = overlappingSprites;
                     break;
@@ -41,188 +71,74 @@ namespace SpriteSorting
         }
 
         private static bool CheckOverlappingSprites(SpriteSortingData data,
-            SpriteRenderer[] allSpriteRenderers, Dictionary<int, SortingGroup[]> sortingGroupParents,
-            SpriteRenderer spriteRendererToCheck, out List<OverlappingItem> overlappingSprites)
+            IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
+            out List<OverlappingItem> overlappingComponents)
         {
-            overlappingSprites = new List<OverlappingItem>();
-            Debug.Log("start search in " + allSpriteRenderers.Length + " sprite renderers for an overlap with " +
-                      spriteRendererToCheck.name);
+            overlappingComponents = new List<OverlappingItem>();
+            Debug.Log("start search in " + filteredSortingComponents.Count + " sprite renderers for an overlap with " +
+                      sortingComponentToCheck.spriteRenderer.name);
 
-            var sortingLayerToCheck = spriteRendererToCheck.sortingLayerID;
-            var sortingOrderToCheck = spriteRendererToCheck.sortingOrder;
-
-            var spriteRendererToCheckHasSortingGroup = sortingGroupParents.TryGetValue(
-                spriteRendererToCheck.GetInstanceID(), out var sortingGroupsOfSpriteRendererToCheck);
-            if (spriteRendererToCheckHasSortingGroup)
+            foreach (var sortingComponent in filteredSortingComponents)
             {
-                var outMostSortingGroup =
-                    sortingGroupsOfSpriteRendererToCheck[sortingGroupsOfSpriteRendererToCheck.Length - 1];
-                sortingLayerToCheck = outMostSortingGroup.sortingLayerID;
-                sortingOrderToCheck = outMostSortingGroup.sortingOrder;
-            }
+                if (sortingComponentToCheck.Equals(sortingComponent))
+                {
+                    continue;
+                }
+                
+                if (sortingComponentToCheck.sortingGroup != null && sortingComponent.sortingGroup != null &&
+                    sortingComponentToCheck.sortingGroup == sortingComponent.sortingGroup)
+                {
+                    continue;
+                }
 
-            if (!data.selectedLayers.Contains(sortingLayerToCheck))
-            {
-                return false;
-            }
-
-            foreach (var spriteRenderer in allSpriteRenderers)
-            {
-                if (spriteRenderer == spriteRendererToCheck ||
-                    !spriteRenderer.bounds.Intersects(spriteRendererToCheck.bounds))
+                if (!sortingComponent.spriteRenderer.bounds.Intersects(sortingComponentToCheck.spriteRenderer.bounds))
                 {
                     continue;
                 }
 
                 //TODO: is z the distance to the camera? if not maybe create something to choose for the user
                 if (data.cameraProjectionType == CameraProjectionType.Orthogonal &&
-                    Math.Abs(spriteRenderer.transform.position.z - spriteRendererToCheck.transform.position.z) >
+                    Math.Abs(sortingComponent.spriteRenderer.transform.position.z -
+                             sortingComponentToCheck.spriteRenderer.transform.position.z) >
                     Tolerance)
                 {
                     continue;
                 }
 
-                var currentSortingLayer = spriteRenderer.sortingLayerID;
-                var currentSortingOrder = spriteRenderer.sortingOrder;
-                var spriteRendererHasSortingGroup =
-                    sortingGroupParents.TryGetValue(spriteRenderer.GetInstanceID(), out var sortingGroups);
-
-                if (spriteRendererToCheckHasSortingGroup && spriteRendererHasSortingGroup)
-                {
-                    // both have sorting groups, check them
-                    // SortingGroup sortingGroupSpriteRendererToCheck;
-                    // SortingGroup sortingGroupSpriteRenderer;
-
-                    var indices =
-                        GetIndicesOfFirstDifferenceInSortingGroups(sortingGroupsOfSpriteRendererToCheck, sortingGroups);
-                    var sortingLayerOfFirstDifferenceInSortingGroup = spriteRendererToCheck.sortingLayerID;
-                    var sortingOrderOfFirstDifferenceInSortingGroup = spriteRendererToCheck.sortingOrder;
-
-                    if (indices[0] >= 0)
-                    {
-                        var sortingGroupSpriteRendererToCheck = sortingGroupsOfSpriteRendererToCheck[indices[0]];
-
-                        sortingLayerOfFirstDifferenceInSortingGroup = sortingGroupSpriteRendererToCheck.sortingLayerID;
-                        sortingOrderOfFirstDifferenceInSortingGroup = sortingGroupSpriteRendererToCheck.sortingOrder;
-                    }
-
-                    if (indices[1] >= 0)
-                    {
-                        var sortingGroupSpriteRenderer = sortingGroups[indices[1]];
-
-                        currentSortingLayer = sortingGroupSpriteRenderer.sortingLayerID;
-                        currentSortingOrder = sortingGroupSpriteRenderer.sortingOrder;
-                    }
-
-                    if (currentSortingLayer != sortingLayerOfFirstDifferenceInSortingGroup ||
-                        currentSortingOrder != sortingOrderOfFirstDifferenceInSortingGroup)
-                    {
-                        continue;
-                    }
-
-                    overlappingSprites.Add(new OverlappingItem(spriteRenderer));
-
-
-                    // filteredSpriteRenderer.sortingOrder != spriteRendererToCheck.sortingOrder
-                    // data.selectedLayers.
-                    // if (sortingGroup != null && sortingGroup.sortingLayerID != spriteRendererToCheck.sortingLayerID &&
-                    //     sortingGroup.sortingOrder != spriteRendererToCheck.sortingOrder)
-                    continue;
-                }
-
-                if (spriteRendererHasSortingGroup)
-                {
-                    var outMostSortingGroup = sortingGroups[sortingGroups.Length - 1];
-                    currentSortingLayer = outMostSortingGroup.sortingLayerID;
-                    currentSortingOrder = outMostSortingGroup.sortingOrder;
-                }
-
-                if ( /*!data.selectedLayers.Contains(currentSortingLayer) ||*/
-                    currentSortingLayer != sortingLayerToCheck ||
-                    currentSortingOrder != sortingOrderToCheck)
+                if (sortingComponentToCheck.CurrentSortingLayer != sortingComponent.CurrentSortingLayer ||
+                    sortingComponentToCheck.CurrentSortingOrder != sortingComponent.CurrentSortingOrder)
                 {
                     continue;
                 }
 
-                overlappingSprites.Add(new OverlappingItem(spriteRenderer));
+                overlappingComponents.Add(new OverlappingItem(sortingComponent.spriteRenderer));
             }
 
-            if (overlappingSprites.Count <= 0)
+            if (overlappingComponents.Count <= 0)
             {
                 return false;
             }
 
-            overlappingSprites.Add(new OverlappingItem(spriteRendererToCheck));
-            Debug.Log("found overlapping with " + overlappingSprites.Count + " sprites");
+            overlappingComponents.Add(new OverlappingItem(sortingComponentToCheck.spriteRenderer));
+            Debug.Log("found overlapping with " + overlappingComponents.Count + " sprites");
             return true;
         }
 
-        private static int[] GetIndicesOfFirstDifferenceInSortingGroups(
-            IReadOnlyList<SortingGroup> sortingGroupsOfSpriteRendererToCheck,
-            IReadOnlyList<SortingGroup> sortingGroups)
+        private static List<SortingGroup> FilterSortingGroups(SortingGroup[] groups)
         {
-            int maxLength = sortingGroups.Count > sortingGroupsOfSpriteRendererToCheck.Count
-                ? sortingGroups.Count - 1
-                : sortingGroupsOfSpriteRendererToCheck.Count - 1;
+            var list = new List<SortingGroup>();
 
-            int lastIndexSpriteRendererToCheck = sortingGroupsOfSpriteRendererToCheck.Count - 1;
-            int lastIndexSpriteRenderer = sortingGroups.Count - 1;
-
-            for (int i = maxLength; i >= 0; i--)
+            foreach (var sortingGroup in groups)
             {
-                var sortingGroupSpriteRendererToCheck = i < sortingGroupsOfSpriteRendererToCheck.Count
-                    ? sortingGroupsOfSpriteRendererToCheck[i]
-                    : null;
-                var sortingGroupSpriteRenderer = i < sortingGroups.Count ? sortingGroups[i] : null;
-
-                if (sortingGroupSpriteRendererToCheck != null && sortingGroupSpriteRenderer != null)
+                if (!sortingGroup.enabled)
                 {
-                    if (sortingGroupSpriteRendererToCheck == sortingGroupSpriteRenderer)
-                    {
-                        lastIndexSpriteRendererToCheck--;
-                        lastIndexSpriteRenderer--;
-                        continue;
-                    }
-
-                    // if (i > 0 &&
-                    //     sortingGroupSpriteRendererToCheck.sortingLayerID == sortingGroupSpriteRenderer.sortingLayerID &&
-                    //     sortingGroupSpriteRendererToCheck.sortingOrder == sortingGroupSpriteRenderer.sortingOrder)
-                    // {
-                    //     lastIndexSpriteRendererToCheck--;
-                    //     lastIndexSpriteRenderer--;
-                    //     continue;
-                    // }
-
-                    return new int[] {lastIndexSpriteRendererToCheck, lastIndexSpriteRenderer};
+                    continue;
                 }
 
-                if (sortingGroupSpriteRendererToCheck == null)
-                {
-                    lastIndexSpriteRendererToCheck--;
-                    return new int[] {lastIndexSpriteRendererToCheck, lastIndexSpriteRenderer};
-                }
-
-                lastIndexSpriteRenderer--;
-                return new int[] {lastIndexSpriteRendererToCheck, lastIndexSpriteRenderer};
+                list.Add(sortingGroup);
             }
 
-            return new int[] {lastIndexSpriteRendererToCheck, lastIndexSpriteRenderer};
+            return list;
         }
-
-        // int i = sortingGroupsOfSpriteRendererToCheck.Length - 1, j = sortingGroups.Length - 1;
-        // for (;
-        //     i >= 0 && j >= 0;
-        //     i--, j--)
-        // {
-        //     var sortingGroupSpriteRendererToCheck = sortingGroupsOfSpriteRendererToCheck[i];
-        //     var sortingGroupSpriteRenderer = sortingGroups[j];
-        //
-        //     if (sortingGroupSpriteRendererToCheck == sortingGroupSpriteRenderer)
-        //     {
-        //         continue;
-        //     }
-        //
-        //     break;
-        // }
     }
 }
