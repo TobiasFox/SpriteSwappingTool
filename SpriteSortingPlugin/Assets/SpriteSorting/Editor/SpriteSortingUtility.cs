@@ -22,7 +22,7 @@ namespace SpriteSorting
             }
 
             var filteredSortingComponents = new List<SortingComponent>();
-            
+
             foreach (var spriteRenderer in spriteRenderers)
             {
                 if (!spriteRenderer.enabled)
@@ -84,7 +84,7 @@ namespace SpriteSorting
                 {
                     continue;
                 }
-                
+
                 if (sortingComponentToCheck.sortingGroup != null && sortingComponent.sortingGroup != null &&
                     sortingComponentToCheck.sortingGroup == sortingComponent.sortingGroup)
                 {
@@ -111,7 +111,7 @@ namespace SpriteSorting
                     continue;
                 }
 
-                overlappingComponents.Add(new OverlappingItem(sortingComponent.spriteRenderer));
+                overlappingComponents.Add(new OverlappingItem(sortingComponent));
             }
 
             if (overlappingComponents.Count <= 0)
@@ -119,7 +119,7 @@ namespace SpriteSorting
                 return false;
             }
 
-            overlappingComponents.Add(new OverlappingItem(sortingComponentToCheck.spriteRenderer));
+            overlappingComponents.Add(new OverlappingItem(sortingComponentToCheck));
             Debug.Log("found overlapping with " + overlappingComponents.Count + " sprites");
             return true;
         }

@@ -41,6 +41,23 @@ namespace SpriteSorting
                 originSortingOrder = originSpriteRenderer.sortingOrder;
             }
         }
+        
+        public OverlappingItem(SortingComponent sortingComponent)
+        {
+            originSpriteRenderer = sortingComponent.spriteRenderer;
+            originSortingGroup = sortingComponent.sortingGroup;
+
+            if (originSortingGroup != null)
+            {
+                originSortingLayer = originSortingGroup.sortingLayerID;
+                originSortingOrder = originSortingGroup.sortingOrder;
+            }
+            else
+            {
+                originSortingLayer = originSpriteRenderer.sortingLayerID;
+                originSortingOrder = originSpriteRenderer.sortingOrder;
+            }
+        }
 
         public void UpdatePreviewSortingOrderWithExistingOrder()
         {

@@ -9,6 +9,8 @@ namespace SpriteSorting
 {
     public class SpriteSortingEditorWindow : EditorWindow
     {
+        private const float LineSpacing = 1.5f;
+        
         private Vector2 scrollPosition = Vector2.zero;
 
         private bool ignoreAlphaOfSprites;
@@ -262,6 +264,7 @@ namespace SpriteSorting
 
             for (int i = 0; i < sortingLayerNames.Length; i++)
             {
+                //bitmask moving check if bit is set
                 var layer = 1 << i;
                 if ((selectedSortingLayers & layer) != 0)
                 {
@@ -419,7 +422,8 @@ namespace SpriteSorting
             {
                 drawHeaderCallback = DrawHeaderCallback,
                 drawElementCallback = DrawElementCallback,
-                onSelectCallback = OnSelectCallback
+                onSelectCallback = OnSelectCallback,
+                elementHeightCallback = ElementHeightCallback
             };
 
             // reordableSpriteSortingList.onMouseUpCallback = (ReorderableList list) =>
@@ -485,6 +489,17 @@ namespace SpriteSorting
             }
         }
 
+        private float ElementHeightCallback(int index)
+        {
+            var element = result.overlappingItems[index];
+            if (element.originSortingGroup == null)
+            {
+                return EditorGUIUtility.singleLineHeight * 2 + LineSpacing + LineSpacing * 3;
+            }
+
+            return EditorGUIUtility.singleLineHeight * 3 + 2 * LineSpacing + LineSpacing * 3;
+        }
+
         private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
             var element = result.overlappingItems[index];
@@ -493,12 +508,41 @@ namespace SpriteSorting
             rect.y += 2;
 
             EditorGUI.LabelField(new Rect(rect.x, rect.y, 90, EditorGUIUtility.singleLineHeight),
-                element.originSpriteRenderer.name);
+                "\"" + element.originSpriteRenderer.name + "\"");
+
+            if (GUI.Button(
+                new Rect(rect.width - 28, rect.y, 55,
+                    EditorGUIUtility.singleLineHeight), "Select"))
+            {
+                Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
+                SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
+            }
+
+            if (element.originSortingGroup != null)
+            {
+                rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, 140, EditorGUIUtility.singleLineHeight),
+                    "in outmost Sorting Group");
+
+                EditorGUI.LabelField(
+                    new Rect(rect.x + 140 + 2.5f, rect.y, 120, EditorGUIUtility.singleLineHeight),
+                    "\"" + element.originSortingGroup.name + "\"");
+
+                if (GUI.Button(
+                    new Rect(rect.width - 56, rect.y, 83,
+                        EditorGUIUtility.singleLineHeight), "Select Group"))
+                {
+                    Selection.objects = new Object[] {element.originSortingGroup.gameObject};
+                    SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
+                }
+            }
+
+            rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
 
             EditorGUIUtility.labelWidth = 35;
             EditorGUI.BeginChangeCheck();
             element.sortingLayer =
-                EditorGUI.Popup(new Rect(rect.x + 90 + 10, rect.y, 135, EditorGUIUtility.singleLineHeight), "Layer",
+                EditorGUI.Popup(new Rect(rect.x, rect.y, 135, EditorGUIUtility.singleLineHeight), "Layer",
                     element.sortingLayer, sortingLayerNames);
 
             if (EditorGUI.EndChangeCheck())
@@ -516,7 +560,7 @@ namespace SpriteSorting
             EditorGUI.BeginChangeCheck();
             element.sortingOrder =
                 EditorGUI.DelayedIntField(
-                    new Rect(rect.x + 90 + 10 + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
+                    new Rect(rect.x + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
                     "Order " + element.originSortingOrder + " +", element.sortingOrder);
 
             if (EditorGUI.EndChangeCheck())
@@ -527,7 +571,7 @@ namespace SpriteSorting
             }
 
             if (GUI.Button(
-                new Rect(rect.x + 90 + 10 + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
+                new Rect(rect.x + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
                 "+1"))
             {
                 element.sortingOrder++;
@@ -536,20 +580,12 @@ namespace SpriteSorting
             }
 
             if (GUI.Button(
-                new Rect(rect.x + 90 + 10 + 135 + 10 + 120 + 10 + 25 + 10, rect.y, 25,
+                new Rect(rect.x + 135 + 10 + 120 + 10 + 25 + 10, rect.y, 25,
                     EditorGUIUtility.singleLineHeight), "-1"))
             {
                 element.sortingOrder--;
                 isPreviewUpdating = true;
                 isCurrentIndexUpdated = UpdateSortingOrder(index, element);
-            }
-
-            if (GUI.Button(
-                new Rect(rect.x + 90 + 10 + 135 + 10 + 120 + 10 + 25 + 10 + 25 + 10, rect.y, 55,
-                    EditorGUIUtility.singleLineHeight), "Select"))
-            {
-                Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
-                SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
             }
 
             if (isPreviewUpdating)
