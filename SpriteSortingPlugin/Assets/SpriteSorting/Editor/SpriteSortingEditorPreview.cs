@@ -10,6 +10,7 @@ namespace SpriteSorting
     public class SpriteSortingEditorPreview
     {
         private bool isPreviewVisible = true;
+        private bool isPreviewNeedsAnUpdate;
         private GameObject previewGameObject;
         private Editor previewEditor;
         private bool isVisualizingBoundsInScene;
@@ -33,11 +34,13 @@ namespace SpriteSorting
 
             if (!isPreviewVisible)
             {
+                isPreviewNeedsAnUpdate = true;
                 return;
             }
 
-            if (isUpdatePreview)
+            if (isUpdatePreview || isPreviewNeedsAnUpdate)
             {
+                isPreviewNeedsAnUpdate = false;
                 CleanUpPreview();
             }
 

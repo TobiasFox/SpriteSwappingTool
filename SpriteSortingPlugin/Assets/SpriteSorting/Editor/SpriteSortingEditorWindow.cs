@@ -39,6 +39,7 @@ namespace SpriteSorting
         public static void ShowWindow()
         {
             var window = GetWindow<SpriteSortingEditorWindow>();
+            window.titleContent = new GUIContent("Sprite Sorting");
             window.Init();
             window.Show();
         }
@@ -298,7 +299,7 @@ namespace SpriteSorting
                 preview.UpdateOverlappingItems(result.overlappingItems);
             }
 
-            if (result.overlappingItems.Count > 2)
+            if (result.overlappingItems.Count > 1)
             {
                 InitReordableListForNewSortingGroup();
             }
