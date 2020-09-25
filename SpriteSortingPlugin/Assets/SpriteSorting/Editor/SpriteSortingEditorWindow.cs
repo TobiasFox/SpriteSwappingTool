@@ -29,6 +29,8 @@ namespace SpriteSorting
         private bool hasChangedLayer;
         private Color bg1 = new Color(0.83f, 0.83f, 0.83f);
         private Color bg2 = new Color(0.76f, 0.76f, 0.76f);
+        private Color activeColor = new Color(0.1f, 0.69f, 1f, 0.7f);
+        private Color focussingColor = new Color(0.45f, 0.77f, 0.95f, 0.91f);
         private bool isAnalyzingWithChangedLayerFirst;
 
         private ReorderableList reordableListForSortingGroup;
@@ -478,7 +480,20 @@ namespace SpriteSorting
 
         private void DrawElementBackgroundCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
-            var color = index % 2 == 0 ? bg1 : bg2;
+            Color color;
+            if (isActive)
+            {
+                color = activeColor;
+            }
+            else if (isFocused)
+            {
+                color = focussingColor;
+            }
+            else
+            {
+                color = index % 2 == 0 ? bg1 : bg2;
+            }
+
             EditorGUI.DrawRect(rect, color);
         }
 
