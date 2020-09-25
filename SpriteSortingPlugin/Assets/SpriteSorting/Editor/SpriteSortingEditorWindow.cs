@@ -443,7 +443,8 @@ namespace SpriteSorting
                 drawElementCallback = DrawElementCallback,
                 onSelectCallback = OnSelectCallback,
                 elementHeightCallback = ElementHeightCallback,
-                drawElementBackgroundCallback = DrawElementBackgroundCallback
+                drawElementBackgroundCallback = DrawElementBackgroundCallback,
+                onReorderCallbackWithDetails = OnReorderCallbackWithDetails
             };
 
             // reordableSpriteSortingList.onMouseUpCallback = (ReorderableList list) =>
@@ -478,6 +479,67 @@ namespace SpriteSorting
             //     };
         }
 
+        private void OnReorderCallbackWithDetails(ReorderableList list, int oldIndex, int newIndex)
+        {
+            var itemWithNewIndex = result.overlappingItems[newIndex];
+            
+            if (oldIndex + 1 == newIndex || oldIndex - 1 == newIndex)
+            {
+                var itemWithOldIndex = result.overlappingItems[oldIndex];
+
+                var tempSortingOrder = itemWithNewIndex.sortingOrder;
+                var tempLayerId = itemWithNewIndex.sortingLayerDropDownIndex;
+
+                itemWithNewIndex.sortingOrder = itemWithOldIndex.sortingOrder;
+                itemWithNewIndex.sortingLayerDropDownIndex = itemWithOldIndex.sortingLayerDropDownIndex;
+
+                itemWithOldIndex.sortingOrder = tempSortingOrder;
+                itemWithOldIndex.sortingLayerDropDownIndex = tempLayerId;
+                return;
+            }
+
+            var isAdjustingSortingOrderUpwards = newIndex <= result.overlappingItems.Count / 2;
+            var lastItem = result.overlappingItems[newIndex + (isAdjustingSortingOrderUpwards ? 1 : -1)];
+
+            if (isAdjustingSortingOrderUpwards)
+            {
+                if (itemWithNewIndex.sortingOrder <= lastItem.sortingOrder)
+                {
+                    itemWithNewIndex.sortingOrder = lastItem.sortingOrder + 1;
+                }
+
+                for (var i = newIndex - 1; i >= 0; i--)
+                {
+                    var previousItem = result.overlappingItems[i + 1];
+                    var currentItem = result.overlappingItems[i];
+
+                    if (previousItem.sortingOrder == currentItem.sortingOrder)
+                    {
+                        currentItem.sortingOrder++;
+                    }
+                }
+
+                return;
+            }
+
+            if (itemWithNewIndex.sortingOrder >= lastItem.sortingOrder)
+            {
+                itemWithNewIndex.sortingOrder = lastItem.sortingOrder - 1;
+            }
+
+            for (var i = newIndex + 1; i < result.overlappingItems.Count; i++)
+            {
+                var previousItem = result.overlappingItems[i - 1];
+                var currentItem = result.overlappingItems[i];
+
+                if (previousItem.sortingOrder == currentItem.sortingOrder)
+                {
+                    currentItem.sortingOrder--;
+                }
+            }
+        }
+
+        //TODO: remember last focussed element before recompilation is active
         private void DrawElementBackgroundCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
             Color color;
@@ -529,6 +591,7 @@ namespace SpriteSorting
             }
         }
 
+        //TODO: adjust height when dragging elements
         private float ElementHeightCallback(int index)
         {
             var element = result.overlappingItems[index];
