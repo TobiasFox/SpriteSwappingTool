@@ -27,6 +27,8 @@ namespace SpriteSorting
         private bool analyzeButtonWasClicked;
         private ReorderableList reordableSpriteSortingList;
         private bool hasChangedLayer;
+        private Color bg1 = new Color(0.83f, 0.83f, 0.83f);
+        private Color bg2 = new Color(0.76f, 0.76f, 0.76f);
         private bool isAnalyzingWithChangedLayerFirst;
 
         private ReorderableList reordableListForSortingGroup;
@@ -121,11 +123,6 @@ namespace SpriteSorting
                 return;
             }
 
-            if (sortingType != SortingType.Layer)
-            {
-                UpdateSortingLayerNames();
-            }
-
             if (result.overlappingItems == null || (result.overlappingItems.Count <= 0 && itemsForSortingGroup == null))
                 // if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
             {
@@ -136,6 +133,11 @@ namespace SpriteSorting
 
                 EndScrollRect();
                 return;
+            }
+
+            if (sortingType != SortingType.Layer)
+            {
+                UpdateSortingLayerNames();
             }
 
             reordableSpriteSortingList.DoLayoutList();
@@ -198,6 +200,8 @@ namespace SpriteSorting
             reordableSpriteSortingList.drawHeaderCallback = null;
             reordableSpriteSortingList.drawElementCallback = null;
             reordableSpriteSortingList.onSelectCallback = null;
+            reordableSpriteSortingList.elementHeightCallback = null;
+            reordableSpriteSortingList.drawElementBackgroundCallback = null;
             reordableSpriteSortingList = null;
 
             if (reordableListForSortingGroup == null)
@@ -207,6 +211,7 @@ namespace SpriteSorting
 
             reordableListForSortingGroup.drawHeaderCallback = null;
             reordableListForSortingGroup.drawElementCallback = null;
+
             reordableListForSortingGroup = null;
         }
 
@@ -435,7 +440,8 @@ namespace SpriteSorting
                 drawHeaderCallback = DrawHeaderCallback,
                 drawElementCallback = DrawElementCallback,
                 onSelectCallback = OnSelectCallback,
-                elementHeightCallback = ElementHeightCallback
+                elementHeightCallback = ElementHeightCallback,
+                drawElementBackgroundCallback = DrawElementBackgroundCallback
             };
 
             // reordableSpriteSortingList.onMouseUpCallback = (ReorderableList list) =>
@@ -468,6 +474,12 @@ namespace SpriteSorting
             //         Debug.Log("reorder from "+previousIndex +" to "+newIndex);
             //         //d
             //     };
+        }
+
+        private void DrawElementBackgroundCallback(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            var color = index % 2 == 0 ? bg1 : bg2;
+            EditorGUI.DrawRect(rect, color);
         }
 
         private void InitOverlappingItems(bool isReset)
