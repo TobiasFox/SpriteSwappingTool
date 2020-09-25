@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace SpriteSorting
@@ -17,18 +18,15 @@ namespace SpriteSorting
         private bool isSceneVisualizingDelegateIsAdded;
         private List<OverlappingItem> overlappingItems;
         private bool isShowingAllSpritesOfSortingGroups;
+        private List<OverlappingSpriteItem> overlappingSprites;
 
-        public SpriteSortingEditorPreview(List<OverlappingItem> overlappingItems)
+        public void UpdateOverlappingItems(SpriteSortingAnalysisResult result)
         {
-            this.overlappingItems = overlappingItems;
+            overlappingItems = result.overlappingItems;
+            overlappingSprites = result.overlappingSpriteList;
         }
 
-        public void UpdateOverlappingItems(List<OverlappingItem> overlappingItems)
-        {
-            this.overlappingItems = overlappingItems;
-        }
-
-        public void DoPreview(bool isUpdatePreview, float currentEditorWidth)
+        public void DoPreview(bool isUpdatePreview)
         {
             isPreviewVisible = EditorGUILayout.Foldout(isPreviewVisible, "Preview", true);
 
@@ -76,7 +74,7 @@ namespace SpriteSorting
 
             isShowingAllSpritesOfSortingGroups = EditorGUILayout.ToggleLeft("Show all Sprites Of Sorting Groups",
                 isShowingAllSpritesOfSortingGroups);
-            
+
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
             var previewRect = EditorGUILayout.GetControlRect(false, 256 + horizontalRect.height);
 
@@ -88,18 +86,78 @@ namespace SpriteSorting
 
         private void GeneratePreviewGameObject()
         {
-            previewGameObject = new GameObject
-            {
-                hideFlags = HideFlags.DontSave
-            };
+            previewGameObject = PreviewItem.CreateGameObject(null, "Preview", true);
             previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
+
+            var previewRoot = new PreviewItem(previewGameObject.transform);
 
             foreach (var overlappingItem in overlappingItems)
             {
-                overlappingItem.GeneratePreview(previewGameObject.transform);
+                if (overlappingItem.originSortingGroup == null)
+                {
+                    previewRoot.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
+                    continue;
+                }
+
+                var spritePreviewItem = GetAppropriatePreviewItem(overlappingItem.originSpriteRenderer, previewRoot);
+                spritePreviewItem.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
+
+
+                var childSpriteRenderer = overlappingItem.originSortingGroup
+                    .GetComponentsInChildren<SpriteRenderer>();
+
+                foreach (var spriteRenderer in childSpriteRenderer)
+                {
+                    if (spriteRenderer == overlappingItem.originSpriteRenderer)
+                    {
+                        continue;
+                    }
+
+                    if (!overlappingItem.originSpriteRenderer.bounds.Intersects(spriteRenderer.bounds))
+                    {
+                        continue;
+                    }
+
+                    var previewItem = GetAppropriatePreviewItem(spriteRenderer, previewRoot);
+                    previewItem.AddSpriteRenderer(spriteRenderer);
+                }
             }
 
-            previewGameObject.hideFlags = HideFlags.HideAndDontSave;
+            PreviewItem.HideAndDontSaveGameObject(previewGameObject);
+        }
+
+        private static PreviewItem GetAppropriatePreviewItem(SpriteRenderer currentSpriteRenderer,
+            PreviewItem lastPreviewGroup)
+        {
+            var activeSortingGroups =
+                SpriteSortingUtility.FilterSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
+
+            for (int i = activeSortingGroups.Count - 1; i >= 0; i--)
+            {
+                var currentSortingGroup = activeSortingGroups[i];
+
+                var hasSortingGroup =
+                    lastPreviewGroup.TryGetSortingGroup(currentSortingGroup, out var previewSortingGroup);
+
+                lastPreviewGroup = !hasSortingGroup
+                    ? lastPreviewGroup.AddSortingGroup(currentSortingGroup)
+                    : previewSortingGroup;
+            }
+
+            return lastPreviewGroup;
+        }
+
+        private OverlappingSpriteItem GetBelongingOverlappingSpriteItem(int sortingGroupInstanceId)
+        {
+            foreach (var overlappingSpriteItem in overlappingSprites)
+            {
+                if (overlappingSpriteItem.sortingGroupInstanceId == sortingGroupInstanceId)
+                {
+                    return overlappingSpriteItem;
+                }
+            }
+
+            return null;
         }
 
         public void UpdatePreviewEditor()
@@ -159,11 +217,6 @@ namespace SpriteSorting
         {
             if (previewGameObject != null)
             {
-                foreach (var overlappingItem in overlappingItems)
-                {
-                    overlappingItem.CleanUpPreview();
-                }
-
                 Object.DestroyImmediate(previewGameObject);
                 previewGameObject = null;
             }

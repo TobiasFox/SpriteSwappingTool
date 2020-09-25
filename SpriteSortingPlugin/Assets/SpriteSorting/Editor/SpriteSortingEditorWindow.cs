@@ -10,7 +10,7 @@ namespace SpriteSorting
     public class SpriteSortingEditorWindow : EditorWindow
     {
         private const float LineSpacing = 1.5f;
-        
+
         private Vector2 scrollPosition = Vector2.zero;
 
         private bool ignoreAlphaOfSprites;
@@ -173,7 +173,7 @@ namespace SpriteSorting
                 return;
             }
 
-            preview.DoPreview(isAnalyzedButtonClickedThisFrame, position.width);
+            preview.DoPreview(isAnalyzedButtonClickedThisFrame);
 
             EndScrollRect();
         }
@@ -292,12 +292,10 @@ namespace SpriteSorting
 
             if (preview == null)
             {
-                preview = new SpriteSortingEditorPreview(result.overlappingItems);
+                preview = new SpriteSortingEditorPreview();
             }
-            else
-            {
-                preview.UpdateOverlappingItems(result.overlappingItems);
-            }
+
+            preview.UpdateOverlappingItems(result);
 
             if (result.overlappingItems.Count > 1)
             {

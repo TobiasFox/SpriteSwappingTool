@@ -22,6 +22,7 @@ namespace SpriteSorting
             }
 
             var filteredSortingComponents = new List<SortingComponent>();
+            var spriteDictionary = new Dictionary<int, Dictionary<int, SpriteRenderer>>();
 
             foreach (var spriteRenderer in spriteRenderers)
             {
@@ -31,9 +32,9 @@ namespace SpriteSorting
                 }
 
                 var sortingGroupArray = spriteRenderer.GetComponentsInParent<SortingGroup>();
-                var sortingGroups = FilterSortingGroups(sortingGroupArray);
+                var outmostSortingGroup = GetOutmostActiveSortingGroup(sortingGroupArray);
 
-                if (sortingGroups.Count <= 0)
+                if (outmostSortingGroup == null)
                 {
                     if (!data.selectedLayers.Contains(spriteRenderer.sortingLayerID))
                     {
@@ -44,7 +45,6 @@ namespace SpriteSorting
                     continue;
                 }
 
-                var outmostSortingGroup = sortingGroups[sortingGroups.Count - 1];
                 if (!data.selectedLayers.Contains(outmostSortingGroup.sortingLayerID))
                 {
                     continue;
@@ -59,9 +59,28 @@ namespace SpriteSorting
             //TODO: optimize foreach
             foreach (var sortingComponent in filteredSortingComponents)
             {
-                if (CheckOverlappingSprites(data, filteredSortingComponents, sortingComponent,
+                if (CheckOverlappingSprites(data, filteredSortingComponents, sortingComponent, ref spriteDictionary,
                     out var overlappingSprites))
                 {
+                    // var overlappingSpriteList = new List<OverlappingSpriteItem>();
+                    // foreach (var spriteDictionaryItem in spriteDictionary)
+                    // {
+                    //     var overlappingSpriteItem = new OverlappingSpriteItem(spriteDictionaryItem.Key);
+                    //     foreach (var spriteRenderer in spriteDictionaryItem.Value.Values)
+                    //     {
+                    //         overlappingSpriteItem.overlappingSprites.Add(spriteRenderer);
+                    //     }
+                    //
+                    //     overlappingSpriteList.Add(overlappingSpriteItem);
+                    // }
+
+                    // var overlappingSpriteList = new List<List<SpriteRenderer>>();
+                    // foreach (var spriteDictionaries in spriteDictionary.Values)
+                    // {
+                    //     overlappingSpriteList.Add(new List<SpriteRenderer>(spriteDictionaries.Values));
+                    // }
+
+                    // result.overlappingSpriteList = overlappingSpriteList;
                     result.overlappingItems = overlappingSprites;
                     break;
                 }
@@ -72,6 +91,7 @@ namespace SpriteSorting
 
         private static bool CheckOverlappingSprites(SpriteSortingData data,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
+            ref Dictionary<int, Dictionary<int, SpriteRenderer>> spriteDictionary,
             out List<OverlappingItem> overlappingComponents)
         {
             overlappingComponents = new List<OverlappingItem>();
@@ -85,14 +105,17 @@ namespace SpriteSorting
                     continue;
                 }
 
-                if (sortingComponentToCheck.sortingGroup != null && sortingComponent.sortingGroup != null &&
-                    sortingComponentToCheck.sortingGroup == sortingComponent.sortingGroup)
+                if (!sortingComponent.spriteRenderer.bounds.Intersects(sortingComponentToCheck.spriteRenderer.bounds))
                 {
                     continue;
                 }
 
-                if (!sortingComponent.spriteRenderer.bounds.Intersects(sortingComponentToCheck.spriteRenderer.bounds))
+                if (sortingComponentToCheck.sortingGroup != null && sortingComponent.sortingGroup != null &&
+                    sortingComponentToCheck.sortingGroup == sortingComponent.sortingGroup)
                 {
+                    // UpdateSpriteDictionary(ref spriteDictionary, sortingComponentToCheck.sortingGroup.GetInstanceID(),
+                    // sortingComponent.spriteRenderer, sortingComponentToCheck.spriteRenderer);
+
                     continue;
                 }
 
@@ -124,7 +147,63 @@ namespace SpriteSorting
             return true;
         }
 
-        private static List<SortingGroup> FilterSortingGroups(SortingGroup[] groups)
+        // private static void UpdateSpriteDictionary(
+        //     ref Dictionary<int, Dictionary<int, SpriteRenderer>> spriteDictionary,
+        //     SpriteRenderer spriteRenderer)
+        // {
+        //     var isSpriteRendererContained =
+        //         spriteDictionary.TryGetValue(spriteRenderer.GetInstanceID(), out var overlappingDictionary);
+        //     if (!isSpriteRendererContained)
+        //     {
+        //         overlappingDictionary = new Dictionary<int, SpriteRenderer>();
+        //         overlappingDictionary.Add();
+        //     }
+        //
+        //     foreach (var renderer in spriteRendererList)
+        //     {
+        //         if (renderer == spriteRenderer)
+        //         {
+        //             return;
+        //         }
+        //     }
+        //
+        //     //needs to check, if renderer is already contained
+        //
+        //     spriteRendererList.Add(spriteRenderer);
+        //     spriteDictionary[spriteRenderer.GetInstanceID()] = spriteRendererList;
+        // }
+
+        private static void UpdateSpriteDictionary(
+            ref Dictionary<int, Dictionary<int, SpriteRenderer>> spriteDictionary, int sortingGroupInstanceId,
+            params SpriteRenderer[] renderers)
+        {
+            var isSpriteRendererContained =
+                spriteDictionary.TryGetValue(sortingGroupInstanceId, out var overlappingDictionary);
+            if (!isSpriteRendererContained)
+            {
+                overlappingDictionary = new Dictionary<int, SpriteRenderer>();
+                foreach (var spriteRenderer in renderers)
+                {
+                    overlappingDictionary.Add(spriteRenderer.GetInstanceID(), spriteRenderer);
+                }
+
+                spriteDictionary[sortingGroupInstanceId] = overlappingDictionary;
+
+                return;
+            }
+
+            foreach (var spriteRenderer in renderers)
+            {
+                if (overlappingDictionary.ContainsKey(spriteRenderer.GetInstanceID()))
+                {
+                    continue;
+                }
+
+                overlappingDictionary.Add(spriteRenderer.GetInstanceID(), spriteRenderer);
+            }
+        }
+
+        public static List<SortingGroup> FilterSortingGroups(IEnumerable<SortingGroup> groups)
         {
             var list = new List<SortingGroup>();
 
@@ -139,6 +218,22 @@ namespace SpriteSorting
             }
 
             return list;
+        }
+
+        private static SortingGroup GetOutmostActiveSortingGroup(IReadOnlyList<SortingGroup> groups)
+        {
+            for (var i = groups.Count - 1; i >= 0; i--)
+            {
+                var sortingGroup = groups[i];
+                if (!sortingGroup.enabled)
+                {
+                    continue;
+                }
+
+                return sortingGroup;
+            }
+
+            return null;
         }
     }
 }

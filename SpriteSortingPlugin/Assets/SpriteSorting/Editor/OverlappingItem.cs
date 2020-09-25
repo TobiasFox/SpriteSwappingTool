@@ -15,10 +15,8 @@ namespace SpriteSorting
         public int originSortingLayer;
 
         public SpriteRenderer previewSpriteRenderer;
-
         public SortingGroup previewSortingGroup;
-
-        // public GameObject sortingGroupChildren;
+        public GameObject previewOverlappingSpritesInSortingGroupParent;
         public int sortingOrder;
         public int sortingLayer;
 
@@ -41,7 +39,7 @@ namespace SpriteSorting
                 originSortingOrder = originSpriteRenderer.sortingOrder;
             }
         }
-        
+
         public OverlappingItem(SortingComponent sortingComponent)
         {
             originSpriteRenderer = sortingComponent.spriteRenderer;
@@ -113,11 +111,19 @@ namespace SpriteSorting
                 ComponentUtility.PasteComponentAsNew(spriteGameObject);
                 previewSortingGroup = spriteGameObject.GetComponent<SortingGroup>();
 
-                //TODO: get all children of sorting group
-                // sortingGroupChildren = new GameObject("sortingGroupChildren")
+                // //TODO: get all children of sorting group
+                //
+                // var allSpriteChildrenOfSortingGroup = originSortingGroup.GetComponents<SpriteRenderer>();
+                //
+                // foreach (var spriteRenderer in allSpriteChildrenOfSortingGroup)
                 // {
-                //     hideFlags = HideFlags.DontSave
-                // };
+                //     if (!spriteRenderer.enabled)
+                //     {
+                //         continue;
+                //     }
+                //     
+                //     
+                // }
 
                 // var children = originSortingGroup.GetComponentsInChildren<SpriteRenderer>();
                 // foreach (var child in children)
@@ -126,12 +132,41 @@ namespace SpriteSorting
                 //     {
                 //         continue;
                 //     }
+                //
+                //     if (!originSpriteRenderer.bounds.Intersects(child.bounds))
+                //     {
+                //         continue;
+                //     }
+                //
+                //     if (previewOverlappingSpritesInSortingGroupParent == null)
+                //     {
+                //         previewOverlappingSpritesInSortingGroupParent = new GameObject("sortingGroupChildren")
+                //         {
+                //             hideFlags = HideFlags.DontSave
+                //         };
+                //     }
+                //
                 //     var childGameObject = new GameObject(child.name)
                 //     {
                 //         hideFlags = HideFlags.DontSave
                 //     };
-                //     ComponentUtility.CopyComponent(child.transform);
-                //     ComponentUtility.PasteComponentValues(childGameObject.transform);
+                //
+                //     var childTransform = child.transform;
+                //     childGameObject.transform.position = childTransform.position;
+                //     childGameObject.transform.rotation = childTransform.rotation;
+                //     childGameObject.transform.localScale = childTransform.lossyScale;
+                //
+                //     ComponentUtility.CopyComponent(child);
+                //     ComponentUtility.PasteComponentAsNew(childGameObject);
+                //
+                //     childGameObject.transform.SetParent(previewOverlappingSpritesInSortingGroupParent.transform);
+                //     childGameObject.hideFlags = HideFlags.HideAndDontSave;
+                // }
+
+                // if (previewOverlappingSpritesInSortingGroupParent != null)
+                // {
+                //     previewOverlappingSpritesInSortingGroupParent.transform.SetParent(previewSortingGroup.transform);
+                //     previewOverlappingSpritesInSortingGroupParent.hideFlags = HideFlags.HideAndDontSave;
                 // }
             }
 

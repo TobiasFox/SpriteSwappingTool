@@ -11,5 +11,7 @@ namespace SpriteSorting
         public List<SpriteRenderer> overlappingRenderers;
         public List<SortingGroup> overlappingSortingGroups;
         public List<OverlappingItem> overlappingItems;
+        public List<SortingComponent> overlappingSortingComponents;
+        public List<OverlappingSpriteItem> overlappingSpriteList;
     }
 }
