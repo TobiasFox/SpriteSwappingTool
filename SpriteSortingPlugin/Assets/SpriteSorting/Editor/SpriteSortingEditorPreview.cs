@@ -42,15 +42,7 @@ namespace SpriteSorting
                 CleanUpPreview();
             }
 
-            if (previewGameObject == null)
-            {
-                GeneratePreviewGameObject();
-            }
-
-            if (previewEditor == null)
-            {
-                previewEditor = Editor.CreateEditor(previewGameObject);
-            }
+            GeneratePreview();
 
             var horizontalRect = EditorGUILayout.BeginHorizontal();
             EditorGUI.indentLevel++;
@@ -84,9 +76,22 @@ namespace SpriteSorting
             previewGameObject.SetActive(false);
         }
 
+        private void GeneratePreview()
+        {
+            if (previewGameObject == null)
+            {
+                GeneratePreviewGameObject();
+            }
+
+            if (previewEditor == null)
+            {
+                previewEditor = Editor.CreateEditor(previewGameObject);
+            }
+        }
+
         private void GeneratePreviewGameObject()
         {
-            previewGameObject = PreviewItem.CreateGameObject(null, "Preview", true);
+            previewGameObject = PreviewUtility.CreateGameObject(null, "Preview", true);
             previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
 
             var previewRoot = new PreviewItem(previewGameObject.transform);
@@ -95,13 +100,20 @@ namespace SpriteSorting
             {
                 if (overlappingItem.originSortingGroup == null)
                 {
-                    previewRoot.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
+                    var previewSpriteRenderer = previewRoot.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
+                    overlappingItem.previewSpriteRenderer = previewSpriteRenderer;
+                    overlappingItem.UpdatePreviewSortingLayer();
+                    overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
                     continue;
                 }
 
                 var spritePreviewItem = GetAppropriatePreviewItem(overlappingItem.originSpriteRenderer, previewRoot);
                 spritePreviewItem.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
 
+                previewRoot.TryGetSortingGroup(overlappingItem.originSortingGroup,
+                    out overlappingItem.previewSortingGroup);
+                overlappingItem.UpdatePreviewSortingLayer();
+                overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
 
                 var childSpriteRenderer = overlappingItem.originSortingGroup
                     .GetComponentsInChildren<SpriteRenderer>();
@@ -123,7 +135,7 @@ namespace SpriteSorting
                 }
             }
 
-            PreviewItem.HideAndDontSaveGameObject(previewGameObject);
+            PreviewUtility.HideAndDontSaveGameObject(previewGameObject);
         }
 
         private static PreviewItem GetAppropriatePreviewItem(SpriteRenderer currentSpriteRenderer,
@@ -137,11 +149,17 @@ namespace SpriteSorting
                 var currentSortingGroup = activeSortingGroups[i];
 
                 var hasSortingGroup =
-                    lastPreviewGroup.TryGetSortingGroup(currentSortingGroup, out var previewSortingGroup);
+                    lastPreviewGroup.TryGetPreviewItem(currentSortingGroup, out var previewSortingGroup);
 
-                lastPreviewGroup = !hasSortingGroup
-                    ? lastPreviewGroup.AddSortingGroup(currentSortingGroup)
-                    : previewSortingGroup;
+                if (!hasSortingGroup)
+                {
+                    lastPreviewGroup.AddSortingGroup(currentSortingGroup);
+                    lastPreviewGroup.TryGetPreviewItem(currentSortingGroup, out lastPreviewGroup);
+                }
+                else
+                {
+                    lastPreviewGroup = previewSortingGroup;
+                }
             }
 
             return lastPreviewGroup;

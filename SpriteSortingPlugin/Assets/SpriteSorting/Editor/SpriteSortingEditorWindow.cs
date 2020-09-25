@@ -121,6 +121,11 @@ namespace SpriteSorting
                 return;
             }
 
+            if (sortingType != SortingType.Layer)
+            {
+                UpdateSortingLayerNames();
+            }
+
             if (result.overlappingItems == null || (result.overlappingItems.Count <= 0 && itemsForSortingGroup == null))
                 // if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
             {
@@ -208,29 +213,36 @@ namespace SpriteSorting
 
         private void ShowSortingLayers()
         {
+            UpdateSortingLayerNames();
+
+            selectedSortingLayers =
+                EditorGUILayout.MaskField("Sorting Layers", selectedSortingLayers, sortingLayerNames);
+        }
+
+        private void UpdateSortingLayerNames()
+        {
             sortingLayerNames = new string[SortingLayer.layers.Length];
             for (var i = 0; i < SortingLayer.layers.Length; i++)
             {
                 sortingLayerNames[i] = SortingLayer.layers[i].name;
             }
 
-            if (selectedLayers == null)
+            if (selectedLayers != null)
             {
-                int defaultIndex = 0;
-                for (var i = 0; i < sortingLayerNames.Length; i++)
-                {
-                    if (sortingLayerNames[i].Equals("Default"))
-                    {
-                        defaultIndex = i;
-                    }
-                }
-
-                selectedSortingLayers = 1 << defaultIndex;
-                selectedLayers = new List<int>();
+                return;
             }
 
-            selectedSortingLayers =
-                EditorGUILayout.MaskField("Sorting Layers", selectedSortingLayers, sortingLayerNames);
+            int defaultIndex = 0;
+            for (var i = 0; i < sortingLayerNames.Length; i++)
+            {
+                if (sortingLayerNames[i].Equals("Default"))
+                {
+                    defaultIndex = i;
+                }
+            }
+
+            selectedSortingLayers = 1 << defaultIndex;
+            selectedLayers = new List<int>();
         }
 
         private void Analyze()
@@ -326,14 +338,15 @@ namespace SpriteSorting
 
             EditorGUIUtility.labelWidth = 35;
             EditorGUI.BeginChangeCheck();
-            element.sortingLayer =
+            element.sortingLayerDropDownIndex =
                 EditorGUI.Popup(new Rect(rect.x + 15 + 90 + 10, rect.y, 135, EditorGUIUtility.singleLineHeight),
                     "Layer",
-                    element.sortingLayer, sortingLayerNames);
+                    element.sortingLayerDropDownIndex, sortingLayerNames);
 
             if (EditorGUI.EndChangeCheck())
             {
-                element.UpdatePreviewSortingLayer(sortingLayerNames[element.sortingLayer]);
+                element.sortingLayerName = sortingLayerNames[element.sortingLayerDropDownIndex];
+                element.UpdatePreviewSortingLayer();
                 // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
             }
@@ -464,7 +477,7 @@ namespace SpriteSorting
             for (var i = 0; i < result.overlappingItems.Count; i++)
             {
                 var overlappingItem = result.overlappingItems[i];
-                overlappingItem.sortingLayer = sortingLayerIndex;
+                overlappingItem.sortingLayerDropDownIndex = sortingLayerIndex;
 
                 if (!isReset)
                 {
@@ -474,7 +487,8 @@ namespace SpriteSorting
                 overlappingItem.sortingOrder = result.overlappingItems.Count - (i + 1);
 
                 overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
-                overlappingItem.UpdatePreviewSortingLayer(sortingLayerNames[overlappingItem.sortingLayer]);
+                overlappingItem.sortingLayerName = sortingLayerNames[overlappingItem.sortingLayerDropDownIndex];
+                overlappingItem.UpdatePreviewSortingLayer();
             }
         }
 
@@ -540,13 +554,14 @@ namespace SpriteSorting
 
             EditorGUIUtility.labelWidth = 35;
             EditorGUI.BeginChangeCheck();
-            element.sortingLayer =
+            element.sortingLayerDropDownIndex =
                 EditorGUI.Popup(new Rect(rect.x, rect.y, 135, EditorGUIUtility.singleLineHeight), "Layer",
-                    element.sortingLayer, sortingLayerNames);
+                    element.sortingLayerDropDownIndex, sortingLayerNames);
 
             if (EditorGUI.EndChangeCheck())
             {
-                element.UpdatePreviewSortingLayer(sortingLayerNames[element.sortingLayer]);
+                element.sortingLayerName = sortingLayerNames[element.sortingLayerDropDownIndex];
+                element.UpdatePreviewSortingLayer();
                 // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
 
@@ -604,7 +619,7 @@ namespace SpriteSorting
         {
             foreach (var item in result.overlappingItems)
             {
-                if (item.originSortingLayer == SortingLayer.NameToID(sortingLayerNames[item.sortingLayer]))
+                if (item.originSortingLayer == SortingLayer.NameToID(sortingLayerNames[item.sortingLayerDropDownIndex]))
                 {
                     continue;
                 }

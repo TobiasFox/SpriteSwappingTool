@@ -9,6 +9,7 @@ namespace SpriteSorting
     [Serializable]
     public class PreviewItem
     {
+        //TODO: consider using a composite pattern
         private List<SortingGroup> sortingGroups;
         private Transform previewItemParent;
         private Transform spriteRendererParent;
@@ -17,11 +18,11 @@ namespace SpriteSorting
 
         public PreviewItem(Transform parent)
         {
-            previewItemParent = CreateGameObject(parent, "PreviewItem", true).transform;
-            HideAndDontSaveGameObject(previewItemParent.gameObject);
+            previewItemParent = PreviewUtility.CreateGameObject(parent, "PreviewItem", true).transform;
+            PreviewUtility.HideAndDontSaveGameObject(previewItemParent.gameObject);
         }
 
-        public PreviewItem AddSortingGroup(SortingGroup newSortingGroup)
+        public SortingGroup AddSortingGroup(SortingGroup newSortingGroup)
         {
             if (newSortingGroup == null)
             {
@@ -30,17 +31,18 @@ namespace SpriteSorting
 
             if (sortingGroupParent == null)
             {
-                sortingGroupParent = CreateGameObject(previewItemParent, "SortingGroupParent", true).transform;
-                HideAndDontSaveGameObject(sortingGroupParent.gameObject);
+                sortingGroupParent = PreviewUtility.CreateGameObject(previewItemParent, "SortingGroupParent", true)
+                    .transform;
+                PreviewUtility.HideAndDontSaveGameObject(sortingGroupParent.gameObject);
             }
 
-            var sortingGroupGO = CreateGameObject(sortingGroupParent, "SortingGroup", true);
+            var sortingGroupGO = PreviewUtility.CreateGameObject(sortingGroupParent, "SortingGroup", true);
 
             var sortingGroup = sortingGroupGO.AddComponent<SortingGroup>();
             sortingGroup.sortingLayerID = newSortingGroup.sortingLayerID;
             sortingGroup.sortingOrder = newSortingGroup.sortingOrder;
 
-            HideAndDontSaveGameObject(sortingGroupGO);
+            PreviewUtility.HideAndDontSaveGameObject(sortingGroupGO);
             if (sortingGroups == null)
             {
                 sortingGroups = new List<SortingGroup>();
@@ -56,24 +58,24 @@ namespace SpriteSorting
             }
 
             childrenSortingGroupElements.Add(child);
-            return child;
+            return sortingGroup;
         }
 
-        public void AddSpriteRenderer(SpriteRenderer spriteRenderer)
+        public SpriteRenderer AddSpriteRenderer(SpriteRenderer spriteRenderer)
         {
             if (spriteRenderer == null)
             {
-                return;
+                return null;
             }
 
             if (spriteRendererParent == null)
             {
                 spriteRendererParent =
-                    CreateGameObject(previewItemParent, "SpriteRendererParent", true).transform;
-                HideAndDontSaveGameObject(spriteRendererParent.gameObject);
+                    PreviewUtility.CreateGameObject(previewItemParent, "SpriteRendererParent", true).transform;
+                PreviewUtility.HideAndDontSaveGameObject(spriteRendererParent.gameObject);
             }
 
-            var child = CreateGameObject(spriteRendererParent, spriteRenderer.name, true);
+            var child = PreviewUtility.CreateGameObject(spriteRendererParent, spriteRenderer.name, true);
             var spriteRendererTransform = spriteRenderer.transform;
 
             child.transform.position = spriteRendererTransform.position;
@@ -84,50 +86,61 @@ namespace SpriteSorting
             ComponentUtility.PasteComponentAsNew(child);
 
 
-            HideAndDontSaveGameObject(child);
+            PreviewUtility.HideAndDontSaveGameObject(child);
+
+            return child.GetComponent<SpriteRenderer>();
         }
 
-        public bool TryGetSortingGroup(SortingGroup originSortingGroup, out PreviewItem preview)
+        public bool TryGetSortingGroup(SortingGroup sortingGroupToSearch, out SortingGroup sortingGroup)
         {
-            preview = null;
-            if (childrenSortingGroupElements == null)
+            sortingGroup = null;
+            if (childrenSortingGroupElements == null || sortingGroupToSearch == null)
             {
                 return false;
             }
 
+            var index = GetSortingGroupIndex(sortingGroupToSearch.sortingLayerID, sortingGroupToSearch.sortingOrder);
+            if (index < 0)
+            {
+                return false;
+            }
+
+            sortingGroup = sortingGroups[index];
+            return true;
+        }
+
+        private int GetSortingGroupIndex(int layerID, int sortingOrder)
+        {
             for (var i = 0; i < sortingGroups.Count; i++)
             {
-                var childSortingGroup = sortingGroups[i];
-
-                if (childSortingGroup.sortingLayerID != originSortingGroup.sortingLayerID ||
-                    childSortingGroup.sortingOrder != originSortingGroup.sortingOrder)
+                var currentSortingGroup = sortingGroups[i];
+                if (currentSortingGroup.sortingLayerID != layerID || currentSortingGroup.sortingOrder != sortingOrder)
                 {
                     continue;
                 }
 
-                preview = childrenSortingGroupElements[i];
-                return true;
+                return i;
             }
 
-            return false;
+            return -1;
         }
 
-        //TODO: maybe a pool?
-        public static GameObject CreateGameObject(Transform parent, string name, bool isDontSave)
+        public bool TryGetPreviewItem(SortingGroup originSortingGroup, out PreviewItem previewItem)
         {
-            var previewItem = new GameObject(name)
+            previewItem = null;
+            if (childrenSortingGroupElements == null || originSortingGroup == null)
             {
-                hideFlags = isDontSave ? HideFlags.DontSave : HideFlags.None
-            };
+                return false;
+            }
 
-            previewItem.transform.SetParent(parent);
+            var index = GetSortingGroupIndex(originSortingGroup.sortingLayerID, originSortingGroup.sortingOrder);
+            if (index < 0)
+            {
+                return false;
+            }
 
-            return previewItem;
-        }
-
-        public static void HideAndDontSaveGameObject(GameObject gameObject)
-        {
-            gameObject.hideFlags = HideFlags.HideAndDontSave;
+            previewItem = childrenSortingGroupElements[index];
+            return true;
         }
     }
 }
