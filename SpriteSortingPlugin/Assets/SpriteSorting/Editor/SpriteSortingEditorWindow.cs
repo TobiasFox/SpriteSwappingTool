@@ -31,6 +31,7 @@ namespace SpriteSorting
         private Color bg2 = new Color(0.76f, 0.76f, 0.76f);
         private Color activeColor = new Color(0.1f, 0.69f, 1f, 0.7f);
         private Color focussingColor = new Color(0.45f, 0.77f, 0.95f, 0.91f);
+        private int lastFocussedIndex;
         private bool isAnalyzingWithChangedLayerFirst;
 
         private ReorderableList reordableListForSortingGroup;
@@ -204,6 +205,7 @@ namespace SpriteSorting
             reordableSpriteSortingList.onSelectCallback = null;
             reordableSpriteSortingList.elementHeightCallback = null;
             reordableSpriteSortingList.drawElementBackgroundCallback = null;
+            reordableSpriteSortingList.onReorderCallbackWithDetails = null;
             reordableSpriteSortingList = null;
 
             if (reordableListForSortingGroup == null)
@@ -447,6 +449,9 @@ namespace SpriteSorting
                 onReorderCallbackWithDetails = OnReorderCallbackWithDetails
             };
 
+            reordableSpriteSortingList.index = lastFocussedIndex;
+
+
             // reordableSpriteSortingList.onMouseUpCallback = (ReorderableList list) =>
             // {
             //     Debug.Log("mouse up reordable list");
@@ -470,19 +475,12 @@ namespace SpriteSorting
             //     Debug.Log("reorder");
             //     //d
             // };
-            //
-            // reordableSpriteSortingList.onReorderCallbackWithDetails =
-            //     (ReorderableList list, int previousIndex, int newIndex) =>
-            //     {
-            //         Debug.Log("reorder from "+previousIndex +" to "+newIndex);
-            //         //d
-            //     };
         }
 
         private void OnReorderCallbackWithDetails(ReorderableList list, int oldIndex, int newIndex)
         {
             var itemWithNewIndex = result.overlappingItems[newIndex];
-            
+
             if (oldIndex + 1 == newIndex || oldIndex - 1 == newIndex)
             {
                 var itemWithOldIndex = result.overlappingItems[oldIndex];
@@ -579,16 +577,22 @@ namespace SpriteSorting
                 overlappingItem.sortingLayerName = sortingLayerNames[overlappingItem.sortingLayerDropDownIndex];
                 overlappingItem.UpdatePreviewSortingLayer();
             }
+
+            if (!isReset)
+            {
+                lastFocussedIndex = -1;
+            }
         }
 
         private void OnSelectCallback(ReorderableList list)
         {
-            // Debug.Log("on select");
             for (var i = 0; i < list.count; i++)
             {
                 var item = (OverlappingItem) list.list[i];
                 item.IsItemSelected = i == list.index;
             }
+
+            lastFocussedIndex = list.index;
         }
 
         //TODO: adjust height when dragging elements
