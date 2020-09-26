@@ -734,19 +734,62 @@ namespace SpriteSorting
 
             element.UpdatePreviewSortingOrderWithExistingOrder();
 
+            //TODO: update other elements sorting order when one is updated, e.g. when the -1 button is pressed
+            var index = currentIndex;
             var indexToSwitch = GetIndexToSwitch(currentIndex);
-            if (indexToSwitch < 0)
+            if (indexToSwitch >= 0)
             {
-                return false;
+                var tempItem = result.overlappingItems[currentIndex];
+                result.overlappingItems.RemoveAt(currentIndex);
+                result.overlappingItems.Insert(indexToSwitch, tempItem);
+                Debug.Log("switch " + currentIndex + " with " + indexToSwitch);
+                index = indexToSwitch;
             }
 
-            var tempItem = result.overlappingItems[currentIndex];
-            result.overlappingItems.RemoveAt(currentIndex);
-            result.overlappingItems.Insert(indexToSwitch, tempItem);
-            Debug.Log("switch " + currentIndex + " with " + indexToSwitch);
-            reordableSpriteSortingList.index = indexToSwitch;
+            reordableSpriteSortingList.index = index;
+            var itemsHaveChanges = UpdateSurroundingItems(index);
 
-            return true;
+            return indexToSwitch >= 0 || itemsHaveChanges;
+        }
+
+        private bool UpdateSurroundingItems(int currentIndex)
+        {
+            var itemsHaveChanges = false;
+
+            //not called/used in current implementation
+            for (var i = currentIndex - 1; i >= 0; i--)
+            {
+                var previousItem = result.overlappingItems[i + 1];
+                var currentItem = result.overlappingItems[i];
+
+                if (previousItem.sortingOrder == currentItem.sortingOrder)
+                {
+                    currentItem.sortingOrder++;
+                    itemsHaveChanges = true;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            for (var i = currentIndex + 1; i < result.overlappingItems.Count; i++)
+            {
+                var previousItem = result.overlappingItems[i - 1];
+                var currentItem = result.overlappingItems[i];
+
+                if (previousItem.sortingOrder == currentItem.sortingOrder)
+                {
+                    currentItem.sortingOrder--;
+                    itemsHaveChanges = true;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return itemsHaveChanges;
         }
 
         private int GetIndexToSwitch(int currentIndex)
