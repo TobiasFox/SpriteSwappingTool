@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SpriteSorting
+namespace SpriteSortingPlugin
 {
     public struct SpriteSortingData
     {

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace SpriteSorting
+namespace SpriteSortingPlugin
 {
     [Serializable]
     public class OverlappingItem
@@ -21,6 +21,7 @@ namespace SpriteSorting
 
         public bool IsItemSelected { get; set; }
         public int OriginSortedIndex { get; set; }
+        public bool IsBaseItem { get; private set; }
 
         public OverlappingItem(SpriteRenderer originSpriteRenderer)
         {
@@ -39,10 +40,11 @@ namespace SpriteSorting
             }
         }
 
-        public OverlappingItem(SortingComponent sortingComponent)
+        public OverlappingItem(SortingComponent sortingComponent, bool isBaseItem = false)
         {
             originSpriteRenderer = sortingComponent.spriteRenderer;
             originSortingGroup = sortingComponent.sortingGroup;
+            IsBaseItem = isBaseItem;
 
             if (originSortingGroup != null)
             {
@@ -86,6 +88,19 @@ namespace SpriteSorting
             {
                 Object.DestroyImmediate(previewSpriteRenderer.gameObject);
             }
+        }
+
+        public bool HasSortingLayerChanged()
+        {
+            return originSortingLayer !=
+                   SortingLayer.NameToID(SortingLayerUtility.SortingLayerNames[sortingLayerDropDownIndex]);
+        }
+
+        public override string ToString()
+        {
+            return "OI[origin: " + SortingLayer.IDToName(originSortingLayer) + ", " + originSortingOrder +
+                   " current: " + sortingLayerName + ", " + (originSortingOrder + sortingOrder) + ", baseItem: " +
+                   IsBaseItem + ", originSortedIndex:" + OriginSortedIndex + "]";
         }
     }
 }

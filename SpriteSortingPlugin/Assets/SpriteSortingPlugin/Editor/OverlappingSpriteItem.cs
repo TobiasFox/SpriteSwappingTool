@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpriteSorting
+namespace SpriteSortingPlugin
 {
     [Serializable]
     public class OverlappingSpriteItem

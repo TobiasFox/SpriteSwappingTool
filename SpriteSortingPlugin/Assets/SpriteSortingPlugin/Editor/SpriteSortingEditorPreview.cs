@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace SpriteSorting
+namespace SpriteSortingPlugin
 {
     [Serializable]
     public class SpriteSortingEditorPreview
@@ -16,14 +16,12 @@ namespace SpriteSorting
         private Editor previewEditor;
         private bool isVisualizingBoundsInScene;
         private bool isSceneVisualizingDelegateIsAdded;
-        private List<OverlappingItem> overlappingItems;
         private bool isShowingAllSpritesOfSortingGroups;
-        private List<OverlappingSpriteItem> overlappingSprites;
+        private OverlappingItems overlappingItems;
 
-        public void UpdateOverlappingItems(SpriteSortingAnalysisResult result)
+        public void UpdateOverlappingItems(OverlappingItems overlappingItems)
         {
-            overlappingItems = result.overlappingItems;
-            overlappingSprites = result.overlappingSpriteList;
+            this.overlappingItems = overlappingItems;
         }
 
         public void DoPreview(bool isUpdatePreview)
@@ -96,7 +94,7 @@ namespace SpriteSorting
 
             var previewRoot = new PreviewItem(previewGameObject.transform);
 
-            foreach (var overlappingItem in overlappingItems)
+            foreach (var overlappingItem in overlappingItems.Items)
             {
                 if (overlappingItem.originSortingGroup == null)
                 {
@@ -165,19 +163,6 @@ namespace SpriteSorting
             return lastPreviewGroup;
         }
 
-        private OverlappingSpriteItem GetBelongingOverlappingSpriteItem(int sortingGroupInstanceId)
-        {
-            foreach (var overlappingSpriteItem in overlappingSprites)
-            {
-                if (overlappingSpriteItem.sortingGroupInstanceId == sortingGroupInstanceId)
-                {
-                    return overlappingSpriteItem;
-                }
-            }
-
-            return null;
-        }
-
         public void UpdatePreviewEditor()
         {
             if (!isPreviewVisible)
@@ -217,7 +202,7 @@ namespace SpriteSorting
                 return;
             }
 
-            foreach (var item in overlappingItems)
+            foreach (var item in overlappingItems.Items)
             {
                 Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
                 var bounds = item.originSpriteRenderer.bounds;
@@ -225,7 +210,7 @@ namespace SpriteSorting
                 Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
             }
 
-            if (overlappingItems.Count > 0)
+            if (overlappingItems.Items.Count > 0)
             {
                 sceneView.Repaint();
             }

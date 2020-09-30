@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace SpriteSorting
+namespace SpriteSortingPlugin
 {
     public static class SpriteSortingUtility
     {
@@ -22,7 +22,6 @@ namespace SpriteSorting
             }
 
             var filteredSortingComponents = new List<SortingComponent>();
-            var spriteDictionary = new Dictionary<int, Dictionary<int, SpriteRenderer>>();
 
             foreach (var spriteRenderer in spriteRenderers)
             {
@@ -59,29 +58,11 @@ namespace SpriteSorting
             //TODO: optimize foreach
             foreach (var sortingComponent in filteredSortingComponents)
             {
-                if (CheckOverlappingSprites(data, filteredSortingComponents, sortingComponent, ref spriteDictionary,
-                    out var overlappingSprites))
+                if (CheckOverlappingSprites(data, filteredSortingComponents, sortingComponent,
+                    out var overlappingSprites, out var baseItem))
                 {
-                    // var overlappingSpriteList = new List<OverlappingSpriteItem>();
-                    // foreach (var spriteDictionaryItem in spriteDictionary)
-                    // {
-                    //     var overlappingSpriteItem = new OverlappingSpriteItem(spriteDictionaryItem.Key);
-                    //     foreach (var spriteRenderer in spriteDictionaryItem.Value.Values)
-                    //     {
-                    //         overlappingSpriteItem.overlappingSprites.Add(spriteRenderer);
-                    //     }
-                    //
-                    //     overlappingSpriteList.Add(overlappingSpriteItem);
-                    // }
-
-                    // var overlappingSpriteList = new List<List<SpriteRenderer>>();
-                    // foreach (var spriteDictionaries in spriteDictionary.Values)
-                    // {
-                    //     overlappingSpriteList.Add(new List<SpriteRenderer>(spriteDictionaries.Values));
-                    // }
-
-                    // result.overlappingSpriteList = overlappingSpriteList;
                     result.overlappingItems = overlappingSprites;
+                    result.baseItem = baseItem;
                     break;
                 }
             }
@@ -91,10 +72,10 @@ namespace SpriteSorting
 
         private static bool CheckOverlappingSprites(SpriteSortingData data,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
-            ref Dictionary<int, Dictionary<int, SpriteRenderer>> spriteDictionary,
-            out List<OverlappingItem> overlappingComponents)
+            out List<OverlappingItem> overlappingComponents, out OverlappingItem baseItem)
         {
             overlappingComponents = new List<OverlappingItem>();
+            baseItem = null;
             Debug.Log("start search in " + filteredSortingComponents.Count + " sprite renderers for an overlap with " +
                       sortingComponentToCheck.spriteRenderer.name);
 
@@ -113,9 +94,6 @@ namespace SpriteSorting
                 if (sortingComponentToCheck.sortingGroup != null && sortingComponent.sortingGroup != null &&
                     sortingComponentToCheck.sortingGroup == sortingComponent.sortingGroup)
                 {
-                    // UpdateSpriteDictionary(ref spriteDictionary, sortingComponentToCheck.sortingGroup.GetInstanceID(),
-                    // sortingComponent.spriteRenderer, sortingComponentToCheck.spriteRenderer);
-
                     continue;
                 }
 
@@ -142,65 +120,10 @@ namespace SpriteSorting
                 return false;
             }
 
-            overlappingComponents.Add(new OverlappingItem(sortingComponentToCheck));
+            baseItem = new OverlappingItem(sortingComponentToCheck, true);
+            overlappingComponents.Insert(0, baseItem);
             Debug.Log("found overlapping with " + overlappingComponents.Count + " sprites");
             return true;
-        }
-
-        // private static void UpdateSpriteDictionary(
-        //     ref Dictionary<int, Dictionary<int, SpriteRenderer>> spriteDictionary,
-        //     SpriteRenderer spriteRenderer)
-        // {
-        //     var isSpriteRendererContained =
-        //         spriteDictionary.TryGetValue(spriteRenderer.GetInstanceID(), out var overlappingDictionary);
-        //     if (!isSpriteRendererContained)
-        //     {
-        //         overlappingDictionary = new Dictionary<int, SpriteRenderer>();
-        //         overlappingDictionary.Add();
-        //     }
-        //
-        //     foreach (var renderer in spriteRendererList)
-        //     {
-        //         if (renderer == spriteRenderer)
-        //         {
-        //             return;
-        //         }
-        //     }
-        //
-        //     //needs to check, if renderer is already contained
-        //
-        //     spriteRendererList.Add(spriteRenderer);
-        //     spriteDictionary[spriteRenderer.GetInstanceID()] = spriteRendererList;
-        // }
-
-        private static void UpdateSpriteDictionary(
-            ref Dictionary<int, Dictionary<int, SpriteRenderer>> spriteDictionary, int sortingGroupInstanceId,
-            params SpriteRenderer[] renderers)
-        {
-            var isSpriteRendererContained =
-                spriteDictionary.TryGetValue(sortingGroupInstanceId, out var overlappingDictionary);
-            if (!isSpriteRendererContained)
-            {
-                overlappingDictionary = new Dictionary<int, SpriteRenderer>();
-                foreach (var spriteRenderer in renderers)
-                {
-                    overlappingDictionary.Add(spriteRenderer.GetInstanceID(), spriteRenderer);
-                }
-
-                spriteDictionary[sortingGroupInstanceId] = overlappingDictionary;
-
-                return;
-            }
-
-            foreach (var spriteRenderer in renderers)
-            {
-                if (overlappingDictionary.ContainsKey(spriteRenderer.GetInstanceID()))
-                {
-                    continue;
-                }
-
-                overlappingDictionary.Add(spriteRenderer.GetInstanceID(), spriteRenderer);
-            }
         }
 
         public static List<SortingGroup> FilterSortingGroups(IEnumerable<SortingGroup> groups)

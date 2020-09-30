@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpriteSorting
+namespace SpriteSortingPlugin
 {
     public class SpriteSortingReordableList : ScriptableObject
     {
