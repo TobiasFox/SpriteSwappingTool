@@ -66,12 +66,6 @@ namespace SpriteSortingPlugin
         {
             var itemWithNewIndex = items[newIndex];
 
-            if (oldIndex + 1 == newIndex || oldIndex - 1 == newIndex)
-            {
-                SwitchItems(oldIndex, newIndex);
-                return;
-            }
-
             var isAdjustingSortingOrderUpwards = newIndex <= items.Count / 2;
             var lastItem = items[newIndex + (isAdjustingSortingOrderUpwards ? 1 : -1)];
 
@@ -128,6 +122,20 @@ namespace SpriteSortingPlugin
             element.UpdatePreviewSortingOrderWithExistingOrder();
 
             UpdateSurroundingItems(currentIndex);
+        }
+
+        public void UpdateSortingLayer(int currentIndex, out int newIndexInList)
+        {
+            if (currentIndex < 0)
+            {
+                newIndexInList = -1;
+                return;
+            }
+
+            var element = items[currentIndex];
+            element.UpdatePreviewSortingLayer();
+
+            newIndexInList = currentIndex;
         }
 
         private void UpdateSurroundingItems(int currentIndex)

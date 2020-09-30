@@ -154,6 +154,7 @@ namespace SpriteSortingPlugin
             {
                 Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
                 SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
+                EditorGUIUtility.PingObject(element.originSpriteRenderer);
             }
 
             if (element.originSortingGroup != null)
@@ -173,6 +174,7 @@ namespace SpriteSortingPlugin
                 {
                     Selection.objects = new Object[] {element.originSortingGroup.gameObject};
                     SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
+                    EditorGUIUtility.PingObject(element.originSortingGroup);
                 }
             }
 
@@ -187,7 +189,8 @@ namespace SpriteSortingPlugin
             if (EditorGUI.EndChangeCheck())
             {
                 element.sortingLayerName = SortingLayerUtility.SortingLayerNames[element.sortingLayerDropDownIndex];
-                element.UpdatePreviewSortingLayer();
+                overlappingItems.UpdateSortingLayer(index, out var newIndexInList);
+                reordableSpriteSortingList.index = newIndexInList;
                 // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
 
