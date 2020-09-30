@@ -83,65 +83,7 @@ namespace SpriteSortingPlugin
 
         private void OnReorderCallbackWithDetails(ReorderableList list, int oldIndex, int newIndex)
         {
-            var itemWithNewIndex = (OverlappingItem) list.list[newIndex];
-
-            if (oldIndex + 1 == newIndex || oldIndex - 1 == newIndex)
-            {
-                var itemWithOldIndex = (OverlappingItem) list.list[oldIndex];
-
-                var tempSortingOrder = itemWithNewIndex.sortingOrder;
-                var tempLayerId = itemWithNewIndex.sortingLayerDropDownIndex;
-
-                itemWithNewIndex.sortingOrder = itemWithOldIndex.sortingOrder;
-                itemWithNewIndex.sortingLayerDropDownIndex = itemWithOldIndex.sortingLayerDropDownIndex;
-
-                itemWithOldIndex.sortingOrder = tempSortingOrder;
-                itemWithOldIndex.sortingLayerDropDownIndex = tempLayerId;
-
-                preview.UpdatePreviewEditor();
-                return;
-            }
-
-            var isAdjustingSortingOrderUpwards = newIndex <= list.list.Count / 2;
-            var lastItem = (OverlappingItem) list.list[newIndex + (isAdjustingSortingOrderUpwards ? 1 : -1)];
-
-            if (isAdjustingSortingOrderUpwards)
-            {
-                if (itemWithNewIndex.sortingOrder <= lastItem.sortingOrder)
-                {
-                    itemWithNewIndex.sortingOrder = lastItem.sortingOrder + 1;
-                }
-
-                for (var i = newIndex - 1; i >= 0; i--)
-                {
-                    var previousItem = (OverlappingItem) list.list[i + 1];
-                    var currentItem = (OverlappingItem) list.list[i];
-
-                    if (previousItem.sortingOrder == currentItem.sortingOrder)
-                    {
-                        currentItem.sortingOrder++;
-                    }
-                }
-
-                return;
-            }
-
-            if (itemWithNewIndex.sortingOrder >= lastItem.sortingOrder)
-            {
-                itemWithNewIndex.sortingOrder = lastItem.sortingOrder - 1;
-            }
-
-            for (var i = newIndex + 1; i < list.count; i++)
-            {
-                var previousItem = (OverlappingItem) list.list[i - 1];
-                var currentItem = (OverlappingItem) list.list[i];
-
-                if (previousItem.sortingOrder == currentItem.sortingOrder)
-                {
-                    currentItem.sortingOrder--;
-                }
-            }
-
+            overlappingItems.ReOrderItem(oldIndex, newIndex);
             preview.UpdatePreviewEditor();
         }
 
@@ -192,9 +134,9 @@ namespace SpriteSortingPlugin
         {
             var element = (OverlappingItem) reordableSpriteSortingList.list[index];
             bool isPreviewUpdating = false;
-            bool isCurrentIndexUpdated = false;
-            rect.y += 2;
             var startX = rect.x;
+
+            rect.y += 2;
 
             if (element.IsBaseItem)
             {
@@ -265,7 +207,7 @@ namespace SpriteSortingPlugin
             {
                 // Debug.Log("new order to " + element.tempSpriteRenderer.sortingOrder);
                 isPreviewUpdating = true;
-                isCurrentIndexUpdated = overlappingItems.UpdateSortingOrder(index);
+                overlappingItems.UpdateSortingOrder(index);
             }
 
             if (GUI.Button(
@@ -274,7 +216,7 @@ namespace SpriteSortingPlugin
             {
                 element.sortingOrder++;
                 isPreviewUpdating = true;
-                isCurrentIndexUpdated = overlappingItems.UpdateSortingOrder(index);
+                overlappingItems.UpdateSortingOrder(index);
             }
 
             if (GUI.Button(
@@ -283,18 +225,13 @@ namespace SpriteSortingPlugin
             {
                 element.sortingOrder--;
                 isPreviewUpdating = true;
-                isCurrentIndexUpdated = overlappingItems.UpdateSortingOrder(index);
+                overlappingItems.UpdateSortingOrder(index);
             }
 
             if (isPreviewUpdating)
             {
-                if (!isCurrentIndexUpdated)
-                {
-                    reordableSpriteSortingList.index = index;
-                }
-
                 OnSelectCallback(reordableSpriteSortingList);
-                
+
                 preview.UpdatePreviewEditor();
             }
         }

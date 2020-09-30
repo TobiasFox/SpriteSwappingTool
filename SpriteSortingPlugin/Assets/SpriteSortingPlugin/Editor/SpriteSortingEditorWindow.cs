@@ -126,6 +126,7 @@ namespace SpriteSortingPlugin
                     "No sorting order issues with overlapping sprites were found in the currently loaded scenes.",
                     EditorStyles.boldLabel);
                 CleanUpReordableList();
+                preview.EnableSceneVisualization(false);
 
                 EndScrollRect();
                 return;
@@ -208,22 +209,27 @@ namespace SpriteSortingPlugin
 
             if (selectedLayers == null)
             {
-                int defaultIndex = 0;
-                for (var i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
-                {
-                    if (SortingLayerUtility.SortingLayerNames[i].Equals("Default"))
-                    {
-                        defaultIndex = i;
-                    }
-                }
-
-                selectedSortingLayers = 1 << defaultIndex;
-                selectedLayers = new List<int>();
+                SelectDefaultLayer();
             }
 
             selectedSortingLayers =
                 EditorGUILayout.MaskField("Sorting Layers", selectedSortingLayers,
                     SortingLayerUtility.SortingLayerNames);
+        }
+
+        private void SelectDefaultLayer()
+        {
+            int defaultIndex = 0;
+            for (var i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
+            {
+                if (SortingLayerUtility.SortingLayerNames[i].Equals("Default"))
+                {
+                    defaultIndex = i;
+                }
+            }
+
+            selectedSortingLayers = 1 << defaultIndex;
+            selectedLayers = new List<int>();
         }
 
         private void Analyze()

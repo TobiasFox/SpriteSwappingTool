@@ -62,38 +62,76 @@ namespace SpriteSortingPlugin
             hasChangedLayer = false;
         }
 
-        public bool UpdateSortingOrder(int currentIndex)
+        public void ReOrderItem(int oldIndex, int newIndex)
+        {
+            var itemWithNewIndex = items[newIndex];
+
+            if (oldIndex + 1 == newIndex || oldIndex - 1 == newIndex)
+            {
+                SwitchItems(oldIndex, newIndex);
+                return;
+            }
+
+            var isAdjustingSortingOrderUpwards = newIndex <= items.Count / 2;
+            var lastItem = items[newIndex + (isAdjustingSortingOrderUpwards ? 1 : -1)];
+
+            if (isAdjustingSortingOrderUpwards)
+            {
+                if (itemWithNewIndex.sortingOrder <= lastItem.sortingOrder)
+                {
+                    itemWithNewIndex.sortingOrder = lastItem.sortingOrder + 1;
+                    itemWithNewIndex.UpdatePreviewSortingOrderWithExistingOrder();
+                }
+
+                for (var i = newIndex - 1; i >= 0; i--)
+                {
+                    var previousItem = items[i + 1];
+                    var currentItem = items[i];
+
+                    if (previousItem.sortingOrder == currentItem.sortingOrder)
+                    {
+                        currentItem.sortingOrder++;
+                        currentItem.UpdatePreviewSortingOrderWithExistingOrder();
+                    }
+                }
+
+                return;
+            }
+
+            if (itemWithNewIndex.sortingOrder >= lastItem.sortingOrder)
+            {
+                itemWithNewIndex.sortingOrder = lastItem.sortingOrder - 1;
+                itemWithNewIndex.UpdatePreviewSortingOrderWithExistingOrder();
+            }
+
+            for (var i = newIndex + 1; i < items.Count; i++)
+            {
+                var previousItem = items[i - 1];
+                var currentItem = items[i];
+
+                if (previousItem.sortingOrder == currentItem.sortingOrder)
+                {
+                    currentItem.sortingOrder--;
+                    currentItem.UpdatePreviewSortingOrderWithExistingOrder();
+                }
+            }
+        }
+
+        public void UpdateSortingOrder(int currentIndex)
         {
             if (currentIndex < 0)
             {
-                return false;
+                return;
             }
 
             var element = items[currentIndex];
             element.UpdatePreviewSortingOrderWithExistingOrder();
 
-            //TODO: update other elements sorting order when one is updated, e.g. when the -1 button is pressed
-            // var index = currentIndex;
-            // var indexToSwitch = GetIndexToSwitch(currentIndex);
-            // if (indexToSwitch >= 0)
-            // {
-            //     reordableSpriteSortingList.list.RemoveAt(currentIndex);
-            //     reordableSpriteSortingList.list.Insert(indexToSwitch, element);
-            //     Debug.Log("switch " + currentIndex + " with " + indexToSwitch);
-            //     index = indexToSwitch;
-            // }
-
-            var itemsHaveChanges = UpdateSurroundingItems(currentIndex);
-
-            /*return indexToSwitch >= 0 || */
-            // preview.UpdatePreviewEditor();
-            return itemsHaveChanges;
+            UpdateSurroundingItems(currentIndex);
         }
 
-        private bool UpdateSurroundingItems(int currentIndex)
+        private void UpdateSurroundingItems(int currentIndex)
         {
-            var itemsHaveChanges = false;
-
             //not called/used in current implementation
             for (var i = currentIndex - 1; i >= 0; i--)
             {
@@ -103,7 +141,7 @@ namespace SpriteSortingPlugin
                 if (previousItem.sortingOrder == currentItem.sortingOrder)
                 {
                     currentItem.sortingOrder++;
-                    itemsHaveChanges = true;
+                    currentItem.UpdatePreviewSortingOrderWithExistingOrder();
                 }
                 else
                 {
@@ -119,15 +157,13 @@ namespace SpriteSortingPlugin
                 if (previousItem.sortingOrder == currentItem.sortingOrder)
                 {
                     currentItem.sortingOrder--;
-                    itemsHaveChanges = true;
+                    currentItem.UpdatePreviewSortingOrderWithExistingOrder();
                 }
                 else
                 {
                     break;
                 }
             }
-
-            return itemsHaveChanges;
         }
 
         private int GetIndexToSwitch(int currentIndex)
@@ -175,6 +211,24 @@ namespace SpriteSortingPlugin
             }
 
             return -1;
+        }
+        
+        private void SwitchItems(int oldIndex, int newIndex)
+        {
+            var itemWithNewIndex = items[newIndex];
+            var itemWithOldIndex = items[oldIndex];
+
+            var tempSortingOrder = itemWithNewIndex.sortingOrder;
+            var tempLayerId = itemWithNewIndex.sortingLayerDropDownIndex;
+
+            itemWithNewIndex.sortingOrder = itemWithOldIndex.sortingOrder;
+            itemWithNewIndex.sortingLayerDropDownIndex = itemWithOldIndex.sortingLayerDropDownIndex;
+
+            itemWithOldIndex.sortingOrder = tempSortingOrder;
+            itemWithOldIndex.sortingLayerDropDownIndex = tempLayerId;
+
+            itemWithNewIndex.UpdatePreview();
+            itemWithOldIndex.UpdatePreview();
         }
 
         private void InitOverlappingItems(bool isReset)

@@ -82,6 +82,12 @@ namespace SpriteSortingPlugin
             }
         }
 
+        public void UpdatePreview()
+        {
+            UpdatePreviewSortingOrderWithExistingOrder();
+            UpdatePreviewSortingLayer();
+        }
+
         public void CleanUpPreview()
         {
             if (previewSpriteRenderer != null)
@@ -99,8 +105,9 @@ namespace SpriteSortingPlugin
         public override string ToString()
         {
             return "OI[origin: " + SortingLayer.IDToName(originSortingLayer) + ", " + originSortingOrder +
-                   " current: " + sortingLayerName + ", " + (originSortingOrder + sortingOrder) + ", baseItem: " +
-                   IsBaseItem + ", originSortedIndex:" + OriginSortedIndex + "]";
+                   " current: " + sortingLayerName + ", " + (originSortingOrder + sortingOrder) + "(" +
+                   originSortingOrder + "+" + sortingOrder + "), baseItem: " + IsBaseItem +
+                   ", originSortedIndex:" + OriginSortedIndex + "]";
         }
     }
 }
