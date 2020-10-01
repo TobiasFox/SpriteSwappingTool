@@ -5,24 +5,24 @@ using UnityEngine.Rendering;
 namespace SpriteSortingPlugin
 {
     [Serializable]
-    public struct SortingComponent
+    public class SortingComponent
     {
         public readonly SpriteRenderer spriteRenderer;
-        public readonly SortingGroup sortingGroup;
+        public readonly SortingGroup outmostSortingGroup;
 
-        public SortingComponent(SpriteRenderer spriteRenderer, SortingGroup sortingGroup = null)
+        public SortingComponent(SpriteRenderer spriteRenderer, SortingGroup outmostSortingGroup = null)
         {
             this.spriteRenderer = spriteRenderer;
-            this.sortingGroup = sortingGroup;
+            this.outmostSortingGroup = outmostSortingGroup;
         }
 
         public int CurrentSortingOrder
         {
             get
             {
-                if (sortingGroup != null)
+                if (outmostSortingGroup != null)
                 {
-                    return sortingGroup.sortingOrder;
+                    return outmostSortingGroup.sortingOrder;
                 }
 
                 return spriteRenderer != null ? spriteRenderer.sortingOrder : 0;
@@ -33,9 +33,9 @@ namespace SpriteSortingPlugin
         {
             get
             {
-                if (sortingGroup != null)
+                if (outmostSortingGroup != null)
                 {
-                    return sortingGroup.sortingLayerID;
+                    return outmostSortingGroup.sortingLayerID;
                 }
 
                 return spriteRenderer != null ? spriteRenderer.sortingLayerID : 0;
@@ -54,15 +54,15 @@ namespace SpriteSortingPlugin
 
         public bool Equals(SortingComponent other)
         {
-            return spriteRenderer == other.spriteRenderer && sortingGroup == other.sortingGroup;
+            return spriteRenderer == other.spriteRenderer && outmostSortingGroup == other.outmostSortingGroup;
         }
 
         public override int GetHashCode()
         {
             var hashcode = spriteRenderer.GetHashCode();
-            if (sortingGroup != null)
+            if (outmostSortingGroup != null)
             {
-                hashcode ^= sortingGroup.GetHashCode();
+                hashcode ^= outmostSortingGroup.GetHashCode();
             }
 
             return hashcode;
@@ -71,7 +71,7 @@ namespace SpriteSortingPlugin
         public override string ToString()
         {
             return "SortingComponent[" + spriteRenderer.name + ", " + CurrentSortingLayer + ", " + CurrentSortingOrder +
-                   ", SG:" + (sortingGroup != null) + "]";
+                   ", SG:" + (outmostSortingGroup != null) + "]";
         }
     }
 }

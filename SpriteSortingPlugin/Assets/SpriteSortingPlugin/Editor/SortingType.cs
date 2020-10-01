@@ -4,7 +4,5 @@ namespace SpriteSortingPlugin
     {
         Layer,
         Sprite,
-        SortingGroup,
-        GameObjectParents,
     }
 }

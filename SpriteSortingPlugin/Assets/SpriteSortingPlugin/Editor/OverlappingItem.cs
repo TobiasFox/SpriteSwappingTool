@@ -43,7 +43,7 @@ namespace SpriteSortingPlugin
         public OverlappingItem(SortingComponent sortingComponent, bool isBaseItem = false)
         {
             originSpriteRenderer = sortingComponent.spriteRenderer;
-            originSortingGroup = sortingComponent.sortingGroup;
+            originSortingGroup = sortingComponent.outmostSortingGroup;
             IsBaseItem = isBaseItem;
 
             if (originSortingGroup != null)

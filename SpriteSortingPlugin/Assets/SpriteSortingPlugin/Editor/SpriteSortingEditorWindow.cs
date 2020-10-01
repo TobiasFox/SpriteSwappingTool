@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -15,11 +14,15 @@ namespace SpriteSortingPlugin
         private bool ignoreAlphaOfSprites;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
-        private SpriteRenderer spriteRenderer;
-        private SortingGroup sortingGroup;
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private SortingGroup sortingGroup;
+        [SerializeField] private List<Transform> gameObjectParents;
+        private SerializedObject serializedObject;
 
         private int selectedSortingLayers;
         private List<int> selectedLayers;
+        private bool isGameObjectParentsExpanded;
+        private bool isUsingGameObjectParents;
 
         private SpriteSortingAnalysisResult result;
         private bool analyzeButtonWasClicked;
@@ -50,6 +53,11 @@ namespace SpriteSortingPlugin
 
         private void OnEnable()
         {
+            if (serializedObject == null)
+            {
+                serializedObject = new SerializedObject(this);
+            }
+
             if (analyzeButtonWasClicked)
             {
                 if (result.overlappingItems != null && result.overlappingItems.Count > 0)
@@ -69,6 +77,7 @@ namespace SpriteSortingPlugin
         private void OnGUI()
         {
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            serializedObject.Update();
 
             GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
             ignoreAlphaOfSprites = EditorGUILayout.Toggle("ignore Alpha Of Sprites", ignoreAlphaOfSprites);
@@ -82,10 +91,27 @@ namespace SpriteSortingPlugin
                 case SortingType.Layer:
                     ShowSortingLayers();
 
+                    isUsingGameObjectParents =
+                        EditorGUILayout.BeginToggleGroup("use specific gameObject parents?", isUsingGameObjectParents);
+
+                    if (isUsingGameObjectParents)
+                    {
+                        var gameObjectParentsSerializedProp = serializedObject.FindProperty("gameObjectParents");
+                        if (isGameObjectParentsExpanded)
+                        {
+                            gameObjectParentsSerializedProp.isExpanded = true;
+                            isGameObjectParentsExpanded = false;
+                        }
+
+                        EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                    }
+
+                    EditorGUILayout.EndToggleGroup();
+
                     break;
                 case SortingType.Sprite:
-                    spriteRenderer = EditorGUILayout.ObjectField("Sprite", spriteRenderer, typeof(SpriteRenderer), true,
-                        GUILayout.Height(EditorGUIUtility.singleLineHeight)) as SpriteRenderer;
+                    var serializedSpriteRenderer = serializedObject.FindProperty("spriteRenderer");
+                    EditorGUILayout.PropertyField(serializedSpriteRenderer, true);
 
                     //TODO: will not work for prefab scene
                     if (spriteRenderer != null && !spriteRenderer.gameObject.scene.isLoaded)
@@ -94,17 +120,9 @@ namespace SpriteSortingPlugin
                     }
 
                     break;
-                case SortingType.SortingGroup:
-                    sortingGroup = EditorGUILayout.ObjectField("Sorting Group", sortingGroup, typeof(SortingGroup),
-                        true, GUILayout.Height(EditorGUIUtility.singleLineHeight)) as SortingGroup;
-                    if (sortingGroup != null && !sortingGroup.gameObject.scene.isLoaded)
-                    {
-                        GUILayout.Label("Please choose a SortingGroup from an active Scene.");
-                    }
-
-                    break;
             }
 
+            serializedObject.ApplyModifiedProperties();
             bool isAnalyzedButtonClickedThisFrame = false;
 
             if (GUILayout.Button("Analyze"))
@@ -237,25 +255,30 @@ namespace SpriteSortingPlugin
             switch (sortingType)
             {
                 case SortingType.Layer:
-                    AnalyzeLayer();
+                    UpdateSelectedLayers();
+                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayers,
+                        gameObjectParents);
                     break;
                 case SortingType.Sprite:
-                    AnalyzeSprite();
-                    break;
-                case SortingType.SortingGroup:
-                    AnalyzeSortingGroup();
+                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer);
                     break;
             }
 
+            if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
+            {
+                return;
+            }
+
+            overlappingItems = new OverlappingItems(result.baseItem, result.overlappingItems);
+            preview.UpdateOverlappingItems(overlappingItems);
+            reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
+
+            if (result.overlappingItems.Count > 1)
+            {
+                InitReordableListForNewSortingGroup();
+            }
+
             analyzeButtonWasClicked = true;
-        }
-
-        private void AnalyzeSprite()
-        {
-        }
-
-        private void AnalyzeSortingGroup()
-        {
         }
 
         private void UpdateSelectedLayers()
@@ -270,30 +293,6 @@ namespace SpriteSortingPlugin
                 {
                     selectedLayers.Add(SortingLayer.NameToID(SortingLayerUtility.SortingLayerNames[i]));
                 }
-            }
-        }
-
-        private void AnalyzeLayer()
-        {
-            UpdateSelectedLayers();
-
-            result = SpriteSortingUtility.AnalyzeSpriteSorting(new SpriteSortingData
-                {selectedLayers = selectedLayers, cameraProjectionType = cameraProjectionType});
-
-            if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
-            {
-                return;
-            }
-
-            overlappingItems = new OverlappingItems(result.baseItem, result.overlappingItems);
-
-            preview.UpdateOverlappingItems(overlappingItems);
-
-            reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
-
-            if (result.overlappingItems.Count > 1)
-            {
-                InitReordableListForNewSortingGroup();
             }
         }
 
