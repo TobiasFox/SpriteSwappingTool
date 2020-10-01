@@ -20,7 +20,7 @@ namespace SpriteSortingPlugin
         private Color bg2 = new Color(0.76f, 0.76f, 0.76f);
         private Color activeColor = new Color(0.1f, 0.69f, 1f, 0.7f);
         private Color focussingColor = new Color(0.45f, 0.77f, 0.95f, 0.91f);
-        private int lastFocussedIndex;
+        private int lastFocussedIndex = -1;
         private OverlappingItems overlappingItems;
         private SpriteSortingEditorPreview preview;
 
@@ -266,11 +266,6 @@ namespace SpriteSortingPlugin
             reordableSpriteSortingList.drawElementBackgroundCallback = null;
             reordableSpriteSortingList.onReorderCallbackWithDetails = null;
             reordableSpriteSortingList = null;
-        }
-
-        public void ResetLastFocusIndex()
-        {
-            lastFocussedIndex = -1;
         }
     }
 }
