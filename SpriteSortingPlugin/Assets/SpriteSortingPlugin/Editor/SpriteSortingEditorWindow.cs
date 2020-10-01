@@ -2,7 +2,6 @@
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin
@@ -15,7 +14,6 @@ namespace SpriteSortingPlugin
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
         [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private SortingGroup sortingGroup;
         [SerializeField] private List<Transform> gameObjectParents;
         private SerializedObject serializedObject;
 
