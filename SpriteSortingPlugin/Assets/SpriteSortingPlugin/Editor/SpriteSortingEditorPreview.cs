@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -16,7 +15,6 @@ namespace SpriteSortingPlugin
         private Editor previewEditor;
         private bool isVisualizingBoundsInScene;
         private bool isSceneVisualizingDelegateIsAdded;
-        private bool isShowingAllSpritesOfSortingGroups;
         private OverlappingItems overlappingItems;
 
         public void UpdateOverlappingItems(OverlappingItems overlappingItems)
@@ -61,9 +59,6 @@ namespace SpriteSortingPlugin
             }
 
             EditorGUILayout.EndHorizontal();
-
-            isShowingAllSpritesOfSortingGroups = EditorGUILayout.ToggleLeft("Show all Sprites Of Sorting Groups",
-                isShowingAllSpritesOfSortingGroups);
 
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
             var previewRect = EditorGUILayout.GetControlRect(false, 256 + horizontalRect.height);

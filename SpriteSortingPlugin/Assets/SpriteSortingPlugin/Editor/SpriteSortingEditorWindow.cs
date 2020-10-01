@@ -90,7 +90,7 @@ namespace SpriteSortingPlugin
                     ShowSortingLayers();
 
                     isUsingGameObjectParents =
-                        EditorGUILayout.BeginToggleGroup("use specific gameObject parents?", isUsingGameObjectParents);
+                        EditorGUILayout.BeginToggleGroup("use specific GameObject parents?", isUsingGameObjectParents);
 
                     if (isUsingGameObjectParents)
                     {
