@@ -62,6 +62,14 @@ namespace SpriteSortingPlugin
             hasChangedLayer = false;
         }
 
+        public void ConvertSortingOrder(bool isRelative)
+        {
+            foreach (var overlappingItem in items)
+            {
+                overlappingItem.ConvertSortingOrder(isRelative);
+            }
+        }
+
         public void ReOrderItem(int oldIndex, int newIndex)
         {
             var itemWithNewIndex = items[newIndex];

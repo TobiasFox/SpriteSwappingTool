@@ -18,6 +18,7 @@ namespace SpriteSortingPlugin
         public int sortingOrder;
         public int sortingLayerDropDownIndex;
         public string sortingLayerName;
+        private bool isUsingRelativeSortingOrder = true;
 
         public bool IsItemSelected { get; set; }
         public int OriginSortedIndex { get; set; }
@@ -60,13 +61,19 @@ namespace SpriteSortingPlugin
 
         public void UpdatePreviewSortingOrderWithExistingOrder()
         {
+            var newPreviewSortingOrder = sortingOrder;
+            if (isUsingRelativeSortingOrder)
+            {
+                newPreviewSortingOrder += originSortingOrder;
+            }
+
             if (previewSortingGroup != null)
             {
-                previewSortingGroup.sortingOrder = originSortingOrder + sortingOrder;
+                previewSortingGroup.sortingOrder = newPreviewSortingOrder;
             }
             else if (previewSpriteRenderer != null)
             {
-                previewSpriteRenderer.sortingOrder = originSortingOrder + sortingOrder;
+                previewSpriteRenderer.sortingOrder = newPreviewSortingOrder;
             }
         }
 
@@ -86,6 +93,12 @@ namespace SpriteSortingPlugin
         {
             UpdatePreviewSortingOrderWithExistingOrder();
             UpdatePreviewSortingLayer();
+        }
+
+        public void ConvertSortingOrder(bool isRelative)
+        {
+            isUsingRelativeSortingOrder = isRelative;
+            sortingOrder += originSortingOrder * (isRelative ? -1 : 1);
         }
 
         public void CleanUpPreview()

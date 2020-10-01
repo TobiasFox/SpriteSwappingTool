@@ -23,6 +23,7 @@ namespace SpriteSortingPlugin
         private int lastFocussedIndex = -1;
         private OverlappingItems overlappingItems;
         private SpriteSortingEditorPreview preview;
+        private bool isUsingRelativeSortingOrder = true;
 
         public void InitReordableList(OverlappingItems overlappingItems, SpriteSortingEditorPreview preview)
         {
@@ -201,10 +202,10 @@ namespace SpriteSortingPlugin
             EditorGUIUtility.labelWidth = 70;
 
             EditorGUI.BeginChangeCheck();
+            var sortingOrderLabel = "Order " + (isUsingRelativeSortingOrder ? element.originSortingOrder + " +" : "");
             element.sortingOrder =
-                EditorGUI.DelayedIntField(
-                    new Rect(rect.x + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
-                    "Order " + element.originSortingOrder + " +", element.sortingOrder);
+                EditorGUI.DelayedIntField(new Rect(rect.x + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
+                    sortingOrderLabel, element.sortingOrder);
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -242,6 +243,14 @@ namespace SpriteSortingPlugin
         private void DrawHeaderCallback(Rect rect)
         {
             EditorGUI.LabelField(rect, "Overlapping Items");
+
+            if (GUI.Button(new Rect(rect.width - 172.5f, rect.y, 135, EditorGUIUtility.singleLineHeight),
+                (isUsingRelativeSortingOrder ? "Total" : "Relative") + " Sorting Order"))
+            {
+                isUsingRelativeSortingOrder = !isUsingRelativeSortingOrder;
+                overlappingItems.ConvertSortingOrder(isUsingRelativeSortingOrder);
+                preview.UpdatePreviewEditor();
+            }
 
             if (GUI.Button(new Rect(rect.width - 35, rect.y, 45, EditorGUIUtility.singleLineHeight), "Reset"))
             {
