@@ -2,7 +2,7 @@
 
 namespace SpriteSortingPlugin
 {
-    public class OverlappingItemComparer : Comparer<OverlappingItem>
+    public class OverlappingItemIndexComparer : Comparer<OverlappingItem>
     {
         public override int Compare(OverlappingItem x, OverlappingItem y)
         {

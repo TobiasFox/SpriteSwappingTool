@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SpriteSortingPlugin
 {
@@ -13,7 +12,8 @@ namespace SpriteSortingPlugin
         private List<OverlappingItem> itemsForNewSortingGroup;
 
         private bool hasChangedLayer;
-        private OverlappingItemComparer originIndexComparer;
+        private OverlappingItemIndexComparer originIndexComparer;
+        private OverlappingItemIdentityComparer overlappingItemIdentityComparer;
 
         public List<OverlappingItem> Items => items;
         public OverlappingItem BaseItem => baseItem;
@@ -32,7 +32,7 @@ namespace SpriteSortingPlugin
         {
             if (originIndexComparer == null)
             {
-                originIndexComparer = new OverlappingItemComparer();
+                originIndexComparer = new OverlappingItemIndexComparer();
             }
 
             ArrayList.Adapter(items).Sort(originIndexComparer);
@@ -126,27 +126,37 @@ namespace SpriteSortingPlugin
 
         public void UpdateSortingLayer(int currentIndex, out int newIndexInList)
         {
+            newIndexInList = -1;
             if (currentIndex < 0)
             {
-                newIndexInList = -1;
                 return;
             }
 
             var element = items[currentIndex];
             element.UpdatePreviewSortingLayer();
 
-            newIndexInList = currentIndex;
+            if (overlappingItemIdentityComparer == null)
+            {
+                overlappingItemIdentityComparer = new OverlappingItemIdentityComparer();
+            }
+
+            ArrayList.Adapter(items).Sort(overlappingItemIdentityComparer);
+
+            newIndexInList = items.IndexOf(element);
+            UpdateSurroundingItems(newIndexInList);
         }
 
         private void UpdateSurroundingItems(int currentIndex)
         {
+            var layerName = items[currentIndex].sortingLayerName;
             //not called/used in current implementation
             for (var i = currentIndex - 1; i >= 0; i--)
             {
                 var previousItem = items[i + 1];
                 var currentItem = items[i];
 
-                if (previousItem.sortingOrder == currentItem.sortingOrder)
+                if (currentItem.sortingLayerName.Equals(layerName) &&
+                    previousItem.sortingOrder == currentItem.sortingOrder)
                 {
                     currentItem.sortingOrder++;
                     currentItem.UpdatePreviewSortingOrderWithExistingOrder();
@@ -162,7 +172,8 @@ namespace SpriteSortingPlugin
                 var previousItem = items[i - 1];
                 var currentItem = items[i];
 
-                if (previousItem.sortingOrder == currentItem.sortingOrder)
+                if (currentItem.sortingLayerName.Equals(layerName) &&
+                    previousItem.sortingOrder == currentItem.sortingOrder)
                 {
                     currentItem.sortingOrder--;
                     currentItem.UpdatePreviewSortingOrderWithExistingOrder();
@@ -220,7 +231,7 @@ namespace SpriteSortingPlugin
 
             return -1;
         }
-        
+
         private void SwitchItems(int oldIndex, int newIndex)
         {
             var itemWithNewIndex = items[newIndex];

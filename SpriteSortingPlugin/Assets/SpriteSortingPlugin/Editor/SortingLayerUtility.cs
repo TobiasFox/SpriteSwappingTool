@@ -8,7 +8,18 @@ namespace SpriteSortingPlugin
     {
         private static string[] sortingLayerNames;
 
-        public static string[] SortingLayerNames => sortingLayerNames;
+        public static string[] SortingLayerNames
+        {
+            get
+            {
+                if (sortingLayerNames == null)
+                {
+                    UpdateSortingLayerNames();
+                }
+
+                return sortingLayerNames;
+            }
+        }
 
         public static void UpdateSortingLayerNames()
         {
