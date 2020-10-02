@@ -1,10 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SpriteSortingPlugin
 {
-    [Serializable]
-    public class SortingLayerUtility
+    public static class SortingLayerUtility
     {
         private static string[] sortingLayerNames;
 
