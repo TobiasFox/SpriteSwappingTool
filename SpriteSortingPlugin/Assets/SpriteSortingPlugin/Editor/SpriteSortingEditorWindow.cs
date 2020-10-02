@@ -18,7 +18,7 @@ namespace SpriteSortingPlugin
         private SerializedObject serializedObject;
 
         private int selectedSortingLayers;
-        private List<int> selectedLayers;
+        private List<string> selectedLayers;
         private bool isGameObjectParentsExpanded;
         private bool isUsingGameObjectParents;
 
@@ -46,7 +46,39 @@ namespace SpriteSortingPlugin
         {
             preview = new SpriteSortingEditorPreview();
             reordableOverlappingItemList = new ReordableOverlappingItemList();
-            // int i = 0;
+            SortingLayerUtility.UpdateSortingLayerNames();
+        }
+
+        private void OnInspectorUpdate()
+        {
+            var isSortingLayerOrderChanged = SortingLayerUtility.UpdateSortingLayerNames();
+            if (isSortingLayerOrderChanged)
+            {
+                var oldSelectedLayerNames = new List<string>(selectedLayers);
+
+                selectedLayers.Clear();
+                selectedSortingLayers = 0;
+
+                for (var i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
+                {
+                    var layerName = SortingLayerUtility.SortingLayerNames[i];
+                    if (oldSelectedLayerNames.Contains(layerName))
+                    {
+                        selectedLayers.Add(layerName);
+                        selectedSortingLayers ^= 1 << i;
+                    }
+                }
+
+                if (analyzeButtonWasClicked && result.overlappingItems != null && result.overlappingItems.Count > 0)
+                {
+                    var currentIndex = reordableOverlappingItemList.GetIndex();
+                    var item = currentIndex < 0 ? null : overlappingItems.Items[currentIndex];
+
+                    overlappingItems.OnChangedSortingLayerOrder();
+
+                    reordableOverlappingItemList.SetIndex(currentIndex < 0 ? -1 : overlappingItems.Items.IndexOf(item));
+                }
+            }
         }
 
         private void OnEnable()
@@ -148,11 +180,6 @@ namespace SpriteSortingPlugin
                 return;
             }
 
-            if (sortingType != SortingType.Layer)
-            {
-                SortingLayerUtility.UpdateSortingLayerNames();
-            }
-
             reordableOverlappingItemList.DoLayoutList();
 
             isCreatingNewSortingGroup =
@@ -218,34 +245,52 @@ namespace SpriteSortingPlugin
             reordableListForSortingGroup = null;
         }
 
-
         private void ShowSortingLayers()
         {
-            SortingLayerUtility.UpdateSortingLayerNames();
-
             if (selectedLayers == null)
             {
                 SelectDefaultLayer();
             }
 
-            selectedSortingLayers =
-                EditorGUILayout.MaskField("Sorting Layers", selectedSortingLayers,
-                    SortingLayerUtility.SortingLayerNames);
+            EditorGUI.BeginChangeCheck();
+            selectedSortingLayers = EditorGUILayout.MaskField("Sorting Layers", selectedSortingLayers,
+                SortingLayerUtility.SortingLayerNames);
+            if (EditorGUI.EndChangeCheck())
+            {
+                UpdateSelectedLayers();
+            }
+        }
+
+        private void UpdateSelectedLayers()
+        {
+            selectedLayers.Clear();
+
+            for (int i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
+            {
+                //bitmask moving check if bit is set
+                var layer = 1 << i;
+                if ((selectedSortingLayers & layer) != 0)
+                {
+                    selectedLayers.Add(SortingLayerUtility.SortingLayerNames[i]);
+                    // selectedLayers.Add(SortingLayer.NameToID(SortingLayerUtility.SortingLayerNames[i]));
+                }
+            }
         }
 
         private void SelectDefaultLayer()
         {
-            int defaultIndex = 0;
+            var defaultIndex = 0;
             for (var i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
             {
                 if (SortingLayerUtility.SortingLayerNames[i].Equals("Default"))
                 {
                     defaultIndex = i;
+                    break;
                 }
             }
 
             selectedSortingLayers = 1 << defaultIndex;
-            selectedLayers = new List<int>();
+            selectedLayers = new List<string> {"Default"};
         }
 
         private void Analyze()
@@ -253,8 +298,14 @@ namespace SpriteSortingPlugin
             switch (sortingType)
             {
                 case SortingType.Layer:
-                    UpdateSelectedLayers();
-                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayers,
+
+                    var selectedLayerIds = new List<int>();
+                    foreach (var selectedLayer in selectedLayers)
+                    {
+                        selectedLayerIds.Add(SortingLayer.NameToID(selectedLayer));
+                    }
+
+                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayerIds,
                         gameObjectParents);
                     break;
                 case SortingType.Sprite:
@@ -277,21 +328,6 @@ namespace SpriteSortingPlugin
             }
 
             analyzeButtonWasClicked = true;
-        }
-
-        private void UpdateSelectedLayers()
-        {
-            selectedLayers.Clear();
-
-            for (int i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
-            {
-                //bitmask moving check if bit is set
-                var layer = 1 << i;
-                if ((selectedSortingLayers & layer) != 0)
-                {
-                    selectedLayers.Add(SortingLayer.NameToID(SortingLayerUtility.SortingLayerNames[i]));
-                }
-            }
         }
 
         private void InitReordableListForNewSortingGroup()

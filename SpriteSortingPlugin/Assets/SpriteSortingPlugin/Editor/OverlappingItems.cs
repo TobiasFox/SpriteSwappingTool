@@ -70,6 +70,22 @@ namespace SpriteSortingPlugin
             }
         }
 
+        public void OnChangedSortingLayerOrder()
+        {
+            foreach (var overlappingItem in items)
+            {
+                overlappingItem.sortingLayerDropDownIndex =
+                    SortingLayerUtility.GetLayerNameIndex(overlappingItem.sortingLayerName);
+            }
+
+            if (overlappingItemIdentityComparer == null)
+            {
+                overlappingItemIdentityComparer = new OverlappingItemIdentityComparer();
+            }
+
+            ArrayList.Adapter(items).Sort(overlappingItemIdentityComparer);
+        }
+
         public void ReOrderItem(int oldIndex, int newIndex)
         {
             var itemWithNewIndex = items[newIndex];

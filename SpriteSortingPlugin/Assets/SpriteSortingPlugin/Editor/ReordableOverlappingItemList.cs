@@ -82,6 +82,17 @@ namespace SpriteSortingPlugin
             reordableSpriteSortingList.DoLayoutList();
         }
 
+        public int GetIndex()
+        {
+            return reordableSpriteSortingList.index;
+        }
+
+        public void SetIndex(int newIndex)
+        {
+            reordableSpriteSortingList.index = newIndex;
+            OnSelectCallback(reordableSpriteSortingList);
+        }
+
         private void OnReorderCallbackWithDetails(ReorderableList list, int oldIndex, int newIndex)
         {
             overlappingItems.ReOrderItem(oldIndex, newIndex);
