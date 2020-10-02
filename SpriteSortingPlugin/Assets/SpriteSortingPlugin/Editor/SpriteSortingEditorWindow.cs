@@ -55,6 +55,14 @@ namespace SpriteSortingPlugin
 
         private void OnInspectorUpdate()
         {
+            if (sortingType == SortingType.Layer)
+            {
+                CheckSortingLayerOrder();
+            }
+        }
+
+        private void CheckSortingLayerOrder()
+        {
             var isSortingLayerOrderChanged = SortingLayerUtility.UpdateSortingLayerNames();
             if (isSortingLayerOrderChanged)
             {
@@ -130,8 +138,7 @@ namespace SpriteSortingPlugin
             ignoreAlphaOfSprites = EditorGUILayout.Toggle("ignore Alpha Of Sprites", ignoreAlphaOfSprites);
             cameraProjectionType =
                 (CameraProjectionType) EditorGUILayout.EnumPopup("Projection type of camera", cameraProjectionType);
-            sortingType =
-                (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
+            sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
 
             switch (sortingType)
             {
