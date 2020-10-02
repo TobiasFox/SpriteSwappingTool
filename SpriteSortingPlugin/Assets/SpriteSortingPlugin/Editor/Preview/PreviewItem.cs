@@ -4,7 +4,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Preview
 {
     [Serializable]
     public class PreviewItem

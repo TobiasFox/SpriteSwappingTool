@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Preview
 {
     public static class PreviewUtility
     {
