@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace SpriteSortingPlugin
 {
@@ -132,6 +133,14 @@ namespace SpriteSortingPlugin
                     currentItem.sortingOrder--;
                     currentItem.UpdatePreviewSortingOrderWithExistingOrder();
                 }
+            }
+        }
+
+        public void ApplySortingOptions()
+        {
+            foreach (var overlappingItem in items)
+            {
+                overlappingItem.ApplySortingOption();
             }
         }
 

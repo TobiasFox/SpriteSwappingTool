@@ -211,12 +211,17 @@ namespace SpriteSortingPlugin
             if (GUILayout.Button("Confirm and continue searching"))
             {
                 Debug.Log("sort sprites");
+
+                overlappingItems.ApplySortingOptions();
+                
                 analyzeButtonWasClicked = false;
                 result.overlappingItems = null;
                 preview.CleanUpPreview();
 
                 //TODO: check isAnalyzingWithChangedLayerFirst
                 EndScrollRect();
+                
+                Analyze();
                 return;
             }
 
@@ -295,6 +300,8 @@ namespace SpriteSortingPlugin
 
         private void Analyze()
         {
+            analyzeButtonWasClicked = true;
+            
             switch (sortingType)
             {
                 case SortingType.Layer:
@@ -326,8 +333,6 @@ namespace SpriteSortingPlugin
             {
                 InitReordableListForNewSortingGroup();
             }
-
-            analyzeButtonWasClicked = true;
         }
 
         private void InitReordableListForNewSortingGroup()

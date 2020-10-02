@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
@@ -113,6 +114,28 @@ namespace SpriteSortingPlugin
         {
             return originSortingLayer !=
                    SortingLayer.NameToID(SortingLayerUtility.SortingLayerNames[sortingLayerDropDownIndex]);
+        }
+
+        public void ApplySortingOption()
+        {
+            var newSortingOrder = sortingOrder;
+            if (isUsingRelativeSortingOrder)
+            {
+                newSortingOrder += originSortingOrder;
+            }
+
+            if (originSortingGroup != null)
+            {
+                Undo.RecordObject(originSortingGroup, "apply sorting options");
+                originSortingGroup.sortingLayerName = sortingLayerName;
+                originSortingGroup.sortingOrder = newSortingOrder;
+
+                return;
+            }
+
+            Undo.RecordObject(originSpriteRenderer, "apply sorting options");
+            originSpriteRenderer.sortingLayerName = sortingLayerName;
+            originSpriteRenderer.sortingOrder = newSortingOrder;
         }
 
         public override string ToString()
