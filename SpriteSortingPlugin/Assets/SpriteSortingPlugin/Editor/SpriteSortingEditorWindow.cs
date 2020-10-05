@@ -64,12 +64,13 @@ namespace SpriteSortingPlugin
         private void CheckSortingLayerOrder()
         {
             var isSortingLayerOrderChanged = SortingLayerUtility.UpdateSortingLayerNames();
-            if (isSortingLayerOrderChanged)
+            if (!isSortingLayerOrderChanged)
             {
-                ReInitializeSelectedLayers();
-
-                UpdateChangedSortingLayerOrderInOverlappingItems();
+                return;
             }
+
+            ReInitializeSelectedLayers();
+            UpdateChangedSortingLayerOrderInOverlappingItems();
         }
 
         private void UpdateChangedSortingLayerOrderInOverlappingItems()
@@ -112,6 +113,8 @@ namespace SpriteSortingPlugin
             {
                 serializedObject = new SerializedObject(this);
             }
+
+            SortingLayerUtility.UpdateSortingLayerNames();
 
             if (analyzeButtonWasClicked)
             {
