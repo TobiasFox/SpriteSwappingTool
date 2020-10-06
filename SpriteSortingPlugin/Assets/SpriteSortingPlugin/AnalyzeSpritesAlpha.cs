@@ -6,12 +6,14 @@ namespace SpriteSortingPlugin
 {
     public class AnalyzeSpritesAlpha : MonoBehaviour
     {
+        [SerializeField] private bool liveUpdateBounds;
+
         private SpriteRenderer ownRenderer;
         private int[] borders;
-        float[] adjustedBorder = new float[4];
-        Vector3[] sourcePoints = new Vector3[4];
-        Vector3[] points = new Vector3[4];
-        private Bounds newBounds;
+        private Bounds ownBounds;
+
+        private readonly Vector3[] sourcePoints = new Vector3[4];
+        private readonly Vector3[] points = new Vector3[4];
 
         public void Generate()
         {
@@ -32,12 +34,12 @@ namespace SpriteSortingPlugin
                 for (int x = 0; x < spriteTexture.width; x++)
                 {
                     var color = pixelArray[counter];
-            
+
                     AnalyzeOutmostAlpha(x, y, color.a);
                     counter++;
                 }
             }
-            
+
             //more performant around 0,124s
             // for (int i = 0; i < pixelArray.Length; i++)
             // {
@@ -55,6 +57,7 @@ namespace SpriteSortingPlugin
             //     counter++;
             // }
 
+            var adjustedBorder = new float[4];
             for (var i = 0; i < borders.Length; i++)
             {
                 adjustedBorder[i] = borders[i] / ownRenderer.sprite.pixelsPerUnit;
@@ -62,29 +65,35 @@ namespace SpriteSortingPlugin
 
             var width = adjustedBorder[3] - adjustedBorder[1];
             var height = adjustedBorder[2] - adjustedBorder[0];
-            newBounds = new Bounds(transform.position, new Vector3(width, height, 0));
+            ownBounds = new Bounds(transform.position, new Vector3(width, height, 0));
 
-            // sourcePoints[0] = new Vector3(adjustedBorder[1], adjustedBorder[0], 0) /*- transform.position*/; // top Left
-            // sourcePoints[1] = new Vector3(adjustedBorder[1], adjustedBorder[2], 0) /* - transform.position*/
-            //     ; //bottom left
-            // sourcePoints[2] = new Vector3(adjustedBorder[3], adjustedBorder[2], 0) /*- transform.position*/
-            //     ; //bottom right
-            // sourcePoints[3] = new Vector3(adjustedBorder[3], adjustedBorder[0], 0) /*- transform.position*/; //top right
-
-            // // Apply scaling
-            // for (int s = 0; s < sourcePoints.Length; s++)
-            // {
-            //     sourcePoints[s] = new Vector3(sourcePoints[s].x / transform.localScale.x,
-            //         sourcePoints[s].y / transform.localScale.y, 0);
-            // }
-            //
-            // // Transform points from local to world space
-            // for (int t = 0; t < points.Length; t++)
-            // {
-            //     points[t] = transform.TransformPoint(sourcePoints[t]);
-            // }
+            UpdateRotatedBoundingBoxPoints();
 
             Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
+        }
+
+        private void UpdateRotatedBoundingBoxPoints()
+        {
+            var position = transform.position;
+            ownBounds.center = position;
+
+            sourcePoints[0] = new Vector3(ownBounds.min.x, ownBounds.max.y, 0) - position; // top left 
+            sourcePoints[1] = new Vector3(ownBounds.min.x, ownBounds.min.y, 0) - position; // bottom left 
+            sourcePoints[2] = new Vector3(ownBounds.max.x, ownBounds.min.y, 0) - position; // bottom right
+            sourcePoints[3] = new Vector3(ownBounds.max.x, ownBounds.max.y, 0) - position; // top right
+
+            // Apply scaling
+            var localScale = transform.localScale;
+            for (int s = 0; s < sourcePoints.Length; s++)
+            {
+                sourcePoints[s] = new Vector3(sourcePoints[s].x / localScale.x, sourcePoints[s].y / localScale.y, 0);
+            }
+
+            // Transform points from local to world space
+            for (int t = 0; t < points.Length; t++)
+            {
+                points[t] = transform.TransformPoint(sourcePoints[t]);
+            }
         }
 
         private void AnalyzeOutmostAlpha(int x, int y, float alpha)
@@ -126,29 +135,27 @@ namespace SpriteSortingPlugin
                 return;
             }
 
-            // Gizmos.DrawLine(points[0], points[1]);
-            // Gizmos.color=Color.red;
-            // Gizmos.DrawLine(points[1], points[2]);
-            // Gizmos.color=Color.blue;
-            // Gizmos.DrawLine(points[2], points[3]);
-            // Gizmos.color=Color.green;
-            // Gizmos.DrawLine(points[3], points[0]);
-
-            var extents = newBounds.extents;
-            var position = transform.position;
+            if (liveUpdateBounds)
+            {
+                UpdateRotatedBoundingBoxPoints();
+            }
 
             Gizmos.color = Color.white;
-            Gizmos.DrawSphere(position + new Vector3(-extents.x, extents.y, 0), 1);
+            Gizmos.DrawSphere(points[0], 1);
+            Gizmos.DrawLine(points[0], points[1]);
             Gizmos.color = Color.red;
-            Gizmos.DrawSphere(position + new Vector3(-extents.x, -extents.y, 0), 1);
+            Gizmos.DrawSphere(points[1], 1);
+            Gizmos.DrawLine(points[1], points[2]);
             Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(position + new Vector3(extents.x, extents.y, 0), 1);
+            Gizmos.DrawSphere(points[2], 1);
+            Gizmos.DrawLine(points[2], points[3]);
             Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(position + new Vector3(extents.x, -extents.y, 0), 1);
+            Gizmos.DrawSphere(points[3], 1);
+            Gizmos.DrawLine(points[3], points[0]);
 
 
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(newBounds.center + position, newBounds.size);
+            // Gizmos.color = Color.green;
+            // Gizmos.DrawWireCube(newBounds.center, newBounds.size);
         }
 
         private bool Validate()
