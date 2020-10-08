@@ -59,6 +59,9 @@ namespace SpriteSortingPlugin
             {
                 CheckSortingLayerOrder();
             }
+            
+            //TODO: could be more performant by comparing the name each frame instead of redrawing everything
+            Repaint();
         }
 
         private void CheckSortingLayerOrder()
