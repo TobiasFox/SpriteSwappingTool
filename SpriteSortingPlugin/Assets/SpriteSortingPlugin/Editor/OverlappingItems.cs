@@ -181,16 +181,15 @@ namespace SpriteSortingPlugin
         private void UpdateSurroundingItems(int currentIndex)
         {
             var layerName = items[currentIndex].sortingLayerName;
-            //not called/used in current implementation
             for (var i = currentIndex - 1; i >= 0; i--)
             {
                 var previousItem = items[i + 1];
                 var currentItem = items[i];
 
                 if (currentItem.sortingLayerName.Equals(layerName) &&
-                    previousItem.sortingOrder == currentItem.sortingOrder)
+                    previousItem.sortingOrder >= currentItem.sortingOrder)
                 {
-                    currentItem.sortingOrder++;
+                    currentItem.sortingOrder = previousItem.sortingOrder + 1;
                     currentItem.UpdatePreviewSortingOrderWithExistingOrder();
                 }
                 else
@@ -205,9 +204,9 @@ namespace SpriteSortingPlugin
                 var currentItem = items[i];
 
                 if (currentItem.sortingLayerName.Equals(layerName) &&
-                    previousItem.sortingOrder == currentItem.sortingOrder)
+                    previousItem.sortingOrder <= currentItem.sortingOrder)
                 {
-                    currentItem.sortingOrder--;
+                    currentItem.sortingOrder=previousItem.sortingOrder-1;
                     currentItem.UpdatePreviewSortingOrderWithExistingOrder();
                 }
                 else
