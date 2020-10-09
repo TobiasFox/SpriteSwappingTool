@@ -31,10 +31,10 @@ namespace SpriteSortingPlugin
             }
         }
 
-        public ObjectOrientedBoundingBox(Bounds bounds, Quaternion rotation)
+        public ObjectOrientedBoundingBox(Bounds bounds, float zRotation)
         {
             ownBounds = bounds;
-            this.rotation = rotation;
+            rotation = Quaternion.Euler(0, 0, zRotation);
 
             Initialize();
         }
@@ -43,6 +43,7 @@ namespace SpriteSortingPlugin
         {
             double min = Vector2.Dot(axis, localWorldPoints[0]);
             var max = min;
+
             for (var i = 1; i < localWorldPoints.Length; i++)
             {
                 double p = Vector2.Dot(axis, localWorldPoints[i]);
@@ -60,6 +61,20 @@ namespace SpriteSortingPlugin
             return proj;
         }
 
+        public void UpdateCenter(Vector2 center)
+        {
+            ownBounds.center = center;
+
+            //TODO: update points
+        }
+
+        public void UpdateRotation(float zRotation)
+        {
+            rotation = Quaternion.Euler(0, 0, zRotation);
+
+            //TODO: update points
+        }
+
         private void Initialize()
         {
             originLocalWorldPoints[0] = new Vector3(ownBounds.min.x, ownBounds.max.y, 0); // top left 
@@ -74,6 +89,8 @@ namespace SpriteSortingPlugin
                 dir = rotation * dir;
                 localWorldPoints[i] = dir + pivot;
             }
+
+            //TODO: consider scale
         }
     }
 }
