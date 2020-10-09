@@ -65,7 +65,7 @@ namespace SpriteSortingPlugin
 
             var width = adjustedBorder[3] - adjustedBorder[1];
             var height = adjustedBorder[2] - adjustedBorder[0];
-            ownBounds = new Bounds(transform.position, new Vector3(width, height, 0));
+            ownBounds = new Bounds(Vector3.zero, new Vector2(width, height));
 
             UpdateRotatedBoundingBoxPoints();
 
