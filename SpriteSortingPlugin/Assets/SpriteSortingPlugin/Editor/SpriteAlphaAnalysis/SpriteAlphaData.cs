@@ -28,6 +28,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             {
                 return;
             }
+            
+            objectOrientedBoundingBoxDictionary.Clear();
 
             foreach (var objectOrientedBoundingBox in oobbList)
             {

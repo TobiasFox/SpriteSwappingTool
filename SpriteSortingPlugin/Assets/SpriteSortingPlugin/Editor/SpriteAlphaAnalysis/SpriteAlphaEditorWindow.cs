@@ -52,21 +52,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             {
                 spriteList.Clear();
             }
-
-            // for (int i = 0; i < 75; i++)
-            // {
-            //     var itemName = "a";
-            //     if (i % 2 == 0)
-            //     {
-            //         itemName = "b";
-            //     }
-            //     else if (i % 3 == 0)
-            //     {
-            //         itemName = "c";
-            //     }
-            //
-            //     spriteList.Add(itemName);
-            // }
         }
 
         private void OnEnable()
@@ -239,6 +224,28 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             reorderableSpriteList = new ReorderableList(spriteList, typeof(string), false, false, false, false);
             reorderableSpriteList.onSelectCallback += OnSpriteSelected;
             reorderableSpriteList.drawElementCallback += DrawElementCallBack;
+            reorderableSpriteList.drawElementBackgroundCallback += DrawElementBackgroundCallBack;
+        }
+
+        private void DrawElementBackgroundCallBack(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            Color color;
+            if (isActive)
+            {
+                color = ReordableBackgroundColors.ActiveColor;
+            }
+            else if (isFocused)
+            {
+                color = ReordableBackgroundColors.FocussingColor;
+            }
+            else
+            {
+                color = index % 2 == 0
+                    ? ReordableBackgroundColors.BackgroundColor1
+                    : ReordableBackgroundColors.BackgroundColor2;
+            }
+
+            EditorGUI.DrawRect(rect, color);
         }
 
         private void DrawElementCallBack(Rect rect, int index, bool isactive, bool isfocused)
@@ -265,6 +272,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private void OnDestroy()
         {
             reorderableSpriteList.onSelectCallback = null;
+            reorderableSpriteList.drawElementCallback = null;
+            reorderableSpriteList.drawElementBackgroundCallback = null;
             reorderableSpriteList = null;
         }
     }

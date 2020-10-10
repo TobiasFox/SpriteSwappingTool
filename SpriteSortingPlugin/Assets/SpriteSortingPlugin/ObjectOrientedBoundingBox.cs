@@ -9,14 +9,14 @@ namespace SpriteSortingPlugin
     {
         public string assetGuid;
         public string assetName;
-        [SerializeField] private Vector2[] localWorldPoints = new Vector2[4];
+        [SerializeField, HideInInspector] private Vector2[] localWorldPoints = new Vector2[4];
         [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
         [SerializeField] private float zRotation;
         private Quaternion rotation;
         private Bounds ownBounds;
 
-        [SerializeField] private Vector2[] axes;
+        [SerializeField, HideInInspector] private Vector2[] axes;
         private Vector2[] points = new Vector2[4];
 
         public Vector2[] Axes
