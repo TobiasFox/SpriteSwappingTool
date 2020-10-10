@@ -1,17 +1,21 @@
-﻿using SpriteSortingPlugin.SAT;
+﻿using System;
+using SpriteSortingPlugin.SAT;
 using UnityEngine;
 
 namespace SpriteSortingPlugin
 {
+    [Serializable]
     public class ObjectOrientedBoundingBox
     {
-        private readonly Vector2[] localWorldPoints = new Vector2[4];
-        private readonly Vector2[] originLocalWorldPoints = new Vector2[4];
+        public string assetGuid;
+        [SerializeField] private Vector2[] localWorldPoints = new Vector2[4];
+        [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
+        [SerializeField] private float zRotation;
         private Quaternion rotation;
         private Bounds ownBounds;
 
-        private Vector2[] axes;
+        [SerializeField] private Vector2[] axes;
         private Vector2[] points = new Vector2[4];
 
         public Vector2[] Axes
@@ -34,6 +38,7 @@ namespace SpriteSortingPlugin
         public ObjectOrientedBoundingBox(Bounds bounds, float zRotation)
         {
             ownBounds = bounds;
+            this.zRotation = zRotation;
             rotation = Quaternion.Euler(0, 0, zRotation);
 
             Initialize();
