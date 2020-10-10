@@ -8,6 +8,7 @@ namespace SpriteSortingPlugin
     public class ObjectOrientedBoundingBox
     {
         public string assetGuid;
+        public string assetName;
         [SerializeField] private Vector2[] localWorldPoints = new Vector2[4];
         [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
 

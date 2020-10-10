@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
-using UnityEditor.Sprites;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -19,7 +18,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private string searchString;
         private bool isShowingSpriteAlphaGUI = true;
 
-        private List<string> spriteList;
+        private List<ObjectOrientedBoundingBox> spriteList;
         private ReorderableList reorderableSpriteList;
         private SearchField searchField;
         private Vector2 rightBarScrollPosition;
@@ -47,27 +46,27 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         {
             if (spriteList == null)
             {
-                spriteList = new List<string>();
+                spriteList = new List<ObjectOrientedBoundingBox>();
             }
             else
             {
                 spriteList.Clear();
             }
 
-            for (int i = 0; i < 75; i++)
-            {
-                var itemName = "a";
-                if (i % 2 == 0)
-                {
-                    itemName = "b";
-                }
-                else if (i % 3 == 0)
-                {
-                    itemName = "c";
-                }
-
-                spriteList.Add(itemName);
-            }
+            // for (int i = 0; i < 75; i++)
+            // {
+            //     var itemName = "a";
+            //     if (i % 2 == 0)
+            //     {
+            //         itemName = "b";
+            //     }
+            //     else if (i % 3 == 0)
+            //     {
+            //         itemName = "c";
+            //     }
+            //
+            //     spriteList.Add(itemName);
+            // }
         }
 
         private void OnEnable()
@@ -198,9 +197,9 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
 
             spriteList.Clear();
-            foreach (var guid in spriteAlphaData.objectOrientedBoundingBoxDictionary.Keys)
+            foreach (var objectOrientedBoundingBox in spriteAlphaData.objectOrientedBoundingBoxDictionary.Values)
             {
-                spriteList.Add(guid);
+                spriteList.Add(objectOrientedBoundingBox);
             }
         }
 
@@ -221,7 +220,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             foreach (var objectOrientedBoundingBox in oobbList)
             {
-                spriteList.Add(objectOrientedBoundingBox.assetGuid);
+                spriteList.Add(objectOrientedBoundingBox);
                 spriteAlphaData.objectOrientedBoundingBoxDictionary.Add(objectOrientedBoundingBox.assetGuid,
                     objectOrientedBoundingBox);
             }
@@ -239,6 +238,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         {
             reorderableSpriteList = new ReorderableList(spriteList, typeof(string), false, false, false, false);
             reorderableSpriteList.onSelectCallback += OnSpriteSelected;
+            reorderableSpriteList.drawElementCallback += DrawElementCallBack;
+        }
+
+        private void DrawElementCallBack(Rect rect, int index, bool isactive, bool isfocused)
+        {
+            var oobb = spriteList[index];
+            EditorGUI.LabelField(rect, oobb.assetName);
         }
 
         private void OnSpriteSelected(ReorderableList list)
@@ -248,13 +254,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 return;
             }
 
-            var guid = (string) list.list[list.index];
+            var oobb = spriteList[list.index];
 
-            var path = AssetDatabase.GUIDToAssetPath(guid);
+            var path = AssetDatabase.GUIDToAssetPath(oobb.assetGuid);
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
             testSprite = sprite;
-            // Repaint();
         }
 
         private void OnDestroy()

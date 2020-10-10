@@ -57,6 +57,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
                 oobb.assetGuid = spritePair.Key;
+                oobb.assetName = sprite.texture.name;
                 list.Add(oobb);
 
                 // currentProgress++;
