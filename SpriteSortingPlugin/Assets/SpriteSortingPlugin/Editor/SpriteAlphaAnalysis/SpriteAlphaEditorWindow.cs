@@ -101,12 +101,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             // serializedObject.Update();
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"), spriteAlphaData,
-                typeof(SpriteAlphaData), false);
+            spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"), spriteAlphaData,
+                typeof(SpriteAlphaData), false) as SpriteAlphaData;
 
             if (GUILayout.Button("Load"))
             {
                 Debug.Log("loaded sprite Alpha Data");
+                LoadSpriteAlphaData();
                 isShowingSpriteAlphaGUI = true;
             }
 
@@ -189,6 +190,20 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             GUILayout.EndArea();
         }
 
+        private void LoadSpriteAlphaData()
+        {
+            if (spriteAlphaData == null)
+            {
+                return;
+            }
+
+            spriteList.Clear();
+            foreach (var guid in spriteAlphaData.objectOrientedBoundingBoxDictionary.Keys)
+            {
+                spriteList.Add(guid);
+            }
+        }
+
         private void AnalyzeSpriteAlphas()
         {
             if (spriteAlphaAnalyzer == null)
@@ -201,6 +216,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var oobbList = spriteAlphaAnalyzer.GenerateOOBBs();
 
             spriteAlphaData = CreateInstance<SpriteAlphaData>();
+
             spriteList.Clear();
 
             foreach (var objectOrientedBoundingBox in oobbList)
