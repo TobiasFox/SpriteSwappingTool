@@ -50,7 +50,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 if (!spriteIsReadable)
                 {
-                    SetSpriteReadable();
+                    SetSpriteReadable(sprite.texture);
                 }
 
                 // currentProgress++;
@@ -63,7 +63,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 if (!spriteIsReadable)
                 {
-                    SetSpriteNonReadable();
+                    SetSpriteNonReadable(sprite.texture);
                 }
 
                 // currentProgress++;
@@ -73,12 +73,30 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             return list;
         }
 
-        private void SetSpriteReadable()
+        private void SetSpriteReadable(Texture2D spriteTexture)
         {
+            var path = AssetDatabase.GetAssetPath(spriteTexture.GetInstanceID());
+            var textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+
+            AssetDatabase.StartAssetEditing();
+
+            textureImporter.isReadable = true;
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+
+            AssetDatabase.StopAssetEditing();
         }
 
-        private void SetSpriteNonReadable()
+        private void SetSpriteNonReadable(Texture2D spriteTexture)
         {
+            var path = AssetDatabase.GetAssetPath(spriteTexture.GetInstanceID());
+            var textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+
+            AssetDatabase.StartAssetEditing();
+
+            textureImporter.isReadable = false;
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+
+            AssetDatabase.StopAssetEditing();
         }
 
         private ObjectOrientedBoundingBox GenerateOOBB(Texture2D spriteTexture, float pixelsPerUnit)
