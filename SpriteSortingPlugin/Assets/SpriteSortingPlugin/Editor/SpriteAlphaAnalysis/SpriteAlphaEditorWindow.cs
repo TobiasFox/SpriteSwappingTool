@@ -202,14 +202,31 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             {
                 Handles.color = Color.green;
 
-                var num1 = rightAreaRect.width / rightAreaRect.height;
-                var aspectRatio = (float) selectedSprite.texture.width / (float) selectedSprite.texture.height;
-                var num3 = Mathf.Min(num1 / aspectRatio, 1f);
+                var spriteAspectRatio = (float) selectedSprite.texture.width / (float) selectedSprite.texture.height;
+                var rectAspectRatio = rightAreaRect.width / rightAreaRect.height;
 
-                var textureHeight = num3 * rightAreaRect.height;
+                float textureHeight;
+                float textureWidth;
 
+                // set rect and sprite in ratio and adjust bounding box according to the ScalingMode ScaleToFit
+                if (rectAspectRatio > spriteAspectRatio)
+                {
+                    //rectangle is longer than sprite's width
+                    var num2 = spriteAspectRatio / rectAspectRatio;
+
+                    textureWidth = num2 * rightAreaRect.width;
+                    textureHeight = textureWidth / spriteAspectRatio;
+                }
+                else
+                {
+                    var num3 = rectAspectRatio / spriteAspectRatio;
+
+                    textureHeight = num3 * rightAreaRect.height;
+                    textureWidth = textureHeight * spriteAspectRatio;
+                }
+
+                var scaleXFactor = textureWidth / selectedSprite.bounds.size.x;
                 var scaleYFactor = textureHeight / selectedSprite.bounds.size.y;
-                var scaleXFactor = scaleYFactor * aspectRatio;
 
                 var newBoundsWidth = scaleXFactor * selectedOOBB.OwnBounds.size.x;
                 var newBoundsHeight = scaleYFactor * selectedOOBB.OwnBounds.size.y;
