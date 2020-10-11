@@ -30,10 +30,9 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
 
-        private Camera previewGameObject;
-
         // private ObjectOrientedBoundingBoxComponent oobbComponent;
         private ObjectOrientedBoundingBox selectedOOBB;
+        [SerializeField] private AlphaRectangleBorder alphaRectangleBorder;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -49,6 +48,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             //TODO: remove
             SelectDefaultSpriteAlphaData();
+            alphaRectangleBorder = new AlphaRectangleBorder();
         }
 
         private void SelectDefaultSpriteAlphaData()
@@ -79,10 +79,10 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void OnEnable()
         {
-            // if (serializedObject == null)
-            // {
-            //     serializedObject = new SerializedObject(this);
-            // }
+            if (serializedObject == null)
+            {
+                serializedObject = new SerializedObject(this);
+            }
 
             if (searchField == null)
             {
@@ -105,7 +105,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void OnGUI()
         {
-            // serializedObject.Update();
+            serializedObject.Update();
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
             spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"), spriteAlphaData,
@@ -134,6 +134,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
 
             EditorGUILayout.EndHorizontal();
+            serializedObject.ApplyModifiedProperties();
 
             if (!isShowingSpriteAlphaGUI)
             {
@@ -192,14 +193,11 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             //             GUILayout.Height(EditorGUIUtility.singleLineHeight)) as
             //         Sprite;
 
-            if (selectedSprite != null)
+            if (selectedOOBB != null)
             {
                 var textureRect = new Rect(0, 0, rightAreaRect.width, rightAreaRect.height);
                 EditorGUI.DrawTextureTransparent(textureRect, selectedSprite.texture, ScaleMode.ScaleToFit);
-            }
 
-            if (selectedOOBB != null)
-            {
                 Handles.color = Color.green;
 
                 var spriteAspectRatio = (float) selectedSprite.texture.width / (float) selectedSprite.texture.height;
@@ -236,15 +234,19 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 Handles.DrawWireCube(rectCenter, scaledSize);
                 Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
-            }
-            // {
-            //     GUILayout.BeginArea(new Rect(0, position.height - 100, position.width, 100));
-            //     EditorGUI.DrawRect(new Rect(0, 0, position.width, 100), ReordableBackgroundColors.TransparentBackgroundColor);
-            //     
-            //
-            //     GUILayout.EndArea();
-            // }
 
+
+                {
+                    GUILayout.BeginArea(new Rect(0, position.height - 125, position.width, 100));
+                    EditorGUI.DrawRect(new Rect(0, 0, position.width, 125),
+                        ReordableBackgroundColors.TransparentBackgroundColor);
+
+                    var serializedProperty = serializedObject.FindProperty(nameof(alphaRectangleBorder));
+                    EditorGUILayout.PropertyField(serializedProperty, new GUIContent("border"), true);
+
+                    GUILayout.EndArea();
+                }
+            } 
 
             GUILayout.EndArea();
         }
@@ -342,6 +344,10 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
             selectedSprite = sprite;
+
+            alphaRectangleBorder.spriteWidth = sprite.texture.width;
+            alphaRectangleBorder.spriteHeight = sprite.texture.height;
+            
         }
 
         private void OnDestroy()
