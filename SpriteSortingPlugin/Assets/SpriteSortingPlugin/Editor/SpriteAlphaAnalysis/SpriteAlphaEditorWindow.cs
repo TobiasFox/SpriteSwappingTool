@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEditorInternal;
@@ -13,7 +14,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private SerializedObject serializedObject;
 
         [SerializeField] private SpriteAlphaData spriteAlphaData;
-        private Sprite testSprite;
+        private Sprite selectedSprite;
 
         private string searchString;
         private bool isShowingSpriteAlphaGUI = true;
@@ -21,13 +22,18 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private List<ObjectOrientedBoundingBox> spriteList;
         private ReorderableList reorderableSpriteList;
         private SearchField searchField;
-        private Vector2 rightBarScrollPosition;
+        private Vector2 leftBarScrollPosition;
         private float lastHeight;
         private Material material;
         private Shader transparentUnlitShader;
 
         private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
+
+        private Camera previewGameObject;
+
+        // private ObjectOrientedBoundingBoxComponent oobbComponent;
+        private ObjectOrientedBoundingBox selectedOOBB;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -40,6 +46,23 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private void Awake()
         {
             ResetSpriteList();
+
+            //TODO: remove
+            SelectDefaultSpriteAlphaData();
+        }
+
+        private void SelectDefaultSpriteAlphaData()
+        {
+            try
+            {
+                var guids = AssetDatabase.FindAssets("SpriteAlphaData 2");
+                spriteAlphaData =
+                    AssetDatabase.LoadAssetAtPath<SpriteAlphaData>(AssetDatabase.GUIDToAssetPath(guids[0]));
+            }
+            catch (Exception e)
+            {
+                Debug.Log("auto selection of SpriteAlphaData went wrong");
+            }
         }
 
         private void ResetSpriteList()
@@ -117,11 +140,11 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 return;
             }
 
-            var rightBarWidth = position.width / 4;
+            var leftBarWidth = position.width / 4;
 
-            if (rightBarWidth < MinWidthRightContentBar)
+            if (leftBarWidth < MinWidthRightContentBar)
             {
-                rightBarWidth = MinWidthRightContentBar;
+                leftBarWidth = MinWidthRightContentBar;
             }
 
             if (Event.current.type == EventType.Repaint)
@@ -129,12 +152,16 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 lastHeight = GUILayoutUtility.GetLastRect().height;
             }
 
-            var rightAreaRect = new Rect(0, lastHeight, rightBarWidth, position.height);
-            GUILayout.BeginArea(rightAreaRect);
+            var leftAreaRect = new Rect(0, lastHeight, leftBarWidth, position.height);
+            GUILayout.BeginArea(leftAreaRect);
 
-            rightBarScrollPosition = EditorGUILayout.BeginScrollView(rightBarScrollPosition);
+            leftBarScrollPosition = EditorGUILayout.BeginScrollView(leftBarScrollPosition);
             {
                 EditorGUILayout.LabelField("Sprites");
+                // oobbComponent =
+                //     EditorGUILayout.ObjectField("HandleTest", oobbComponent, typeof(ObjectOrientedBoundingBoxComponent),
+                //         true) as ObjectOrientedBoundingBoxComponent;
+
                 searchField.OnGUI(searchString);
 
                 if (reorderableSpriteList == null)
@@ -149,9 +176,9 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             GUILayout.EndArea();
 
-            var leftAreaRect = new Rect(rightBarWidth, lastHeight, position.width - rightBarWidth, position.height);
+            var rightAreaRect = new Rect(leftBarWidth, lastHeight, position.width - leftBarWidth, position.height);
 
-            GUILayout.BeginArea(leftAreaRect, new GUIStyle {normal = {background = Texture2D.whiteTexture}});
+            GUILayout.BeginArea(rightAreaRect, new GUIStyle {normal = {background = Texture2D.whiteTexture}});
 
             // if (reorderableSpriteList.index == -1)
             // {
@@ -159,17 +186,49 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             //     return;
             // }
 
-            EditorGUI.BeginChangeCheck();
-            testSprite =
-                EditorGUILayout.ObjectField("test", testSprite, typeof(Sprite), false,
-                        GUILayout.Height(EditorGUIUtility.singleLineHeight)) as
-                    Sprite;
+            // EditorGUI.BeginChangeCheck();
+            // testSprite =
+            //     EditorGUILayout.ObjectField("test", testSprite, typeof(Sprite), false,
+            //             GUILayout.Height(EditorGUIUtility.singleLineHeight)) as
+            //         Sprite;
 
-            if (testSprite != null)
+            if (selectedSprite != null)
             {
-                GUI.DrawTexture(new Rect(0, 0, leftAreaRect.width, leftAreaRect.height), testSprite.texture,
-                    ScaleMode.ScaleToFit);
+                var textureRect = new Rect(0, 0, rightAreaRect.width, rightAreaRect.height);
+                EditorGUI.DrawTextureTransparent(textureRect, selectedSprite.texture, ScaleMode.ScaleToFit);
             }
+
+            if (selectedOOBB != null)
+            {
+                Handles.color = Color.green;
+
+                var num1 = rightAreaRect.width / rightAreaRect.height;
+                var aspectRatio = selectedSprite.texture.width / selectedSprite.texture.height;
+                var num3 = num1 / aspectRatio;
+
+                var textureWidth = rightAreaRect.width;
+                var textureHeight = num3 * rightAreaRect.height;
+
+                var scaleXFactor = textureWidth / selectedSprite.bounds.size.x;
+                var scaleYFactor = textureHeight / selectedSprite.bounds.size.y;
+
+                var newBoundsWidth = scaleXFactor * selectedOOBB.OwnBounds.size.x;
+                var newBoundsHeight = scaleYFactor * selectedOOBB.OwnBounds.size.y;
+
+                var scaledSize = new Vector3(newBoundsWidth, newBoundsHeight);
+                var rectCenter = new Vector3(rightAreaRect.width / 2, rightAreaRect.height / 2);
+
+                Handles.DrawWireCube(rectCenter, scaledSize);
+                Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
+            }
+            // {
+            //     GUILayout.BeginArea(new Rect(0, position.height - 100, position.width, 100));
+            //     EditorGUI.DrawRect(new Rect(0, 0, position.width, 100), ReordableBackgroundColors.TransparentBackgroundColor);
+            //     
+            //
+            //     GUILayout.EndArea();
+            // }
+
 
             GUILayout.EndArea();
         }
@@ -261,12 +320,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 return;
             }
 
-            var oobb = spriteList[list.index];
+            selectedOOBB = spriteList[list.index];
 
-            var path = AssetDatabase.GUIDToAssetPath(oobb.assetGuid);
+            var path = AssetDatabase.GUIDToAssetPath(selectedOOBB.assetGuid);
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
-            testSprite = sprite;
+            selectedSprite = sprite;
         }
 
         private void OnDestroy()

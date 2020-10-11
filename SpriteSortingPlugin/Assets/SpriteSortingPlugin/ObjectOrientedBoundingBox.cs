@@ -14,7 +14,7 @@ namespace SpriteSortingPlugin
 
         [SerializeField] private float zRotation;
         private Quaternion rotation;
-        private Bounds ownBounds;
+        [SerializeField] private Bounds ownBounds;
 
         [SerializeField, HideInInspector] private Vector2[] axes;
         private Vector2[] points = new Vector2[4];
@@ -35,6 +35,9 @@ namespace SpriteSortingPlugin
                 return axes;
             }
         }
+
+        public Vector2[] Points => points;
+        public Bounds OwnBounds => ownBounds;
 
         public ObjectOrientedBoundingBox(Bounds bounds, float zRotation)
         {
@@ -72,6 +75,7 @@ namespace SpriteSortingPlugin
             ownBounds.center = center;
 
             //TODO: update points
+            UpdateLocalWorldPoints();
         }
 
         public void UpdateRotation(float zRotation)
@@ -79,6 +83,27 @@ namespace SpriteSortingPlugin
             rotation = Quaternion.Euler(0, 0, zRotation);
 
             //TODO: update points
+            UpdateLocalWorldPoints();
+        }
+
+        public void UpdateBox(Transform transform)
+        {
+            ownBounds.center = transform.position;
+            rotation = Quaternion.Euler(0, 0, transform.rotation.z);
+            UpdateLocalWorldPoints();
+
+            // Apply scaling
+            // var localScale = transform.localScale;
+            // for (int s = 0; s < sourcePoints.Length; s++)
+            // {
+            //     sourcePoints[s] = new Vector3(sourcePoints[s].x / localScale.x, sourcePoints[s].y / localScale.y, 0);
+            // }
+
+            // Transform points from local to world space
+            for (int t = 0; t < points.Length; t++)
+            {
+                points[t] = transform.TransformPoint(localWorldPoints[t]);
+            }
         }
 
         private void Initialize()
@@ -88,6 +113,13 @@ namespace SpriteSortingPlugin
             originLocalWorldPoints[2] = new Vector3(ownBounds.max.x, ownBounds.min.y, 0); // bottom right
             originLocalWorldPoints[3] = new Vector3(ownBounds.max.x, ownBounds.max.y, 0); // top right
 
+            UpdateLocalWorldPoints();
+
+            //TODO: consider scale
+        }
+
+        private void UpdateLocalWorldPoints()
+        {
             var pivot = (Vector2) ownBounds.center;
             for (var i = 0; i < localWorldPoints.Length; i++)
             {
@@ -95,8 +127,6 @@ namespace SpriteSortingPlugin
                 dir = rotation * dir;
                 localWorldPoints[i] = dir + pivot;
             }
-
-            //TODO: consider scale
         }
     }
 }
