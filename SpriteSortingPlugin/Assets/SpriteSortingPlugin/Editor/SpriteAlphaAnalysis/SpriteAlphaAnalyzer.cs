@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 {
@@ -135,6 +137,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             //     AnalyzeOutmostAlpha(tempHeight, row, color.a);
             //     counter++;
             // }
+
+            //offset of about 1 pixel in all directions
+            borders[0] = Math.Max(borders[0] - 1, 0);
+            borders[1] = Math.Max(borders[1] - 1, 0);
+            borders[2] = Math.Min(borders[2] + 1, spriteTexture.height);
+            borders[3] = Math.Min(borders[3] + 1, spriteTexture.width);
 
             var adjustedBorder = new float[4];
             for (var i = 0; i < borders.Length; i++)
