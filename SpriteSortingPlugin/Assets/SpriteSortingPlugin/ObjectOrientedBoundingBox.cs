@@ -18,6 +18,7 @@ namespace SpriteSortingPlugin
 
         [SerializeField, HideInInspector] private Vector2[] axes;
         private Vector2[] points = new Vector2[4];
+        public AlphaRectangleBorder alphaRectangleBorder;
 
         public Vector2[] Axes
         {
@@ -104,6 +105,17 @@ namespace SpriteSortingPlugin
             {
                 points[t] = transform.TransformPoint(localWorldPoints[t]);
             }
+        }
+
+        public void UpdateBosSizeWithBorder()
+        {
+            //TODO: consider only moving one side
+            var width = alphaRectangleBorder.rightBorder / alphaRectangleBorder.pixelPerUnit -
+                        alphaRectangleBorder.leftBorder / alphaRectangleBorder.pixelPerUnit;
+            var height = alphaRectangleBorder.bottomBorder / alphaRectangleBorder.pixelPerUnit -
+                         alphaRectangleBorder.topBorder / alphaRectangleBorder.pixelPerUnit;
+            ownBounds.size = new Vector2(width, height);
+            UpdateLocalWorldPoints();
         }
 
         private void Initialize()

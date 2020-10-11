@@ -144,6 +144,17 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             borders[2] = Math.Min(borders[2] + 1, spriteTexture.height);
             borders[3] = Math.Min(borders[3] + 1, spriteTexture.width);
 
+            var alphaRectangleBorder = new AlphaRectangleBorder
+            {
+                topBorder = borders[0],
+                leftBorder = borders[1],
+                bottomBorder = borders[2],
+                rightBorder = borders[3],
+                spriteHeight = spriteTexture.height,
+                spriteWidth = spriteTexture.width,
+                pixelPerUnit = pixelsPerUnit
+            };
+
             var adjustedBorder = new float[4];
             for (var i = 0; i < borders.Length; i++)
             {
@@ -152,7 +163,10 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             var width = adjustedBorder[3] - adjustedBorder[1];
             var height = adjustedBorder[2] - adjustedBorder[0];
-            var oobb = new ObjectOrientedBoundingBox(new Bounds(Vector3.zero, new Vector2(width, height)), 0);
+            var oobb = new ObjectOrientedBoundingBox(new Bounds(Vector3.zero, new Vector2(width, height)), 0)
+            {
+                alphaRectangleBorder = alphaRectangleBorder
+            };
 
             // Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
             return oobb;
