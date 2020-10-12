@@ -148,8 +148,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             {
                 topBorder = borders[0],
                 leftBorder = borders[1],
-                bottomBorder = borders[2],
-                rightBorder = borders[3],
+                bottomBorder = spriteTexture.height - borders[2],
+                rightBorder = spriteTexture.width - borders[3],
                 spriteHeight = spriteTexture.height,
                 spriteWidth = spriteTexture.width,
                 pixelPerUnit = pixelsPerUnit

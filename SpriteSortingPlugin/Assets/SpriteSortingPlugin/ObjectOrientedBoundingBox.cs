@@ -45,6 +45,7 @@ namespace SpriteSortingPlugin
             ownBounds = bounds;
             this.zRotation = zRotation;
             rotation = Quaternion.Euler(0, 0, zRotation);
+            alphaRectangleBorder = new AlphaRectangleBorder();
 
             Initialize();
         }
