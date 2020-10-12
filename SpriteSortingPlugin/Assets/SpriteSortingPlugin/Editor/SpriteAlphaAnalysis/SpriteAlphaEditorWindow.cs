@@ -210,42 +210,33 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 Handles.color = Color.green;
 
                 // var textureHeight = CalculateDisplayingTextureRect(textureRect, rightAreaRect, out var textureWidth, out var displayingTextureRect);
-                var displayingTextureRect = CalculateDisplayingTextureRect(textureRect);
+                var rectWithAlphaBorders = CalculateDisplayingTextureRect(textureRect);
 
-                var scaleXFactor = textureRect.width / displayingTextureRect.width;
-                var scaleYFactor = textureRect.height / displayingTextureRect.height;
+                var scaleXFactor = textureRect.width / rectWithAlphaBorders.width;
+                var scaleYFactor = textureRect.height / rectWithAlphaBorders.height;
 
 
-                displayingTextureRect = ApplyAlphaBorderOffset(ref displayingTextureRect, scaleXFactor, scaleYFactor);
+                rectWithAlphaBorders = ApplyAlphaBorderOffset(ref rectWithAlphaBorders, textureRect);
+                // displayingTextureRect.center = textureRect.center;
 
-                // var scaleXFactor = textureWidth / selectedSprite.bounds.size.x;
-                // var scaleYFactor = textureHeight / selectedSprite.bounds.size.y;
-                //
-                // var newBoundsWidth = scaleXFactor * selectedOOBB.OwnBounds.size.x;
-                // var newBoundsHeight = scaleYFactor * selectedOOBB.OwnBounds.size.y;
-                //
-                // var scaledSize = new Vector3(newBoundsWidth, newBoundsHeight);
-                // var rectCenter = new Vector3(rightAreaRect.width / 2, rightAreaRect.height / 2);
 
                 //TODO: draw single lines
 
-                Handles.DrawSolidDisc(new Vector2(displayingTextureRect.x, displayingTextureRect.y), Vector3.forward,
+                Handles.DrawSolidDisc(new Vector2(rectWithAlphaBorders.x, rectWithAlphaBorders.y), Vector3.forward,
                     20);
                 Handles.color = Color.red;
                 Handles.DrawSolidDisc(
-                    new Vector2(displayingTextureRect.x + displayingTextureRect.width, displayingTextureRect.y),
+                    new Vector2(rectWithAlphaBorders.x + rectWithAlphaBorders.width, rectWithAlphaBorders.y),
                     Vector3.forward, 20);
                 Handles.color = Color.black;
                 Handles.DrawSolidDisc(
-                    new Vector2(displayingTextureRect.x, displayingTextureRect.y + displayingTextureRect.height),
+                    new Vector2(rectWithAlphaBorders.x, rectWithAlphaBorders.y + rectWithAlphaBorders.height),
                     Vector3.forward, 20);
                 Handles.color = Color.magenta;
-                Handles.DrawSolidDisc(new Vector2(displayingTextureRect.x + displayingTextureRect.width,
-                    displayingTextureRect.y + displayingTextureRect.height), Vector3.forward, 20);
+                Handles.DrawSolidDisc(new Vector2(rectWithAlphaBorders.x + rectWithAlphaBorders.width,
+                    rectWithAlphaBorders.y + rectWithAlphaBorders.height), Vector3.forward, 20);
 
                 Handles.color = Color.green;
-                // Handles.DrawWireCube(rectCenter, scaledSize);
-                // Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
 
                 // var halfNewBoundsWidth = newBoundsWidth / 2f;
                 // var halfNewBoundsHeight = newBoundsHeight / 2f;
@@ -277,7 +268,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                     EditorGUI.BeginChangeCheck();
 
-                    DrawAlphaRectangleBorder(alphaRectangleBorderRect);
+                    DrawAlphaRectangleBorderSettings(alphaRectangleBorderRect);
 
                     if (EditorGUI.EndChangeCheck())
                     {
@@ -291,26 +282,32 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             GUILayout.EndArea();
         }
 
-        private Rect ApplyAlphaBorderOffset(ref Rect displayingTextureRect, float scaleXFactor, float scaleYFactor)
+        private Rect ApplyAlphaBorderOffset(ref Rect rectWithAlphaBorders, Rect textureRect)
         {
-            //origin top left
-            var pixelHeight = displayingTextureRect.height / selectedOOBB.alphaRectangleBorder.spriteHeight;
-            var pixelWidth = displayingTextureRect.width / selectedOOBB.alphaRectangleBorder.spriteWidth;
-
-            // top and left
-            displayingTextureRect.xMin = pixelWidth * selectedOOBB.alphaRectangleBorder.leftBorder;
-            displayingTextureRect.yMin = pixelHeight * selectedOOBB.alphaRectangleBorder.topBorder;
-
-            // bottom and right
-            displayingTextureRect.xMax = pixelWidth * (selectedOOBB.alphaRectangleBorder.spriteWidth -
-                                                       selectedOOBB.alphaRectangleBorder.rightBorder);
-            displayingTextureRect.yMax = pixelHeight * (selectedOOBB.alphaRectangleBorder.spriteHeight -
-                                                        selectedOOBB.alphaRectangleBorder.bottomBorder);
+            // rectWithAlphaBorders.center = textureRect.center;
 
             //move x and y
+            var newX = textureRect.center.x - (rectWithAlphaBorders.size.x / 2f);
+            var newY = textureRect.center.y - (rectWithAlphaBorders.size.y / 2f);
+
+            rectWithAlphaBorders.position = new Vector2(newX, newY);
+
+            //origin top left
+            var pixelHeight = rectWithAlphaBorders.height / selectedOOBB.AlphaRectangleBorder.spriteHeight;
+            var pixelWidth = rectWithAlphaBorders.width / selectedOOBB.AlphaRectangleBorder.spriteWidth;
+
+            // top and left
+            rectWithAlphaBorders.xMin = pixelWidth * selectedOOBB.AlphaRectangleBorder.leftBorder;
+            rectWithAlphaBorders.yMin = pixelHeight * selectedOOBB.AlphaRectangleBorder.topBorder;
+
+            // bottom and right
+            rectWithAlphaBorders.xMax = pixelWidth * (selectedOOBB.AlphaRectangleBorder.spriteWidth -
+                                                      selectedOOBB.AlphaRectangleBorder.rightBorder);
+            rectWithAlphaBorders.yMax = pixelHeight * (selectedOOBB.AlphaRectangleBorder.spriteHeight -
+                                                       selectedOOBB.AlphaRectangleBorder.bottomBorder);
 
 
-            return displayingTextureRect;
+            return rectWithAlphaBorders;
         }
 
         private Rect CalculateDisplayingTextureRect(Rect textureRect)
@@ -331,9 +328,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 displayingTextureRect =
                     new Rect(textureRect.xMin + (float) ((double) textureRect.width * (1.0 - (double) num2) * 0.5),
                         textureRect.yMin, num2 * textureRect.width, textureRect.height);
-
-                // textureWidth = num2 * rightAreaRect.width;
-                // textureHeight = textureWidth / spriteAspectRatio;
             }
             else
             {
@@ -342,51 +336,56 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 displayingTextureRect = new Rect(textureRect.xMin,
                     textureRect.yMin + (float) ((double) textureRect.height * (1.0 - (double) num3) * 0.5),
                     textureRect.width, num3 * textureRect.height);
-
-                // textureHeight = num3 * rightAreaRect.height;
-                // textureWidth = textureHeight * spriteAspectRatio;
             }
 
             return displayingTextureRect;
         }
 
-        private void DrawAlphaRectangleBorder(Rect rect)
+        private void DrawAlphaRectangleBorderSettings(Rect rect)
         {
             var intFieldLength = rect.width / 3f;
-            var halfSpriteWidth = selectedOOBB.alphaRectangleBorder.spriteWidth / 2;
-            var halfSpriteHeight = selectedOOBB.alphaRectangleBorder.spriteHeight / 2;
+            var halfSpriteWidth = selectedOOBB.AlphaRectangleBorder.spriteWidth / 2;
+            var halfSpriteHeight = selectedOOBB.AlphaRectangleBorder.spriteHeight / 2;
 
             EditorGUI.LabelField(new Rect(rect.width / 2 - 45, rect.y, 90, EditorGUIUtility.singleLineHeight),
                 "Adjust Borders");
 
-            rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
+            if (GUI.Button(new Rect(rect.width - 60, rect.y, 60, EditorGUIUtility.singleLineHeight), "Reset"))
+            {
+                selectedOOBB.ResetAlphaRectangleBorder();
+            }
 
-            selectedOOBB.alphaRectangleBorder.topBorder = EditorGUI.IntSlider(
+            rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
+            var alphaBorder = selectedOOBB.AlphaRectangleBorder;
+
+            alphaBorder.topBorder = EditorGUI.IntSlider(
                 new Rect(rect.x + intFieldLength, rect.y, intFieldLength, EditorGUIUtility.singleLineHeight),
-                selectedOOBB.alphaRectangleBorder.topBorder, 0, halfSpriteHeight);
+                alphaBorder.topBorder, 0, halfSpriteHeight);
 
             rect.y += 1.5f * EditorGUIUtility.singleLineHeight + LineSpacing;
 
             {
-                selectedOOBB.alphaRectangleBorder.leftBorder = EditorGUI.IntSlider(
+                alphaBorder.leftBorder = EditorGUI.IntSlider(
                     new Rect(rect.x, rect.y, intFieldLength, EditorGUIUtility.singleLineHeight),
-                    selectedOOBB.alphaRectangleBorder.leftBorder, 0, halfSpriteWidth);
+                    alphaBorder.leftBorder, 0, halfSpriteWidth);
 
                 EditorGUI.LabelField(new Rect(rect.width / 2 - moveIcon.width,
                     rect.y - (moveIcon.height / 2f) + EditorGUIUtility.singleLineHeight / 2f, moveIcon.width,
                     EditorGUIUtility.singleLineHeight * 2), new GUIContent(moveIcon));
 
-                selectedOOBB.alphaRectangleBorder.rightBorder = EditorGUI.IntSlider(
+                alphaBorder.rightBorder = EditorGUI.IntSlider(
                     new Rect(rect.x + 2 * intFieldLength, rect.y, intFieldLength,
                         EditorGUIUtility.singleLineHeight),
-                    selectedOOBB.alphaRectangleBorder.rightBorder, 0, halfSpriteWidth);
+                    alphaBorder.rightBorder, 0, halfSpriteWidth);
 
                 rect.y += 1.5f * EditorGUIUtility.singleLineHeight + LineSpacing;
             }
 
-            selectedOOBB.alphaRectangleBorder.bottomBorder = EditorGUI.IntSlider(
+            alphaBorder.bottomBorder = EditorGUI.IntSlider(
                 new Rect(rect.x + intFieldLength, rect.y, intFieldLength, EditorGUIUtility.singleLineHeight),
-                selectedOOBB.alphaRectangleBorder.bottomBorder, 0, halfSpriteHeight);
+                alphaBorder.bottomBorder, 0, halfSpriteHeight);
+
+            selectedOOBB.AlphaRectangleBorder = alphaBorder;
         }
 
         private void LoadSpriteAlphaData()

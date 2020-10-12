@@ -18,7 +18,26 @@ namespace SpriteSortingPlugin
 
         [SerializeField, HideInInspector] private Vector2[] axes;
         private Vector2[] points = new Vector2[4];
-        public AlphaRectangleBorder alphaRectangleBorder;
+        [SerializeField] private AlphaRectangleBorder alphaRectangleBorder;
+        [SerializeField, HideInInspector] private AlphaRectangleBorder originAlphaRectangleBorder;
+
+        [SerializeField, HideInInspector] private bool isOriginAlphaRectangleBorderSet;
+
+        public AlphaRectangleBorder AlphaRectangleBorder
+        {
+            get => alphaRectangleBorder;
+            set
+            {
+                alphaRectangleBorder = value;
+
+                if (!isOriginAlphaRectangleBorderSet)
+                {
+                    isOriginAlphaRectangleBorderSet = true;
+
+                    originAlphaRectangleBorder = (AlphaRectangleBorder) alphaRectangleBorder.Clone();
+                }
+            }
+        }
 
         public Vector2[] Axes
         {
@@ -117,6 +136,11 @@ namespace SpriteSortingPlugin
                          alphaRectangleBorder.topBorder / alphaRectangleBorder.pixelPerUnit;
             ownBounds.size = new Vector2(width, height);
             UpdateLocalWorldPoints();
+        }
+
+        public void ResetAlphaRectangleBorder()
+        {
+            alphaRectangleBorder = (AlphaRectangleBorder) originAlphaRectangleBorder.Clone();
         }
 
         private void Initialize()

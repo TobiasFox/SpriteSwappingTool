@@ -165,7 +165,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var height = adjustedBorder[2] - adjustedBorder[0];
             var oobb = new ObjectOrientedBoundingBox(new Bounds(Vector3.zero, new Vector2(width, height)), 0)
             {
-                alphaRectangleBorder = alphaRectangleBorder
+                AlphaRectangleBorder = alphaRectangleBorder
             };
 
             // Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
