@@ -209,56 +209,10 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 Handles.color = Color.green;
 
-                // var textureHeight = CalculateDisplayingTextureRect(textureRect, rightAreaRect, out var textureWidth, out var displayingTextureRect);
                 var rectWithAlphaBorders = CalculateDisplayingTextureRect(textureRect);
-
-                var scaleXFactor = textureRect.width / rectWithAlphaBorders.width;
-                var scaleYFactor = textureRect.height / rectWithAlphaBorders.height;
-
-
                 rectWithAlphaBorders = ApplyAlphaBorderOffset(ref rectWithAlphaBorders, textureRect);
-                // displayingTextureRect.center = textureRect.center;
 
-
-                //TODO: draw single lines
-
-                Handles.DrawSolidDisc(new Vector2(rectWithAlphaBorders.x, rectWithAlphaBorders.y), Vector3.forward,
-                    20);
-                Handles.color = Color.red;
-                Handles.DrawSolidDisc(
-                    new Vector2(rectWithAlphaBorders.x + rectWithAlphaBorders.width, rectWithAlphaBorders.y),
-                    Vector3.forward, 20);
-                Handles.color = Color.black;
-                Handles.DrawSolidDisc(
-                    new Vector2(rectWithAlphaBorders.x, rectWithAlphaBorders.y + rectWithAlphaBorders.height),
-                    Vector3.forward, 20);
-                Handles.color = Color.magenta;
-                Handles.DrawSolidDisc(new Vector2(rectWithAlphaBorders.x + rectWithAlphaBorders.width,
-                    rectWithAlphaBorders.y + rectWithAlphaBorders.height), Vector3.forward, 20);
-
-                Handles.color = Color.green;
-
-                // var halfNewBoundsWidth = newBoundsWidth / 2f;
-                // var halfNewBoundsHeight = newBoundsHeight / 2f;
-                //
-                // var topLeft = new Vector2(rectCenter.x - halfNewBoundsWidth, rectCenter.y - halfNewBoundsHeight);
-                // var bottomLeft = new Vector2(rectCenter.x - halfNewBoundsWidth, rectCenter.y + halfNewBoundsHeight);
-                // var topRight = new Vector2(rectCenter.x + halfNewBoundsWidth, rectCenter.y - halfNewBoundsHeight);
-                // var bottomRight = new Vector2(rectCenter.x + halfNewBoundsWidth, rectCenter.y + halfNewBoundsHeight);
-                //
-                //
-                // Handles.DrawLine(topLeft, topRight);
-                // Handles.DrawLine(new Vector2(topLeft.x + 1, topLeft.y + 1),
-                //     new Vector2(topRight.x + 1, topRight.y + 1));
-                // Handles.DrawLine(topRight, bottomRight);
-                // Handles.DrawLine(new Vector2(topRight.x + 1, topRight.y + 1),
-                //     new Vector2(bottomRight.x + 1, bottomRight.y + 1));
-                // Handles.DrawLine(bottomRight, bottomLeft);
-                // Handles.DrawLine(new Vector2(bottomRight.x + 1, bottomRight.y + 1),
-                //     new Vector2(bottomLeft.x + 1, bottomLeft.y + 1));
-                // Handles.DrawLine(bottomLeft, topLeft);
-                // Handles.DrawLine(new Vector2(bottomLeft.x + 1, bottomLeft.y + 1),
-                //     new Vector2(topLeft.x + 1, topLeft.y + 1));
+                DrawDoubleRectangleLines(rectWithAlphaBorders);
 
 
                 {
@@ -282,17 +236,39 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             GUILayout.EndArea();
         }
 
+        private static void DrawDoubleRectangleLines(Rect rectWithAlphaBorders)
+        {
+            var topLeft = new Vector2(rectWithAlphaBorders.x, rectWithAlphaBorders.y);
+            var bottomLeft = new Vector2(rectWithAlphaBorders.x,
+                rectWithAlphaBorders.y + rectWithAlphaBorders.height);
+            var topRight = new Vector2(rectWithAlphaBorders.x + rectWithAlphaBorders.width, rectWithAlphaBorders.y);
+            var bottomRight = new Vector2(rectWithAlphaBorders.x + rectWithAlphaBorders.width,
+                rectWithAlphaBorders.y + rectWithAlphaBorders.height);
+
+            //top
+            Handles.DrawLine(topLeft, topRight);
+            Handles.DrawLine(new Vector2(topLeft.x + 1, topLeft.y + 1),
+                new Vector2(topRight.x + 1, topRight.y + 1));
+
+            //right
+            Handles.DrawLine(topRight, bottomRight);
+            Handles.DrawLine(new Vector2(topRight.x + 1, topRight.y + 1),
+                new Vector2(bottomRight.x + 1, bottomRight.y + 1));
+
+            //bottom
+            Handles.DrawLine(bottomRight, bottomLeft);
+            Handles.DrawLine(new Vector2(bottomRight.x + 1, bottomRight.y + 1),
+                new Vector2(bottomLeft.x + 1, bottomLeft.y + 1));
+
+            //left
+            Handles.DrawLine(bottomLeft, topLeft);
+            Handles.DrawLine(new Vector2(bottomLeft.x + 1, bottomLeft.y + 1),
+                new Vector2(topLeft.x + 1, topLeft.y + 1));
+        }
+
         private Rect ApplyAlphaBorderOffset(ref Rect rectWithAlphaBorders, Rect textureRect)
         {
-            // rectWithAlphaBorders.center = textureRect.center;
-
-            //move x and y
-            var newX = textureRect.center.x - (rectWithAlphaBorders.size.x / 2f);
-            var newY = textureRect.center.y - (rectWithAlphaBorders.size.y / 2f);
-
-            rectWithAlphaBorders.position = new Vector2(newX, newY);
-
-            //origin top left
+            var offset = rectWithAlphaBorders.position;
             var pixelHeight = rectWithAlphaBorders.height / selectedOOBB.AlphaRectangleBorder.spriteHeight;
             var pixelWidth = rectWithAlphaBorders.width / selectedOOBB.AlphaRectangleBorder.spriteWidth;
 
@@ -306,6 +282,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             rectWithAlphaBorders.yMax = pixelHeight * (selectedOOBB.AlphaRectangleBorder.spriteHeight -
                                                        selectedOOBB.AlphaRectangleBorder.bottomBorder);
 
+            //move position to center the rect again
+            rectWithAlphaBorders.position += offset;
 
             return rectWithAlphaBorders;
         }
