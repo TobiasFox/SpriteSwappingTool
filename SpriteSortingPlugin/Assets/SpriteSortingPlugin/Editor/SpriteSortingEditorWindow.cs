@@ -152,7 +152,7 @@ namespace SpriteSortingPlugin
                     spriteAlphaData,
                     typeof(SpriteAlphaData), false) as SpriteAlphaData;
 
-                if (GUILayout.Button("Create Sprite Alpha Data"))
+                if (GUILayout.Button("Open Sprite Alpha Editor Window to create the Data"))
                 {
                     var spriteAlphaEditorWindow = GetWindow<SpriteAlphaEditorWindow>();
                     spriteAlphaEditorWindow.Show();

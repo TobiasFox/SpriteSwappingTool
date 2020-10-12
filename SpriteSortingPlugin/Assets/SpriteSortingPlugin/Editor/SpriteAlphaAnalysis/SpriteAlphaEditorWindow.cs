@@ -214,7 +214,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             Handles.color = Color.green;
 
             var rectWithAlphaBorders = CalculateDisplayingTextureRect(textureRect);
-            rectWithAlphaBorders = ApplyAlphaBorderOffset(ref rectWithAlphaBorders, textureRect);
+            ApplyAlphaBorderOffset(ref rectWithAlphaBorders);
 
             DrawDoubleRectangleLines(rectWithAlphaBorders);
 
@@ -268,7 +268,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 new Vector2(topLeft.x + 1, topLeft.y + 1));
         }
 
-        private Rect ApplyAlphaBorderOffset(ref Rect rectWithAlphaBorders, Rect textureRect)
+        private void ApplyAlphaBorderOffset(ref Rect rectWithAlphaBorders)
         {
             var offset = rectWithAlphaBorders.position;
             var pixelHeight = rectWithAlphaBorders.height / selectedOOBB.AlphaRectangleBorder.spriteHeight;
@@ -286,8 +286,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             //move position to center the rect again
             rectWithAlphaBorders.position += offset;
-
-            return rectWithAlphaBorders;
         }
 
         private Rect CalculateDisplayingTextureRect(Rect textureRect)
