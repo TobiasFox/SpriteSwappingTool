@@ -202,37 +202,39 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             //             GUILayout.Height(EditorGUIUtility.singleLineHeight)) as
             //         Sprite;
 
-            if (selectedOOBB != null)
+            if (selectedOOBB == null)
             {
-                var textureRect = new Rect(0, 0, rightAreaRect.width, rightAreaRect.height);
-                EditorGUI.DrawTextureTransparent(textureRect, selectedSprite.texture, ScaleMode.ScaleToFit);
-
-                Handles.color = Color.green;
-
-                var rectWithAlphaBorders = CalculateDisplayingTextureRect(textureRect);
-                rectWithAlphaBorders = ApplyAlphaBorderOffset(ref rectWithAlphaBorders, textureRect);
-
-                DrawDoubleRectangleLines(rectWithAlphaBorders);
-
-
-                {
-                    GUILayout.BeginArea(new Rect(0, position.height - 125, rightAreaRect.width, 100));
-                    var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 125);
-                    EditorGUI.DrawRect(alphaRectangleBorderRect, ReordableBackgroundColors.TransparentBackgroundColor);
-
-                    EditorGUI.BeginChangeCheck();
-
-                    DrawAlphaRectangleBorderSettings(alphaRectangleBorderRect);
-
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        selectedOOBB.UpdateBosSizeWithBorder();
-                    }
-
-                    GUILayout.EndArea();
-                }
+                GUILayout.EndArea();
+                return;
             }
 
+            var textureRect = new Rect(0, 0, rightAreaRect.width, rightAreaRect.height);
+            EditorGUI.DrawTextureTransparent(textureRect, selectedSprite.texture, ScaleMode.ScaleToFit);
+
+            Handles.color = Color.green;
+
+            var rectWithAlphaBorders = CalculateDisplayingTextureRect(textureRect);
+            rectWithAlphaBorders = ApplyAlphaBorderOffset(ref rectWithAlphaBorders, textureRect);
+
+            DrawDoubleRectangleLines(rectWithAlphaBorders);
+
+            {
+                GUILayout.BeginArea(new Rect(0, position.height - 125, rightAreaRect.width, 100));
+                var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 125);
+                EditorGUI.DrawRect(alphaRectangleBorderRect, ReordableBackgroundColors.TransparentBackgroundColor);
+
+                EditorGUI.BeginChangeCheck();
+
+                DrawAlphaRectangleBorderSettings(alphaRectangleBorderRect);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RegisterCompleteObjectUndo(spriteAlphaData, "changed OOBB size");
+                    selectedOOBB.UpdateBosSizeWithBorder();
+                }
+
+                GUILayout.EndArea();
+            }
             GUILayout.EndArea();
         }
 
@@ -293,11 +295,10 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var spriteAspectRatio = (float) selectedSprite.texture.width / (float) selectedSprite.texture.height;
             var rectAspectRatio = textureRect.width / textureRect.height;
 
-            // float textureHeight;
-            // float textureWidth;
             Rect displayingTextureRect;
 
             // set rect and sprite in ratio and adjust bounding box according to the ScalingMode ScaleToFit, from UnityEngine.GUI.CalculateScaledTextureRects
+            //https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Modules/IMGUI/GUI.cs#L262
             if (rectAspectRatio > spriteAspectRatio)
             {
                 //rectangle is longer than sprite's width
