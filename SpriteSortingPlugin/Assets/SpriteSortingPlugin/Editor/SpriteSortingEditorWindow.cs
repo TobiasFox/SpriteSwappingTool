@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SpriteSortingPlugin.Preview;
+using SpriteSortingPlugin.SpriteAlphaAnalysis;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace SpriteSortingPlugin
         private Vector2 scrollPosition = Vector2.zero;
 
         private bool ignoreAlphaOfSprites;
+        [SerializeField] private SpriteAlphaData spriteAlphaData;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -141,7 +143,26 @@ namespace SpriteSortingPlugin
             serializedObject.Update();
 
             GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
-            ignoreAlphaOfSprites = EditorGUILayout.Toggle("ignore Alpha Of Sprites", ignoreAlphaOfSprites);
+            ignoreAlphaOfSprites = EditorGUILayout.BeginToggleGroup("ignore Alpha of sprites", ignoreAlphaOfSprites);
+
+            if (ignoreAlphaOfSprites)
+            {
+                EditorGUILayout.BeginHorizontal();
+                spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"),
+                    spriteAlphaData,
+                    typeof(SpriteAlphaData), false) as SpriteAlphaData;
+
+                if (GUILayout.Button("Create Sprite Alpha Data"))
+                {
+                    var spriteAlphaEditorWindow = GetWindow<SpriteAlphaEditorWindow>();
+                    spriteAlphaEditorWindow.Show();
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
+
+            EditorGUILayout.EndToggleGroup();
+
             cameraProjectionType =
                 (CameraProjectionType) EditorGUILayout.EnumPopup("Projection type of camera", cameraProjectionType);
             sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);

@@ -41,12 +41,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         public static void ShowWindow()
         {
             var window = GetWindow<SpriteAlphaEditorWindow>();
-            window.titleContent = new GUIContent("Sprite Alpha Analysis");
             window.Show();
         }
 
         private void Awake()
         {
+            titleContent = new GUIContent("Sprite Alpha Analysis");
             ResetSpriteList();
 
             //TODO: remove
