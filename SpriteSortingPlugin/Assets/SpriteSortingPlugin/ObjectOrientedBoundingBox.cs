@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SpriteSortingPlugin
 {
     [Serializable]
-    public class ObjectOrientedBoundingBox
+    public class ObjectOrientedBoundingBox : ISerializationCallbackReceiver
     {
         public string assetGuid;
         public string assetName;
@@ -14,7 +14,10 @@ namespace SpriteSortingPlugin
 
         [SerializeField] private float zRotation;
         private Quaternion rotation;
-        [SerializeField] private Bounds ownBounds;
+        private Bounds ownBounds;
+        [SerializeField] private Vector2 boundsCenter;
+        [SerializeField] private Vector2 boundsSize;
+        [SerializeField] private Vector2 boundsCenterOffset;
 
         [SerializeField, HideInInspector] private Vector2[] axes;
         private Vector2[] points = new Vector2[4];
@@ -32,9 +35,8 @@ namespace SpriteSortingPlugin
 
                 if (!isOriginAlphaRectangleBorderSet)
                 {
-                    isOriginAlphaRectangleBorderSet = true;
-
                     originAlphaRectangleBorder = (AlphaRectangleBorder) alphaRectangleBorder.Clone();
+                    isOriginAlphaRectangleBorderSet = true;
                 }
             }
         }
@@ -62,6 +64,7 @@ namespace SpriteSortingPlugin
         public ObjectOrientedBoundingBox(Bounds bounds, float zRotation)
         {
             ownBounds = bounds;
+            boundsCenter = bounds.center;
             this.zRotation = zRotation;
             rotation = Quaternion.Euler(0, 0, zRotation);
             alphaRectangleBorder = new AlphaRectangleBorder();
@@ -93,9 +96,9 @@ namespace SpriteSortingPlugin
 
         public void UpdateCenter(Vector2 center)
         {
-            ownBounds.center = center;
+            boundsCenter = center;
+            ownBounds.center = center + boundsCenterOffset;
 
-            //TODO: update points
             UpdateLocalWorldPoints();
         }
 
@@ -103,13 +106,13 @@ namespace SpriteSortingPlugin
         {
             rotation = Quaternion.Euler(0, 0, zRotation);
 
-            //TODO: update points
             UpdateLocalWorldPoints();
         }
 
         public void UpdateBox(Transform transform)
         {
-            ownBounds.center = transform.position;
+            boundsCenter = transform.position;
+            ownBounds.center = boundsCenter + boundsCenterOffset;
             rotation = Quaternion.Euler(0, 0, transform.rotation.z);
             UpdateLocalWorldPoints();
 
@@ -127,20 +130,38 @@ namespace SpriteSortingPlugin
             }
         }
 
-        public void UpdateBosSizeWithBorder()
+        public void UpdateBoxSizeWithBorder()
         {
-            //TODO: consider only moving one side
-            var width = alphaRectangleBorder.rightBorder / alphaRectangleBorder.pixelPerUnit -
-                        alphaRectangleBorder.leftBorder / alphaRectangleBorder.pixelPerUnit;
-            var height = alphaRectangleBorder.bottomBorder / alphaRectangleBorder.pixelPerUnit -
-                         alphaRectangleBorder.topBorder / alphaRectangleBorder.pixelPerUnit;
+            var convertedLeftBorder = alphaRectangleBorder.leftBorder / alphaRectangleBorder.pixelPerUnit;
+            var convertedTopBorder = alphaRectangleBorder.topBorder / alphaRectangleBorder.pixelPerUnit;
+            var convertedRightBorder = (alphaRectangleBorder.spriteWidth - alphaRectangleBorder.rightBorder) /
+                                       alphaRectangleBorder.pixelPerUnit;
+            var convertedBottomBorder = (alphaRectangleBorder.spriteHeight - alphaRectangleBorder.bottomBorder) /
+                                        alphaRectangleBorder.pixelPerUnit;
+
+            var width = convertedRightBorder - convertedLeftBorder;
+            var height = convertedBottomBorder - convertedTopBorder;
             ownBounds.size = new Vector2(width, height);
+
+            boundsCenterOffset = Vector2.zero;
+
+            boundsCenterOffset.x += convertedLeftBorder / 2f;
+            boundsCenterOffset.x -=
+                ((float) alphaRectangleBorder.rightBorder / (float) alphaRectangleBorder.pixelPerUnit) / 2f;
+
+            boundsCenterOffset.y -=
+                ((float) alphaRectangleBorder.bottomBorder / (float) alphaRectangleBorder.pixelPerUnit) / 2f;
+            boundsCenterOffset.y += convertedTopBorder / 2f;
+
+            ownBounds.center = boundsCenter + boundsCenterOffset;
             UpdateLocalWorldPoints();
         }
 
         public void ResetAlphaRectangleBorder()
         {
             alphaRectangleBorder = (AlphaRectangleBorder) originAlphaRectangleBorder.Clone();
+            boundsCenterOffset = Vector2.zero;
+            ownBounds.center = boundsCenter;
         }
 
         private void Initialize()
@@ -150,9 +171,8 @@ namespace SpriteSortingPlugin
             originLocalWorldPoints[2] = new Vector3(ownBounds.max.x, ownBounds.min.y, 0); // bottom right
             originLocalWorldPoints[3] = new Vector3(ownBounds.max.x, ownBounds.max.y, 0); // top right
 
-            UpdateLocalWorldPoints();
-
             //TODO: consider scale
+            UpdateLocalWorldPoints();
         }
 
         private void UpdateLocalWorldPoints()
@@ -164,6 +184,17 @@ namespace SpriteSortingPlugin
                 dir = rotation * dir;
                 localWorldPoints[i] = dir + pivot;
             }
+        }
+
+        public void OnBeforeSerialize()
+        {
+            boundsCenter = (Vector2) ownBounds.center - boundsCenterOffset;
+            boundsSize = ownBounds.size;
+        }
+
+        public void OnAfterDeserialize()
+        {
+            ownBounds = new Bounds(boundsCenter + boundsCenterOffset, boundsSize);
         }
     }
 }

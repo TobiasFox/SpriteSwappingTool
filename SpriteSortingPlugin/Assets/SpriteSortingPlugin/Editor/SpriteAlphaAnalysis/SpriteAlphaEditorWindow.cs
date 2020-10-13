@@ -19,6 +19,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         [SerializeField] private SpriteAlphaData spriteAlphaData;
         private Sprite selectedSprite;
+        private float selectedSpriteAspectRatio;
 
         private string searchString;
         private bool isShowingSpriteAlphaGUI = true;
@@ -213,10 +214,21 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             Handles.color = Color.green;
 
-            var rectWithAlphaBorders = CalculateDisplayingTextureRect(textureRect);
-            ApplyAlphaBorderOffset(ref rectWithAlphaBorders);
+            var rectWithAlphaBorders = CalculateRectWithAlphaBorders(textureRect);
 
-            DrawDoubleRectangleLines(rectWithAlphaBorders);
+            var scaleXFactor = rectWithAlphaBorders.width / selectedSprite.bounds.size.x;
+            var scaleYFactor = rectWithAlphaBorders.height / selectedSprite.bounds.size.y;
+
+            var newBoundsWidth = scaleXFactor * selectedOOBB.OwnBounds.size.x;
+            var newBoundsHeight = scaleYFactor * selectedOOBB.OwnBounds.size.y;
+
+            var scaledSize = new Vector2(newBoundsWidth, newBoundsHeight);
+            var rectCenter = rectWithAlphaBorders.center + new Vector2(selectedOOBB.OwnBounds.center.x * scaleXFactor,
+                selectedOOBB.OwnBounds.center.y * scaleYFactor);
+
+            Handles.DrawWireCube(rectCenter, scaledSize);
+            Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
+            
 
             {
                 GUILayout.BeginArea(new Rect(0, position.height - 125, rightAreaRect.width, 100));
@@ -230,7 +242,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RegisterCompleteObjectUndo(spriteAlphaData, "changed OOBB size");
-                    selectedOOBB.UpdateBosSizeWithBorder();
+                    selectedOOBB.UpdateBoxSizeWithBorder();
                 }
 
                 GUILayout.EndArea();
@@ -238,69 +250,18 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             GUILayout.EndArea();
         }
 
-        private static void DrawDoubleRectangleLines(Rect rectWithAlphaBorders)
+        private Rect CalculateRectWithAlphaBorders(Rect textureRect)
         {
-            var topLeft = new Vector2(rectWithAlphaBorders.x, rectWithAlphaBorders.y);
-            var bottomLeft = new Vector2(rectWithAlphaBorders.x,
-                rectWithAlphaBorders.y + rectWithAlphaBorders.height);
-            var topRight = new Vector2(rectWithAlphaBorders.x + rectWithAlphaBorders.width, rectWithAlphaBorders.y);
-            var bottomRight = new Vector2(rectWithAlphaBorders.x + rectWithAlphaBorders.width,
-                rectWithAlphaBorders.y + rectWithAlphaBorders.height);
-
-            //top
-            Handles.DrawLine(topLeft, topRight);
-            Handles.DrawLine(new Vector2(topLeft.x + 1, topLeft.y + 1),
-                new Vector2(topRight.x + 1, topRight.y + 1));
-
-            //right
-            Handles.DrawLine(topRight, bottomRight);
-            Handles.DrawLine(new Vector2(topRight.x + 1, topRight.y + 1),
-                new Vector2(bottomRight.x + 1, bottomRight.y + 1));
-
-            //bottom
-            Handles.DrawLine(bottomRight, bottomLeft);
-            Handles.DrawLine(new Vector2(bottomRight.x + 1, bottomRight.y + 1),
-                new Vector2(bottomLeft.x + 1, bottomLeft.y + 1));
-
-            //left
-            Handles.DrawLine(bottomLeft, topLeft);
-            Handles.DrawLine(new Vector2(bottomLeft.x + 1, bottomLeft.y + 1),
-                new Vector2(topLeft.x + 1, topLeft.y + 1));
-        }
-
-        private void ApplyAlphaBorderOffset(ref Rect rectWithAlphaBorders)
-        {
-            var offset = rectWithAlphaBorders.position;
-            var pixelHeight = rectWithAlphaBorders.height / selectedOOBB.AlphaRectangleBorder.spriteHeight;
-            var pixelWidth = rectWithAlphaBorders.width / selectedOOBB.AlphaRectangleBorder.spriteWidth;
-
-            // top and left
-            rectWithAlphaBorders.xMin = pixelWidth * selectedOOBB.AlphaRectangleBorder.leftBorder;
-            rectWithAlphaBorders.yMin = pixelHeight * selectedOOBB.AlphaRectangleBorder.topBorder;
-
-            // bottom and right
-            rectWithAlphaBorders.xMax = pixelWidth * (selectedOOBB.AlphaRectangleBorder.spriteWidth -
-                                                      selectedOOBB.AlphaRectangleBorder.rightBorder);
-            rectWithAlphaBorders.yMax = pixelHeight * (selectedOOBB.AlphaRectangleBorder.spriteHeight -
-                                                       selectedOOBB.AlphaRectangleBorder.bottomBorder);
-
-            //move position to center the rect again
-            rectWithAlphaBorders.position += offset;
-        }
-
-        private Rect CalculateDisplayingTextureRect(Rect textureRect)
-        {
-            var spriteAspectRatio = (float) selectedSprite.texture.width / (float) selectedSprite.texture.height;
             var rectAspectRatio = textureRect.width / textureRect.height;
 
             Rect displayingTextureRect;
 
             // set rect and sprite in ratio and adjust bounding box according to the ScalingMode ScaleToFit, from UnityEngine.GUI.CalculateScaledTextureRects
             //https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Modules/IMGUI/GUI.cs#L262
-            if (rectAspectRatio > spriteAspectRatio)
+            if (rectAspectRatio > selectedSpriteAspectRatio)
             {
                 //rectangle is longer than sprite's width
-                var num2 = spriteAspectRatio / rectAspectRatio;
+                var num2 = selectedSpriteAspectRatio / rectAspectRatio;
 
                 displayingTextureRect =
                     new Rect(textureRect.xMin + (float) ((double) textureRect.width * (1.0 - (double) num2) * 0.5),
@@ -308,7 +269,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
             else
             {
-                var num3 = rectAspectRatio / spriteAspectRatio;
+                var num3 = rectAspectRatio / selectedSpriteAspectRatio;
 
                 displayingTextureRect = new Rect(textureRect.xMin,
                     textureRect.yMin + (float) ((double) textureRect.height * (1.0 - (double) num3) * 0.5),
@@ -392,6 +353,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             spriteAlphaData = CreateInstance<SpriteAlphaData>();
 
+            reorderableSpriteList.index = -1;
             spriteList.Clear();
 
             foreach (var objectOrientedBoundingBox in oobbList)
@@ -458,6 +420,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
             selectedSprite = sprite;
+            selectedSpriteAspectRatio = (float) selectedSprite.texture.width / (float) selectedSprite.texture.height;
         }
 
         private void OnDestroy()
