@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteAlphaAnalysis
+namespace SpriteSortingPlugin
 {
-    [CreateAssetMenu(fileName = "Data")]
+    // [CreateAssetMenu(fileName = "Data")]
     public class SpriteAlphaData : ScriptableObject, ISerializationCallbackReceiver
     {
         [SerializeField] private List<ObjectOrientedBoundingBox> oobbList = new List<ObjectOrientedBoundingBox>();
