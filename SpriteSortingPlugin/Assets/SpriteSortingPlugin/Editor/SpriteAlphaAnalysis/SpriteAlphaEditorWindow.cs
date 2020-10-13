@@ -223,16 +223,19 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var scaleXFactor = rectWithAlphaBorders.width / selectedSprite.bounds.size.x;
             var scaleYFactor = rectWithAlphaBorders.height / selectedSprite.bounds.size.y;
 
-            var newBoundsWidth = scaleXFactor * selectedOOBB.OwnBounds.size.x;
-            var newBoundsHeight = scaleYFactor * selectedOOBB.OwnBounds.size.y;
+            var newBoundsWidth = scaleXFactor *
+                (selectedOOBB.AlphaRectangleBorder.spriteWidth - selectedOOBB.AlphaRectangleBorder.leftBorder -
+                 selectedOOBB.AlphaRectangleBorder.rightBorder) / selectedOOBB.AlphaRectangleBorder.pixelPerUnit;
+            var newBoundsHeight = scaleYFactor *
+                (selectedOOBB.AlphaRectangleBorder.spriteHeight - selectedOOBB.AlphaRectangleBorder.topBorder -
+                 selectedOOBB.AlphaRectangleBorder.bottomBorder) / selectedOOBB.AlphaRectangleBorder.pixelPerUnit;
 
             var scaledSize = new Vector2(newBoundsWidth, newBoundsHeight);
-            var rectCenter = rectWithAlphaBorders.center + new Vector2(selectedOOBB.OwnBounds.center.x * scaleXFactor,
-                selectedOOBB.OwnBounds.center.y * scaleYFactor);
+            var rectCenter = rectWithAlphaBorders.center - new Vector2(selectedOOBB.BoundsCenterOffset.x * scaleXFactor,
+                selectedOOBB.BoundsCenterOffset.y * scaleYFactor);
 
             Handles.DrawWireCube(rectCenter, scaledSize);
             Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
-            
 
             {
                 GUILayout.BeginArea(new Rect(0, position.height - 125, rightAreaRect.width, 100));

@@ -20,7 +20,7 @@ namespace SpriteSortingPlugin
         [SerializeField] private Vector2 boundsCenterOffset;
 
         [SerializeField, HideInInspector] private Vector2[] axes;
-        private Vector2[] points = new Vector2[4];
+        private Vector2[] points;
         [SerializeField] private AlphaRectangleBorder alphaRectangleBorder;
         [SerializeField, HideInInspector] private AlphaRectangleBorder originAlphaRectangleBorder;
 
@@ -60,6 +60,7 @@ namespace SpriteSortingPlugin
 
         public Vector2[] Points => points;
         public Bounds OwnBounds => ownBounds;
+        public Vector2 BoundsCenterOffset => boundsCenterOffset;
 
         public ObjectOrientedBoundingBox(Bounds bounds, float zRotation)
         {
@@ -68,6 +69,10 @@ namespace SpriteSortingPlugin
             this.zRotation = zRotation;
             rotation = Quaternion.Euler(0, 0, zRotation);
             alphaRectangleBorder = new AlphaRectangleBorder();
+            points = new Vector2[localWorldPoints.Length];
+
+            Initialize();
+        }
 
             Initialize();
         }
@@ -123,6 +128,12 @@ namespace SpriteSortingPlugin
             //     sourcePoints[s] = new Vector3(sourcePoints[s].x / localScale.x, sourcePoints[s].y / localScale.y, 0);
             // }
 
+            //TODO: check initialization of point array
+            if (points == null)
+            {
+                points = new Vector2[4];
+            }
+
             // Transform points from local to world space
             for (int t = 0; t < points.Length; t++)
             {
@@ -149,9 +160,9 @@ namespace SpriteSortingPlugin
             boundsCenterOffset.x -=
                 ((float) alphaRectangleBorder.rightBorder / (float) alphaRectangleBorder.pixelPerUnit) / 2f;
 
-            boundsCenterOffset.y -=
+            boundsCenterOffset.y +=
                 ((float) alphaRectangleBorder.bottomBorder / (float) alphaRectangleBorder.pixelPerUnit) / 2f;
-            boundsCenterOffset.y += convertedTopBorder / 2f;
+            boundsCenterOffset.y -= convertedTopBorder / 2f;
 
             ownBounds.center = boundsCenter + boundsCenterOffset;
             UpdateLocalWorldPoints();
@@ -177,10 +188,33 @@ namespace SpriteSortingPlugin
 
         private void UpdateLocalWorldPoints()
         {
+            //apply border
+            var convertedLeftBorder = (alphaRectangleBorder.leftBorder - originAlphaRectangleBorder.leftBorder) /
+                                      alphaRectangleBorder.pixelPerUnit;
+            var convertedTopBorder = (alphaRectangleBorder.topBorder - originAlphaRectangleBorder.topBorder) /
+                                     alphaRectangleBorder.pixelPerUnit;
+            var convertedRightBorder = (alphaRectangleBorder.rightBorder - originAlphaRectangleBorder.rightBorder) /
+                                       alphaRectangleBorder.pixelPerUnit;
+            var convertedBottomBorder = (alphaRectangleBorder.bottomBorder - originAlphaRectangleBorder.bottomBorder) /
+                                        alphaRectangleBorder.pixelPerUnit;
+
+            localWorldPoints[0] = new Vector3(originLocalWorldPoints[0].x + convertedLeftBorder,
+                originLocalWorldPoints[0].y - convertedTopBorder, 0); // top left 
+
+            localWorldPoints[1] = new Vector3(originLocalWorldPoints[1].x + convertedLeftBorder,
+                originLocalWorldPoints[1].y + convertedBottomBorder, 0); // bottom left 
+
+            localWorldPoints[2] = new Vector3(originLocalWorldPoints[2].x - convertedRightBorder,
+                originLocalWorldPoints[2].y + convertedBottomBorder, 0); // bottom right
+
+            localWorldPoints[3] = new Vector3(originLocalWorldPoints[3].x - convertedRightBorder,
+                originLocalWorldPoints[3].y - convertedTopBorder, 0); // top right
+
+            //apply rotation
             var pivot = (Vector2) ownBounds.center;
             for (var i = 0; i < localWorldPoints.Length; i++)
             {
-                var dir = originLocalWorldPoints[i] - pivot;
+                var dir = localWorldPoints[i] - pivot;
                 dir = rotation * dir;
                 localWorldPoints[i] = dir + pivot;
             }
