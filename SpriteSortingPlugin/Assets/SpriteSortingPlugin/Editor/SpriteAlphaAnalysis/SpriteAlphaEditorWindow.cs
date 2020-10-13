@@ -115,34 +115,37 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private void OnGUI()
         {
             // serializedObject.Update();
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-
-            spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"), spriteAlphaData,
-                typeof(SpriteAlphaData), false) as SpriteAlphaData;
-
-            if (GUILayout.Button("Load"))
             {
-                Debug.Log("loaded sprite Alpha Data");
-                LoadSpriteAlphaData();
-                isShowingSpriteAlphaGUI = true;
+                EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+
+                spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"),
+                    spriteAlphaData,
+                    typeof(SpriteAlphaData), false) as SpriteAlphaData;
+
+                if (GUILayout.Button("Load"))
+                {
+                    Debug.Log("loaded sprite Alpha Data");
+                    LoadSpriteAlphaData();
+                    isShowingSpriteAlphaGUI = true;
+                }
+
+                if (GUILayout.Button("Reset List"))
+                {
+                    // Debug.Log("Save sprite Alpha Data");
+                    ResetSpriteList();
+                }
+
+                if (GUILayout.Button("Analyze Alpha of Sprites"))
+                {
+                    Debug.Log("analyze alpha");
+
+                    AnalyzeSpriteAlphas();
+
+                    isShowingSpriteAlphaGUI = true;
+                }
+
+                EditorGUILayout.EndHorizontal();
             }
-
-            if (GUILayout.Button("Reset List"))
-            {
-                // Debug.Log("Save sprite Alpha Data");
-                ResetSpriteList();
-            }
-
-            if (GUILayout.Button("Analyze Alpha of Sprites"))
-            {
-                Debug.Log("analyze alpha");
-
-                AnalyzeSpriteAlphas();
-
-                isShowingSpriteAlphaGUI = true;
-            }
-
-            EditorGUILayout.EndHorizontal();
             // serializedObject.ApplyModifiedProperties();
 
             if (!isShowingSpriteAlphaGUI)
@@ -151,7 +154,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
 
             var leftBarWidth = position.width / 4;
-
             if (leftBarWidth < MinWidthRightContentBar)
             {
                 leftBarWidth = MinWidthRightContentBar;
@@ -162,29 +164,31 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 lastHeight = GUILayoutUtility.GetLastRect().height;
             }
 
-            var leftAreaRect = new Rect(0, lastHeight, leftBarWidth, position.height);
-            GUILayout.BeginArea(leftAreaRect);
-
-            leftBarScrollPosition = EditorGUILayout.BeginScrollView(leftBarScrollPosition);
             {
-                EditorGUILayout.LabelField("Sprites");
-                // oobbComponent =
-                //     EditorGUILayout.ObjectField("HandleTest", oobbComponent, typeof(ObjectOrientedBoundingBoxComponent),
-                //         true) as ObjectOrientedBoundingBoxComponent;
+                var leftAreaRect = new Rect(0, lastHeight, leftBarWidth, position.height);
+                GUILayout.BeginArea(leftAreaRect);
 
-                searchField.OnGUI(searchString);
-
-                if (reorderableSpriteList == null)
+                leftBarScrollPosition = EditorGUILayout.BeginScrollView(leftBarScrollPosition);
                 {
-                    InitReordableSpriteList();
+                    EditorGUILayout.LabelField("Sprites");
+                    // oobbComponent =
+                    //     EditorGUILayout.ObjectField("HandleTest", oobbComponent, typeof(ObjectOrientedBoundingBoxComponent),
+                    //         true) as ObjectOrientedBoundingBoxComponent;
+
+                    searchField.OnGUI(searchString);
+
+                    if (reorderableSpriteList == null)
+                    {
+                        InitReordableSpriteList();
+                    }
+
+                    reorderableSpriteList.DoLayoutList();
+
+                    EditorGUILayout.EndScrollView();
                 }
 
-                reorderableSpriteList.DoLayoutList();
-
-                EditorGUILayout.EndScrollView();
+                GUILayout.EndArea();
             }
-
-            GUILayout.EndArea();
 
             var rightAreaRect = new Rect(leftBarWidth, lastHeight, position.width - leftBarWidth,
                 position.height - lastHeight);
