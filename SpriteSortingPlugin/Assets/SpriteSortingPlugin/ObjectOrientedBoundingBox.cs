@@ -177,8 +177,8 @@ namespace SpriteSortingPlugin
 
             boundsCenterOffset = Vector2.zero;
 
-            boundsCenterOffset.x += convertedLeftBorder / 2f;
-            boundsCenterOffset.x -=
+            boundsCenterOffset.x -= convertedLeftBorder / 2f;
+            boundsCenterOffset.x +=
                 ((float) alphaRectangleBorder.rightBorder / (float) alphaRectangleBorder.pixelPerUnit) / 2f;
 
             boundsCenterOffset.y +=
