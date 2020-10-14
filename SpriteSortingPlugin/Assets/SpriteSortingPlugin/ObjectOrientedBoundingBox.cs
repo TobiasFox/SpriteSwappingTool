@@ -9,17 +9,17 @@ namespace SpriteSortingPlugin
     {
         public string assetGuid;
         public string assetName;
-        [SerializeField, HideInInspector] private Vector2[] localWorldPoints = new Vector2[4];
+        [SerializeField, HideInInspector] public Vector2[] localWorldPoints = new Vector2[4];
         [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
-        [SerializeField] private float zRotation;
+        [SerializeField] public float zRotation;
         private Quaternion rotation;
         private Bounds ownBounds;
         [SerializeField] private Vector2 boundsCenter;
         [SerializeField] private Vector2 boundsSize;
         [SerializeField] private Vector2 boundsCenterOffset;
 
-        [SerializeField, HideInInspector] private Vector2[] axes;
+        [SerializeField] private Vector2[] axes;
         private Vector2[] points;
         [SerializeField] private AlphaRectangleBorder alphaRectangleBorder;
         [SerializeField, HideInInspector] private AlphaRectangleBorder originAlphaRectangleBorder;
@@ -45,20 +45,25 @@ namespace SpriteSortingPlugin
         {
             get
             {
-                if (axes != null)
-                {
-                    return axes;
-                }
+                CheckValidWorldPoints();
 
                 axes = new Vector2[2];
-                axes[0] = Vector2.Perpendicular(localWorldPoints[3] - localWorldPoints[0]);
-                axes[1] = Vector2.Perpendicular(localWorldPoints[0] - localWorldPoints[1]);
+                axes[0] = Vector2.Perpendicular(points[3] - points[0]);
+                axes[1] = Vector2.Perpendicular(points[0] - points[1]);
 
                 return axes;
             }
         }
 
-        public Vector2[] Points => points;
+        public Vector2[] Points
+        {
+            get
+            {
+                CheckValidWorldPoints();
+                return points;
+            }
+        }
+
         public Bounds OwnBounds => ownBounds;
         public Vector2 BoundsCenterOffset => boundsCenterOffset;
 
@@ -74,17 +79,32 @@ namespace SpriteSortingPlugin
             Initialize();
         }
 
+        public ObjectOrientedBoundingBox(AlphaRectangleBorder alphaRectangleBorder, float zRotation = 0)
+        {
+            this.zRotation = zRotation;
+            rotation = Quaternion.Euler(0, 0, zRotation);
+            this.alphaRectangleBorder = alphaRectangleBorder;
+            points = new Vector2[localWorldPoints.Length];
+            originAlphaRectangleBorder = (AlphaRectangleBorder) alphaRectangleBorder.Clone();
+
+            var width = alphaRectangleBorder.rightBorder - alphaRectangleBorder.leftBorder;
+            var height = alphaRectangleBorder.bottomBorder - alphaRectangleBorder.topBorder;
+            boundsCenter = Vector2.zero;
+            ownBounds = new Bounds(boundsCenter, new Vector2(width, height));
+
             Initialize();
         }
 
         public Projection ProjectAxis(Vector2 axis)
         {
-            double min = Vector2.Dot(axis, localWorldPoints[0]);
+            CheckValidWorldPoints();
+
+            double min = Vector2.Dot(axis, points[0]);
             var max = min;
 
-            for (var i = 1; i < localWorldPoints.Length; i++)
+            for (var i = 1; i < points.Length; i++)
             {
-                double p = Vector2.Dot(axis, localWorldPoints[i]);
+                double p = Vector2.Dot(axis, points[i]);
                 if (p < min)
                 {
                     min = p;
@@ -118,7 +138,8 @@ namespace SpriteSortingPlugin
         {
             boundsCenter = transform.position;
             ownBounds.center = boundsCenter + boundsCenterOffset;
-            rotation = Quaternion.Euler(0, 0, transform.rotation.z);
+            zRotation = transform.rotation.z;
+            rotation = Quaternion.Euler(0, 0, zRotation);
             UpdateLocalWorldPoints();
 
             // Apply scaling
@@ -129,13 +150,13 @@ namespace SpriteSortingPlugin
             // }
 
             //TODO: check initialization of point array
-            if (points == null)
+            if (points == null || points.Length != 4)
             {
                 points = new Vector2[4];
             }
 
             // Transform points from local to world space
-            for (int t = 0; t < points.Length; t++)
+            for (int t = 0; t < localWorldPoints.Length; t++)
             {
                 points[t] = transform.TransformPoint(localWorldPoints[t]);
             }
@@ -217,6 +238,15 @@ namespace SpriteSortingPlugin
                 var dir = localWorldPoints[i] - pivot;
                 dir = rotation * dir;
                 localWorldPoints[i] = dir + pivot;
+            }
+        }
+
+        private void CheckValidWorldPoints()
+        {
+            if (points == null || points.Length != 4)
+            {
+                points = new Vector2[4];
+                UpdateLocalWorldPoints();
             }
         }
 

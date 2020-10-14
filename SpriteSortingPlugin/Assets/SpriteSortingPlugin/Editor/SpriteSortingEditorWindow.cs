@@ -363,10 +363,11 @@ namespace SpriteSortingPlugin
                     }
 
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayerIds,
-                        gameObjectParents);
+                        gameObjectParents, spriteAlphaData);
                     break;
                 case SortingType.Sprite:
-                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer);
+                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer,
+                        spriteAlphaData);
                     break;
             }
 
