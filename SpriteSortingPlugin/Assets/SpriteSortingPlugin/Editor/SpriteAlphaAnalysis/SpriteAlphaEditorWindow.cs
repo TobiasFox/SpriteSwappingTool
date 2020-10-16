@@ -64,7 +64,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         {
             try
             {
-                var guids = AssetDatabase.FindAssets("SpriteAlphaData 2");
+                var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
                 spriteAlphaData =
                     AssetDatabase.LoadAssetAtPath<SpriteAlphaData>(AssetDatabase.GUIDToAssetPath(guids[0]));
             }
@@ -236,6 +236,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             Handles.DrawWireCube(rectCenter, scaledSize);
             Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
+            Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x - 1, scaledSize.y - 1));
 
             {
                 GUILayout.BeginArea(new Rect(0, position.height - 125, rightAreaRect.width, 100));

@@ -24,6 +24,36 @@ namespace SpriteSortingPlugin
                 return;
             }
 
+            // GenerateOutmostAlpha();
+
+            GenerateOutmostPolygon();
+            
+            Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
+        }
+
+        private void GenerateOutmostPolygon()
+        {
+            var spriteTexture = ownRenderer.sprite.texture;
+            var pixelArray = spriteTexture.GetPixels();
+            var counter = 0;
+
+            for (int y = 0; y < spriteTexture.height; y++)
+            {
+                for (int x = 0; x < spriteTexture.width; x++)
+                {
+                    var color = pixelArray[counter];
+
+                    
+                    
+                    
+                    
+                    counter++;
+                }
+            }
+        }
+
+        private void GenerateOutmostAlpha()
+        {
             var spriteTexture = ownRenderer.sprite.texture;
             var pixelArray = spriteTexture.GetPixels();
             borders = new int[] {spriteTexture.height, spriteTexture.width, 0, 0};
@@ -74,8 +104,6 @@ namespace SpriteSortingPlugin
             ownBounds = new Bounds(Vector3.zero, new Vector2(width, height));
 
             UpdateRotatedBoundingBoxPoints();
-
-            Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
         }
 
         private void UpdateRotatedBoundingBoxPoints()
@@ -147,16 +175,16 @@ namespace SpriteSortingPlugin
             }
 
             Gizmos.color = Color.white;
-            Gizmos.DrawSphere(points[0], 1);
+            // Gizmos.DrawSphere(points[0], 1);
             Gizmos.DrawLine(points[0], points[1]);
             Gizmos.color = Color.red;
-            Gizmos.DrawSphere(points[1], 1);
+            // Gizmos.DrawSphere(points[1], 1);
             Gizmos.DrawLine(points[1], points[2]);
             Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(points[2], 1);
+            // Gizmos.DrawSphere(points[2], 1);
             Gizmos.DrawLine(points[2], points[3]);
             Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(points[3], 1);
+            // Gizmos.DrawSphere(points[3], 1);
             Gizmos.DrawLine(points[3], points[0]);
 
 

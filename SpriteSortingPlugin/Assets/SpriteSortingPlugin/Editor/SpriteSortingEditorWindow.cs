@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SpriteSortingPlugin.Preview;
 using SpriteSortingPlugin.SpriteAlphaAnalysis;
 using UnityEditor;
@@ -14,7 +15,7 @@ namespace SpriteSortingPlugin
 
         private Vector2 scrollPosition = Vector2.zero;
 
-        private bool ignoreAlphaOfSprites;
+        private bool ignoreAlphaOfSprites = true;
         [SerializeField] private SpriteAlphaData spriteAlphaData;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
@@ -44,15 +45,32 @@ namespace SpriteSortingPlugin
         public static void ShowWindow()
         {
             var window = GetWindow<SpriteSortingEditorWindow>();
-            window.titleContent = new GUIContent("Sprite Sorting");
             window.Show();
         }
 
         private void Awake()
         {
+            titleContent = new GUIContent("Sprite Sorting");
             preview = new SpriteSortingEditorPreview();
             reordableOverlappingItemList = new ReordableOverlappingItemList();
             SortingLayerUtility.UpdateSortingLayerNames();
+
+            //TODO: remove
+            SelectDefaultSpriteAlphaData();
+        }
+
+        private void SelectDefaultSpriteAlphaData()
+        {
+            try
+            {
+                var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
+                spriteAlphaData =
+                    AssetDatabase.LoadAssetAtPath<SpriteAlphaData>(AssetDatabase.GUIDToAssetPath(guids[0]));
+            }
+            catch (Exception e)
+            {
+                Debug.Log("auto selection of SpriteAlphaData went wrong");
+            }
         }
 
         private void OnInspectorUpdate()
@@ -61,7 +79,7 @@ namespace SpriteSortingPlugin
             {
                 CheckSortingLayerOrder();
             }
-            
+
             //TODO: could be more performant by comparing the name each frame instead of redrawing everything
             Repaint();
         }
@@ -149,8 +167,7 @@ namespace SpriteSortingPlugin
             {
                 EditorGUILayout.BeginHorizontal();
                 spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"),
-                    spriteAlphaData,
-                    typeof(SpriteAlphaData), false) as SpriteAlphaData;
+                    spriteAlphaData, typeof(SpriteAlphaData), false) as SpriteAlphaData;
 
                 if (GUILayout.Button("Open Sprite Alpha Editor Window to create the Data"))
                 {
