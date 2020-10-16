@@ -90,7 +90,7 @@ namespace SpriteSortingPlugin
         {
             var itemWithNewIndex = items[newIndex];
 
-            var isAdjustingSortingOrderUpwards = newIndex <= items.Count / 2;
+            var isAdjustingSortingOrderUpwards = newIndex < items.Count / 2;
             var lastItem = items[newIndex + (isAdjustingSortingOrderUpwards ? 1 : -1)];
 
             if (isAdjustingSortingOrderUpwards)
