@@ -29,9 +29,6 @@ MonoBehaviour:
     boundsCenter: {x: -26.012806, y: 10.3}
     boundsSize: {x: 1.92, y: 1.01}
     boundsCenterOffset: {x: 0, y: 0}
-    axes:
-    - {x: -0, y: 1.9199982}
-    - {x: -1.0100002, y: 0}
     alphaRectangleBorder:
       topBorder: 0
       leftBorder: 0
@@ -52,22 +49,19 @@ MonoBehaviour:
   - assetGuid: 87fbc87560525ef4189940c80115072c
     assetName: b_plant_group_9b
     localWorldPoints:
-    - {x: -4.9349995, y: 4.185}
-    - {x: -4.9349995, y: -4.1850004}
-    - {x: 4.9350014, y: -4.1850004}
-    - {x: 4.9350014, y: 4.185}
+    - {x: -3.7934399, y: 5.2419715}
+    - {x: -5.7912755, y: -2.8861005}
+    - {x: 3.7934399, y: -5.2419715}
+    - {x: 5.7912755, y: 2.8861005}
     originLocalWorldPoints:
     - {x: -4.935, y: 4.185}
     - {x: -4.935, y: -4.185}
     - {x: 4.935, y: -4.185}
     - {x: 4.935, y: 4.185}
-    zRotation: -0
-    boundsCenter: {x: -28.442806, y: 7.4590883}
+    zRotation: 346.19077
+    boundsCenter: {x: 11.49, y: -0.44}
     boundsSize: {x: 9.87, y: 8.37}
     boundsCenterOffset: {x: 0, y: 0}
-    axes:
-    - {x: -0, y: 9.870003}
-    - {x: -8.370001, y: 0}
     alphaRectangleBorder:
       topBorder: 93
       leftBorder: 18
@@ -89,21 +83,18 @@ MonoBehaviour:
     assetName: background
     localWorldPoints:
     - {x: -15.199999, y: 13.22}
-    - {x: -15.199999, y: -13.219999}
-    - {x: 15.2, y: -13.219999}
-    - {x: 15.2, y: 13.22}
+    - {x: -15.199999, y: -13.22}
+    - {x: 15.199999, y: -13.22}
+    - {x: 15.199999, y: 13.22}
     originLocalWorldPoints:
     - {x: -15.199999, y: 13.22}
     - {x: -15.199999, y: -13.22}
     - {x: 15.199999, y: -13.22}
     - {x: 15.199999, y: 13.22}
-    zRotation: -0
-    boundsCenter: {x: -8.250001, y: 5.5290885}
+    zRotation: 0
+    boundsCenter: {x: 11.45, y: -4.6}
     boundsSize: {x: 30.399998, y: 26.44}
     boundsCenterOffset: {x: 0, y: 0}
-    axes:
-    - {x: -0, y: 30.400002}
-    - {x: -26.439999, y: 0}
     alphaRectangleBorder:
       topBorder: 726
       leftBorder: 527

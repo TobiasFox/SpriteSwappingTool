@@ -155,20 +155,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 pixelPerUnit = pixelsPerUnit
             };
 
-            var adjustedBorder = new float[4];
-            for (var i = 0; i < borders.Length; i++)
-            {
-                adjustedBorder[i] = borders[i] / pixelsPerUnit;
-            }
-
-            var width = adjustedBorder[3] - adjustedBorder[1];
-            var height = adjustedBorder[2] - adjustedBorder[0];
-            var oobb = new ObjectOrientedBoundingBox(new Bounds(Vector3.zero, new Vector2(width, height)), 0)
-            {
-                AlphaRectangleBorder = alphaRectangleBorder
-            };
-
-            // Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
+            var oobb = new ObjectOrientedBoundingBox(alphaRectangleBorder, Vector2.zero, 0);
             return oobb;
         }
 

@@ -5,9 +5,11 @@ namespace SpriteSortingPlugin
 {
     public class ObjectOrientedBoundingBoxComponent : MonoBehaviour
     {
-        public ObjectOrientedBoundingBox oobb;
         public SpriteAlphaData data;
-        public bool isDataGet;
+        public bool isUsingOOBBCopy;
+        public bool isShowingLocalPoints;
+
+        public ObjectOrientedBoundingBox oobb;
 
         private void OnDrawGizmosSelected()
         {
@@ -27,22 +29,45 @@ namespace SpriteSortingPlugin
                 return;
             }
 
+            if (isUsingOOBBCopy)
+            {
+                oobb = new ObjectOrientedBoundingBox(oobb);
+            }
+
             oobb.UpdateBox(transform);
 
-            Gizmos.color = Color.white;
-            Gizmos.DrawSphere(oobb.Points[0], 1);
-            Gizmos.DrawLine(oobb.Points[0], oobb.Points[1]);
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(oobb.Points[1], 1);
-            Gizmos.DrawLine(oobb.Points[1], oobb.Points[2]);
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(oobb.Points[2], 1);
-            Gizmos.DrawLine(oobb.Points[2], oobb.Points[3]);
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(oobb.Points[3], 1);
-            Gizmos.DrawLine(oobb.Points[3], oobb.Points[0]);
+            if (isShowingLocalPoints)
+            {
+                var oobbLocalPoints = oobb.LocalWorldPoints;
 
-            // Gizmos.DrawWireCube(oobb.OwnBounds.center, oobb.OwnBounds.size);
+                Gizmos.color = Color.white;
+                Gizmos.DrawSphere(oobbLocalPoints[0], 0.3f);
+                Gizmos.DrawLine(oobbLocalPoints[0], oobbLocalPoints[1]);
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(oobbLocalPoints[1], 0.3f);
+                Gizmos.DrawLine(oobbLocalPoints[1], oobbLocalPoints[2]);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawSphere(oobbLocalPoints[2], 0.3f);
+                Gizmos.DrawLine(oobbLocalPoints[2], oobbLocalPoints[3]);
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(oobbLocalPoints[3], 0.3f);
+                Gizmos.DrawLine(oobbLocalPoints[3], oobbLocalPoints[0]);
+            }
+
+            var oobbPoints = oobb.Points;
+
+            Gizmos.color = Color.white;
+            Gizmos.DrawSphere(oobbPoints[0], 0.3f);
+            Gizmos.DrawLine(oobbPoints[0], oobbPoints[1]);
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(oobbPoints[1], 0.3f);
+            Gizmos.DrawLine(oobbPoints[1], oobbPoints[2]);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(oobbPoints[2], 0.3f);
+            Gizmos.DrawLine(oobbPoints[2], oobbPoints[3]);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(oobbPoints[3], 0.3f);
+            Gizmos.DrawLine(oobbPoints[3], oobbPoints[0]);
         }
     }
 

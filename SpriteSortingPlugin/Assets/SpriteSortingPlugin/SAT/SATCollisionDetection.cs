@@ -11,8 +11,8 @@ namespace SpriteSortingPlugin.SAT
                 return false;
             }
 
-            DrawOOBB(oobb, Color.blue);
-            DrawOOBB(otherOOBB, Color.green);
+            // DrawOOBB(oobb, Color.blue);
+            // DrawOOBB(otherOOBB, Color.green);
 
             return CheckAxisProjectionsOnOOBB(oobb, otherOOBB) && CheckAxisProjectionsOnOOBB(otherOOBB, oobb);
         }
@@ -48,7 +48,7 @@ namespace SpriteSortingPlugin.SAT
             return true;
         }
 
-        private static void DrawAxisAndPerp(Vector2 point1, Vector2 point2, Vector2 axis)
+        private static void DrawAxisAndPerp(Vector2 point1, Vector2 point2, Vector2 axis, bool isFirst)
         {
             Debug.DrawLine(point1, new Vector3(point1.x, point1.y, 2));
             Debug.DrawLine(point2, new Vector3(point2.x, point2.y, 2));
@@ -60,14 +60,19 @@ namespace SpriteSortingPlugin.SAT
             Debug.DrawLine(center, new Vector3(center.x, center.y, 2));
             Debug.DrawLine(endPerp, new Vector3(endPerp.x, endPerp.y, 2));
             Debug.DrawLine(center, endPerp, Color.magenta);
+            
+            Debug.DrawLine(center, new Vector3(center.x, center.y, 2));
+            Debug.DrawLine(endPerp, new Vector3(endPerp.x, endPerp.y, 2));
+            Debug.DrawLine(Vector2.zero, axis,isFirst? Color.yellow:Color.black);
         }
 
         private static void DrawOOBB(ObjectOrientedBoundingBox oobb, Color color)
         {
-            Debug.DrawLine(oobb.Points[0], oobb.Points[1], color, 2);
-            Debug.DrawLine(oobb.Points[1], oobb.Points[2], color, 2);
-            Debug.DrawLine(oobb.Points[2], oobb.Points[3], color, 2);
-            Debug.DrawLine(oobb.Points[3], oobb.Points[0], color, 2);
+            var oobbPoints = oobb.Points;
+            Debug.DrawLine(oobbPoints[0], oobbPoints[1], color, 2);
+            Debug.DrawLine(oobbPoints[1], oobbPoints[2], color, 2);
+            Debug.DrawLine(oobbPoints[2], oobbPoints[3], color, 2);
+            Debug.DrawLine(oobbPoints[3], oobbPoints[0], color, 2);
         }
     }
 }

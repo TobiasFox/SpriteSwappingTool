@@ -244,6 +244,11 @@ namespace SpriteSortingPlugin
 
                     if (hasSortingComponentOOBB)
                     {
+                        if (oobbToCheck == sortingComponentOOBB)
+                        {
+                            sortingComponentOOBB = (ObjectOrientedBoundingBox) oobbToCheck.Clone();
+                        }
+
                         sortingComponentOOBB.UpdateBox(sortingComponent.spriteRenderer.transform);
 
                         var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, sortingComponentOOBB);
