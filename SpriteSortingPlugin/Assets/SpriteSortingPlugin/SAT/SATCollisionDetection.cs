@@ -25,15 +25,15 @@ namespace SpriteSortingPlugin.SAT
             {
                 var axis = oobbAxes[i];
 
-                //TODO: OOBB specific
-                if (i == 0)
-                {
-                    DrawAxisAndPerp(oobb.Points[3], oobb.Points[0], axis);
-                }
-                else
-                {
-                    DrawAxisAndPerp(oobb.Points[1], oobb.Points[0], axis);
-                }
+                // OOBB specific
+                // if (i == 0)
+                // {
+                //     DrawAxisAndPerp(oobb.Points[3], oobb.Points[0], axis);
+                // }
+                // else
+                // {
+                //     DrawAxisAndPerp(oobb.Points[1], oobb.Points[0], axis);
+                // }
 
 
                 var projection = oobb.ProjectAxis(axis);

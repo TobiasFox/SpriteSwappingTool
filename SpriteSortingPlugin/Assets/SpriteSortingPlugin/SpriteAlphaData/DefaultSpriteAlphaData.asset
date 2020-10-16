@@ -10,26 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9eb8c2846e9ff464cbd83851b830f40d, type: 3}
-  m_Name: SpriteAlphaData 1
+  m_Name: DefaultSpriteAlphaData
   m_EditorClassIdentifier: 
   oobbList:
   - assetGuid: 44e745fc44d254a4c90e0de2c43094c2
     assetName: test
     localWorldPoints:
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
+    - {x: -0.9599991, y: 0.5050001}
+    - {x: -0.9599991, y: -0.5050001}
+    - {x: 0.9599991, y: -0.5050001}
+    - {x: 0.9599991, y: 0.5050001}
     originLocalWorldPoints:
     - {x: -0.96, y: 0.505}
     - {x: -0.96, y: -0.505}
     - {x: 0.96, y: -0.505}
     - {x: 0.96, y: 0.505}
-    zRotation: 0
-    boundsCenter: {x: 0, y: 0}
+    zRotation: -0
+    boundsCenter: {x: -26.012806, y: 10.3}
     boundsSize: {x: 1.92, y: 1.01}
     boundsCenterOffset: {x: 0, y: 0}
-    axes: []
+    axes:
+    - {x: -0, y: 1.9199982}
+    - {x: -1.0100002, y: 0}
     alphaRectangleBorder:
       topBorder: 0
       leftBorder: 0
@@ -50,20 +52,22 @@ MonoBehaviour:
   - assetGuid: 87fbc87560525ef4189940c80115072c
     assetName: b_plant_group_9b
     localWorldPoints:
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
+    - {x: -4.9349995, y: 4.185}
+    - {x: -4.9349995, y: -4.1850004}
+    - {x: 4.9350014, y: -4.1850004}
+    - {x: 4.9350014, y: 4.185}
     originLocalWorldPoints:
     - {x: -4.935, y: 4.185}
     - {x: -4.935, y: -4.185}
     - {x: 4.935, y: -4.185}
     - {x: 4.935, y: 4.185}
-    zRotation: 0
-    boundsCenter: {x: 0, y: 0}
+    zRotation: -0
+    boundsCenter: {x: -28.442806, y: 7.4590883}
     boundsSize: {x: 9.87, y: 8.37}
     boundsCenterOffset: {x: 0, y: 0}
-    axes: []
+    axes:
+    - {x: -0, y: 9.870003}
+    - {x: -8.370001, y: 0}
     alphaRectangleBorder:
       topBorder: 93
       leftBorder: 18
@@ -84,20 +88,22 @@ MonoBehaviour:
   - assetGuid: 47c62591626bbc94dba9a5c281496f48
     assetName: background
     localWorldPoints:
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
-    - {x: NaN, y: NaN}
+    - {x: -15.199999, y: 13.22}
+    - {x: -15.199999, y: -13.219999}
+    - {x: 15.2, y: -13.219999}
+    - {x: 15.2, y: 13.22}
     originLocalWorldPoints:
     - {x: -15.199999, y: 13.22}
     - {x: -15.199999, y: -13.22}
     - {x: 15.199999, y: -13.22}
     - {x: 15.199999, y: 13.22}
-    zRotation: 0
-    boundsCenter: {x: 0, y: 0}
+    zRotation: -0
+    boundsCenter: {x: -8.250001, y: 5.5290885}
     boundsSize: {x: 30.399998, y: 26.44}
     boundsCenterOffset: {x: 0, y: 0}
-    axes: []
+    axes:
+    - {x: -0, y: 30.400002}
+    - {x: -26.439999, y: 0}
     alphaRectangleBorder:
       topBorder: 726
       leftBorder: 527

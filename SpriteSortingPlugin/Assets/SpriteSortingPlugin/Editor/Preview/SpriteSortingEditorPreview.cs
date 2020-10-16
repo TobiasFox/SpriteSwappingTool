@@ -16,10 +16,16 @@ namespace SpriteSortingPlugin.Preview
         private bool isVisualizingBoundsInScene;
         private bool isSceneVisualizingDelegateIsAdded;
         private OverlappingItems overlappingItems;
+        private SpriteAlphaData spriteAlphaData;
 
         public void UpdateOverlappingItems(OverlappingItems overlappingItems)
         {
             this.overlappingItems = overlappingItems;
+        }
+
+        public void UpdateSpriteAlphaData(SpriteAlphaData spriteAlphaData)
+        {
+            this.spriteAlphaData = spriteAlphaData;
         }
 
         public void DoPreview(bool isUpdatePreview)
@@ -197,12 +203,29 @@ namespace SpriteSortingPlugin.Preview
                 return;
             }
 
+            var isUsingSpriteAlphaData = spriteAlphaData != null;
+
             foreach (var item in overlappingItems.Items)
             {
                 Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
-                var bounds = item.originSpriteRenderer.bounds;
-                //TODO: consider rotated bounds
-                Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
+
+                if (isUsingSpriteAlphaData &&
+                    spriteAlphaData.objectOrientedBoundingBoxDictionary.TryGetValue(item.SpriteAssetGuid,
+                        out var objectOrientedBoundingBox))
+                {
+                    objectOrientedBoundingBox.UpdateBox(item.originSpriteRenderer.transform);
+                    var oobbPoints = objectOrientedBoundingBox.Points;
+
+                    Handles.DrawLine(oobbPoints[0], oobbPoints[1]);
+                    Handles.DrawLine(oobbPoints[1], oobbPoints[2]);
+                    Handles.DrawLine(oobbPoints[2], oobbPoints[3]);
+                    Handles.DrawLine(oobbPoints[3], oobbPoints[0]);
+                }
+                else
+                {
+                    var bounds = item.originSpriteRenderer.bounds;
+                    Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
+                }
             }
 
             if (overlappingItems.Items.Count > 0)

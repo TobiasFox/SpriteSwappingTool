@@ -166,8 +166,14 @@ namespace SpriteSortingPlugin
             if (ignoreAlphaOfSprites)
             {
                 EditorGUILayout.BeginHorizontal();
+
+                EditorGUI.BeginChangeCheck();
                 spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"),
                     spriteAlphaData, typeof(SpriteAlphaData), false) as SpriteAlphaData;
+                if (EditorGUI.EndChangeCheck())
+                {
+                    preview.UpdateSpriteAlphaData(spriteAlphaData);
+                }
 
                 if (GUILayout.Button("Open Sprite Alpha Editor Window to create the Data"))
                 {
@@ -395,6 +401,7 @@ namespace SpriteSortingPlugin
 
             overlappingItems = new OverlappingItems(result.baseItem, result.overlappingItems);
             preview.UpdateOverlappingItems(overlappingItems);
+            preview.UpdateSpriteAlphaData(spriteAlphaData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
 
             if (result.overlappingItems.Count > 1)

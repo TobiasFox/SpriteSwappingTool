@@ -9,7 +9,7 @@ namespace SpriteSortingPlugin
     {
         public string assetGuid;
         public string assetName;
-        [SerializeField, HideInInspector] public Vector2[] localWorldPoints = new Vector2[4];
+        [SerializeField, HideInInspector] private Vector2[] localWorldPoints = new Vector2[4];
         [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
         [SerializeField] public float zRotation;
