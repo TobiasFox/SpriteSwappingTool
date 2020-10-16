@@ -375,6 +375,13 @@ namespace SpriteSortingPlugin
         {
             analyzeButtonWasClicked = true;
 
+            var isVisualizingBoundsInScene = preview.IsVisualizingBoundsInScene;
+
+            if (isVisualizingBoundsInScene)
+            {
+                preview.EnableSceneVisualization(false);
+            }
+
             switch (sortingType)
             {
                 case SortingType.Layer:
@@ -392,6 +399,11 @@ namespace SpriteSortingPlugin
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer,
                         spriteAlphaData);
                     break;
+            }
+
+            if (isVisualizingBoundsInScene)
+            {
+                preview.EnableSceneVisualization(true);
             }
 
             if (result.overlappingItems == null || result.overlappingItems.Count <= 0)

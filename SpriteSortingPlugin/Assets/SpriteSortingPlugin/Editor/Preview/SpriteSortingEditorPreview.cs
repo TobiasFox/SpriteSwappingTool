@@ -18,6 +18,8 @@ namespace SpriteSortingPlugin.Preview
         private OverlappingItems overlappingItems;
         private SpriteAlphaData spriteAlphaData;
 
+        public bool IsVisualizingBoundsInScene => isVisualizingBoundsInScene;
+
         public void UpdateOverlappingItems(OverlappingItems overlappingItems)
         {
             this.overlappingItems = overlappingItems;
