@@ -1,5 +1,5 @@
 
-=== Fri Sep 11 17:49:59 2020
+=== Tue Oct 13 13:52:20 2020
 
 Packages were changed.
 Update Mode: mergeDefaultDependencies
@@ -44,12 +44,11 @@ The following packages were added:
   com.unity.timeline@1.2.13
   com.unity.ugui@1.0.0
 
-=== Fri Sep 11 18:15:11 2020
+=== Tue Oct 13 14:05:12 2020
 
 Packages were changed.
 Update Mode: updateDependencies
 
 The following packages were updated:
   com.unity.ide.vscode from version 1.1.4 to 1.2.1
-  com.unity.render-pipelines.universal from version 7.1.8 to 7.3.1
   com.unity.test-framework from version 1.1.11 to 1.1.16

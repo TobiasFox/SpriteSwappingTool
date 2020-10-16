@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpriteSortingPlugin.SAT;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
@@ -11,7 +13,7 @@ namespace SpriteSortingPlugin
         private const float Tolerance = 0.00001f;
 
         public static SpriteSortingAnalysisResult AnalyzeSpriteSorting(CameraProjectionType cameraProjectionType,
-            List<int> selectedLayers, List<Transform> gameObjectsParents = null)
+            List<int> selectedLayers, List<Transform> gameObjectsParents = null, SpriteAlphaData spriteAlphaData = null)
         {
             var result = new SpriteSortingAnalysisResult();
 
@@ -29,8 +31,8 @@ namespace SpriteSortingPlugin
             //TODO: optimize foreach
             foreach (var sortingComponent in filteredSortingComponents)
             {
-                if (CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents,
-                    sortingComponent, out var overlappingSprites, out var baseItem))
+                if (CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, sortingComponent,
+                    spriteAlphaData, out var overlappingSprites, out var baseItem))
                 {
                     result.overlappingItems = overlappingSprites;
                     result.baseItem = baseItem;
@@ -42,7 +44,7 @@ namespace SpriteSortingPlugin
         }
 
         public static SpriteSortingAnalysisResult AnalyzeSpriteSorting(CameraProjectionType cameraProjectionType,
-            SpriteRenderer spriteRenderer)
+            SpriteRenderer spriteRenderer, SpriteAlphaData spriteAlphaData = null)
         {
             var result = new SpriteSortingAnalysisResult();
             var selectedLayers = new List<int> {spriteRenderer.sortingLayerID};
@@ -65,7 +67,7 @@ namespace SpriteSortingPlugin
                       " to " + filteredSortingComponents.Count);
 
             if (!CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, sortingComponentToCheck,
-                out var overlappingSprites, out var baseItem))
+                spriteAlphaData, out var overlappingSprites, out var baseItem))
             {
                 return result;
             }
@@ -189,12 +191,32 @@ namespace SpriteSortingPlugin
 
         private static bool CheckOverlappingSprites(CameraProjectionType cameraProjectionType,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
-            out List<OverlappingItem> overlappingComponents, out OverlappingItem baseItem)
+            SpriteAlphaData spriteAlphaData, out List<OverlappingItem> overlappingComponents,
+            out OverlappingItem baseItem)
         {
             overlappingComponents = new List<OverlappingItem>();
             baseItem = null;
             Debug.Log("start search in " + filteredSortingComponents.Count + " sprite renderers for an overlap with " +
                       sortingComponentToCheck.spriteRenderer.name);
+
+            var isUsingOOBB = spriteAlphaData != null;
+            var hasSortingComponentToCheckOOBB = false;
+
+            ObjectOrientedBoundingBox oobbToCheck = null;
+
+            if (isUsingOOBB)
+            {
+                var assetGuid =
+                    AssetDatabase.AssetPathToGUID(
+                        AssetDatabase.GetAssetPath(sortingComponentToCheck.spriteRenderer.sprite.GetInstanceID()));
+                hasSortingComponentToCheckOOBB =
+                    spriteAlphaData.objectOrientedBoundingBoxDictionary.TryGetValue(assetGuid, out oobbToCheck);
+
+                if (hasSortingComponentToCheckOOBB)
+                {
+                    oobbToCheck.UpdateBox(sortingComponentToCheck.spriteRenderer.transform);
+                }
+            }
 
             var boundsToCheck = sortingComponentToCheck.spriteRenderer.bounds;
 
@@ -208,6 +230,34 @@ namespace SpriteSortingPlugin
                 if (!sortingComponent.spriteRenderer.bounds.Intersects(boundsToCheck))
                 {
                     continue;
+                }
+
+                if (isUsingOOBB && hasSortingComponentToCheckOOBB)
+                {
+                    var assetGuid =
+                        AssetDatabase.AssetPathToGUID(
+                            AssetDatabase.GetAssetPath(sortingComponent.spriteRenderer.sprite.GetInstanceID()));
+
+                    var hasSortingComponentOOBB =
+                        spriteAlphaData.objectOrientedBoundingBoxDictionary.TryGetValue(assetGuid,
+                            out var sortingComponentOOBB);
+
+                    if (hasSortingComponentOOBB)
+                    {
+                        if (oobbToCheck == sortingComponentOOBB)
+                        {
+                            sortingComponentOOBB = (ObjectOrientedBoundingBox) oobbToCheck.Clone();
+                        }
+
+                        sortingComponentOOBB.UpdateBox(sortingComponent.spriteRenderer.transform);
+
+                        var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, sortingComponentOOBB);
+
+                        if (!isOverlapping)
+                        {
+                            continue;
+                        }
+                    }
                 }
 
                 if (sortingComponentToCheck.outmostSortingGroup != null &&
