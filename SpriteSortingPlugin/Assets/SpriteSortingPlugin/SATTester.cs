@@ -15,6 +15,9 @@ namespace SpriteSortingPlugin
         public SpriteRenderer[] spriteRenderers;
         public SpriteAlphaData spriteAlphaData;
         private ObjectOrientedBoundingBox[] oobbs;
+        public Vector2 point1;
+        public Vector2 point2;
+
 
         public void Test()
         {
@@ -47,9 +50,6 @@ namespace SpriteSortingPlugin
 
             Debug.Log(isOverlapping);
         }
-
-        public Vector2 point1;
-        public Vector2 point2;
 
         public void Test2()
         {
