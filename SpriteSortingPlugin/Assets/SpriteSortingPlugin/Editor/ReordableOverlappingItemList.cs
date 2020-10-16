@@ -17,10 +17,6 @@ namespace SpriteSortingPlugin
         private static bool isInitializedIcons;
 
         private ReorderableList reordableSpriteSortingList;
-        private Color bg1 = new Color(0.83f, 0.83f, 0.83f);
-        private Color bg2 = new Color(0.76f, 0.76f, 0.76f);
-        private Color activeColor = new Color(0.1f, 0.69f, 1f, 0.7f);
-        private Color focussingColor = new Color(0.45f, 0.77f, 0.95f, 0.91f);
         private int lastFocussedIndex = -1;
         private OverlappingItems overlappingItems;
         private SpriteSortingEditorPreview preview;
@@ -106,15 +102,17 @@ namespace SpriteSortingPlugin
             Color color;
             if (isActive)
             {
-                color = activeColor;
+                color = ReordableBackgroundColors.ActiveColor;
             }
             else if (isFocused)
             {
-                color = focussingColor;
+                color = ReordableBackgroundColors.FocussingColor;
             }
             else
             {
-                color = index % 2 == 0 ? bg1 : bg2;
+                color = index % 2 == 0
+                    ? ReordableBackgroundColors.BackgroundColor1
+                    : ReordableBackgroundColors.BackgroundColor2;
             }
 
             EditorGUI.DrawRect(rect, color);

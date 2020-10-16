@@ -25,6 +25,8 @@ namespace SpriteSortingPlugin
         public int OriginSortedIndex { get; set; }
         public bool IsBaseItem { get; private set; }
 
+        public string SpriteAssetGuid { get; private set; }
+
         public OverlappingItem(SpriteRenderer originSpriteRenderer)
         {
             this.originSpriteRenderer = originSpriteRenderer;
@@ -58,6 +60,9 @@ namespace SpriteSortingPlugin
                 originSortingLayer = originSpriteRenderer.sortingLayerID;
                 originSortingOrder = originSpriteRenderer.sortingOrder;
             }
+
+            SpriteAssetGuid = AssetDatabase.AssetPathToGUID(
+                AssetDatabase.GetAssetPath(originSpriteRenderer.sprite.GetInstanceID()));
         }
 
         public void UpdatePreviewSortingOrderWithExistingOrder()

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SpriteSortingPlugin.Preview;
+using SpriteSortingPlugin.SpriteAlphaAnalysis;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -13,7 +15,8 @@ namespace SpriteSortingPlugin
 
         private Vector2 scrollPosition = Vector2.zero;
 
-        private bool ignoreAlphaOfSprites;
+        private bool ignoreAlphaOfSprites = true;
+        [SerializeField] private SpriteAlphaData spriteAlphaData;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -42,15 +45,32 @@ namespace SpriteSortingPlugin
         public static void ShowWindow()
         {
             var window = GetWindow<SpriteSortingEditorWindow>();
-            window.titleContent = new GUIContent("Sprite Sorting");
             window.Show();
         }
 
         private void Awake()
         {
+            titleContent = new GUIContent("Sprite Sorting");
             preview = new SpriteSortingEditorPreview();
             reordableOverlappingItemList = new ReordableOverlappingItemList();
             SortingLayerUtility.UpdateSortingLayerNames();
+
+            //TODO: remove
+            SelectDefaultSpriteAlphaData();
+        }
+
+        private void SelectDefaultSpriteAlphaData()
+        {
+            try
+            {
+                var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
+                spriteAlphaData =
+                    AssetDatabase.LoadAssetAtPath<SpriteAlphaData>(AssetDatabase.GUIDToAssetPath(guids[0]));
+            }
+            catch (Exception e)
+            {
+                Debug.Log("auto selection of SpriteAlphaData went wrong");
+            }
         }
 
         private void OnInspectorUpdate()
@@ -59,7 +79,7 @@ namespace SpriteSortingPlugin
             {
                 CheckSortingLayerOrder();
             }
-            
+
             //TODO: could be more performant by comparing the name each frame instead of redrawing everything
             Repaint();
         }
@@ -141,7 +161,31 @@ namespace SpriteSortingPlugin
             serializedObject.Update();
 
             GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
-            ignoreAlphaOfSprites = EditorGUILayout.Toggle("ignore Alpha Of Sprites", ignoreAlphaOfSprites);
+            ignoreAlphaOfSprites = EditorGUILayout.BeginToggleGroup("ignore Alpha of sprites", ignoreAlphaOfSprites);
+
+            if (ignoreAlphaOfSprites)
+            {
+                EditorGUILayout.BeginHorizontal();
+
+                EditorGUI.BeginChangeCheck();
+                spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"),
+                    spriteAlphaData, typeof(SpriteAlphaData), false) as SpriteAlphaData;
+                if (EditorGUI.EndChangeCheck())
+                {
+                    preview.UpdateSpriteAlphaData(spriteAlphaData);
+                }
+
+                if (GUILayout.Button("Open Sprite Alpha Editor Window to create the Data"))
+                {
+                    var spriteAlphaEditorWindow = GetWindow<SpriteAlphaEditorWindow>();
+                    spriteAlphaEditorWindow.Show();
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
+
+            EditorGUILayout.EndToggleGroup();
+
             cameraProjectionType =
                 (CameraProjectionType) EditorGUILayout.EnumPopup("Projection type of camera", cameraProjectionType);
             sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
@@ -331,6 +375,13 @@ namespace SpriteSortingPlugin
         {
             analyzeButtonWasClicked = true;
 
+            var isVisualizingBoundsInScene = preview.IsVisualizingBoundsInScene;
+
+            if (isVisualizingBoundsInScene)
+            {
+                preview.EnableSceneVisualization(false);
+            }
+
             switch (sortingType)
             {
                 case SortingType.Layer:
@@ -342,11 +393,17 @@ namespace SpriteSortingPlugin
                     }
 
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayerIds,
-                        gameObjectParents);
+                        gameObjectParents, spriteAlphaData);
                     break;
                 case SortingType.Sprite:
-                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer);
+                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer,
+                        spriteAlphaData);
                     break;
+            }
+
+            if (isVisualizingBoundsInScene)
+            {
+                preview.EnableSceneVisualization(true);
             }
 
             if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
@@ -356,6 +413,7 @@ namespace SpriteSortingPlugin
 
             overlappingItems = new OverlappingItems(result.baseItem, result.overlappingItems);
             preview.UpdateOverlappingItems(overlappingItems);
+            preview.UpdateSpriteAlphaData(spriteAlphaData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
 
             if (result.overlappingItems.Count > 1)
