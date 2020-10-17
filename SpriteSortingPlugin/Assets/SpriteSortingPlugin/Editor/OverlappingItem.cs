@@ -134,6 +134,7 @@ namespace SpriteSortingPlugin
                 Undo.RecordObject(originSortingGroup, "apply sorting options");
                 originSortingGroup.sortingLayerName = sortingLayerName;
                 originSortingGroup.sortingOrder = newSortingOrder;
+                EditorUtility.SetDirty(originSortingGroup);
 
                 return;
             }
@@ -141,6 +142,18 @@ namespace SpriteSortingPlugin
             Undo.RecordObject(originSpriteRenderer, "apply sorting options");
             originSpriteRenderer.sortingLayerName = sortingLayerName;
             originSpriteRenderer.sortingOrder = newSortingOrder;
+            EditorUtility.SetDirty(originSpriteRenderer);
+        }
+
+        public int GetNewSortingOrder()
+        {
+            var newSortingOrder = sortingOrder;
+            if (isUsingRelativeSortingOrder)
+            {
+                newSortingOrder += originSortingOrder;
+            }
+
+            return newSortingOrder;
         }
 
         public override string ToString()

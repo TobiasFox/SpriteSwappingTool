@@ -5,6 +5,7 @@ using SpriteSortingPlugin.SpriteAlphaAnalysis;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin
@@ -286,7 +287,7 @@ namespace SpriteSortingPlugin
             {
                 Debug.Log("sort sprites");
 
-                overlappingItems.ApplySortingOptions();
+                ApplySortingOptions();
 
                 analyzeButtonWasClicked = false;
                 result.overlappingItems = null;
@@ -302,6 +303,47 @@ namespace SpriteSortingPlugin
             preview.DoPreview(isAnalyzedButtonClickedThisFrame);
 
             EndScrollRect();
+        }
+
+        private void ApplySortingOptions()
+        {
+            var itemCount = overlappingItems.Items.Count;
+            for (var i = 0; i < itemCount; i++)
+            {
+                var overlappingItem = overlappingItems.Items[i];
+                if (!overlappingItem.HasSortingLayerChanged())
+                {
+                    continue;
+                }
+
+                overlappingItems.Items.RemoveAt(i);
+                overlappingItem.ApplySortingOption();
+            }
+
+
+            var sortingOptions = SpriteSortingUtility.AnalyzeSurroundingSprites(cameraProjectionType,
+                overlappingItems.Items, spriteAlphaData);
+
+            foreach (var sortingOption in sortingOptions)
+            {
+                var sortingComponent = EditorUtility.InstanceIDToObject(sortingOption.Key);
+                var sortingGroupComponent = sortingComponent as SortingGroup;
+                if (sortingGroupComponent != null)
+                {
+                    Undo.RecordObject(sortingGroupComponent, "apply sorting options");
+                    sortingGroupComponent.sortingOrder = sortingOption.Value;
+                    EditorUtility.SetDirty(sortingGroupComponent);
+                    continue;
+                }
+
+                var spriteRendererComponent = sortingComponent as SpriteRenderer;
+                if (spriteRendererComponent != null)
+                {
+                    Undo.RecordObject(spriteRendererComponent, "apply sorting options");
+                    spriteRendererComponent.sortingOrder = sortingOption.Value;
+                    EditorUtility.SetDirty(spriteRendererComponent);
+                }
+            }
         }
 
         private void EndScrollRect()
