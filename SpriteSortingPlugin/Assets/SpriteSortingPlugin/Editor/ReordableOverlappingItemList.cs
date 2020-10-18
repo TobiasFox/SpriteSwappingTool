@@ -190,7 +190,6 @@ namespace SpriteSortingPlugin
                 element.sortingLayerName = SortingLayerUtility.SortingLayerNames[element.sortingLayerDropDownIndex];
                 overlappingItems.UpdateSortingLayer(index, out var newIndexInList);
                 reordableSpriteSortingList.index = newIndexInList;
-                // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
 
                 overlappingItems.CheckChangedLayers();
@@ -207,7 +206,6 @@ namespace SpriteSortingPlugin
 
             if (EditorGUI.EndChangeCheck())
             {
-                // Debug.Log("new order to " + element.tempSpriteRenderer.sortingOrder);
                 isPreviewUpdating = true;
                 overlappingItems.UpdateSortingOrder(index);
             }

@@ -504,9 +504,7 @@ namespace SpriteSortingPlugin
 
             if (EditorGUI.EndChangeCheck())
             {
-                // element.sortingLayerName = sortingLayerNames[element.sortingLayerDropDownIndex];
                 element.UpdatePreviewSortingLayer();
-                // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
             }
 
@@ -521,9 +519,7 @@ namespace SpriteSortingPlugin
 
             if (EditorGUI.EndChangeCheck())
             {
-                // Debug.Log("new order to " + element.tempSpriteRenderer.sortingOrder);
                 isPreviewUpdating = true;
-                // isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(
@@ -532,7 +528,6 @@ namespace SpriteSortingPlugin
             {
                 element.sortingOrder++;
                 isPreviewUpdating = true;
-                // isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(
@@ -541,7 +536,6 @@ namespace SpriteSortingPlugin
             {
                 element.sortingOrder--;
                 isPreviewUpdating = true;
-                // isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(

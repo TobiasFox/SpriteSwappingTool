@@ -52,7 +52,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 if (!spriteIsReadable)
                 {
-                    SetSpriteReadable(sprite.texture);
+                    var isResetReadableFlagSuccessful = SetSpriteReadable(sprite.texture, true);
+                    if (isResetReadableFlagSuccessful)
+                    {
+                        // currentProgress+=2; or +1 error
+                        continue;
+                    }
                 }
 
                 // currentProgress++;
@@ -66,7 +71,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 if (!spriteIsReadable)
                 {
-                    SetSpriteNonReadable(sprite.texture);
+                    SetSpriteReadable(sprite.texture, false);
                 }
 
                 // currentProgress++;
@@ -76,30 +81,34 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             return list;
         }
 
-        private void SetSpriteReadable(Texture2D spriteTexture)
+        private bool SetSpriteReadable(Texture2D spriteTexture, bool isReadable)
         {
             var path = AssetDatabase.GetAssetPath(spriteTexture.GetInstanceID());
             var textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
 
-            AssetDatabase.StartAssetEditing();
+            if (textureImporter == null)
+            {
+                return false;
+            }
 
-            textureImporter.isReadable = true;
-            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            try
+            {
+                AssetDatabase.StartAssetEditing();
 
-            AssetDatabase.StopAssetEditing();
-        }
+                textureImporter.isReadable = isReadable;
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarningFormat("could not set readable flag to {0} of sprite {1}", isReadable, path);
+                Debug.LogWarning(e);
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+            }
 
-        private void SetSpriteNonReadable(Texture2D spriteTexture)
-        {
-            var path = AssetDatabase.GetAssetPath(spriteTexture.GetInstanceID());
-            var textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
-
-            AssetDatabase.StartAssetEditing();
-
-            textureImporter.isReadable = false;
-            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-
-            AssetDatabase.StopAssetEditing();
+            return true;
         }
 
         private ObjectOrientedBoundingBox GenerateOOBB(Texture2D spriteTexture, float pixelsPerUnit)

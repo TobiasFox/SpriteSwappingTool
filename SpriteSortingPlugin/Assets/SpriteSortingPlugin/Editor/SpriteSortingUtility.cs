@@ -393,6 +393,7 @@ namespace SpriteSortingPlugin
                     continue;
                 }
 
+                //TODO cache sortingComponents for better performance
                 var sortingComponent = new SortingComponent(overlappingItem.originSpriteRenderer,
                     overlappingItem.originSortingGroup);
                 baseSortingComponents.Add(sortingComponent);
