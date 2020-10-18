@@ -225,7 +225,7 @@ namespace SpriteSortingPlugin
 
         private static bool CheckOverlappingSprites(CameraProjectionType cameraProjectionType,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
-            SpriteAlphaData spriteAlphaData, bool isCheckingForSameSortingOrder,
+            SpriteAlphaData spriteAlphaData, bool isCheckingForSameSortingOptions,
             out List<SortingComponent> overlappingComponents,
             out SortingComponent baseItem)
         {
@@ -309,7 +309,7 @@ namespace SpriteSortingPlugin
                     continue;
                 }
 
-                if (isCheckingForSameSortingOrder &&
+                if (isCheckingForSameSortingOptions &&
                     (sortingComponentToCheck.CurrentSortingLayer != sortingComponent.CurrentSortingLayer ||
                      sortingComponentToCheck.CurrentSortingOrder != sortingComponent.CurrentSortingOrder))
                 {
@@ -324,10 +324,8 @@ namespace SpriteSortingPlugin
                 return false;
             }
 
-            // baseItem = new OverlappingItem(sortingComponentToCheck, true);
             baseItem = sortingComponentToCheck;
-            // overlappingComponents.Insert(0, baseItem);
-            Debug.Log("found overlapping with " + (overlappingComponents.Count + 1) + " sprites");
+            Debug.Log("found " + (overlappingComponents.Count + 1) + " overlapping sprites");
             return true;
         }
 
@@ -385,13 +383,18 @@ namespace SpriteSortingPlugin
 
             foreach (var overlappingItem in overlappingItems)
             {
+                excludingSpriteRendererList.Add(overlappingItem.originSpriteRenderer);
+
+                var newSortingOrder = overlappingItem.GetNewSortingOrder();
+                if (overlappingItem.originSortingOrder == newSortingOrder)
+                {
+                    continue;
+                }
+
                 var sortingComponent = new SortingComponent(overlappingItem.originSpriteRenderer,
                     overlappingItem.originSortingGroup);
                 baseSortingComponents.Add(sortingComponent);
-
-                excludingSpriteRendererList.Add(overlappingItem.originSpriteRenderer);
-
-                sortingOptions.Add(sortingComponent.GetInstanceId(), overlappingItem.GetNewSortingOrder());
+                sortingOptions.Add(sortingComponent.GetInstanceId(), newSortingOrder);
             }
 
             AnalyzeSurroundingSpritesRecursive(cameraProjectionType, spriteAlphaData, spriteRenderers,
@@ -407,8 +410,6 @@ namespace SpriteSortingPlugin
         {
             var filteredSortingComponents = FilterSortingComponents(spriteRenderers,
                 new List<int> {baseSortingComponents[0].CurrentSortingLayer}, excludingSpriteRendererList);
-            Debug.Log("filtered spriteRenderers with SortingGroup and exclude base overlapping items: from " +
-                      spriteRenderers.Count + " to " + filteredSortingComponents.Count);
 
             foreach (var baseSortingComponent in baseSortingComponents)
             {
