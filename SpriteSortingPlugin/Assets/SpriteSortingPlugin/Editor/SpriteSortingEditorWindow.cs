@@ -283,7 +283,8 @@ namespace SpriteSortingPlugin
                     "Analyse Sprites / Sorting Groups with changed Layer first?", isAnalyzingWithChangedLayerFirst);
             }
 
-            if (GUILayout.Button("Confirm and continue searching"))
+            var buttonLabel = sortingType == SortingType.Layer ? "Confirm and continue searching" : "confirm";
+            if (GUILayout.Button(buttonLabel))
             {
                 Debug.Log("sort sprites");
 
@@ -295,8 +296,12 @@ namespace SpriteSortingPlugin
 
                 EndScrollRect();
 
-                //TODO: check isAnalyzingWithChangedLayerFirst
-                Analyze();
+                if (sortingType == SortingType.Layer)
+                {
+                    //TODO: check isAnalyzingWithChangedLayerFirst
+                    Analyze();
+                }
+
                 return;
             }
 
@@ -330,6 +335,9 @@ namespace SpriteSortingPlugin
                 var sortingGroupComponent = sortingComponent as SortingGroup;
                 if (sortingGroupComponent != null)
                 {
+                    Debug.LogFormat("Update Sorting Order on Sorting Group {0} from {1} to {2}",
+                        sortingGroupComponent.name, sortingGroupComponent.sortingOrder, sortingOption.Value);
+                    
                     Undo.RecordObject(sortingGroupComponent, "apply sorting options");
                     sortingGroupComponent.sortingOrder = sortingOption.Value;
                     EditorUtility.SetDirty(sortingGroupComponent);
@@ -339,6 +347,9 @@ namespace SpriteSortingPlugin
                 var spriteRendererComponent = sortingComponent as SpriteRenderer;
                 if (spriteRendererComponent != null)
                 {
+                    Debug.LogFormat("Update Sorting Order on SpriteRenderer {0} from {1} to {2}",
+                        spriteRendererComponent.name, spriteRendererComponent.sortingOrder, sortingOption.Value);
+                    
                     Undo.RecordObject(spriteRendererComponent, "apply sorting options");
                     spriteRendererComponent.sortingOrder = sortingOption.Value;
                     EditorUtility.SetDirty(spriteRendererComponent);
