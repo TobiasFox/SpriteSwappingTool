@@ -380,7 +380,7 @@ namespace SpriteSortingPlugin
 
             var sortingOptions = new Dictionary<int, int>();
 
-            var tempSpriteList = new List<SpriteRenderer>();
+            var excludingSpriteRendererList = new List<SpriteRenderer>();
             var baseSortingComponents = new List<SortingComponent>();
 
             foreach (var overlappingItem in overlappingItems)
@@ -389,13 +389,13 @@ namespace SpriteSortingPlugin
                     overlappingItem.originSortingGroup);
                 baseSortingComponents.Add(sortingComponent);
 
-                tempSpriteList.Add(overlappingItem.originSpriteRenderer);
+                excludingSpriteRendererList.Add(overlappingItem.originSpriteRenderer);
 
                 sortingOptions.Add(sortingComponent.GetInstanceId(), overlappingItem.GetNewSortingOrder());
             }
 
             AnalyzeSurroundingSpritesRecursive(cameraProjectionType, spriteAlphaData, spriteRenderers,
-                baseSortingComponents, tempSpriteList, ref sortingOptions);
+                baseSortingComponents, excludingSpriteRendererList, ref sortingOptions);
 
             return sortingOptions;
         }

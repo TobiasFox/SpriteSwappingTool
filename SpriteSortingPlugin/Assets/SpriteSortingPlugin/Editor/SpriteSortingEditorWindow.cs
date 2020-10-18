@@ -269,13 +269,13 @@ namespace SpriteSortingPlugin
                     rectForReordableList.width - 12.5f, rectForReordableList.height));
 
                 EditorGUI.indentLevel--;
-                EditorGUILayout.Space();
             }
             else
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.Space();
             }
+
+            EditorGUILayout.Space();
 
             if (overlappingItems.HasChangedLayer)
             {
@@ -293,9 +293,9 @@ namespace SpriteSortingPlugin
                 result.overlappingItems = null;
                 preview.CleanUpPreview();
 
-                //TODO: check isAnalyzingWithChangedLayerFirst
                 EndScrollRect();
 
+                //TODO: check isAnalyzingWithChangedLayerFirst
                 Analyze();
                 return;
             }
