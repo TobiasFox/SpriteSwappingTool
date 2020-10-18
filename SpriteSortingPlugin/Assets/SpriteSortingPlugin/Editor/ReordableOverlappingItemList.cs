@@ -48,30 +48,9 @@ namespace SpriteSortingPlugin
                 index = lastFocussedIndex
             };
 
+            if (!isUsingRelativeSortingOrder)
             {
-                // reordableSpriteSortingList.onMouseUpCallback = (ReorderableList list) =>
-                // {
-                //     Debug.Log("mouse up reordable list");
-                //     //s
-                // };
-                // //
-                // reordableSpriteSortingList.onMouseDragCallback = (ReorderableList list) =>
-                // {
-                //     Debug.Log("mouse drag");
-                //     //s
-                // };
-                //
-                // reordableSpriteSortingList.onChangedCallback = (ReorderableList list) =>
-                // {
-                //     Debug.Log("changed reordable list");
-                //     //d 
-                // };
-                //
-                // reordableSpriteSortingList.onReorderCallback = (ReorderableList list) =>
-                // {
-                //     Debug.Log("reorder");
-                //     //d
-                // };
+                overlappingItems.ConvertSortingOrder(isUsingRelativeSortingOrder);
             }
         }
 
@@ -165,7 +144,8 @@ namespace SpriteSortingPlugin
             }
 
             EditorGUI.LabelField(
-                new Rect(startX, rect.y, lastElementRectWidth - SelectButtonWidth - 90, EditorGUIUtility.singleLineHeight),
+                new Rect(startX, rect.y, lastElementRectWidth - SelectButtonWidth - 90,
+                    EditorGUIUtility.singleLineHeight),
                 new GUIContent("\"" + element.originSpriteRenderer.name + "\"", spriteIcon));
 
             if (GUI.Button(new Rect(rect.width - 28, rect.y, SelectButtonWidth, EditorGUIUtility.singleLineHeight),

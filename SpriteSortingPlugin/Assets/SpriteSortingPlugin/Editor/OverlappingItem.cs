@@ -131,9 +131,11 @@ namespace SpriteSortingPlugin
 
             if (originSortingGroup != null)
             {
-                Debug.LogFormat("Update Sorting options on Sorting Group {0} - Sorting Layer from {1} to {2}, Sorting Order from {3} to {4}",
-                    originSortingGroup.name, originSortingGroup.sortingLayerName, sortingLayerName, originSortingGroup.sortingOrder, newSortingOrder);
-                
+                Debug.LogFormat(
+                    "Update Sorting options on Sorting Group {0} - Sorting Layer from {1} to {2}, Sorting Order from {3} to {4}",
+                    originSortingGroup.name, originSortingGroup.sortingLayerName, sortingLayerName,
+                    originSortingGroup.sortingOrder, newSortingOrder);
+
                 Undo.RecordObject(originSortingGroup, "apply sorting options");
                 originSortingGroup.sortingLayerName = sortingLayerName;
                 originSortingGroup.sortingOrder = newSortingOrder;
@@ -142,9 +144,11 @@ namespace SpriteSortingPlugin
                 return;
             }
 
-            Debug.LogFormat("Update Sorting options on SpriteRenderer {0} - Sorting Layer from {1} to {2}, Sorting Order from {3} to {4}",
-                originSpriteRenderer.name, originSpriteRenderer.sortingLayerName, sortingLayerName, originSpriteRenderer.sortingOrder, newSortingOrder);
-            
+            Debug.LogFormat(
+                "Update Sorting options on SpriteRenderer {0} - Sorting Layer from {1} to {2}, Sorting Order from {3} to {4}",
+                originSpriteRenderer.name, originSpriteRenderer.sortingLayerName, sortingLayerName,
+                originSpriteRenderer.sortingOrder, newSortingOrder);
+
             Undo.RecordObject(originSpriteRenderer, "apply sorting options");
             originSpriteRenderer.sortingLayerName = sortingLayerName;
             originSpriteRenderer.sortingOrder = newSortingOrder;
