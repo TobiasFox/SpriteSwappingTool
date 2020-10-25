@@ -5,6 +5,7 @@ using SpriteSortingPlugin.SpriteAlphaAnalysis;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin
@@ -268,13 +269,13 @@ namespace SpriteSortingPlugin
                     rectForReordableList.width - 12.5f, rectForReordableList.height));
 
                 EditorGUI.indentLevel--;
-                EditorGUILayout.Space();
             }
             else
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.Space();
             }
+
+            EditorGUILayout.Space();
 
             if (overlappingItems.HasChangedLayer)
             {
@@ -282,26 +283,78 @@ namespace SpriteSortingPlugin
                     "Analyse Sprites / Sorting Groups with changed Layer first?", isAnalyzingWithChangedLayerFirst);
             }
 
-            if (GUILayout.Button("Confirm and continue searching"))
+            var buttonLabel = sortingType == SortingType.Layer ? "Confirm and continue searching" : "confirm";
+            if (GUILayout.Button(buttonLabel))
             {
                 Debug.Log("sort sprites");
 
-                overlappingItems.ApplySortingOptions();
+                ApplySortingOptions();
 
                 analyzeButtonWasClicked = false;
                 result.overlappingItems = null;
                 preview.CleanUpPreview();
 
-                //TODO: check isAnalyzingWithChangedLayerFirst
                 EndScrollRect();
 
-                Analyze();
+                if (sortingType == SortingType.Layer)
+                {
+                    //TODO: check isAnalyzingWithChangedLayerFirst
+                    Analyze();
+                }
+
                 return;
             }
 
             preview.DoPreview(isAnalyzedButtonClickedThisFrame);
 
             EndScrollRect();
+        }
+
+        private void ApplySortingOptions()
+        {
+            var itemCount = overlappingItems.Items.Count;
+            for (var i = 0; i < itemCount; i++)
+            {
+                var overlappingItem = overlappingItems.Items[i];
+                if (!overlappingItem.HasSortingLayerChanged())
+                {
+                    continue;
+                }
+
+                overlappingItems.Items.RemoveAt(i);
+                overlappingItem.ApplySortingOption();
+            }
+
+
+            var sortingOptions = SpriteSortingUtility.AnalyzeSurroundingSprites(cameraProjectionType,
+                overlappingItems.Items, spriteAlphaData);
+
+            foreach (var sortingOption in sortingOptions)
+            {
+                var sortingComponent = EditorUtility.InstanceIDToObject(sortingOption.Key);
+                var sortingGroupComponent = sortingComponent as SortingGroup;
+                if (sortingGroupComponent != null)
+                {
+                    Debug.LogFormat("Update Sorting Order on Sorting Group {0} from {1} to {2}",
+                        sortingGroupComponent.name, sortingGroupComponent.sortingOrder, sortingOption.Value);
+                    
+                    Undo.RecordObject(sortingGroupComponent, "apply sorting options");
+                    sortingGroupComponent.sortingOrder = sortingOption.Value;
+                    EditorUtility.SetDirty(sortingGroupComponent);
+                    continue;
+                }
+
+                var spriteRendererComponent = sortingComponent as SpriteRenderer;
+                if (spriteRendererComponent != null)
+                {
+                    Debug.LogFormat("Update Sorting Order on SpriteRenderer {0} from {1} to {2}",
+                        spriteRendererComponent.name, spriteRendererComponent.sortingOrder, sortingOption.Value);
+                    
+                    Undo.RecordObject(spriteRendererComponent, "apply sorting options");
+                    spriteRendererComponent.sortingOrder = sortingOption.Value;
+                    EditorUtility.SetDirty(spriteRendererComponent);
+                }
+            }
         }
 
         private void EndScrollRect()
@@ -451,9 +504,7 @@ namespace SpriteSortingPlugin
 
             if (EditorGUI.EndChangeCheck())
             {
-                // element.sortingLayerName = sortingLayerNames[element.sortingLayerDropDownIndex];
                 element.UpdatePreviewSortingLayer();
-                // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
             }
 
@@ -468,9 +519,7 @@ namespace SpriteSortingPlugin
 
             if (EditorGUI.EndChangeCheck())
             {
-                // Debug.Log("new order to " + element.tempSpriteRenderer.sortingOrder);
                 isPreviewUpdating = true;
-                // isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(
@@ -479,7 +528,6 @@ namespace SpriteSortingPlugin
             {
                 element.sortingOrder++;
                 isPreviewUpdating = true;
-                // isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(
@@ -488,7 +536,6 @@ namespace SpriteSortingPlugin
             {
                 element.sortingOrder--;
                 isPreviewUpdating = true;
-                // isCurrentIndexUpdated = UpdateSortingOrder(index, element);
             }
 
             if (GUI.Button(
