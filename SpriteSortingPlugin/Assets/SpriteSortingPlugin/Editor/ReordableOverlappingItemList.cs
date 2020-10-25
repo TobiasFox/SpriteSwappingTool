@@ -11,6 +11,7 @@ namespace SpriteSortingPlugin
     public class ReordableOverlappingItemList
     {
         private const float LineSpacing = 1.5f;
+        private const int SelectButtonWidth = 55;
         private static Texture spriteIcon;
         private static Texture baseItemIcon;
         private static Texture sortingGroupIcon;
@@ -47,30 +48,9 @@ namespace SpriteSortingPlugin
                 index = lastFocussedIndex
             };
 
+            if (!isUsingRelativeSortingOrder)
             {
-                // reordableSpriteSortingList.onMouseUpCallback = (ReorderableList list) =>
-                // {
-                //     Debug.Log("mouse up reordable list");
-                //     //s
-                // };
-                // //
-                // reordableSpriteSortingList.onMouseDragCallback = (ReorderableList list) =>
-                // {
-                //     Debug.Log("mouse drag");
-                //     //s
-                // };
-                //
-                // reordableSpriteSortingList.onChangedCallback = (ReorderableList list) =>
-                // {
-                //     Debug.Log("changed reordable list");
-                //     //d 
-                // };
-                //
-                // reordableSpriteSortingList.onReorderCallback = (ReorderableList list) =>
-                // {
-                //     Debug.Log("reorder");
-                //     //d
-                // };
+                overlappingItems.ConvertSortingOrder(isUsingRelativeSortingOrder);
             }
         }
 
@@ -141,10 +121,12 @@ namespace SpriteSortingPlugin
             return EditorGUIUtility.singleLineHeight * 3 + 2 * LineSpacing + LineSpacing * 3;
         }
 
+        private float lastElementRectWidth;
+
         private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
             var element = (OverlappingItem) reordableSpriteSortingList.list[index];
-            bool isPreviewUpdating = false;
+            var isPreviewUpdating = false;
             var startX = rect.x;
 
             rect.y += 2;
@@ -156,12 +138,18 @@ namespace SpriteSortingPlugin
                 startX += 80 + 5;
             }
 
-            EditorGUI.LabelField(new Rect(startX, rect.y, 90, EditorGUIUtility.singleLineHeight),
+            if (Event.current.type == EventType.Repaint)
+            {
+                lastElementRectWidth = rect.width;
+            }
+
+            EditorGUI.LabelField(
+                new Rect(startX, rect.y, lastElementRectWidth - SelectButtonWidth - 90,
+                    EditorGUIUtility.singleLineHeight),
                 new GUIContent("\"" + element.originSpriteRenderer.name + "\"", spriteIcon));
 
-            if (GUI.Button(
-                new Rect(rect.width - 28, rect.y, 55,
-                    EditorGUIUtility.singleLineHeight), "Select"))
+            if (GUI.Button(new Rect(rect.width - 28, rect.y, SelectButtonWidth, EditorGUIUtility.singleLineHeight),
+                "Select"))
             {
                 Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
                 SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
@@ -202,7 +190,6 @@ namespace SpriteSortingPlugin
                 element.sortingLayerName = SortingLayerUtility.SortingLayerNames[element.sortingLayerDropDownIndex];
                 overlappingItems.UpdateSortingLayer(index, out var newIndexInList);
                 reordableSpriteSortingList.index = newIndexInList;
-                // Debug.Log("changed layer to " + element.tempSpriteRenderer.sortingLayerName);
                 isPreviewUpdating = true;
 
                 overlappingItems.CheckChangedLayers();
@@ -219,7 +206,6 @@ namespace SpriteSortingPlugin
 
             if (EditorGUI.EndChangeCheck())
             {
-                // Debug.Log("new order to " + element.tempSpriteRenderer.sortingOrder);
                 isPreviewUpdating = true;
                 overlappingItems.UpdateSortingOrder(index);
             }
