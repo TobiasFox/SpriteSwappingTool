@@ -264,6 +264,27 @@ namespace SpriteSortingPlugin
                     continue;
                 }
 
+                if (sortingComponentToCheck.outmostSortingGroup != null &&
+                    sortingComponent.outmostSortingGroup != null &&
+                    sortingComponentToCheck.outmostSortingGroup == sortingComponent.outmostSortingGroup)
+                {
+                    continue;
+                }
+
+                if (isCheckingForSameSortingOptions &&
+                    (sortingComponentToCheck.CurrentSortingLayer != sortingComponent.CurrentSortingLayer ||
+                     sortingComponentToCheck.CurrentSortingOrder != sortingComponent.CurrentSortingOrder))
+                {
+                    continue;
+                }
+                
+                if (cameraProjectionType == CameraProjectionType.Orthogonal && Math.Abs(
+                    sortingComponent.spriteRenderer.transform.position.z - boundsToCheck.center.z) > Tolerance)
+                {
+                    //TODO: is z the distance to the camera? if not maybe create something to choose for the user
+                    continue;
+                }
+                
                 if (!sortingComponent.spriteRenderer.bounds.Intersects(boundsToCheck))
                 {
                     continue;
@@ -295,27 +316,6 @@ namespace SpriteSortingPlugin
                             continue;
                         }
                     }
-                }
-
-                if (sortingComponentToCheck.outmostSortingGroup != null &&
-                    sortingComponent.outmostSortingGroup != null &&
-                    sortingComponentToCheck.outmostSortingGroup == sortingComponent.outmostSortingGroup)
-                {
-                    continue;
-                }
-
-                if (cameraProjectionType == CameraProjectionType.Orthogonal && Math.Abs(
-                    sortingComponent.spriteRenderer.transform.position.z - boundsToCheck.center.z) > Tolerance)
-                {
-                    //TODO: is z the distance to the camera? if not maybe create something to choose for the user
-                    continue;
-                }
-
-                if (isCheckingForSameSortingOptions &&
-                    (sortingComponentToCheck.CurrentSortingLayer != sortingComponent.CurrentSortingLayer ||
-                     sortingComponentToCheck.CurrentSortingOrder != sortingComponent.CurrentSortingOrder))
-                {
-                    continue;
                 }
 
                 overlappingComponents.Add(sortingComponent);
