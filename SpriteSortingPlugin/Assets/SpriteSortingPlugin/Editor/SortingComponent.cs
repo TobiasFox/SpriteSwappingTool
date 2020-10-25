@@ -42,6 +42,13 @@ namespace SpriteSortingPlugin
             }
         }
 
+        public int GetInstanceId()
+        {
+            return outmostSortingGroup != null
+                ? outmostSortingGroup.GetInstanceID()
+                : spriteRenderer.GetInstanceID();
+        }
+
         public override bool Equals(object obj)
         {
             if (!(obj is SortingComponent otherSortingComponent))

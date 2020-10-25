@@ -135,14 +135,6 @@ namespace SpriteSortingPlugin
             }
         }
 
-        public void ApplySortingOptions()
-        {
-            foreach (var overlappingItem in items)
-            {
-                overlappingItem.ApplySortingOption();
-            }
-        }
-
         public void UpdateSortingOrder(int currentIndex)
         {
             if (currentIndex < 0)
@@ -206,7 +198,7 @@ namespace SpriteSortingPlugin
                 if (currentItem.sortingLayerName.Equals(layerName) &&
                     previousItem.sortingOrder <= currentItem.sortingOrder)
                 {
-                    currentItem.sortingOrder=previousItem.sortingOrder-1;
+                    currentItem.sortingOrder = previousItem.sortingOrder - 1;
                     currentItem.UpdatePreviewSortingOrderWithExistingOrder();
                 }
                 else
