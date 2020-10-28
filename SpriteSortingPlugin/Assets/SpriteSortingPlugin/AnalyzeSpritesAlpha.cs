@@ -232,7 +232,7 @@ namespace SpriteSortingPlugin
                 {
                     if (i >= 5)
                     {
-                        break;
+                        return currentPriority;
                     }
                 }
                 else if (currentWidth == spriteWidth - 1)
