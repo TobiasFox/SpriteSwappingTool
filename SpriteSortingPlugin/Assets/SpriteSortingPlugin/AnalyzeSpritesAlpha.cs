@@ -18,6 +18,33 @@ namespace SpriteSortingPlugin
         private readonly Vector3[] sourcePoints = new Vector3[4];
         private readonly Vector3[] points = new Vector3[4];
 
+        public SpriteAlphaData spriteAlphaData;
+        public Transform otherTransform;
+        private GameObject polygonGameobject;
+
+        public void CreateCollider()
+        {
+            var spriteRenderer = GetComponent<SpriteRenderer>();
+            var assetGuid =
+                AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID()));
+
+            var containsDataItem = spriteAlphaData.spriteDataDictionary.TryGetValue(assetGuid, out var spriteDataItem);
+            if (!containsDataItem)
+            {
+                return;
+            }
+
+            polygonGameobject = new GameObject("colliderGameobject");
+            var polyCol = polygonGameobject.AddComponent<PolygonCollider2D>();
+            polyCol.points = spriteDataItem.outlinePoints.ToArray();
+        }
+
+        public void SetColliderToOtherTransform()
+        {
+            polygonGameobject.transform.SetPositionAndRotation(otherTransform.position, otherTransform.rotation);
+            polygonGameobject.transform.localScale = otherTransform.lossyScale;
+        }
+
         public void Generate()
         {
             var startTime = EditorApplication.timeSinceStartup;
@@ -106,7 +133,7 @@ namespace SpriteSortingPlugin
 
                     pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(backtracedDirection);
                     firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
-                    
+
                     neighbourOfBoundaryPointIndex =
                         PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
                 }
@@ -847,6 +874,16 @@ namespace SpriteSortingPlugin
             if (GUILayout.Button("Optimize"))
             {
                 analyzeSpritesAlpha.Optimize();
+            }
+
+            if (GUILayout.Button("ColliderTest"))
+            {
+                analyzeSpritesAlpha.CreateCollider();
+            }
+
+            if (GUILayout.Button("SetColliderToOtherTransform"))
+            {
+                analyzeSpritesAlpha.SetColliderToOtherTransform();
             }
         }
     }

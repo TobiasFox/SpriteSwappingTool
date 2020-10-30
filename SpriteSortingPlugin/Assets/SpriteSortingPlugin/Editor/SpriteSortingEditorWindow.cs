@@ -16,8 +16,9 @@ namespace SpriteSortingPlugin
 
         private Vector2 scrollPosition = Vector2.zero;
 
-        private bool ignoreAlphaOfSprites = true;
+        private bool useSpriteAlphaOutline = true;
         [SerializeField] private SpriteAlphaData spriteAlphaData;
+        [SerializeField] private AlphaAnalysisType alphaAnalysisType;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -162,10 +163,11 @@ namespace SpriteSortingPlugin
             serializedObject.Update();
 
             GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
-            ignoreAlphaOfSprites = EditorGUILayout.BeginToggleGroup("ignore Alpha of sprites", ignoreAlphaOfSprites);
+            useSpriteAlphaOutline = EditorGUILayout.BeginToggleGroup("use Sprite Alpha Outline", useSpriteAlphaOutline);
 
-            if (ignoreAlphaOfSprites)
+            if (useSpriteAlphaOutline)
             {
+                EditorGUI.indentLevel++;
                 EditorGUILayout.BeginHorizontal();
 
                 EditorGUI.BeginChangeCheck();
@@ -174,6 +176,15 @@ namespace SpriteSortingPlugin
                 if (EditorGUI.EndChangeCheck())
                 {
                     preview.UpdateSpriteAlphaData(spriteAlphaData);
+
+                    //TODO select default value
+                    // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
+                    // {
+                    //     if (spriteDataItem.outlinePoints != null)
+                    //     {
+                    //         alphaAnalysisType = AlphaAnalysisType.Outline;
+                    //     }
+                    // }
                 }
 
                 if (GUILayout.Button("Open Sprite Alpha Editor Window to create the Data"))
@@ -183,6 +194,12 @@ namespace SpriteSortingPlugin
                 }
 
                 EditorGUILayout.EndHorizontal();
+
+                alphaAnalysisType =
+                    (AlphaAnalysisType) EditorGUILayout.EnumPopup("Overlapping SpriteRenderer Detecting Type",
+                        alphaAnalysisType);
+
+                EditorGUI.indentLevel--;
             }
 
             EditorGUILayout.EndToggleGroup();
@@ -325,9 +342,8 @@ namespace SpriteSortingPlugin
                 overlappingItem.ApplySortingOption();
             }
 
-
             var sortingOptions = SpriteSortingUtility.AnalyzeSurroundingSprites(cameraProjectionType,
-                overlappingItems.Items, spriteAlphaData);
+                overlappingItems.Items, spriteAlphaData, alphaAnalysisType);
 
             foreach (var sortingOption in sortingOptions)
             {
@@ -337,7 +353,7 @@ namespace SpriteSortingPlugin
                 {
                     Debug.LogFormat("Update Sorting Order on Sorting Group {0} from {1} to {2}",
                         sortingGroupComponent.name, sortingGroupComponent.sortingOrder, sortingOption.Value);
-                    
+
                     Undo.RecordObject(sortingGroupComponent, "apply sorting options");
                     sortingGroupComponent.sortingOrder = sortingOption.Value;
                     EditorUtility.SetDirty(sortingGroupComponent);
@@ -349,7 +365,7 @@ namespace SpriteSortingPlugin
                 {
                     Debug.LogFormat("Update Sorting Order on SpriteRenderer {0} from {1} to {2}",
                         spriteRendererComponent.name, spriteRendererComponent.sortingOrder, sortingOption.Value);
-                    
+
                     Undo.RecordObject(spriteRendererComponent, "apply sorting options");
                     spriteRendererComponent.sortingOrder = sortingOption.Value;
                     EditorUtility.SetDirty(spriteRendererComponent);
@@ -446,11 +462,11 @@ namespace SpriteSortingPlugin
                     }
 
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayerIds,
-                        gameObjectParents, spriteAlphaData);
+                        gameObjectParents, spriteAlphaData, alphaAnalysisType);
                     break;
                 case SortingType.Sprite:
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer,
-                        spriteAlphaData);
+                        spriteAlphaData, alphaAnalysisType);
                     break;
             }
 

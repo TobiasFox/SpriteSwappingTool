@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SpriteSortingPlugin.SAT;
 using UnityEditor;
 using UnityEngine;
@@ -14,8 +15,12 @@ namespace SpriteSortingPlugin
 
         private static SortingComponentShortestDifferenceComparer sortingComponentShortestDifferenceComparer;
 
+        private static Dictionary<string, SpriteColliderData> spriteColliderDataDictionary =
+            new Dictionary<string, SpriteColliderData>();
+
         public static SpriteSortingAnalysisResult AnalyzeSpriteSorting(CameraProjectionType cameraProjectionType,
-            List<int> selectedLayers, List<Transform> gameObjectsParents = null, SpriteAlphaData spriteAlphaData = null)
+            List<int> selectedLayers, List<Transform> gameObjectsParents = null, SpriteAlphaData spriteAlphaData = null,
+            AlphaAnalysisType alphaAnalysisType = AlphaAnalysisType.OOBB)
         {
             var result = new SpriteSortingAnalysisResult();
 
@@ -29,12 +34,13 @@ namespace SpriteSortingPlugin
 
             Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Count +
                       " to " + filteredSortingComponents.Count);
+            ResetSpriteColliders();
 
             //TODO: optimize foreach
             foreach (var sortingComponent in filteredSortingComponents)
             {
                 if (CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, sortingComponent,
-                    spriteAlphaData, out List<OverlappingItem> overlappingSprites, out var baseItem))
+                    spriteAlphaData, alphaAnalysisType, out List<OverlappingItem> overlappingSprites, out var baseItem))
                 {
                     result.overlappingItems = overlappingSprites;
                     result.baseItem = baseItem;
@@ -46,7 +52,8 @@ namespace SpriteSortingPlugin
         }
 
         public static SpriteSortingAnalysisResult AnalyzeSpriteSorting(CameraProjectionType cameraProjectionType,
-            SpriteRenderer spriteRenderer, SpriteAlphaData spriteAlphaData = null)
+            SpriteRenderer spriteRenderer, SpriteAlphaData spriteAlphaData = null,
+            AlphaAnalysisType alphaAnalysisType = AlphaAnalysisType.OOBB)
         {
             var result = new SpriteSortingAnalysisResult();
             var selectedLayers = new List<int> {spriteRenderer.sortingLayerID};
@@ -67,9 +74,10 @@ namespace SpriteSortingPlugin
             var filteredSortingComponents = FilterSortingComponents(spriteRenderers, selectedLayers);
             Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Count +
                       " to " + filteredSortingComponents.Count);
+            ResetSpriteColliders();
 
             if (!CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, sortingComponentToCheck,
-                spriteAlphaData, out List<OverlappingItem> overlappingSprites, out var baseItem))
+                spriteAlphaData, alphaAnalysisType, out List<OverlappingItem> overlappingSprites, out var baseItem))
             {
                 return result;
             }
@@ -101,6 +109,17 @@ namespace SpriteSortingPlugin
             }
 
             return filteredSortingComponents;
+        }
+
+        private static void ResetSpriteColliders()
+        {
+            var colliderDataKeyList = new List<string>(spriteColliderDataDictionary.Keys);
+            foreach (var assetGuid in colliderDataKeyList)
+            {
+                var colliderData = spriteColliderDataDictionary[assetGuid];
+                colliderData.isUsed = false;
+                spriteColliderDataDictionary[assetGuid] = colliderData;
+            }
         }
 
         private static bool ValidateSortingComponent(List<int> selectedLayers, SpriteRenderer spriteRenderer,
@@ -200,14 +219,14 @@ namespace SpriteSortingPlugin
 
         private static bool CheckOverlappingSprites(CameraProjectionType cameraProjectionType,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
-            SpriteAlphaData spriteAlphaData, out List<OverlappingItem> overlappingComponents,
-            out OverlappingItem baseItem)
+            SpriteAlphaData spriteAlphaData, AlphaAnalysisType alphaAnalysisType,
+            out List<OverlappingItem> overlappingComponents, out OverlappingItem baseItem)
         {
             overlappingComponents = null;
             baseItem = null;
 
             if (!CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, sortingComponentToCheck,
-                spriteAlphaData, true, out List<SortingComponent> overlappingSortingComponents,
+                spriteAlphaData, true, alphaAnalysisType, out List<SortingComponent> overlappingSortingComponents,
                 out SortingComponent baseSortingComponent))
             {
                 return false;
@@ -227,7 +246,7 @@ namespace SpriteSortingPlugin
 
         private static bool CheckOverlappingSprites(CameraProjectionType cameraProjectionType,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
-            SpriteAlphaData spriteAlphaData, bool isCheckingForSameSortingOptions,
+            SpriteAlphaData spriteAlphaData, bool isCheckingForSameSortingOptions, AlphaAnalysisType alphaAnalysisType,
             out List<SortingComponent> overlappingComponents,
             out SortingComponent baseItem)
         {
@@ -236,22 +255,75 @@ namespace SpriteSortingPlugin
             Debug.Log("start search in " + filteredSortingComponents.Count + " sprite renderers for an overlap with " +
                       sortingComponentToCheck.spriteRenderer.name);
 
-            var isUsingOOBB = spriteAlphaData != null;
-            var hasSortingComponentToCheckOOBB = false;
+            var hasSpriteAlphaData = spriteAlphaData != null;
+            var hasSortingComponentToCheckSpriteDataItem = false;
 
             ObjectOrientedBoundingBox oobbToCheck = null;
+            PolygonCollider2D polygonColliderToCheck = null;
 
-            if (isUsingOOBB)
+            if (hasSpriteAlphaData)
             {
                 var assetGuid =
                     AssetDatabase.AssetPathToGUID(
                         AssetDatabase.GetAssetPath(sortingComponentToCheck.spriteRenderer.sprite.GetInstanceID()));
-                hasSortingComponentToCheckOOBB =
-                    spriteAlphaData.objectOrientedBoundingBoxDictionary.TryGetValue(assetGuid, out oobbToCheck);
 
-                if (hasSortingComponentToCheckOOBB)
+                hasSortingComponentToCheckSpriteDataItem =
+                    spriteAlphaData.spriteDataDictionary.TryGetValue(assetGuid, out var spriteDataItem);
+
+                if (hasSortingComponentToCheckSpriteDataItem)
                 {
-                    oobbToCheck.UpdateBox(sortingComponentToCheck.spriteRenderer.transform);
+                    switch (alphaAnalysisType)
+                    {
+                        case AlphaAnalysisType.OOBB:
+                            if (spriteDataItem.objectOrientedBoundingBox != null)
+                            {
+                                oobbToCheck = spriteDataItem.objectOrientedBoundingBox;
+                                oobbToCheck.UpdateBox(sortingComponentToCheck.spriteRenderer.transform);
+                            }
+
+                            break;
+                        case AlphaAnalysisType.Outline:
+
+                            if (spriteDataItem.outlinePoints != null)
+                            {
+                                var polyColliderGameObject = new GameObject("ToCheck- PolygonCollider " +
+                                                                            sortingComponentToCheck.spriteRenderer
+                                                                                .name);
+
+                                var currentTransform = sortingComponentToCheck.spriteRenderer.transform;
+                                polyColliderGameObject.transform.SetPositionAndRotation(
+                                    currentTransform.position, currentTransform.rotation);
+                                polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
+
+                                polygonColliderToCheck = polyColliderGameObject.AddComponent<PolygonCollider2D>();
+                                polygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
+                            }
+
+                            break;
+                        case AlphaAnalysisType.Both:
+                            if (spriteDataItem.objectOrientedBoundingBox != null)
+                            {
+                                oobbToCheck = spriteDataItem.objectOrientedBoundingBox;
+                                oobbToCheck.UpdateBox(sortingComponentToCheck.spriteRenderer.transform);
+                            }
+
+                            if (spriteDataItem.outlinePoints != null)
+                            {
+                                var polyColliderGameObject = new GameObject("ToCheck- PolygonCollider " +
+                                                                            sortingComponentToCheck.spriteRenderer
+                                                                                .name);
+
+                                var currentTransform = sortingComponentToCheck.spriteRenderer.transform;
+                                polyColliderGameObject.transform.SetPositionAndRotation(
+                                    currentTransform.position, currentTransform.rotation);
+                                polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
+
+                                polygonColliderToCheck = polyColliderGameObject.AddComponent<PolygonCollider2D>();
+                                polygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
+                            }
+
+                            break;
+                    }
                 }
             }
 
@@ -277,49 +349,139 @@ namespace SpriteSortingPlugin
                 {
                     continue;
                 }
-                
+
                 if (cameraProjectionType == CameraProjectionType.Orthogonal && Math.Abs(
                     sortingComponent.spriteRenderer.transform.position.z - boundsToCheck.center.z) > Tolerance)
                 {
                     //TODO: is z the distance to the camera? if not maybe create something to choose for the user
                     continue;
                 }
-                
+
                 if (!sortingComponent.spriteRenderer.bounds.Intersects(boundsToCheck))
                 {
                     continue;
                 }
 
-                if (isUsingOOBB && hasSortingComponentToCheckOOBB)
+                if (hasSpriteAlphaData)
                 {
-                    var assetGuid =
-                        AssetDatabase.AssetPathToGUID(
-                            AssetDatabase.GetAssetPath(sortingComponent.spriteRenderer.sprite.GetInstanceID()));
-
-                    var hasSortingComponentOOBB =
-                        spriteAlphaData.objectOrientedBoundingBoxDictionary.TryGetValue(assetGuid,
-                            out var sortingComponentOOBB);
-
-                    if (hasSortingComponentOOBB)
+                    if (hasSortingComponentToCheckSpriteDataItem)
                     {
-                        if (oobbToCheck == sortingComponentOOBB)
+                        var assetGuid =
+                            AssetDatabase.AssetPathToGUID(
+                                AssetDatabase.GetAssetPath(sortingComponent.spriteRenderer.sprite.GetInstanceID()));
+
+                        var hasSortingComponentSpriteDataItem =
+                            spriteAlphaData.spriteDataDictionary.TryGetValue(assetGuid,
+                                out var spriteDataItem);
+
+                        if (hasSortingComponentSpriteDataItem)
                         {
-                            sortingComponentOOBB = (ObjectOrientedBoundingBox) oobbToCheck.Clone();
-                        }
+                            var currentTransform = sortingComponent.spriteRenderer.transform;
+                            switch (alphaAnalysisType)
+                            {
+                                case AlphaAnalysisType.OOBB:
 
-                        sortingComponentOOBB.UpdateBox(sortingComponent.spriteRenderer.transform);
+                                    if (spriteDataItem.objectOrientedBoundingBox != null)
+                                    {
+                                        var otherOOBB = spriteDataItem.objectOrientedBoundingBox;
 
-                        var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, sortingComponentOOBB);
+                                        if (oobbToCheck == otherOOBB)
+                                        {
+                                            otherOOBB = (ObjectOrientedBoundingBox) otherOOBB.Clone();
+                                        }
 
-                        if (!isOverlapping)
-                        {
-                            continue;
+                                        otherOOBB.UpdateBox(currentTransform);
+
+                                        var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, otherOOBB);
+
+                                        if (!isOverlapping)
+                                        {
+                                            continue;
+                                        }
+                                    }
+
+                                    break;
+                                case AlphaAnalysisType.Outline:
+
+                                    if (spriteDataItem.outlinePoints != null)
+                                    {
+                                        //TODO destroy polyColliderGameObject
+                                        var polyColliderGameObject =
+                                            new GameObject("PolygonCollider " + sortingComponent.spriteRenderer.name);
+                                        polyColliderGameObject.transform.SetPositionAndRotation(
+                                            currentTransform.position, currentTransform.rotation);
+                                        polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
+
+                                        var otherPolygonColliderToCheck =
+                                            polyColliderGameObject.AddComponent<PolygonCollider2D>();
+                                        otherPolygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
+
+                                        var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
+
+                                        // Object.DestroyImmediate(polyColliderGameObject);
+
+                                        // Debug.DrawLine(distance.pointA,
+                                        //     new Vector3(distance.pointA.x, distance.pointA.y, -15), Color.blue, 3);
+                                        // Debug.DrawLine(distance.pointB,
+                                        //     new Vector3(distance.pointB.x, distance.pointB.y, -15), Color.cyan, 3);
+                                        // Debug.DrawLine(distance.pointA, distance.pointB, Color.green);
+                                        if (!distance.isOverlapped)
+                                        {
+                                            continue;
+                                        }
+                                    }
+
+                                    break;
+                                case AlphaAnalysisType.Both:
+                                    if (spriteDataItem.objectOrientedBoundingBox != null)
+                                    {
+                                        var otherOOBB = spriteDataItem.objectOrientedBoundingBox;
+
+                                        if (oobbToCheck == otherOOBB)
+                                        {
+                                            otherOOBB = (ObjectOrientedBoundingBox) otherOOBB.Clone();
+                                        }
+
+                                        otherOOBB.UpdateBox(currentTransform);
+
+                                        var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, otherOOBB);
+
+                                        if (!isOverlapping)
+                                        {
+                                            continue;
+                                        }
+                                    }
+
+                                    if (spriteDataItem.outlinePoints != null)
+                                    {
+                                        var polyColliderGameObject =
+                                            new GameObject("PolygonCollider " + sortingComponent.spriteRenderer.name);
+                                        polyColliderGameObject.transform.SetPositionAndRotation(
+                                            currentTransform.position, currentTransform.rotation);
+                                        polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
+
+                                        var otherPolygonColliderToCheck =
+                                            polyColliderGameObject.AddComponent<PolygonCollider2D>();
+                                        otherPolygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
+
+                                        var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
+                                        if (!distance.isOverlapped)
+                                        {
+                                            continue;
+                                        }
+                                    }
+
+                                    break;
+                            }
                         }
                     }
                 }
 
                 overlappingComponents.Add(sortingComponent);
             }
+
+            //TODO destroy polygonColliderToCheck
+            // Object.DestroyImmediate(polygonColliderToCheck);
 
             if (overlappingComponents.Count <= 0)
             {
@@ -365,7 +527,8 @@ namespace SpriteSortingPlugin
         }
 
         public static Dictionary<int, int> AnalyzeSurroundingSprites(CameraProjectionType cameraProjectionType,
-            List<OverlappingItem> overlappingItems, SpriteAlphaData spriteAlphaData)
+            List<OverlappingItem> overlappingItems, SpriteAlphaData spriteAlphaData,
+            AlphaAnalysisType alphaAnalysisType = AlphaAnalysisType.OOBB)
         {
             if (overlappingItems == null || overlappingItems.Count <= 0)
             {
@@ -379,6 +542,7 @@ namespace SpriteSortingPlugin
             }
 
             var sortingOptions = new Dictionary<int, int>();
+            ResetSpriteColliders();
 
             var excludingSpriteRendererList = new List<SpriteRenderer>();
             var baseSortingComponents = new List<SortingComponent>();
@@ -401,7 +565,7 @@ namespace SpriteSortingPlugin
             }
 
             AnalyzeSurroundingSpritesRecursive(cameraProjectionType, spriteAlphaData, spriteRenderers,
-                baseSortingComponents, excludingSpriteRendererList, ref sortingOptions);
+                baseSortingComponents, excludingSpriteRendererList, alphaAnalysisType, ref sortingOptions);
 
             return sortingOptions;
         }
@@ -409,7 +573,7 @@ namespace SpriteSortingPlugin
         private static void AnalyzeSurroundingSpritesRecursive(CameraProjectionType cameraProjectionType,
             SpriteAlphaData spriteAlphaData, List<SpriteRenderer> spriteRenderers,
             List<SortingComponent> baseSortingComponents, List<SpriteRenderer> excludingSpriteRendererList,
-            ref Dictionary<int, int> sortingOptions)
+            AlphaAnalysisType alphaAnalysisType, ref Dictionary<int, int> sortingOptions)
         {
             var filteredSortingComponents = FilterSortingComponents(spriteRenderers,
                 new List<int> {baseSortingComponents[0].CurrentSortingLayer}, excludingSpriteRendererList);
@@ -428,7 +592,8 @@ namespace SpriteSortingPlugin
                 }
 
                 if (!CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, baseSortingComponent,
-                    spriteAlphaData, false, out List<SortingComponent> overlappingSprites, out var baseItem))
+                    spriteAlphaData, false, alphaAnalysisType, out List<SortingComponent> overlappingSprites,
+                    out var baseItem))
                 {
                     continue;
                 }
@@ -471,7 +636,7 @@ namespace SpriteSortingPlugin
                     sortingOptions[currentSortingComponentInstanceId] = newSortingOrder;
 
                     AnalyzeSurroundingSpritesRecursive(cameraProjectionType, spriteAlphaData, spriteRenderers,
-                        overlappingSprites, newExcludingList, ref sortingOptions);
+                        overlappingSprites, newExcludingList, alphaAnalysisType, ref sortingOptions);
                 }
             }
         }

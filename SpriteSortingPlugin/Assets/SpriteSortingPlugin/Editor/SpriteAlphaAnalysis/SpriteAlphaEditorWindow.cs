@@ -421,6 +421,11 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 var path = AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID());
                 var guid = AssetDatabase.AssetPathToGUID(path);
 
+                if (spriteAlphaData.spriteDataDictionary.ContainsKey(guid))
+                {
+                    continue;
+                }
+
                 var spriteDataItem = new SpriteDataItem(guid, spriteRenderer.sprite.name);
                 spriteAlphaData.spriteDataDictionary.Add(guid, spriteDataItem);
 

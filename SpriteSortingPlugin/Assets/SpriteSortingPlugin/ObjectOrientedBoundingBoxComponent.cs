@@ -24,10 +24,12 @@ namespace SpriteSortingPlugin
             }
 
             var spriteGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(spriteRenderer.sprite));
-            if (!data.objectOrientedBoundingBoxDictionary.TryGetValue(spriteGuid, out oobb))
+            if (!data.spriteDataDictionary.TryGetValue(spriteGuid, out var spriteDataItem))
             {
                 return;
             }
+
+            oobb = spriteDataItem.objectOrientedBoundingBox;
 
             if (isUsingOOBBCopy)
             {
