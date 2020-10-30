@@ -33,11 +33,99 @@ namespace SpriteSortingPlugin
             // var pointList = SortOutlinePoints(pixelList);
 
 
-            var pointList = AnalyzeAlphaOutline();
+            // var pointList = AnalyzeAlphaOutline();
+            var pointList = AnalyzeOutlineMooreNeighbourAlgortihm();
 
 
             CreatePolygonCollider(pointList);
             Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
+        }
+
+        private int startPixelIndex;
+        private PixelDirection startPixelEntryDirection;
+
+        private List<Vector2> AnalyzeOutlineMooreNeighbourAlgortihm()
+        {
+            var colliderPointList = new List<Vector2>();
+            var spritePixelsPerUnit = ownRenderer.sprite.pixelsPerUnit;
+            var spriteTexture = ownRenderer.sprite.texture;
+
+            pixels = spriteTexture.GetPixels();
+            spriteHeight = spriteTexture.height;
+            spriteWidth = spriteTexture.width;
+            PixelDirectionUtility.spriteWidth = spriteWidth;
+
+            startPixelIndex = GetFirstSpritePixelIndex(out startPixelEntryDirection);
+            if (startPixelIndex < 0)
+            {
+                Debug.Log("sprite is completely transparent");
+                return colliderPointList;
+            }
+
+            var rectCenter = ownRenderer.sprite.rect.center;
+            var halfPixelOffset = 1f / spritePixelsPerUnit / 2f;
+            var offset = new Vector2(rectCenter.x / spritePixelsPerUnit - halfPixelOffset,
+                rectCenter.y / spritePixelsPerUnit - halfPixelOffset);
+
+
+            var startPixelWidth = startPixelIndex % spriteWidth;
+            var startPixelHeight = startPixelIndex / spriteWidth;
+
+            var point = new Vector2((startPixelWidth / spritePixelsPerUnit),
+                (startPixelHeight / spritePixelsPerUnit)) - offset;
+            // point *= 1 + (1f / spritePixelsPerUnit);
+            colliderPointList.Add(point);
+
+            var boundaryPoint = startPixelIndex;
+            var pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(startPixelEntryDirection);
+            var firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
+            var neighbourOfBoundaryPointIndex =
+                PixelDirectionUtility.GetIndexOfPixelDirection(startPixelIndex, pixelDirectionToCheck);
+            var counter = 0;
+
+            while (neighbourOfBoundaryPointIndex != startPixelIndex)
+            {
+                if (neighbourOfBoundaryPointIndex == startPixelIndex &&
+                    firstEntryDirection == startPixelEntryDirection)
+                {
+                    break;
+                }
+
+                if (pixels[neighbourOfBoundaryPointIndex].a > 0)
+                {
+                    var pixelWidth = neighbourOfBoundaryPointIndex % spriteWidth;
+                    var pixelHeight = neighbourOfBoundaryPointIndex / spriteWidth;
+
+                    //found pixel
+                    var nextPoint = new Vector2((pixelWidth / spritePixelsPerUnit),
+                        (pixelHeight / spritePixelsPerUnit)) - offset;
+                    // point *= 1 + (1f / spritePixelsPerUnit);
+                    colliderPointList.Add(nextPoint);
+
+                    boundaryPoint = neighbourOfBoundaryPointIndex;
+
+                    var backtracedDirection =
+                        PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(pixelDirectionToCheck,
+                            firstEntryDirection);
+
+                    pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(backtracedDirection);
+                    firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
+                    
+                    neighbourOfBoundaryPointIndex =
+                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
+                }
+                else
+                {
+                    //move to next clockwise pixel 
+                    pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
+                    neighbourOfBoundaryPointIndex =
+                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
+                }
+
+                counter++;
+            }
+
+            return colliderPointList;
         }
 
         private Color[] pixels;
@@ -60,7 +148,7 @@ namespace SpriteSortingPlugin
             spriteWidth = spriteTexture.width;
             visitedPixels = new bool[pixels.Length];
 
-            var currentPixelIndex = GetFirstSpritePixelIndex();
+            var currentPixelIndex = GetFirstSpritePixelIndex(out var pixelDirection);
             if (currentPixelIndex < 0)
             {
                 Debug.Log("sprite is completely transparent");
@@ -104,13 +192,23 @@ namespace SpriteSortingPlugin
             var offset = new Vector2(rectCenter.x / spritePixelsPerUnit - halfPixelOffset,
                 rectCenter.y / spritePixelsPerUnit - halfPixelOffset);
 
+            var counter = 0;
+            var isSearching = true;
+
             while (HasPixelOutlineNeighbour(currentPixelIndex, out var nextPixelIndex))
             {
-                var pixelHeight = nextPixelIndex / spriteWidth;
-                var pixelWidth = nextPixelIndex % spriteWidth;
+                if (counter == 597)
+                {
+                    int i = 0;
+                }
 
-                colliderPointList.Add(new Vector2((pixelWidth / spritePixelsPerUnit),
-                    (pixelHeight / spritePixelsPerUnit)) - offset);
+                var pixelWidth = nextPixelIndex % spriteWidth;
+                var pixelHeight = nextPixelIndex / spriteWidth;
+
+                var point = new Vector2((pixelWidth / spritePixelsPerUnit),
+                    (pixelHeight / spritePixelsPerUnit)) - offset;
+                // point *= 1 + (1f / spritePixelsPerUnit);
+                colliderPointList.Add(point);
                 currentPixelIndex = nextPixelIndex;
 
                 if (newStartPosition < 0)
@@ -127,6 +225,8 @@ namespace SpriteSortingPlugin
                     setStartPosition = false;
                     startPosition = newStartPosition;
                 }
+
+                counter++;
             }
 
 
@@ -307,9 +407,10 @@ namespace SpriteSortingPlugin
         // return true;
 
 
-        private int GetFirstSpritePixelIndex()
+        private int GetFirstSpritePixelIndex(out PixelDirection entryDirection)
         {
             var counter = 0;
+            entryDirection = PixelDirection.East;
 
             for (var y = spriteHeight - 1; y >= 0; y--)
             {
@@ -691,6 +792,23 @@ namespace SpriteSortingPlugin
 
         public void Optimize()
         {
+            var direction =
+                PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(PixelDirection.Northwest,
+                    PixelDirection.East);
+
+            var direction2 =
+                PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(PixelDirection.Northwest,
+                    PixelDirection.South);
+
+            var direction3 =
+                PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(PixelDirection.Northwest,
+                    PixelDirection.West);
+
+            var direction4 =
+                PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(PixelDirection.Northwest,
+                    PixelDirection.North);
+
+            int i = 0;
         }
     }
 
