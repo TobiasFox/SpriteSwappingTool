@@ -23,8 +23,9 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private string searchString;
         private bool isShowingSpriteAlphaGUI = true;
+        private bool isShowingOOBB = true;
 
-        private List<ObjectOrientedBoundingBox> spriteList;
+        private List<SpriteDataItem> spriteList;
         private ReorderableList reorderableSpriteList;
         private SearchField searchField;
         private Vector2 leftBarScrollPosition;
@@ -34,9 +35,10 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
+        private AlphaAnalysisType alphaAnalysisType;
 
         // private ObjectOrientedBoundingBoxComponent oobbComponent;
-        private ObjectOrientedBoundingBox selectedOOBB;
+        private SpriteDataItem selectedSpriteDataItem;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -78,7 +80,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         {
             if (spriteList == null)
             {
-                spriteList = new List<ObjectOrientedBoundingBox>();
+                spriteList = new List<SpriteDataItem>();
             }
             else
             {
@@ -135,6 +137,9 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     ResetSpriteList();
                 }
 
+                alphaAnalysisType =
+                    (AlphaAnalysisType) EditorGUILayout.EnumPopup("Type of Alpha Analyses", alphaAnalysisType);
+
                 if (GUILayout.Button("Analyze Alpha of Sprites"))
                 {
                     Debug.Log("analyze alpha");
@@ -175,6 +180,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     //     EditorGUILayout.ObjectField("HandleTest", oobbComponent, typeof(ObjectOrientedBoundingBoxComponent),
                     //         true) as ObjectOrientedBoundingBoxComponent;
 
+                    isShowingOOBB = EditorGUILayout.ToggleLeft("show OOBB?", isShowingOOBB);
+
                     searchField.OnGUI(searchString);
 
                     if (reorderableSpriteList == null)
@@ -207,7 +214,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             //             GUILayout.Height(EditorGUIUtility.singleLineHeight)) as
             //         Sprite;
 
-            if (selectedOOBB == null)
+            if (selectedSpriteDataItem == null)
             {
                 GUILayout.EndArea();
                 return;
@@ -216,6 +223,24 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var textureRect = new Rect(0, 0, rightAreaRect.width, rightAreaRect.height);
             EditorGUI.DrawTextureTransparent(textureRect, selectedSprite.texture, ScaleMode.ScaleToFit);
 
+            if (isShowingOOBB)
+            {
+                DrawOOBB(textureRect, rightAreaRect);
+            }
+            else
+            {
+                DrawOutline(textureRect, rightAreaRect);
+            }
+
+            GUILayout.EndArea();
+        }
+
+        private void DrawOutline(Rect textureRect, Rect rightAreaRect)
+        {
+        }
+
+        private void DrawOOBB(Rect textureRect, Rect rightAreaRect)
+        {
             Handles.color = Color.green;
 
             var rectWithAlphaBorders = CalculateRectWithAlphaBorders(textureRect);
@@ -224,15 +249,20 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var scaleYFactor = rectWithAlphaBorders.height / selectedSprite.bounds.size.y;
 
             var newBoundsWidth = scaleXFactor *
-                (selectedOOBB.AlphaRectangleBorder.spriteWidth - selectedOOBB.AlphaRectangleBorder.leftBorder -
-                 selectedOOBB.AlphaRectangleBorder.rightBorder) / selectedOOBB.AlphaRectangleBorder.pixelPerUnit;
+                                 (selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.spriteWidth -
+                                  selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.leftBorder -
+                                  selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.rightBorder) /
+                                 selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.pixelPerUnit;
             var newBoundsHeight = scaleYFactor *
-                (selectedOOBB.AlphaRectangleBorder.spriteHeight - selectedOOBB.AlphaRectangleBorder.topBorder -
-                 selectedOOBB.AlphaRectangleBorder.bottomBorder) / selectedOOBB.AlphaRectangleBorder.pixelPerUnit;
+                                  (selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.spriteHeight -
+                                   selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.topBorder -
+                                   selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.bottomBorder) /
+                                  selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.pixelPerUnit;
 
             var scaledSize = new Vector2(newBoundsWidth, newBoundsHeight);
-            var rectCenter = rectWithAlphaBorders.center - new Vector2(selectedOOBB.BoundsCenterOffset.x * scaleXFactor,
-                selectedOOBB.BoundsCenterOffset.y * scaleYFactor);
+            var rectCenter = rectWithAlphaBorders.center - new Vector2(
+                selectedSpriteDataItem.objectOrientedBoundingBox.BoundsCenterOffset.x * scaleXFactor,
+                selectedSpriteDataItem.objectOrientedBoundingBox.BoundsCenterOffset.y * scaleYFactor);
 
             Handles.DrawWireCube(rectCenter, scaledSize);
             Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
@@ -250,12 +280,11 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RegisterCompleteObjectUndo(spriteAlphaData, "changed OOBB size");
-                    selectedOOBB.UpdateBoxSizeWithBorder();
+                    selectedSpriteDataItem.objectOrientedBoundingBox.UpdateBoxSizeWithBorder();
                 }
 
                 GUILayout.EndArea();
             }
-            GUILayout.EndArea();
         }
 
         private Rect CalculateRectWithAlphaBorders(Rect textureRect)
@@ -290,19 +319,20 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private void DrawAlphaRectangleBorderSettings(Rect rect)
         {
             var intFieldLength = rect.width / 3f;
-            var halfSpriteWidth = selectedOOBB.AlphaRectangleBorder.spriteWidth / 2;
-            var halfSpriteHeight = selectedOOBB.AlphaRectangleBorder.spriteHeight / 2;
+            var halfSpriteWidth = selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.spriteWidth / 2;
+            var halfSpriteHeight =
+                selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder.spriteHeight / 2;
 
             EditorGUI.LabelField(new Rect(rect.width / 2 - 45, rect.y, 90, EditorGUIUtility.singleLineHeight),
                 "Adjust Borders");
 
             if (GUI.Button(new Rect(rect.width - 60, rect.y, 60, EditorGUIUtility.singleLineHeight), "Reset"))
             {
-                selectedOOBB.ResetAlphaRectangleBorder();
+                selectedSpriteDataItem.objectOrientedBoundingBox.ResetAlphaRectangleBorder();
             }
 
             rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
-            var alphaBorder = selectedOOBB.AlphaRectangleBorder;
+            var alphaBorder = selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder;
 
             alphaBorder.topBorder = EditorGUI.IntSlider(
                 new Rect(rect.x + intFieldLength, rect.y, intFieldLength, EditorGUIUtility.singleLineHeight),
@@ -331,7 +361,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 new Rect(rect.x + intFieldLength, rect.y, intFieldLength, EditorGUIUtility.singleLineHeight),
                 alphaBorder.bottomBorder, 0, halfSpriteHeight);
 
-            selectedOOBB.AlphaRectangleBorder = alphaBorder;
+            selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder = alphaBorder;
         }
 
         private void LoadSpriteAlphaData()
@@ -342,9 +372,14 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
 
             spriteList.Clear();
-            foreach (var objectOrientedBoundingBox in spriteAlphaData.objectOrientedBoundingBoxDictionary.Values)
+            // foreach (var objectOrientedBoundingBox in spriteAlphaData.objectOrientedBoundingBoxDictionary.Values)
+            // {
+            //     spriteList.Add(objectOrientedBoundingBox);
+            // }
+
+            foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
             {
-                spriteList.Add(objectOrientedBoundingBox);
+                spriteList.Add(spriteDataItem);
             }
         }
 
@@ -355,21 +390,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 spriteAlphaAnalyzer = new SpriteAlphaAnalyzer();
             }
 
-            spriteAlphaAnalyzer.Initialize();
-
-            var oobbList = spriteAlphaAnalyzer.GenerateOOBBs();
-
             spriteAlphaData = CreateInstance<SpriteAlphaData>();
-
             reorderableSpriteList.index = -1;
             spriteList.Clear();
 
-            foreach (var objectOrientedBoundingBox in oobbList)
-            {
-                spriteList.Add(objectOrientedBoundingBox);
-                spriteAlphaData.objectOrientedBoundingBoxDictionary.Add(objectOrientedBoundingBox.assetGuid,
-                    objectOrientedBoundingBox);
-            }
+            GenerateSpriteDataItems();
+            spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteAlphaData, alphaAnalysisType);
 
             var assetPathAndName =
                 AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteAlphaData) + ".asset");
@@ -378,6 +404,28 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        private void GenerateSpriteDataItems()
+        {
+            var spriteRenderers = FindObjectsOfType<SpriteRenderer>();
+
+            foreach (var spriteRenderer in spriteRenderers)
+            {
+                if (!spriteRenderer.enabled || !spriteRenderer.gameObject.activeInHierarchy ||
+                    spriteRenderer.sprite == null)
+                {
+                    continue;
+                }
+
+                var path = AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID());
+                var guid = AssetDatabase.AssetPathToGUID(path);
+
+                var spriteDataItem = new SpriteDataItem(guid, spriteRenderer.sprite.name);
+                spriteAlphaData.spriteDataDictionary.Add(guid, spriteDataItem);
+
+                spriteList.Add(spriteDataItem);
+            }
         }
 
         private void InitReordableSpriteList()
@@ -422,9 +470,9 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 return;
             }
 
-            selectedOOBB = spriteList[list.index];
+            selectedSpriteDataItem = spriteList[list.index];
 
-            var path = AssetDatabase.GUIDToAssetPath(selectedOOBB.assetGuid);
+            var path = AssetDatabase.GUIDToAssetPath(selectedSpriteDataItem.assetGuid);
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
             selectedSprite = sprite;

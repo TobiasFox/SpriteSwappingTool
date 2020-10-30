@@ -36,6 +36,7 @@ namespace SpriteSortingPlugin
             // var pointList = AnalyzeAlphaOutline();
             var pointList = AnalyzeOutlineMooreNeighbourAlgortihm();
 
+            //TODO flatten colliderPoints
 
             CreatePolygonCollider(pointList);
             Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
@@ -43,11 +44,16 @@ namespace SpriteSortingPlugin
 
         private int startPixelIndex;
         private PixelDirection startPixelEntryDirection;
+        private Color[] pixels;
+        private int spriteHeight;
+        private int spriteWidth;
+        private float spritePixelsPerUnit;
+        private Vector2 pixelOffset;
 
         private List<Vector2> AnalyzeOutlineMooreNeighbourAlgortihm()
         {
             var colliderPointList = new List<Vector2>();
-            var spritePixelsPerUnit = ownRenderer.sprite.pixelsPerUnit;
+            spritePixelsPerUnit = ownRenderer.sprite.pixelsPerUnit;
             var spriteTexture = ownRenderer.sprite.texture;
 
             pixels = spriteTexture.GetPixels();
@@ -64,16 +70,11 @@ namespace SpriteSortingPlugin
 
             var rectCenter = ownRenderer.sprite.rect.center;
             var halfPixelOffset = 1f / spritePixelsPerUnit / 2f;
-            var offset = new Vector2(rectCenter.x / spritePixelsPerUnit - halfPixelOffset,
+            pixelOffset = new Vector2(rectCenter.x / spritePixelsPerUnit - halfPixelOffset,
                 rectCenter.y / spritePixelsPerUnit - halfPixelOffset);
 
 
-            var startPixelWidth = startPixelIndex % spriteWidth;
-            var startPixelHeight = startPixelIndex / spriteWidth;
-
-            var point = new Vector2((startPixelWidth / spritePixelsPerUnit),
-                (startPixelHeight / spritePixelsPerUnit)) - offset;
-            // point *= 1 + (1f / spritePixelsPerUnit);
+            var point = ConvertToColliderPoint(startPixelIndex);
             colliderPointList.Add(point);
 
             var boundaryPoint = startPixelIndex;
@@ -93,13 +94,8 @@ namespace SpriteSortingPlugin
 
                 if (pixels[neighbourOfBoundaryPointIndex].a > 0)
                 {
-                    var pixelWidth = neighbourOfBoundaryPointIndex % spriteWidth;
-                    var pixelHeight = neighbourOfBoundaryPointIndex / spriteWidth;
-
                     //found pixel
-                    var nextPoint = new Vector2((pixelWidth / spritePixelsPerUnit),
-                        (pixelHeight / spritePixelsPerUnit)) - offset;
-                    // point *= 1 + (1f / spritePixelsPerUnit);
+                    var nextPoint = ConvertToColliderPoint(neighbourOfBoundaryPointIndex);
                     colliderPointList.Add(nextPoint);
 
                     boundaryPoint = neighbourOfBoundaryPointIndex;
@@ -116,6 +112,7 @@ namespace SpriteSortingPlugin
                 }
                 else
                 {
+                    //TODO check against picture boundaries 
                     //move to next clockwise pixel 
                     pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
                     neighbourOfBoundaryPointIndex =
@@ -128,9 +125,18 @@ namespace SpriteSortingPlugin
             return colliderPointList;
         }
 
-        private Color[] pixels;
-        private int spriteHeight;
-        private int spriteWidth;
+        private Vector2 ConvertToColliderPoint(int pixelIndex)
+        {
+            var pixelWidth = pixelIndex % spriteWidth;
+            var pixelHeight = pixelIndex / spriteWidth;
+
+            var point = new Vector2((pixelWidth / spritePixelsPerUnit),
+                (pixelHeight / spritePixelsPerUnit)) - pixelOffset;
+            // point *= 1 + (1f / spritePixelsPerUnit);
+
+            return point;
+        }
+
         private int[] pixelDirections = new int[8];
         private int[] pixelDirectionPriority = new int[8];
         private int[] visitPixelSteps = new int[8];

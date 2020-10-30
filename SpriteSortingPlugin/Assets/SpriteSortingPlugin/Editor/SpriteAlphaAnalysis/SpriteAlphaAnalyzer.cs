@@ -2,52 +2,28 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 {
     public class SpriteAlphaAnalyzer
     {
         private int[] borders;
-        private Dictionary<string, Sprite> spriteDictionary;
 
         private int totalProgress;
         private int currentProgress;
 
         public int CurrentProgress => currentProgress;
 
-        public void Initialize()
+        public void AddAlphaShapeToSpriteAlphaData(ref SpriteAlphaData spriteAlphaData,
+            AlphaAnalysisType alphaAnalysisType)
         {
-            var spriteRenderers = Object.FindObjectsOfType<SpriteRenderer>();
-            spriteDictionary = new Dictionary<string, Sprite>();
-
-            foreach (var spriteRenderer in spriteRenderers)
+            var assetGuidList = new List<string>(spriteAlphaData.spriteDataDictionary.Keys);
+            foreach (var assetGuid in assetGuidList)
             {
-                if (!spriteRenderer.enabled || !spriteRenderer.gameObject.activeInHierarchy ||
-                    spriteRenderer.sprite == null)
-                {
-                    continue;
-                }
+                var spriteDataItem = spriteAlphaData.spriteDataDictionary[assetGuid];
 
-                var path = AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID());
-                var guid = AssetDatabase.AssetPathToGUID(path);
-
-                if (!spriteDictionary.ContainsKey(guid))
-                {
-                    spriteDictionary.Add(guid, spriteRenderer.sprite);
-                }
-            }
-
-            totalProgress = spriteDictionary.Count;
-        }
-
-        public List<ObjectOrientedBoundingBox> GenerateOOBBs()
-        {
-            var list = new List<ObjectOrientedBoundingBox>();
-
-            foreach (var spritePair in spriteDictionary)
-            {
-                var sprite = spritePair.Value;
+                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
                 var spriteIsReadable = sprite.texture.isReadable;
 
                 if (!spriteIsReadable)
@@ -60,12 +36,29 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     }
                 }
 
-                // currentProgress++;
+                switch (alphaAnalysisType)
+                {
+                    case AlphaAnalysisType.OOBB:
+                        var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
+                        spriteDataItem.objectOrientedBoundingBox = oobb;
+                        // currentProgress++;
+                        break;
+                    case AlphaAnalysisType.Outline:
+                        var colliderPoints = GenerateAlphaOutline(sprite);
+                        spriteDataItem.outlinePoints = colliderPoints;
+                        // currentProgress++;
+                        break;
+                    case AlphaAnalysisType.Both:
+                        var oobb2 = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
+                        spriteDataItem.objectOrientedBoundingBox = oobb2;
 
-                var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
-                oobb.assetGuid = spritePair.Key;
-                oobb.assetName = sprite.texture.name;
-                list.Add(oobb);
+                        var colliderPoints2 = GenerateAlphaOutline(sprite);
+                        spriteDataItem.outlinePoints = colliderPoints2;
+                        // currentProgress+=2;
+                        break;
+                }
+
+                spriteAlphaData.spriteDataDictionary[assetGuid] = spriteDataItem;
 
                 // currentProgress++;
 
@@ -76,9 +69,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 // currentProgress++;
             }
-
-
-            return list;
         }
 
         private bool SetSpriteReadable(Texture2D spriteTexture, bool isReadable)
@@ -109,6 +99,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
 
             return true;
+        }
+
+        private List<Vector2> GenerateAlphaOutline(Sprite sprite)
+        {
+            var outlineAnalyzer = new SpriteOutlineAnalysis();
+            var points = outlineAnalyzer.Analyze(sprite);
+            return points;
         }
 
         private ObjectOrientedBoundingBox GenerateOOBB(Texture2D spriteTexture, float pixelsPerUnit)

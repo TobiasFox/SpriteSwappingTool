@@ -8,32 +8,48 @@ namespace SpriteSortingPlugin
     public class SpriteAlphaData : ScriptableObject, ISerializationCallbackReceiver
     {
         [SerializeField] private List<ObjectOrientedBoundingBox> oobbList = new List<ObjectOrientedBoundingBox>();
+        [SerializeField] private List<SpriteDataItem> spriteDataList = new List<SpriteDataItem>();
+
+        [NonSerialized]
+        public Dictionary<string, SpriteDataItem> spriteDataDictionary = new Dictionary<string, SpriteDataItem>();
 
         [NonSerialized] public Dictionary<string, ObjectOrientedBoundingBox> objectOrientedBoundingBoxDictionary =
             new Dictionary<string, ObjectOrientedBoundingBox>();
 
         public void OnBeforeSerialize()
         {
-            if (objectOrientedBoundingBoxDictionary == null)
+            if (objectOrientedBoundingBoxDictionary != null)
             {
-                return;
+                oobbList = new List<ObjectOrientedBoundingBox>(objectOrientedBoundingBoxDictionary.Values);
             }
 
-            oobbList = new List<ObjectOrientedBoundingBox>(objectOrientedBoundingBoxDictionary.Values);
+            if (spriteDataDictionary != null)
+            {
+                spriteDataList = new List<SpriteDataItem>(spriteDataDictionary.Values);
+            }
         }
 
         public void OnAfterDeserialize()
         {
-            if (oobbList == null)
+            if (oobbList != null)
             {
-                return;
-            }
-            
-            objectOrientedBoundingBoxDictionary.Clear();
+                objectOrientedBoundingBoxDictionary.Clear();
 
-            foreach (var objectOrientedBoundingBox in oobbList)
+                foreach (var objectOrientedBoundingBox in oobbList)
+                {
+                    objectOrientedBoundingBoxDictionary.Add(objectOrientedBoundingBox.assetGuid,
+                        objectOrientedBoundingBox);
+                }
+            }
+
+            if (spriteDataList != null)
             {
-                objectOrientedBoundingBoxDictionary.Add(objectOrientedBoundingBox.assetGuid, objectOrientedBoundingBox);
+                spriteDataDictionary.Clear();
+
+                foreach (var spriteData in spriteDataList)
+                {
+                    spriteDataDictionary.Add(spriteData.assetGuid, spriteData);
+                }
             }
         }
     }
