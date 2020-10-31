@@ -36,7 +36,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
-        private OutlineAnalysisType outlineType;
+        private OutlineAnalysisType outlineAnalysisType;
+        private OutlinePrecision outlinePrecision;
 
         // private ObjectOrientedBoundingBoxComponent oobbComponent;
         private SpriteDataItem selectedSpriteDataItem;
@@ -115,15 +116,18 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
         }
 
+        private Rect lastToolbarRect;
+
         private void OnGUI()
         {
             // serializedObject.Update();
             {
-                EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+                var toolbarRect = EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-                spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
-                    spriteData,
-                    typeof(SpriteData), false) as SpriteData;
+                EditorGUIUtility.labelWidth = 110;
+                spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"), spriteData,
+                    typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
+                EditorGUIUtility.labelWidth = 0;
 
                 if (GUILayout.Button("Load"))
                 {
@@ -132,15 +136,26 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     isShowingSpriteAlphaGUI = true;
                 }
 
-                //TODO remove
-                if (GUILayout.Button("Reset List"))
+                // //TODO remove
+                // if (GUILayout.Button("Reset List"))
+                // {
+                //     ResetSpriteList();
+                // }
+
+                GUILayout.FlexibleSpace();
+
+                EditorGUIUtility.labelWidth = 80;
+                outlineAnalysisType =
+                    (OutlineAnalysisType) EditorGUILayout.EnumFlagsField("Outline Type", outlineAnalysisType,
+                        GUILayout.MinWidth(200));
+                EditorGUIUtility.labelWidth = 0;
+
+                if (Event.current.type == EventType.Repaint)
                 {
-                    ResetSpriteList();
+                    lastToolbarRect = toolbarRect;
                 }
 
-                outlineType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField("Outline Type", outlineType);
-
-                if (GUILayout.Button("Analyze Alpha of Sprites"))
+                if (GUILayout.Button("Analyze sprite outlines"))
                 {
                     Debug.Log("analyze alpha");
 
@@ -175,13 +190,16 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 leftBarScrollPosition = EditorGUILayout.BeginScrollView(leftBarScrollPosition);
                 {
-                    EditorGUILayout.LabelField("Sprites");
+                    var style = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
+                    GUILayout.Label("Sprites", style, GUILayout.ExpandWidth(true));
                     // oobbComponent =
                     //     EditorGUILayout.ObjectField("HandleTest", oobbComponent, typeof(ObjectOrientedBoundingBoxComponent),
                     //         true) as ObjectOrientedBoundingBoxComponent;
 
-                    isShowingOOBB = EditorGUILayout.ToggleLeft("show OOBB?", isShowingOOBB);
-                    outlineColor = EditorGUILayout.ColorField("outline Color", outlineColor);
+                    outlinePrecision =
+                        (OutlinePrecision) EditorGUILayout.EnumPopup("Preview Outline", outlinePrecision);
+
+                    outlineColor = EditorGUILayout.ColorField("Outline Color", outlineColor);
 
                     searchField.OnGUI(searchString);
 
@@ -220,13 +238,14 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var rectWithAlphaBorders = CalculateRectWithAlphaBorders(textureRect);
             Handles.color = outlineColor;
 
-            if (isShowingOOBB)
+            switch (outlinePrecision)
             {
-                DrawOOBB(rectWithAlphaBorders, rightAreaRect);
-            }
-            else
-            {
-                DrawOutline(rectWithAlphaBorders);
+                case OutlinePrecision.ObjectOrientedBoundingBox:
+                    DrawOOBB(rectWithAlphaBorders, rightAreaRect);
+                    break;
+                case OutlinePrecision.PixelPerfect:
+                    DrawOutline(rectWithAlphaBorders);
+                    break;
             }
 
             GUILayout.EndArea();
@@ -396,7 +415,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void AnalyzeSpriteAlphas()
         {
-            if (outlineType == OutlineAnalysisType.Nothing)
+            if (outlineAnalysisType == OutlineAnalysisType.Nothing)
             {
                 return;
             }
@@ -409,11 +428,11 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             reorderableSpriteList.index = -1;
             selectedSpriteDataItem = null;
             spriteList.Clear();
-            
+
             spriteData = CreateInstance<SpriteData>();
 
             GenerateSpriteDataItems();
-            spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteData, outlineType);
+            spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteData, outlineAnalysisType);
 
             var assetPathAndName =
                 AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteData) + ".asset");

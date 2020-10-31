@@ -46,39 +46,17 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 {
                     var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
                     spriteDataItem.objectOrientedBoundingBox = oobb;
+                    // currentProgress++;
                 }
 
                 if (outlineType.HasFlag(OutlinePrecision.PixelPerfect))
                 {
                     var colliderPoints = GenerateAlphaOutline(sprite);
                     spriteDataItem.outlinePoints = colliderPoints;
+                    // currentProgress++;
                 }
 
-                // switch (outlineType)
-                // {
-                //     case OutlineType.OOBB:
-                //         var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
-                //         spriteDataItem.objectOrientedBoundingBox = oobb;
-                //         // currentProgress++;
-                //         break;
-                //     case OutlineType.Outline:
-                //         var colliderPoints = GenerateAlphaOutline(sprite);
-                //         spriteDataItem.outlinePoints = colliderPoints;
-                //         // currentProgress++;
-                //         break;
-                //     case OutlineType.Both:
-                //         var oobb2 = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
-                //         spriteDataItem.objectOrientedBoundingBox = oobb2;
-                //
-                //         var colliderPoints2 = GenerateAlphaOutline(sprite);
-                //         spriteDataItem.outlinePoints = colliderPoints2;
-                //         // currentProgress+=2;
-                //         break;
-                // }
-
                 spriteData.spriteDataDictionary[assetGuid] = spriteDataItem;
-
-                // currentProgress++;
 
                 if (!spriteIsReadable)
                 {
