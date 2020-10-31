@@ -41,6 +41,10 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         // private ObjectOrientedBoundingBoxComponent oobbComponent;
         private SpriteDataItem selectedSpriteDataItem;
+        private GUIStyle centeredStyle;
+
+        private bool isDisplayingSpriteOutline = true;
+        private bool isDisplayingSpriteDetails;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -62,6 +66,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 moveIcon = EditorGUIUtility.IconContent("MoveTool@2x").image;
                 isIconInitialized = true;
             }
+
+            centeredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
         }
 
         private void SelectDefaultSpriteAlphaData()
@@ -116,13 +122,11 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
         }
 
-        private Rect lastToolbarRect;
-
         private void OnGUI()
         {
             // serializedObject.Update();
             {
-                var toolbarRect = EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+                EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
                 EditorGUIUtility.labelWidth = 110;
                 spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"), spriteData,
@@ -149,11 +153,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     (OutlineAnalysisType) EditorGUILayout.EnumFlagsField("Outline Type", outlineAnalysisType,
                         GUILayout.MinWidth(200));
                 EditorGUIUtility.labelWidth = 0;
-
-                if (Event.current.type == EventType.Repaint)
-                {
-                    lastToolbarRect = toolbarRect;
-                }
 
                 if (GUILayout.Button("Analyze sprite outlines"))
                 {
@@ -190,17 +189,46 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 leftBarScrollPosition = EditorGUILayout.BeginScrollView(leftBarScrollPosition);
                 {
-                    var style = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
-                    GUILayout.Label("Sprites", style, GUILayout.ExpandWidth(true));
-                    // oobbComponent =
-                    //     EditorGUILayout.ObjectField("HandleTest", oobbComponent, typeof(ObjectOrientedBoundingBoxComponent),
-                    //         true) as ObjectOrientedBoundingBoxComponent;
+                    EditorGUILayout.BeginVertical("HelpBox");
+                    {
+                        GUILayout.Label("Edit Sprite Data", centeredStyle, GUILayout.ExpandWidth(true));
 
-                    outlinePrecision =
-                        (OutlinePrecision) EditorGUILayout.EnumPopup("Preview Outline", outlinePrecision);
+                        EditorGUILayout.BeginHorizontal("HelpBox");
+                        {
+                            EditorGUI.BeginChangeCheck();
+                            isDisplayingSpriteOutline =
+                                GUILayout.Toggle(isDisplayingSpriteOutline, "Sprite outline", "Button");
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                isDisplayingSpriteDetails = !isDisplayingSpriteOutline;
+                            }
 
-                    outlineColor = EditorGUILayout.ColorField("Outline Color", outlineColor);
+                            EditorGUI.BeginChangeCheck();
+                            isDisplayingSpriteDetails =
+                                GUILayout.Toggle(isDisplayingSpriteDetails, "Sprite Details", "Button");
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                isDisplayingSpriteOutline = !isDisplayingSpriteDetails;
+                            }
+                        }
+                        EditorGUILayout.EndHorizontal();
 
+                        if (isDisplayingSpriteOutline)
+                        {
+                            EditorGUILayout.Space();
+
+                            outlinePrecision =
+                                (OutlinePrecision) EditorGUILayout.EnumPopup("Preview Outline", outlinePrecision);
+
+                            outlineColor = EditorGUILayout.ColorField("Outline Color", outlineColor);
+                        }
+                    }
+                    EditorGUILayout.EndVertical();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.Space();
+
+                    GUILayout.Label("Sprites", centeredStyle, GUILayout.ExpandWidth(true));
                     searchField.OnGUI(searchString);
 
                     if (reorderableSpriteList == null)
@@ -221,16 +249,58 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             GUILayout.BeginArea(rightAreaRect, new GUIStyle {normal = {background = Texture2D.whiteTexture}});
 
+            if (isDisplayingSpriteOutline)
+            {
+                if (selectedSpriteDataItem == null)
+                {
+                    GUILayout.EndArea();
+                    return;
+                }
+
+                DrawOutlineContent(rightAreaRect);
+            }
+            else if (isDisplayingSpriteDetails)
+            {
+                DrawSpriteDetails(rightAreaRect);
+            }
+
+            GUILayout.EndArea();
+        }
+
+        private void DrawSpriteDetails(Rect rightAreaRect)
+        {
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Resolution");
+            EditorGUI.BeginDisabledGroup(true);
+            if (selectedSpriteDataItem == null)
+            {
+                EditorGUILayout.IntField("Width", 0);
+                EditorGUILayout.IntField("Height", 0);
+            }
+            else
+            {
+                EditorGUILayout.IntField("Width", selectedSprite?.texture.width ?? 0);
+                EditorGUILayout.IntField("Height", selectedSprite?.texture.height ?? 0);
+            }
+
+            EditorGUILayout.EndHorizontal();
+            EditorGUI.EndDisabledGroup();
+
+            brightness = EditorGUILayout.FloatField("Brightness", brightness);
+            blurriness = EditorGUILayout.FloatField("blurriness", blurriness);
+            primaryColor = EditorGUILayout.ColorField("Primary Color", primaryColor);
+        }
+
+        private float blurriness;
+        private Color primaryColor;
+        private float brightness;
+
+        private void DrawOutlineContent(Rect rightAreaRect)
+        {
             // testSprite =
             //     EditorGUILayout.ObjectField("test", testSprite, typeof(Sprite), false,
             //             GUILayout.Height(EditorGUIUtility.singleLineHeight)) as
             //         Sprite;
-
-            if (selectedSpriteDataItem == null)
-            {
-                GUILayout.EndArea();
-                return;
-            }
 
             var textureRect = new Rect(0, 0, rightAreaRect.width, rightAreaRect.height);
             EditorGUI.DrawTextureTransparent(textureRect, selectedSprite.texture, ScaleMode.ScaleToFit);
@@ -247,8 +317,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     DrawOutline(rectWithAlphaBorders);
                     break;
             }
-
-            GUILayout.EndArea();
         }
 
         private void DrawOutline(Rect rectWithAlphaBorders)
