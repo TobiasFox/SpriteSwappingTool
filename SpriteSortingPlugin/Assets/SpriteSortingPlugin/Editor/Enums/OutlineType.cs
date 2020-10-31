@@ -1,6 +1,6 @@
 ﻿namespace SpriteSortingPlugin
 {
-    public enum AlphaAnalysisType
+    public enum OutlineType
     {
         OOBB,
         Outline,

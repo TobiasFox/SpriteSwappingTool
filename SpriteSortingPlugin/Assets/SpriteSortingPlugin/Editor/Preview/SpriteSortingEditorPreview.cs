@@ -17,6 +17,7 @@ namespace SpriteSortingPlugin.Preview
         private bool isSceneVisualizingDelegateIsAdded;
         private OverlappingItems overlappingItems;
         private SpriteAlphaData spriteAlphaData;
+        private OutlineType outlineType;
 
         public bool IsVisualizingBoundsInScene => isVisualizingBoundsInScene;
 
@@ -28,6 +29,11 @@ namespace SpriteSortingPlugin.Preview
         public void UpdateSpriteAlphaData(SpriteAlphaData spriteAlphaData)
         {
             this.spriteAlphaData = spriteAlphaData;
+        }
+
+        public void UpdateOutlineType(OutlineType outlineType)
+        {
+            this.outlineType = outlineType;
         }
 
         public void DoPreview(bool isUpdatePreview)
@@ -211,19 +217,70 @@ namespace SpriteSortingPlugin.Preview
             {
                 Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
 
-                if (isUsingSpriteAlphaData &&
-                    spriteAlphaData.objectOrientedBoundingBoxDictionary.TryGetValue(item.SpriteAssetGuid,
-                        out var objectOrientedBoundingBox))
-                {
-                    objectOrientedBoundingBox.UpdateBox(item.originSpriteRenderer.transform);
-                    var oobbPoints = objectOrientedBoundingBox.Points;
+                var isDrawingSpriteBounds = false;
 
-                    Handles.DrawLine(oobbPoints[0], oobbPoints[1]);
-                    Handles.DrawLine(oobbPoints[1], oobbPoints[2]);
-                    Handles.DrawLine(oobbPoints[2], oobbPoints[3]);
-                    Handles.DrawLine(oobbPoints[3], oobbPoints[0]);
+                if (isUsingSpriteAlphaData)
+                {
+                    var hasSpriteDataItem = spriteAlphaData.spriteDataDictionary.TryGetValue(
+                        item.SpriteAssetGuid, out var spriteDataItem);
+
+                    if (hasSpriteDataItem)
+                    {
+                        var itemTransform = item.originSpriteRenderer.transform;
+                        
+                        switch (outlineType)
+                        {
+                            case OutlineType.OOBB:
+
+                                if (spriteDataItem.objectOrientedBoundingBox != null)
+                                {
+                                    spriteDataItem.objectOrientedBoundingBox.UpdateBox(itemTransform);
+                                    var oobbPoints = spriteDataItem.objectOrientedBoundingBox.Points;
+
+                                    Handles.DrawLine(oobbPoints[0], oobbPoints[1]);
+                                    Handles.DrawLine(oobbPoints[1], oobbPoints[2]);
+                                    Handles.DrawLine(oobbPoints[2], oobbPoints[3]);
+                                    Handles.DrawLine(oobbPoints[3], oobbPoints[0]);
+                                }
+                                else
+                                {
+                                    isDrawingSpriteBounds = true;
+                                }
+
+                                break;
+                            case OutlineType.Outline:
+                                if (spriteDataItem.outlinePoints != null && spriteDataItem.outlinePoints.Count >= 2)
+                                {
+                                    var lastPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[0]);
+                                    for (var i = 1; i < spriteDataItem.outlinePoints.Count; i++)
+                                    {
+                                        var nextPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[i]);
+                                        Handles.DrawLine(lastPoint, nextPoint);
+                                        lastPoint = nextPoint;
+                                    }
+                                }
+                                else
+                                {
+                                    isDrawingSpriteBounds = true;
+                                }
+
+                                break;
+                            default:
+                                isDrawingSpriteBounds = true;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        isDrawingSpriteBounds = true;
+                    }
                 }
                 else
+                {
+                    isDrawingSpriteBounds = true;
+                }
+
+                if (isDrawingSpriteBounds)
                 {
                     var bounds = item.originSpriteRenderer.bounds;
                     Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));

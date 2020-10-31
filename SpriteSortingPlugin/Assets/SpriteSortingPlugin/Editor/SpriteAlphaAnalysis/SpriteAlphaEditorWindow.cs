@@ -36,7 +36,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
-        private AlphaAnalysisType alphaAnalysisType;
+        private OutlineType outlineType;
 
         // private ObjectOrientedBoundingBoxComponent oobbComponent;
         private SpriteDataItem selectedSpriteDataItem;
@@ -138,8 +138,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     ResetSpriteList();
                 }
 
-                alphaAnalysisType =
-                    (AlphaAnalysisType) EditorGUILayout.EnumPopup("Type of Alpha Analyses", alphaAnalysisType);
+                outlineType =
+                    (OutlineType) EditorGUILayout.EnumPopup("Type of Alpha Analyses", outlineType);
 
                 if (GUILayout.Button("Analyze Alpha of Sprites"))
                 {
@@ -414,12 +414,14 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 spriteAlphaAnalyzer = new SpriteAlphaAnalyzer();
             }
 
-            spriteAlphaData = CreateInstance<SpriteAlphaData>();
             reorderableSpriteList.index = -1;
+            selectedSpriteDataItem = null;
             spriteList.Clear();
+            
+            spriteAlphaData = CreateInstance<SpriteAlphaData>();
 
             GenerateSpriteDataItems();
-            spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteAlphaData, alphaAnalysisType);
+            spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteAlphaData, outlineType);
 
             var assetPathAndName =
                 AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteAlphaData) + ".asset");

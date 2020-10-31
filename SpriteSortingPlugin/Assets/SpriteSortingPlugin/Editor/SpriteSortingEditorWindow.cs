@@ -18,7 +18,7 @@ namespace SpriteSortingPlugin
 
         private bool useSpriteAlphaOutline = true;
         [SerializeField] private SpriteAlphaData spriteAlphaData;
-        [SerializeField] private AlphaAnalysisType alphaAnalysisType;
+        [SerializeField] private OutlineType outlineType;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -195,9 +195,12 @@ namespace SpriteSortingPlugin
 
                 EditorGUILayout.EndHorizontal();
 
-                alphaAnalysisType =
-                    (AlphaAnalysisType) EditorGUILayout.EnumPopup("Overlapping SpriteRenderer Detecting Type",
-                        alphaAnalysisType);
+                EditorGUI.BeginChangeCheck();
+                outlineType = (OutlineType) EditorGUILayout.EnumPopup("Outline Type", outlineType);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    preview.UpdateOutlineType(outlineType);
+                }
 
                 EditorGUI.indentLevel--;
             }
@@ -343,7 +346,7 @@ namespace SpriteSortingPlugin
             }
 
             var sortingOptions = SpriteSortingUtility.AnalyzeSurroundingSprites(cameraProjectionType,
-                overlappingItems.Items, spriteAlphaData, alphaAnalysisType);
+                overlappingItems.Items, spriteAlphaData, outlineType);
 
             foreach (var sortingOption in sortingOptions)
             {
@@ -462,11 +465,11 @@ namespace SpriteSortingPlugin
                     }
 
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayerIds,
-                        gameObjectParents, spriteAlphaData, alphaAnalysisType);
+                        gameObjectParents, spriteAlphaData, outlineType);
                     break;
                 case SortingType.Sprite:
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer,
-                        spriteAlphaData, alphaAnalysisType);
+                        spriteAlphaData, outlineType);
                     break;
             }
 

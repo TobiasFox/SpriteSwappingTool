@@ -15,7 +15,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         public int CurrentProgress => currentProgress;
 
         public void AddAlphaShapeToSpriteAlphaData(ref SpriteAlphaData spriteAlphaData,
-            AlphaAnalysisType alphaAnalysisType)
+            OutlineType outlineType)
         {
             var assetGuidList = new List<string>(spriteAlphaData.spriteDataDictionary.Keys);
             foreach (var assetGuid in assetGuidList)
@@ -36,19 +36,19 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     }
                 }
 
-                switch (alphaAnalysisType)
+                switch (outlineType)
                 {
-                    case AlphaAnalysisType.OOBB:
+                    case OutlineType.OOBB:
                         var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
                         spriteDataItem.objectOrientedBoundingBox = oobb;
                         // currentProgress++;
                         break;
-                    case AlphaAnalysisType.Outline:
+                    case OutlineType.Outline:
                         var colliderPoints = GenerateAlphaOutline(sprite);
                         spriteDataItem.outlinePoints = colliderPoints;
                         // currentProgress++;
                         break;
-                    case AlphaAnalysisType.Both:
+                    case OutlineType.Both:
                         var oobb2 = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
                         spriteDataItem.objectOrientedBoundingBox = oobb2;
 
