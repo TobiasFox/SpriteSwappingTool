@@ -217,79 +217,70 @@ namespace SpriteSortingPlugin.Preview
             {
                 Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
 
-                var isDrawingSpriteBounds = false;
-
                 if (isUsingSpriteAlphaData)
                 {
-                    var hasSpriteDataItem = spriteAlphaData.spriteDataDictionary.TryGetValue(
-                        item.SpriteAssetGuid, out var spriteDataItem);
+                    var hasSpriteDataItem =
+                        spriteAlphaData.spriteDataDictionary.TryGetValue(item.SpriteAssetGuid, out var spriteDataItem);
 
-                    if (hasSpriteDataItem)
+                    if (hasSpriteDataItem && CanDrawOutlineType(spriteDataItem))
                     {
-                        var itemTransform = item.originSpriteRenderer.transform;
-                        
-                        switch (outlineType)
-                        {
-                            case OutlineType.OOBB:
-
-                                if (spriteDataItem.objectOrientedBoundingBox != null)
-                                {
-                                    spriteDataItem.objectOrientedBoundingBox.UpdateBox(itemTransform);
-                                    var oobbPoints = spriteDataItem.objectOrientedBoundingBox.Points;
-
-                                    Handles.DrawLine(oobbPoints[0], oobbPoints[1]);
-                                    Handles.DrawLine(oobbPoints[1], oobbPoints[2]);
-                                    Handles.DrawLine(oobbPoints[2], oobbPoints[3]);
-                                    Handles.DrawLine(oobbPoints[3], oobbPoints[0]);
-                                }
-                                else
-                                {
-                                    isDrawingSpriteBounds = true;
-                                }
-
-                                break;
-                            case OutlineType.Outline:
-                                if (spriteDataItem.outlinePoints != null && spriteDataItem.outlinePoints.Count >= 2)
-                                {
-                                    var lastPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[0]);
-                                    for (var i = 1; i < spriteDataItem.outlinePoints.Count; i++)
-                                    {
-                                        var nextPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[i]);
-                                        Handles.DrawLine(lastPoint, nextPoint);
-                                        lastPoint = nextPoint;
-                                    }
-                                }
-                                else
-                                {
-                                    isDrawingSpriteBounds = true;
-                                }
-
-                                break;
-                            default:
-                                isDrawingSpriteBounds = true;
-                                break;
-                        }
+                        DrawOutline(spriteDataItem, item.originSpriteRenderer.transform);
                     }
                     else
                     {
-                        isDrawingSpriteBounds = true;
+                        var bounds = item.originSpriteRenderer.bounds;
+                        Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
                     }
                 }
-                else
-                {
-                    isDrawingSpriteBounds = true;
-                }
 
-                if (isDrawingSpriteBounds)
+                if (overlappingItems.Items.Count > 0)
                 {
-                    var bounds = item.originSpriteRenderer.bounds;
-                    Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
+                    sceneView.Repaint();
                 }
             }
+        }
 
-            if (overlappingItems.Items.Count > 0)
+        private void DrawOutline(SpriteDataItem spriteDataItem, Transform itemTransform)
+        {
+            switch (outlineType)
             {
-                sceneView.Repaint();
+                case OutlineType.OOBB:
+                    spriteDataItem.objectOrientedBoundingBox.UpdateBox(itemTransform);
+                    var oobbPoints = spriteDataItem.objectOrientedBoundingBox.Points;
+
+                    Handles.DrawLine(oobbPoints[0], oobbPoints[1]);
+                    Handles.DrawLine(oobbPoints[1], oobbPoints[2]);
+                    Handles.DrawLine(oobbPoints[2], oobbPoints[3]);
+                    Handles.DrawLine(oobbPoints[3], oobbPoints[0]);
+                    break;
+                case OutlineType.Outline:
+                    var lastPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[0]);
+                    for (var i = 1; i < spriteDataItem.outlinePoints.Count; i++)
+                    {
+                        var nextPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[i]);
+                        Handles.DrawLine(lastPoint, nextPoint);
+                        lastPoint = nextPoint;
+                    }
+
+                    break;
+            }
+        }
+
+        private bool CanDrawOutlineType(SpriteDataItem spriteDataItem)
+        {
+            if (spriteDataItem == null)
+            {
+                return false;
+            }
+
+            switch (outlineType)
+            {
+                case OutlineType.OOBB:
+                    return spriteDataItem.IsValidOOBB();
+                case OutlineType.Outline:
+                    return spriteDataItem.IsValidOutline();
+                default:
+                    return false;
             }
         }
 

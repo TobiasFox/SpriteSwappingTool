@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 {
-    public class SpriteOutlineAnalysis
+    public class SpriteOutlineAnalyzer
     {
         private int startPixelIndex;
         private PixelDirection startPixelEntryDirection;
@@ -55,7 +55,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
             var neighbourOfBoundaryPointIndex =
                 PixelDirectionUtility.GetIndexOfPixelDirection(startPixelIndex, pixelDirectionToCheck);
-            var counter = 0;
+            // var counter = 0;
 
             while (neighbourOfBoundaryPointIndex != startPixelIndex)
             {
@@ -92,7 +92,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                         PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
                 }
 
-                counter++;
+                // counter++;
             }
 
             return pointList;

@@ -11,12 +11,18 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private int totalProgress;
         private int currentProgress;
+        private SpriteOutlineAnalyzer outlineAnalyzer;
 
         public int CurrentProgress => currentProgress;
 
         public void AddAlphaShapeToSpriteAlphaData(ref SpriteAlphaData spriteAlphaData,
             OutlineType outlineType)
         {
+            if (outlineType == OutlineType.Nothing)
+            {
+                return;
+            }
+
             var assetGuidList = new List<string>(spriteAlphaData.spriteDataDictionary.Keys);
             foreach (var assetGuid in assetGuidList)
             {
@@ -36,27 +42,39 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     }
                 }
 
-                switch (outlineType)
+                if (outlineType.HasFlag(OutlineType.OOBB))
                 {
-                    case OutlineType.OOBB:
-                        var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
-                        spriteDataItem.objectOrientedBoundingBox = oobb;
-                        // currentProgress++;
-                        break;
-                    case OutlineType.Outline:
-                        var colliderPoints = GenerateAlphaOutline(sprite);
-                        spriteDataItem.outlinePoints = colliderPoints;
-                        // currentProgress++;
-                        break;
-                    case OutlineType.Both:
-                        var oobb2 = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
-                        spriteDataItem.objectOrientedBoundingBox = oobb2;
-
-                        var colliderPoints2 = GenerateAlphaOutline(sprite);
-                        spriteDataItem.outlinePoints = colliderPoints2;
-                        // currentProgress+=2;
-                        break;
+                    var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
+                    spriteDataItem.objectOrientedBoundingBox = oobb;
                 }
+
+                if (outlineType.HasFlag(OutlineType.Outline))
+                {
+                    var colliderPoints = GenerateAlphaOutline(sprite);
+                    spriteDataItem.outlinePoints = colliderPoints;
+                }
+
+                // switch (outlineType)
+                // {
+                //     case OutlineType.OOBB:
+                //         var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
+                //         spriteDataItem.objectOrientedBoundingBox = oobb;
+                //         // currentProgress++;
+                //         break;
+                //     case OutlineType.Outline:
+                //         var colliderPoints = GenerateAlphaOutline(sprite);
+                //         spriteDataItem.outlinePoints = colliderPoints;
+                //         // currentProgress++;
+                //         break;
+                //     case OutlineType.Both:
+                //         var oobb2 = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
+                //         spriteDataItem.objectOrientedBoundingBox = oobb2;
+                //
+                //         var colliderPoints2 = GenerateAlphaOutline(sprite);
+                //         spriteDataItem.outlinePoints = colliderPoints2;
+                //         // currentProgress+=2;
+                //         break;
+                // }
 
                 spriteAlphaData.spriteDataDictionary[assetGuid] = spriteDataItem;
 
@@ -103,7 +121,11 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private List<Vector2> GenerateAlphaOutline(Sprite sprite)
         {
-            var outlineAnalyzer = new SpriteOutlineAnalysis();
+            if (outlineAnalyzer == null)
+            {
+                outlineAnalyzer = new SpriteOutlineAnalyzer();
+            }
+
             var points = outlineAnalyzer.Analyze(sprite);
             return points;
         }

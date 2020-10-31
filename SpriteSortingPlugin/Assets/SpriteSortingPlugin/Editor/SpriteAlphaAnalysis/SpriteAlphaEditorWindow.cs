@@ -132,14 +132,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     isShowingSpriteAlphaGUI = true;
                 }
 
+                //TODO remove
                 if (GUILayout.Button("Reset List"))
                 {
-                    // Debug.Log("Save sprite Alpha Data");
                     ResetSpriteList();
                 }
 
-                outlineType =
-                    (OutlineType) EditorGUILayout.EnumPopup("Type of Alpha Analyses", outlineType);
+                outlineType = (OutlineType) EditorGUILayout.EnumFlagsField("Outline Type", outlineType);
 
                 if (GUILayout.Button("Analyze Alpha of Sprites"))
                 {
@@ -204,13 +203,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             GUILayout.BeginArea(rightAreaRect, new GUIStyle {normal = {background = Texture2D.whiteTexture}});
 
-            // if (reorderableSpriteList.index == -1)
-            // {
-            //     GUILayout.EndArea();
-            //     return;
-            // }
-
-            // EditorGUI.BeginChangeCheck();
             // testSprite =
             //     EditorGUILayout.ObjectField("test", testSprite, typeof(Sprite), false,
             //             GUILayout.Height(EditorGUIUtility.singleLineHeight)) as
@@ -396,11 +388,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             }
 
             spriteList.Clear();
-            // foreach (var objectOrientedBoundingBox in spriteAlphaData.objectOrientedBoundingBoxDictionary.Values)
-            // {
-            //     spriteList.Add(objectOrientedBoundingBox);
-            // }
-
             foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
             {
                 spriteList.Add(spriteDataItem);
@@ -409,6 +396,11 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void AnalyzeSpriteAlphas()
         {
+            if (outlineType == OutlineType.Nothing)
+            {
+                return;
+            }
+
             if (spriteAlphaAnalyzer == null)
             {
                 spriteAlphaAnalyzer = new SpriteAlphaAnalyzer();
@@ -491,7 +483,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private void DrawElementCallBack(Rect rect, int index, bool isactive, bool isfocused)
         {
             var oobb = spriteList[index];
-            EditorGUI.LabelField(rect, oobb.assetName);
+            EditorGUI.LabelField(rect, oobb.AssetName);
         }
 
         private void OnSpriteSelected(ReorderableList list)
@@ -503,7 +495,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             selectedSpriteDataItem = spriteList[list.index];
 
-            var path = AssetDatabase.GUIDToAssetPath(selectedSpriteDataItem.assetGuid);
+            var path = AssetDatabase.GUIDToAssetPath(selectedSpriteDataItem.AssetGuid);
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
             selectedSprite = sprite;

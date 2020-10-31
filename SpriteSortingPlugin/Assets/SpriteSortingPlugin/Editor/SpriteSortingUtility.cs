@@ -273,57 +273,24 @@ namespace SpriteSortingPlugin
 
                 if (hasSortingComponentToCheckSpriteDataItem)
                 {
-                    switch (outlineType)
+                    if (outlineType.HasFlag(OutlineType.OOBB) && spriteDataItem.IsValidOOBB())
                     {
-                        case OutlineType.OOBB:
-                            if (spriteDataItem.objectOrientedBoundingBox != null)
-                            {
-                                oobbToCheck = spriteDataItem.objectOrientedBoundingBox;
-                                oobbToCheck.UpdateBox(sortingComponentToCheck.spriteRenderer.transform);
-                            }
+                        oobbToCheck = spriteDataItem.objectOrientedBoundingBox;
+                        oobbToCheck.UpdateBox(sortingComponentToCheck.spriteRenderer.transform);
+                    }
 
-                            break;
-                        case OutlineType.Outline:
+                    if (outlineType.HasFlag(OutlineType.Outline) && spriteDataItem.IsValidOutline())
+                    {
+                        var polyColliderGameObject =
+                            new GameObject("ToCheck- PolygonCollider " + sortingComponentToCheck.spriteRenderer.name);
 
-                            if (spriteDataItem.outlinePoints != null)
-                            {
-                                var polyColliderGameObject = new GameObject("ToCheck- PolygonCollider " +
-                                                                            sortingComponentToCheck.spriteRenderer
-                                                                                .name);
+                        var currentTransform = sortingComponentToCheck.spriteRenderer.transform;
+                        polyColliderGameObject.transform.SetPositionAndRotation(
+                            currentTransform.position, currentTransform.rotation);
+                        polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
 
-                                var currentTransform = sortingComponentToCheck.spriteRenderer.transform;
-                                polyColliderGameObject.transform.SetPositionAndRotation(
-                                    currentTransform.position, currentTransform.rotation);
-                                polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
-
-                                polygonColliderToCheck = polyColliderGameObject.AddComponent<PolygonCollider2D>();
-                                polygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
-                            }
-
-                            break;
-                        case OutlineType.Both:
-                            if (spriteDataItem.objectOrientedBoundingBox != null)
-                            {
-                                oobbToCheck = spriteDataItem.objectOrientedBoundingBox;
-                                oobbToCheck.UpdateBox(sortingComponentToCheck.spriteRenderer.transform);
-                            }
-
-                            if (spriteDataItem.outlinePoints != null)
-                            {
-                                var polyColliderGameObject = new GameObject("ToCheck- PolygonCollider " +
-                                                                            sortingComponentToCheck.spriteRenderer
-                                                                                .name);
-
-                                var currentTransform = sortingComponentToCheck.spriteRenderer.transform;
-                                polyColliderGameObject.transform.SetPositionAndRotation(
-                                    currentTransform.position, currentTransform.rotation);
-                                polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
-
-                                polygonColliderToCheck = polyColliderGameObject.AddComponent<PolygonCollider2D>();
-                                polygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
-                            }
-
-                            break;
+                        polygonColliderToCheck = polyColliderGameObject.AddComponent<PolygonCollider2D>();
+                        polygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
                     }
                 }
             }
@@ -379,101 +346,52 @@ namespace SpriteSortingPlugin
                         if (hasSortingComponentSpriteDataItem)
                         {
                             var currentTransform = sortingComponent.spriteRenderer.transform;
-                            switch (outlineType)
+
+                            if (outlineType.HasFlag(OutlineType.Outline) && spriteDataItem.IsValidOutline())
                             {
-                                case OutlineType.OOBB:
+                                //TODO destroy polyColliderGameObject
+                                var polyColliderGameObject =
+                                    new GameObject("PolygonCollider " + sortingComponent.spriteRenderer.name);
+                                polyColliderGameObject.transform.SetPositionAndRotation(
+                                    currentTransform.position, currentTransform.rotation);
+                                polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
 
-                                    if (spriteDataItem.objectOrientedBoundingBox != null)
-                                    {
-                                        var otherOOBB = spriteDataItem.objectOrientedBoundingBox;
+                                var otherPolygonColliderToCheck =
+                                    polyColliderGameObject.AddComponent<PolygonCollider2D>();
+                                otherPolygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
 
-                                        if (oobbToCheck == otherOOBB)
-                                        {
-                                            otherOOBB = (ObjectOrientedBoundingBox) otherOOBB.Clone();
-                                        }
+                                var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
 
-                                        otherOOBB.UpdateBox(currentTransform);
+                                // Object.DestroyImmediate(polyColliderGameObject);
 
-                                        var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, otherOOBB);
+                                // Debug.DrawLine(distance.pointA,
+                                //     new Vector3(distance.pointA.x, distance.pointA.y, -15), Color.blue, 3);
+                                // Debug.DrawLine(distance.pointB,
+                                //     new Vector3(distance.pointB.x, distance.pointB.y, -15), Color.cyan, 3);
+                                // Debug.DrawLine(distance.pointA, distance.pointB, Color.green);
+                                if (!distance.isOverlapped)
+                                {
+                                    continue;
+                                }
+                            }
 
-                                        if (!isOverlapping)
-                                        {
-                                            continue;
-                                        }
-                                    }
+                            if (outlineType.HasFlag(OutlineType.OOBB) && spriteDataItem.IsValidOOBB())
+                            {
+                                var otherOOBB = spriteDataItem.objectOrientedBoundingBox;
 
-                                    break;
-                                case OutlineType.Outline:
+                                if (oobbToCheck == otherOOBB)
+                                {
+                                    otherOOBB = (ObjectOrientedBoundingBox) otherOOBB.Clone();
+                                }
 
-                                    if (spriteDataItem.outlinePoints != null)
-                                    {
-                                        //TODO destroy polyColliderGameObject
-                                        var polyColliderGameObject =
-                                            new GameObject("PolygonCollider " + sortingComponent.spriteRenderer.name);
-                                        polyColliderGameObject.transform.SetPositionAndRotation(
-                                            currentTransform.position, currentTransform.rotation);
-                                        polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
+                                otherOOBB.UpdateBox(currentTransform);
 
-                                        var otherPolygonColliderToCheck =
-                                            polyColliderGameObject.AddComponent<PolygonCollider2D>();
-                                        otherPolygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
+                                var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, otherOOBB);
 
-                                        var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
-
-                                        // Object.DestroyImmediate(polyColliderGameObject);
-
-                                        // Debug.DrawLine(distance.pointA,
-                                        //     new Vector3(distance.pointA.x, distance.pointA.y, -15), Color.blue, 3);
-                                        // Debug.DrawLine(distance.pointB,
-                                        //     new Vector3(distance.pointB.x, distance.pointB.y, -15), Color.cyan, 3);
-                                        // Debug.DrawLine(distance.pointA, distance.pointB, Color.green);
-                                        if (!distance.isOverlapped)
-                                        {
-                                            continue;
-                                        }
-                                    }
-
-                                    break;
-                                case OutlineType.Both:
-                                    if (spriteDataItem.objectOrientedBoundingBox != null)
-                                    {
-                                        var otherOOBB = spriteDataItem.objectOrientedBoundingBox;
-
-                                        if (oobbToCheck == otherOOBB)
-                                        {
-                                            otherOOBB = (ObjectOrientedBoundingBox) otherOOBB.Clone();
-                                        }
-
-                                        otherOOBB.UpdateBox(currentTransform);
-
-                                        var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, otherOOBB);
-
-                                        if (!isOverlapping)
-                                        {
-                                            continue;
-                                        }
-                                    }
-
-                                    if (spriteDataItem.outlinePoints != null)
-                                    {
-                                        var polyColliderGameObject =
-                                            new GameObject("PolygonCollider " + sortingComponent.spriteRenderer.name);
-                                        polyColliderGameObject.transform.SetPositionAndRotation(
-                                            currentTransform.position, currentTransform.rotation);
-                                        polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
-
-                                        var otherPolygonColliderToCheck =
-                                            polyColliderGameObject.AddComponent<PolygonCollider2D>();
-                                        otherPolygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
-
-                                        var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
-                                        if (!distance.isOverlapped)
-                                        {
-                                            continue;
-                                        }
-                                    }
-
-                                    break;
+                                if (!isOverlapping)
+                                {
+                                    continue;
+                                }
                             }
                         }
                     }

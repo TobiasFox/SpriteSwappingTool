@@ -35,7 +35,7 @@ namespace SpriteSortingPlugin
                 var assetGuid1 =
                     AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID()));
 
-                var oobb = spriteAlphaData.objectOrientedBoundingBoxDictionary[assetGuid1];
+                var oobb = spriteAlphaData.spriteDataDictionary[assetGuid1].objectOrientedBoundingBox;
                 if (i == 1 && oobb == oobbs[0])
                 {
                     oobb = new ObjectOrientedBoundingBox(oobb);

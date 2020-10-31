@@ -7,8 +7,6 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class ObjectOrientedBoundingBox : ISerializationCallbackReceiver, ICloneable
     {
-        public string assetGuid;
-        public string assetName;
         [SerializeField, HideInInspector] private Vector2[] localWorldPoints = new Vector2[4];
         [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
@@ -56,9 +54,6 @@ namespace SpriteSortingPlugin
 
         public ObjectOrientedBoundingBox(ObjectOrientedBoundingBox otherOOBB)
         {
-            assetGuid = (string) otherOOBB.assetGuid.Clone();
-            assetName = (string) otherOOBB.assetName.Clone();
-
             zRotation = otherOOBB.zRotation;
             rotation = Quaternion.Euler(0, 0, zRotation);
             alphaRectangleBorder = (AlphaRectangleBorder) otherOOBB.alphaRectangleBorder.Clone();
