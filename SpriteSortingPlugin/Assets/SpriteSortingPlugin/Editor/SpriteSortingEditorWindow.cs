@@ -37,10 +37,6 @@ namespace SpriteSortingPlugin
         private bool analyzeButtonWasClicked;
         private ReordableOverlappingItemList reordableOverlappingItemList;
 
-        private ReorderableList reordableListForSortingGroup;
-        private List<OverlappingItem> itemsForSortingGroup;
-        private bool isCreatingNewSortingGroup;
-
         private bool isAnalyzingWithChangedLayerFirst;
 
         [MenuItem("Window/Sprite Sorting %q")]
@@ -146,11 +142,6 @@ namespace SpriteSortingPlugin
                 if (result.overlappingItems != null && result.overlappingItems.Count > 0)
                 {
                     reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
-                }
-
-                if (itemsForSortingGroup != null)
-                {
-                    InitReordableListForNewSortingGroup();
                 }
             }
 
@@ -265,7 +256,7 @@ namespace SpriteSortingPlugin
                 return;
             }
 
-            if (result.overlappingItems == null || (result.overlappingItems.Count <= 0 && itemsForSortingGroup == null))
+            if (result.overlappingItems == null || (result.overlappingItems.Count <= 0))
                 // if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
             {
                 GUILayout.Label(
@@ -279,24 +270,6 @@ namespace SpriteSortingPlugin
             }
 
             reordableOverlappingItemList.DoLayoutList();
-
-            isCreatingNewSortingGroup =
-                EditorGUILayout.Foldout(isCreatingNewSortingGroup, "Create new Sorting Group?", true);
-
-            if (isCreatingNewSortingGroup)
-            {
-                EditorGUI.indentLevel++;
-                var rectForReordableList =
-                    EditorGUILayout.GetControlRect(false, reordableListForSortingGroup.GetHeight());
-                reordableListForSortingGroup.DoList(new Rect(rectForReordableList.x + 12.5f, rectForReordableList.y,
-                    rectForReordableList.width - 12.5f, rectForReordableList.height));
-
-                EditorGUI.indentLevel--;
-            }
-            else
-            {
-                EditorGUILayout.Space();
-            }
 
             EditorGUILayout.Space();
 
@@ -387,16 +360,6 @@ namespace SpriteSortingPlugin
         private void CleanUpReordableList()
         {
             reordableOverlappingItemList?.CleanUp();
-
-            if (reordableListForSortingGroup == null)
-            {
-                return;
-            }
-
-            reordableListForSortingGroup.drawHeaderCallback = null;
-            reordableListForSortingGroup.drawElementCallback = null;
-
-            reordableListForSortingGroup = null;
         }
 
         private void ShowSortingLayers()
@@ -490,116 +453,6 @@ namespace SpriteSortingPlugin
             preview.UpdateOverlappingItems(overlappingItems);
             preview.UpdateSpriteAlphaData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
-
-            if (result.overlappingItems.Count > 1)
-            {
-                InitReordableListForNewSortingGroup();
-            }
-        }
-
-        private void InitReordableListForNewSortingGroup()
-        {
-            itemsForSortingGroup = new List<OverlappingItem>();
-            reordableListForSortingGroup = new ReorderableList(itemsForSortingGroup,
-                typeof(OverlappingItem), true, true, false, true)
-            {
-                drawHeaderCallback = DrawHeaderForNewSortingGroupCallback,
-                drawElementCallback = DrawElementForNewSortingGroupCallback
-            };
-        }
-
-        private void DrawElementForNewSortingGroupCallback(Rect rect, int index, bool isActive, bool isFocused)
-        {
-            var element = itemsForSortingGroup[index];
-            bool isPreviewUpdating = false;
-            bool isCurrentIndexUpdated = false;
-            rect.y += 2;
-
-            EditorGUI.LabelField(new Rect(rect.x + 15, rect.y, 90, EditorGUIUtility.singleLineHeight),
-                element.originSpriteRenderer.name);
-
-            EditorGUIUtility.labelWidth = 35;
-            EditorGUI.BeginChangeCheck();
-            element.sortingLayerDropDownIndex =
-                EditorGUI.Popup(new Rect(rect.x + 15 + 90 + 10, rect.y, 135, EditorGUIUtility.singleLineHeight),
-                    "Layer", element.sortingLayerDropDownIndex, SortingLayerUtility.SortingLayerNames);
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                element.UpdatePreviewSortingLayer();
-                isPreviewUpdating = true;
-            }
-
-            //TODO: dynamic spacing depending on number of digits of sorting order
-            EditorGUIUtility.labelWidth = 70;
-
-            EditorGUI.BeginChangeCheck();
-            element.sortingOrder =
-                EditorGUI.DelayedIntField(
-                    new Rect(rect.x + 15 + 90 + 10 + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
-                    "Order " + element.originSortingOrder + " +", element.sortingOrder);
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                isPreviewUpdating = true;
-            }
-
-            if (GUI.Button(
-                new Rect(rect.x + 15 + 90 + 10 + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
-                "+1"))
-            {
-                element.sortingOrder++;
-                isPreviewUpdating = true;
-            }
-
-            if (GUI.Button(
-                new Rect(rect.x + 15 + 90 + 10 + 135 + 10 + 120 + 10 + 25 + 10, rect.y, 25,
-                    EditorGUIUtility.singleLineHeight), "-1"))
-            {
-                element.sortingOrder--;
-                isPreviewUpdating = true;
-            }
-
-            if (GUI.Button(
-                new Rect(rect.x + 15 + 90 + 10 + 135 + 10 + 120 + 10 + 25 + 10 + 25 + 10, rect.y, 55,
-                    EditorGUIUtility.singleLineHeight), "Select"))
-            {
-                Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
-                SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
-            }
-
-            if (isPreviewUpdating)
-            {
-                if (!isCurrentIndexUpdated)
-                {
-                    reordableListForSortingGroup.index = index;
-                }
-
-                // OnSelectCallback(reordableSpriteSortingList);
-
-                preview.UpdatePreviewEditor();
-            }
-        }
-
-        private void DrawHeaderForNewSortingGroupCallback(Rect rect)
-        {
-            EditorGUI.LabelField(rect, "Items For new Sorting Group");
-
-            var hasElements = itemsForSortingGroup != null && itemsForSortingGroup.Count > 0;
-
-            if (!hasElements)
-            {
-                EditorGUI.BeginDisabledGroup(true);
-            }
-
-            if (GUI.Button(new Rect(rect.width - 53, rect.y, 80, EditorGUIUtility.singleLineHeight), "Remove All"))
-            {
-            }
-
-            if (!hasElements)
-            {
-                EditorGUI.EndDisabledGroup();
-            }
         }
 
         private void OnDisable()
