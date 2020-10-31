@@ -2,6 +2,7 @@
 {
     public static class PixelDirectionUtility
     {
+        public const int PixelDirections = 8;
         public static int spriteWidth;
 
         public static int GetIndexOfPixelDirection(int currentPixelIndex, PixelDirection pixelDirection)
@@ -39,7 +40,7 @@
 
         public static PixelDirection GetNextPixelDirectionClockWise(PixelDirection currentPixelDirection)
         {
-            return (PixelDirection) ((((int) currentPixelDirection) + 7) % 8);
+            return GetDirectionWithOffset(currentPixelDirection, 7);
         }
 
         public static PixelDirection GetBacktracedPixelDirectionClockWise(PixelDirection currentPixelDirection,
@@ -62,7 +63,7 @@
             var counter = 0;
 
             var tempDirection = (PixelDirection) ((int) startPixelDirection);
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < PixelDirections; i++)
             {
                 if (tempDirection == currentPixelDirection)
                 {
@@ -96,7 +97,7 @@
 
         private static PixelDirection GetDirectionWithOffset(PixelDirection currentPixelDirection, int offset)
         {
-            return (PixelDirection) (((int) currentPixelDirection + offset) % 8);
+            return (PixelDirection) (((int) currentPixelDirection + offset) % PixelDirections);
         }
 
         public static PixelDirection GetOppositePixelDirection(PixelDirection currentPixelDirection)

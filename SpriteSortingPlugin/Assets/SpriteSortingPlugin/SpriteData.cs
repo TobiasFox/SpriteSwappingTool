@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SpriteSortingPlugin
 {
     // [CreateAssetMenu(fileName = "Data")]
-    public class SpriteAlphaData : ScriptableObject, ISerializationCallbackReceiver
+    public class SpriteData : ScriptableObject, ISerializationCallbackReceiver
     {
         [SerializeField] private List<SpriteDataItem> spriteDataList = new List<SpriteDataItem>();
 

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 {
-    public class SpriteAlphaEditorWindow : EditorWindow
+    public class SpriteDataEditorWindow : EditorWindow
     {
         private const int MinWidthRightContentBar = 200;
         private const float LineSpacing = 1.5f;
@@ -17,7 +17,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private SerializedObject serializedObject;
 
-        [SerializeField] private SpriteAlphaData spriteAlphaData;
+        [SerializeField] private SpriteData spriteData;
         private Sprite selectedSprite;
         private float selectedSpriteAspectRatio;
 
@@ -36,7 +36,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
-        private OutlineType outlineType;
+        private OutlineAnalysisType outlineType;
 
         // private ObjectOrientedBoundingBoxComponent oobbComponent;
         private SpriteDataItem selectedSpriteDataItem;
@@ -44,7 +44,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
         {
-            var window = GetWindow<SpriteAlphaEditorWindow>();
+            var window = GetWindow<SpriteDataEditorWindow>();
             window.Show();
         }
 
@@ -68,8 +68,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             try
             {
                 var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
-                spriteAlphaData =
-                    AssetDatabase.LoadAssetAtPath<SpriteAlphaData>(AssetDatabase.GUIDToAssetPath(guids[0]));
+                spriteData =
+                    AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
             }
             catch (Exception e)
             {
@@ -121,9 +121,9 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             {
                 EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-                spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"),
-                    spriteAlphaData,
-                    typeof(SpriteAlphaData), false) as SpriteAlphaData;
+                spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
+                    spriteData,
+                    typeof(SpriteData), false) as SpriteData;
 
                 if (GUILayout.Button("Load"))
                 {
@@ -138,7 +138,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     ResetSpriteList();
                 }
 
-                outlineType = (OutlineType) EditorGUILayout.EnumFlagsField("Outline Type", outlineType);
+                outlineType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField("Outline Type", outlineType);
 
                 if (GUILayout.Button("Analyze Alpha of Sprites"))
                 {
@@ -295,7 +295,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RegisterCompleteObjectUndo(spriteAlphaData, "changed OOBB size");
+                    Undo.RegisterCompleteObjectUndo(spriteData, "changed OOBB size");
                     selectedSpriteDataItem.objectOrientedBoundingBox.UpdateBoxSizeWithBorder();
                 }
 
@@ -382,13 +382,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void LoadSpriteAlphaData()
         {
-            if (spriteAlphaData == null)
+            if (spriteData == null)
             {
                 return;
             }
 
             spriteList.Clear();
-            foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
+            foreach (var spriteDataItem in spriteData.spriteDataDictionary.Values)
             {
                 spriteList.Add(spriteDataItem);
             }
@@ -396,7 +396,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void AnalyzeSpriteAlphas()
         {
-            if (outlineType == OutlineType.Nothing)
+            if (outlineType == OutlineAnalysisType.Nothing)
             {
                 return;
             }
@@ -410,15 +410,15 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             selectedSpriteDataItem = null;
             spriteList.Clear();
             
-            spriteAlphaData = CreateInstance<SpriteAlphaData>();
+            spriteData = CreateInstance<SpriteData>();
 
             GenerateSpriteDataItems();
-            spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteAlphaData, outlineType);
+            spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteData, outlineType);
 
             var assetPathAndName =
-                AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteAlphaData) + ".asset");
+                AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteData) + ".asset");
 
-            AssetDatabase.CreateAsset(spriteAlphaData, assetPathAndName);
+            AssetDatabase.CreateAsset(spriteData, assetPathAndName);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -439,13 +439,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 var path = AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID());
                 var guid = AssetDatabase.AssetPathToGUID(path);
 
-                if (spriteAlphaData.spriteDataDictionary.ContainsKey(guid))
+                if (spriteData.spriteDataDictionary.ContainsKey(guid))
                 {
                     continue;
                 }
 
                 var spriteDataItem = new SpriteDataItem(guid, spriteRenderer.sprite.name);
-                spriteAlphaData.spriteDataDictionary.Add(guid, spriteDataItem);
+                spriteData.spriteDataDictionary.Add(guid, spriteDataItem);
 
                 spriteList.Add(spriteDataItem);
             }

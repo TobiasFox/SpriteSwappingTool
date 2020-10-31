@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteAlphaAnalysis
+namespace SpriteSortingPlugin
 {
     public class SpriteOutlineAnalyzer
     {
@@ -17,8 +17,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         {
             var pointList = AnalyzeSpriteOutline(sprite);
             //TODO flatten colliderPoints
-            
-            
+
+
             pixels = null;
             return pointList;
         }
@@ -56,11 +56,17 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var neighbourOfBoundaryPointIndex =
                 PixelDirectionUtility.GetIndexOfPixelDirection(startPixelIndex, pixelDirectionToCheck);
             // var counter = 0;
+            var neighbourCounter = 0;
 
             while (neighbourOfBoundaryPointIndex != startPixelIndex)
             {
                 if (neighbourOfBoundaryPointIndex == startPixelIndex &&
                     firstEntryDirection == startPixelEntryDirection)
+                {
+                    break;
+                }
+
+                if (neighbourCounter > PixelDirectionUtility.PixelDirections)
                 {
                     break;
                 }
@@ -82,6 +88,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                     neighbourOfBoundaryPointIndex =
                         PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
+                    neighbourCounter = 0;
                 }
                 else
                 {
@@ -90,6 +97,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
                     neighbourOfBoundaryPointIndex =
                         PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
+                    neighbourCounter++;
                 }
 
                 // counter++;

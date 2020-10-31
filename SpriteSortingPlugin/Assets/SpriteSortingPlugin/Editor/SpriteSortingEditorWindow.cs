@@ -17,8 +17,8 @@ namespace SpriteSortingPlugin
         private Vector2 scrollPosition = Vector2.zero;
 
         private bool useSpriteAlphaOutline = true;
-        [SerializeField] private SpriteAlphaData spriteAlphaData;
-        [SerializeField] private OutlineType outlineType;
+        [SerializeField] private SpriteData spriteData;
+        [SerializeField] private OutlinePrecision outlinePrecision;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -66,8 +66,8 @@ namespace SpriteSortingPlugin
             try
             {
                 var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
-                spriteAlphaData =
-                    AssetDatabase.LoadAssetAtPath<SpriteAlphaData>(AssetDatabase.GUIDToAssetPath(guids[0]));
+                spriteData =
+                    AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
             }
             catch (Exception e)
             {
@@ -162,8 +162,11 @@ namespace SpriteSortingPlugin
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
             serializedObject.Update();
 
-            GUILayout.Label("Sprite Sorting", EditorStyles.boldLabel);
-            useSpriteAlphaOutline = EditorGUILayout.BeginToggleGroup("use Sprite Alpha Outline", useSpriteAlphaOutline);
+            var style = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
+            GUILayout.Label("Sprite Sorting", style, GUILayout.ExpandWidth(true));
+
+            useSpriteAlphaOutline = EditorGUILayout.BeginToggleGroup(
+                "use more precise sprite outline than the SpriteRenderers Bounding Box?", useSpriteAlphaOutline);
 
             if (useSpriteAlphaOutline)
             {
@@ -171,11 +174,11 @@ namespace SpriteSortingPlugin
                 EditorGUILayout.BeginHorizontal();
 
                 EditorGUI.BeginChangeCheck();
-                spriteAlphaData = EditorGUILayout.ObjectField(new GUIContent("Sprite Alpha Data Asset"),
-                    spriteAlphaData, typeof(SpriteAlphaData), false) as SpriteAlphaData;
+                spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
+                    spriteData, typeof(SpriteData), false) as SpriteData;
                 if (EditorGUI.EndChangeCheck())
                 {
-                    preview.UpdateSpriteAlphaData(spriteAlphaData);
+                    preview.UpdateSpriteAlphaData(spriteData);
 
                     //TODO select default value
                     // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
@@ -187,19 +190,19 @@ namespace SpriteSortingPlugin
                     // }
                 }
 
-                if (GUILayout.Button("Open Sprite Alpha Editor Window to create the Data"))
+                if (GUILayout.Button("Open Sprite Data editor window to create the data"))
                 {
-                    var spriteAlphaEditorWindow = GetWindow<SpriteAlphaEditorWindow>();
+                    var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
                     spriteAlphaEditorWindow.Show();
                 }
 
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUI.BeginChangeCheck();
-                outlineType = (OutlineType) EditorGUILayout.EnumPopup("Outline Type", outlineType);
+                outlinePrecision = (OutlinePrecision) EditorGUILayout.EnumPopup("Outline Precision", outlinePrecision);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    preview.UpdateOutlineType(outlineType);
+                    preview.UpdateOutlineType(outlinePrecision);
                 }
 
                 EditorGUI.indentLevel--;
@@ -346,7 +349,7 @@ namespace SpriteSortingPlugin
             }
 
             var sortingOptions = SpriteSortingUtility.AnalyzeSurroundingSprites(cameraProjectionType,
-                overlappingItems.Items, spriteAlphaData, outlineType);
+                overlappingItems.Items, spriteData, outlinePrecision);
 
             foreach (var sortingOption in sortingOptions)
             {
@@ -465,11 +468,11 @@ namespace SpriteSortingPlugin
                     }
 
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayerIds,
-                        gameObjectParents, spriteAlphaData, outlineType);
+                        gameObjectParents, spriteData, outlinePrecision);
                     break;
                 case SortingType.Sprite:
                     result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer,
-                        spriteAlphaData, outlineType);
+                        spriteData, outlinePrecision);
                     break;
             }
 
@@ -485,7 +488,7 @@ namespace SpriteSortingPlugin
 
             overlappingItems = new OverlappingItems(result.baseItem, result.overlappingItems);
             preview.UpdateOverlappingItems(overlappingItems);
-            preview.UpdateSpriteAlphaData(spriteAlphaData);
+            preview.UpdateSpriteAlphaData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
 
             if (result.overlappingItems.Count > 1)

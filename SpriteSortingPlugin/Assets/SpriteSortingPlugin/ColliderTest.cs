@@ -11,7 +11,7 @@ namespace SpriteSortingPlugin
         public SpriteRenderer spriteRenderer1;
         public SpriteRenderer spriteRenderer2;
 
-        public SpriteAlphaData spriteAlphaData;
+        public SpriteData spriteData;
 
         public void Test()
         {
@@ -47,7 +47,7 @@ namespace SpriteSortingPlugin
             var polygonColliderToCheck = polyColliderGameObject1.AddComponent<PolygonCollider2D>();
             var guid1 = AssetDatabase.AssetPathToGUID(
                 AssetDatabase.GetAssetPath(spriteRenderer1.sprite.GetInstanceID()));
-            polygonColliderToCheck.points = spriteAlphaData.spriteDataDictionary[guid1].outlinePoints.ToArray();
+            polygonColliderToCheck.points = spriteData.spriteDataDictionary[guid1].outlinePoints.ToArray();
 
 
             var polyColliderGameObject =
@@ -61,7 +61,7 @@ namespace SpriteSortingPlugin
                 polyColliderGameObject.AddComponent<PolygonCollider2D>();
             var guid2 = AssetDatabase.AssetPathToGUID(
                 AssetDatabase.GetAssetPath(spriteRenderer2.sprite.GetInstanceID()));
-            otherPolygonColliderToCheck.points = spriteAlphaData.spriteDataDictionary[guid2].outlinePoints.ToArray();
+            otherPolygonColliderToCheck.points = spriteData.spriteDataDictionary[guid2].outlinePoints.ToArray();
 
 
             var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);

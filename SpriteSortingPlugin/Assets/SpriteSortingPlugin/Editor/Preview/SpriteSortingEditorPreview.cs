@@ -16,8 +16,8 @@ namespace SpriteSortingPlugin.Preview
         private bool isVisualizingBoundsInScene;
         private bool isSceneVisualizingDelegateIsAdded;
         private OverlappingItems overlappingItems;
-        private SpriteAlphaData spriteAlphaData;
-        private OutlineType outlineType;
+        private SpriteData spriteData;
+        private OutlinePrecision outlinePrecision;
 
         public bool IsVisualizingBoundsInScene => isVisualizingBoundsInScene;
 
@@ -26,14 +26,14 @@ namespace SpriteSortingPlugin.Preview
             this.overlappingItems = overlappingItems;
         }
 
-        public void UpdateSpriteAlphaData(SpriteAlphaData spriteAlphaData)
+        public void UpdateSpriteAlphaData(SpriteData spriteData)
         {
-            this.spriteAlphaData = spriteAlphaData;
+            this.spriteData = spriteData;
         }
 
-        public void UpdateOutlineType(OutlineType outlineType)
+        public void UpdateOutlineType(OutlinePrecision outlinePrecision)
         {
-            this.outlineType = outlineType;
+            this.outlinePrecision = outlinePrecision;
         }
 
         public void DoPreview(bool isUpdatePreview)
@@ -211,7 +211,7 @@ namespace SpriteSortingPlugin.Preview
                 return;
             }
 
-            var isUsingSpriteAlphaData = spriteAlphaData != null;
+            var isUsingSpriteAlphaData = spriteData != null;
 
             foreach (var item in overlappingItems.Items)
             {
@@ -220,7 +220,7 @@ namespace SpriteSortingPlugin.Preview
                 if (isUsingSpriteAlphaData)
                 {
                     var hasSpriteDataItem =
-                        spriteAlphaData.spriteDataDictionary.TryGetValue(item.SpriteAssetGuid, out var spriteDataItem);
+                        spriteData.spriteDataDictionary.TryGetValue(item.SpriteAssetGuid, out var spriteDataItem);
 
                     if (hasSpriteDataItem && CanDrawOutlineType(spriteDataItem))
                     {
@@ -242,9 +242,9 @@ namespace SpriteSortingPlugin.Preview
 
         private void DrawOutline(SpriteDataItem spriteDataItem, Transform itemTransform)
         {
-            switch (outlineType)
+            switch (outlinePrecision)
             {
-                case OutlineType.OOBB:
+                case OutlinePrecision.ObjectOrientedBoundingBox:
                     spriteDataItem.objectOrientedBoundingBox.UpdateBox(itemTransform);
                     var oobbPoints = spriteDataItem.objectOrientedBoundingBox.Points;
 
@@ -253,7 +253,7 @@ namespace SpriteSortingPlugin.Preview
                     Handles.DrawLine(oobbPoints[2], oobbPoints[3]);
                     Handles.DrawLine(oobbPoints[3], oobbPoints[0]);
                     break;
-                case OutlineType.Outline:
+                case OutlinePrecision.PixelPerfect:
                     var lastPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[0]);
                     for (var i = 1; i < spriteDataItem.outlinePoints.Count; i++)
                     {
@@ -273,11 +273,11 @@ namespace SpriteSortingPlugin.Preview
                 return false;
             }
 
-            switch (outlineType)
+            switch (outlinePrecision)
             {
-                case OutlineType.OOBB:
+                case OutlinePrecision.ObjectOrientedBoundingBox:
                     return spriteDataItem.IsValidOOBB();
-                case OutlineType.Outline:
+                case OutlinePrecision.PixelPerfect:
                     return spriteDataItem.IsValidOutline();
                 default:
                     return false;

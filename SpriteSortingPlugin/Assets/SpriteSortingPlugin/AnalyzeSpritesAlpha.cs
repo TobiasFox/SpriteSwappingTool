@@ -18,7 +18,7 @@ namespace SpriteSortingPlugin
         private readonly Vector3[] sourcePoints = new Vector3[4];
         private readonly Vector3[] points = new Vector3[4];
 
-        public SpriteAlphaData spriteAlphaData;
+        public SpriteData spriteData;
         public Transform otherTransform;
         private GameObject polygonGameobject;
 
@@ -28,7 +28,7 @@ namespace SpriteSortingPlugin
             var assetGuid =
                 AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID()));
 
-            var containsDataItem = spriteAlphaData.spriteDataDictionary.TryGetValue(assetGuid, out var spriteDataItem);
+            var containsDataItem = spriteData.spriteDataDictionary.TryGetValue(assetGuid, out var spriteDataItem);
             if (!containsDataItem)
             {
                 return;
@@ -61,13 +61,20 @@ namespace SpriteSortingPlugin
 
 
             // var pointList = AnalyzeAlphaOutline();
-            var pointList = AnalyzeOutlineMooreNeighbourAlgortihm();
+            // var pointList = AnalyzeOutlineMooreNeighbourAlgortihm();
 
-            //TODO flatten colliderPoints
+            if (spriteOutlineAnalyzer == null)
+            {
+                spriteOutlineAnalyzer = new SpriteOutlineAnalyzer();
+            }
+
+            var pointList = spriteOutlineAnalyzer.Analyze(ownRenderer.sprite);
 
             CreatePolygonCollider(pointList);
             Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
         }
+
+        private SpriteOutlineAnalyzer spriteOutlineAnalyzer;
 
         private int startPixelIndex;
         private PixelDirection startPixelEntryDirection;

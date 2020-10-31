@@ -13,7 +13,7 @@ namespace SpriteSortingPlugin
         // public float rotation2;
 
         public SpriteRenderer[] spriteRenderers;
-        public SpriteAlphaData spriteAlphaData;
+        public SpriteData spriteData;
         private ObjectOrientedBoundingBox[] oobbs;
         public Vector2 point1;
         public Vector2 point2;
@@ -35,7 +35,7 @@ namespace SpriteSortingPlugin
                 var assetGuid1 =
                     AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID()));
 
-                var oobb = spriteAlphaData.spriteDataDictionary[assetGuid1].objectOrientedBoundingBox;
+                var oobb = spriteData.spriteDataDictionary[assetGuid1].objectOrientedBoundingBox;
                 if (i == 1 && oobb == oobbs[0])
                 {
                     oobb = new ObjectOrientedBoundingBox(oobb);

@@ -3,11 +3,11 @@
 namespace SpriteSortingPlugin
 {
     [Flags]
-    public enum OutlineType
+    public enum OutlineAnalysisType
     {
         Nothing = 0,
-        OOBB = 1 << 0,
-        Outline = 1 << 1,
+        ObjectOrientedBoundingBox = 1 << 0,
+        PixelPerfect = 1 << 1,
         All = ~0
     }
 }

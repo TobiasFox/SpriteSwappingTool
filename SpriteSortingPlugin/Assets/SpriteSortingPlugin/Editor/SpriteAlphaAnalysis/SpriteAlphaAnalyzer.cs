@@ -15,18 +15,18 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         public int CurrentProgress => currentProgress;
 
-        public void AddAlphaShapeToSpriteAlphaData(ref SpriteAlphaData spriteAlphaData,
-            OutlineType outlineType)
+        public void AddAlphaShapeToSpriteAlphaData(ref SpriteData spriteData,
+            OutlineAnalysisType outlineType)
         {
-            if (outlineType == OutlineType.Nothing)
+            if (outlineType == OutlineAnalysisType.Nothing)
             {
                 return;
             }
 
-            var assetGuidList = new List<string>(spriteAlphaData.spriteDataDictionary.Keys);
+            var assetGuidList = new List<string>(spriteData.spriteDataDictionary.Keys);
             foreach (var assetGuid in assetGuidList)
             {
-                var spriteDataItem = spriteAlphaData.spriteDataDictionary[assetGuid];
+                var spriteDataItem = spriteData.spriteDataDictionary[assetGuid];
 
                 var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
                 var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
@@ -42,13 +42,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     }
                 }
 
-                if (outlineType.HasFlag(OutlineType.OOBB))
+                if (outlineType.HasFlag(OutlinePrecision.ObjectOrientedBoundingBox))
                 {
                     var oobb = GenerateOOBB(sprite.texture, sprite.pixelsPerUnit);
                     spriteDataItem.objectOrientedBoundingBox = oobb;
                 }
 
-                if (outlineType.HasFlag(OutlineType.Outline))
+                if (outlineType.HasFlag(OutlinePrecision.PixelPerfect))
                 {
                     var colliderPoints = GenerateAlphaOutline(sprite);
                     spriteDataItem.outlinePoints = colliderPoints;
@@ -76,7 +76,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 //         break;
                 // }
 
-                spriteAlphaData.spriteDataDictionary[assetGuid] = spriteDataItem;
+                spriteData.spriteDataDictionary[assetGuid] = spriteDataItem;
 
                 // currentProgress++;
 

@@ -18,8 +18,8 @@ namespace SpriteSortingPlugin
             new Dictionary<string, PolygonCollider2D[]>();
 
         public static SpriteSortingAnalysisResult AnalyzeSpriteSorting(CameraProjectionType cameraProjectionType,
-            List<int> selectedLayers, List<Transform> gameObjectsParents = null, SpriteAlphaData spriteAlphaData = null,
-            OutlineType outlineType = OutlineType.OOBB)
+            List<int> selectedLayers, List<Transform> gameObjectsParents = null, SpriteData spriteData = null,
+            OutlinePrecision outlinePrecision = OutlinePrecision.ObjectOrientedBoundingBox)
         {
             var result = new SpriteSortingAnalysisResult();
 
@@ -33,13 +33,12 @@ namespace SpriteSortingPlugin
 
             Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Count +
                       " to " + filteredSortingComponents.Count);
-            ResetSpriteColliders();
 
             //TODO: optimize foreach
             foreach (var sortingComponent in filteredSortingComponents)
             {
                 if (CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, sortingComponent,
-                    spriteAlphaData, outlineType, out List<OverlappingItem> overlappingSprites, out var baseItem))
+                    spriteData, outlinePrecision, out List<OverlappingItem> overlappingSprites, out var baseItem))
                 {
                     result.overlappingItems = overlappingSprites;
                     result.baseItem = baseItem;
@@ -51,8 +50,8 @@ namespace SpriteSortingPlugin
         }
 
         public static SpriteSortingAnalysisResult AnalyzeSpriteSorting(CameraProjectionType cameraProjectionType,
-            SpriteRenderer spriteRenderer, SpriteAlphaData spriteAlphaData = null,
-            OutlineType outlineType = OutlineType.OOBB)
+            SpriteRenderer spriteRenderer, SpriteData spriteData = null,
+            OutlinePrecision outlinePrecision = OutlinePrecision.ObjectOrientedBoundingBox)
         {
             var result = new SpriteSortingAnalysisResult();
             var selectedLayers = new List<int> {spriteRenderer.sortingLayerID};
@@ -73,10 +72,9 @@ namespace SpriteSortingPlugin
             var filteredSortingComponents = FilterSortingComponents(spriteRenderers, selectedLayers);
             Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Count +
                       " to " + filteredSortingComponents.Count);
-            ResetSpriteColliders();
 
             if (!CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, sortingComponentToCheck,
-                spriteAlphaData, outlineType, out List<OverlappingItem> overlappingSprites, out var baseItem))
+                spriteData, outlinePrecision, out List<OverlappingItem> overlappingSprites, out var baseItem))
             {
                 return result;
             }
@@ -108,22 +106,6 @@ namespace SpriteSortingPlugin
             }
 
             return filteredSortingComponents;
-        }
-
-        private static void ResetSpriteColliders()
-        {
-            // var colliderDataKeyList = new List<string>(spriteColliderDataDictionary.Keys);
-            // foreach (var assetGuid in colliderDataKeyList)
-            // {
-            //     var colliderDataArray = spriteColliderDataDictionary[assetGuid];
-            //
-            //     for (int i = 0; i < colliderDataArray.Length; i++)
-            //     {
-            //         colliderDataArray[i].enabled = false;
-            //     }
-            //
-            //     spriteColliderDataDictionary[assetGuid] = colliderDataArray;
-            // }
         }
 
         private static bool ValidateSortingComponent(List<int> selectedLayers, SpriteRenderer spriteRenderer,
@@ -223,14 +205,14 @@ namespace SpriteSortingPlugin
 
         private static bool CheckOverlappingSprites(CameraProjectionType cameraProjectionType,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
-            SpriteAlphaData spriteAlphaData, OutlineType outlineType,
+            SpriteData spriteData, OutlinePrecision outlinePrecision,
             out List<OverlappingItem> overlappingComponents, out OverlappingItem baseItem)
         {
             overlappingComponents = null;
             baseItem = null;
 
             if (!CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, sortingComponentToCheck,
-                spriteAlphaData, true, outlineType, out List<SortingComponent> overlappingSortingComponents,
+                spriteData, true, outlinePrecision, out List<SortingComponent> overlappingSortingComponents,
                 out SortingComponent baseSortingComponent))
             {
                 return false;
@@ -251,7 +233,7 @@ namespace SpriteSortingPlugin
         //TODO simplify parameters
         private static bool CheckOverlappingSprites(CameraProjectionType cameraProjectionType,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
-            SpriteAlphaData spriteAlphaData, bool isCheckingForSameSortingOptions, OutlineType outlineType,
+            SpriteData spriteData, bool isCheckingForSameSortingOptions, OutlinePrecision outlinePrecision,
             out List<SortingComponent> overlappingComponents,
             out SortingComponent baseItem)
         {
@@ -260,7 +242,7 @@ namespace SpriteSortingPlugin
             Debug.Log("start search in " + filteredSortingComponents.Count + " sprite renderers for an overlap with " +
                       sortingComponentToCheck.spriteRenderer.name);
 
-            var hasSpriteAlphaData = spriteAlphaData != null;
+            var hasSpriteAlphaData = spriteData != null;
             var hasSortingComponentToCheckSpriteDataItem = false;
 
             ObjectOrientedBoundingBox oobbToCheck = null;
@@ -274,17 +256,17 @@ namespace SpriteSortingPlugin
                         AssetDatabase.GetAssetPath(sortingComponentToCheck.spriteRenderer.sprite.GetInstanceID()));
 
                 hasSortingComponentToCheckSpriteDataItem =
-                    spriteAlphaData.spriteDataDictionary.TryGetValue(assetGuid, out var spriteDataItem);
+                    spriteData.spriteDataDictionary.TryGetValue(assetGuid, out var spriteDataItem);
 
                 if (hasSortingComponentToCheckSpriteDataItem)
                 {
-                    if (outlineType.HasFlag(OutlineType.OOBB) && spriteDataItem.IsValidOOBB())
+                    if (outlinePrecision.HasFlag(OutlinePrecision.ObjectOrientedBoundingBox) && spriteDataItem.IsValidOOBB())
                     {
                         oobbToCheck = spriteDataItem.objectOrientedBoundingBox;
                         oobbToCheck.UpdateBox(sortingComponentToCheck.spriteRenderer.transform);
                     }
 
-                    if (outlineType.HasFlag(OutlineType.Outline) && spriteDataItem.IsValidOutline())
+                    if (outlinePrecision.HasFlag(OutlinePrecision.PixelPerfect) && spriteDataItem.IsValidOutline())
                     {
                         polygonColliderToCheck = GetCachedColliderOrCreateNewCollider(assetGuid, spriteDataItem,
                             sortingComponentToCheck.spriteRenderer.transform);
@@ -337,14 +319,14 @@ namespace SpriteSortingPlugin
                                 AssetDatabase.GetAssetPath(sortingComponent.spriteRenderer.sprite.GetInstanceID()));
 
                         var hasSortingComponentSpriteDataItem =
-                            spriteAlphaData.spriteDataDictionary.TryGetValue(otherAssetGuid,
+                            spriteData.spriteDataDictionary.TryGetValue(otherAssetGuid,
                                 out var spriteDataItem);
 
                         if (hasSortingComponentSpriteDataItem)
                         {
                             var currentTransform = sortingComponent.spriteRenderer.transform;
 
-                            if (outlineType.HasFlag(OutlineType.Outline) && spriteDataItem.IsValidOutline())
+                            if (outlinePrecision.HasFlag(OutlinePrecision.PixelPerfect) && spriteDataItem.IsValidOutline())
                             {
                                 var otherPolygonColliderToCheck = GetCachedColliderOrCreateNewCollider(otherAssetGuid,
                                     spriteDataItem, sortingComponent.spriteRenderer.transform);
@@ -365,7 +347,7 @@ namespace SpriteSortingPlugin
                                 }
                             }
 
-                            if (outlineType.HasFlag(OutlineType.OOBB) && spriteDataItem.IsValidOOBB())
+                            if (outlinePrecision.HasFlag(OutlinePrecision.ObjectOrientedBoundingBox) && spriteDataItem.IsValidOOBB())
                             {
                                 var otherOOBB = spriteDataItem.objectOrientedBoundingBox;
 
@@ -544,8 +526,8 @@ namespace SpriteSortingPlugin
         }
 
         public static Dictionary<int, int> AnalyzeSurroundingSprites(CameraProjectionType cameraProjectionType,
-            List<OverlappingItem> overlappingItems, SpriteAlphaData spriteAlphaData,
-            OutlineType outlineType = OutlineType.OOBB)
+            List<OverlappingItem> overlappingItems, SpriteData spriteData,
+            OutlinePrecision outlinePrecision = OutlinePrecision.ObjectOrientedBoundingBox)
         {
             if (overlappingItems == null || overlappingItems.Count <= 0)
             {
@@ -559,7 +541,6 @@ namespace SpriteSortingPlugin
             }
 
             var sortingOptions = new Dictionary<int, int>();
-            ResetSpriteColliders();
 
             var excludingSpriteRendererList = new List<SpriteRenderer>();
             var baseSortingComponents = new List<SortingComponent>();
@@ -581,16 +562,16 @@ namespace SpriteSortingPlugin
                 sortingOptions.Add(sortingComponent.GetInstanceId(), newSortingOrder);
             }
 
-            AnalyzeSurroundingSpritesRecursive(cameraProjectionType, spriteAlphaData, spriteRenderers,
-                baseSortingComponents, excludingSpriteRendererList, outlineType, ref sortingOptions);
+            AnalyzeSurroundingSpritesRecursive(cameraProjectionType, spriteData, spriteRenderers,
+                baseSortingComponents, excludingSpriteRendererList, outlinePrecision, ref sortingOptions);
 
             return sortingOptions;
         }
 
         private static void AnalyzeSurroundingSpritesRecursive(CameraProjectionType cameraProjectionType,
-            SpriteAlphaData spriteAlphaData, List<SpriteRenderer> spriteRenderers,
+            SpriteData spriteData, List<SpriteRenderer> spriteRenderers,
             List<SortingComponent> baseSortingComponents, List<SpriteRenderer> excludingSpriteRendererList,
-            OutlineType outlineType, ref Dictionary<int, int> sortingOptions)
+            OutlinePrecision outlinePrecision, ref Dictionary<int, int> sortingOptions)
         {
             var filteredSortingComponents = FilterSortingComponents(spriteRenderers,
                 new List<int> {baseSortingComponents[0].CurrentSortingLayer}, excludingSpriteRendererList);
@@ -609,7 +590,7 @@ namespace SpriteSortingPlugin
                 }
 
                 if (!CheckOverlappingSprites(cameraProjectionType, filteredSortingComponents, baseSortingComponent,
-                    spriteAlphaData, false, outlineType, out List<SortingComponent> overlappingSprites,
+                    spriteData, false, outlinePrecision, out List<SortingComponent> overlappingSprites,
                     out var baseItem))
                 {
                     continue;
@@ -652,8 +633,8 @@ namespace SpriteSortingPlugin
 
                     sortingOptions[currentSortingComponentInstanceId] = newSortingOrder;
 
-                    AnalyzeSurroundingSpritesRecursive(cameraProjectionType, spriteAlphaData, spriteRenderers,
-                        overlappingSprites, newExcludingList, outlineType, ref sortingOptions);
+                    AnalyzeSurroundingSpritesRecursive(cameraProjectionType, spriteData, spriteRenderers,
+                        overlappingSprites, newExcludingList, outlinePrecision, ref sortingOptions);
                 }
             }
         }

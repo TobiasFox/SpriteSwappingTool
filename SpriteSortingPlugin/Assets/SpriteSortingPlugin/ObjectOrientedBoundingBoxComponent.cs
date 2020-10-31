@@ -5,7 +5,7 @@ namespace SpriteSortingPlugin
 {
     public class ObjectOrientedBoundingBoxComponent : MonoBehaviour
     {
-        public SpriteAlphaData data;
+        public SpriteData data;
         public bool isUsingOOBBCopy;
         public bool isShowingLocalPoints;
 
