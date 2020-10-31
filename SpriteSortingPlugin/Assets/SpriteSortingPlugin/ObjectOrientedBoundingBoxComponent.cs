@@ -6,6 +6,7 @@ namespace SpriteSortingPlugin
     public class ObjectOrientedBoundingBoxComponent : MonoBehaviour
     {
         public SpriteData data;
+        public bool isShowingOOBB = true;
         public bool isUsingOOBBCopy;
         public bool isShowingLocalPoints;
 
@@ -13,7 +14,7 @@ namespace SpriteSortingPlugin
 
         private void OnDrawGizmosSelected()
         {
-            if (data == null)
+            if (data == null || !isShowingOOBB)
             {
                 return;
             }
