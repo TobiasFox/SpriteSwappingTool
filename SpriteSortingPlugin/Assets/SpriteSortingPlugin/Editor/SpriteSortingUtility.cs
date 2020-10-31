@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SpriteSortingPlugin.SAT;
 using UnityEditor;
 using UnityEngine;
@@ -15,8 +14,8 @@ namespace SpriteSortingPlugin
 
         private static SortingComponentShortestDifferenceComparer sortingComponentShortestDifferenceComparer;
 
-        private static Dictionary<string, SpriteColliderData> spriteColliderDataDictionary =
-            new Dictionary<string, SpriteColliderData>();
+        private static Dictionary<string, PolygonCollider2D[]> spriteColliderDataDictionary =
+            new Dictionary<string, PolygonCollider2D[]>();
 
         public static SpriteSortingAnalysisResult AnalyzeSpriteSorting(CameraProjectionType cameraProjectionType,
             List<int> selectedLayers, List<Transform> gameObjectsParents = null, SpriteAlphaData spriteAlphaData = null,
@@ -113,13 +112,18 @@ namespace SpriteSortingPlugin
 
         private static void ResetSpriteColliders()
         {
-            var colliderDataKeyList = new List<string>(spriteColliderDataDictionary.Keys);
-            foreach (var assetGuid in colliderDataKeyList)
-            {
-                var colliderData = spriteColliderDataDictionary[assetGuid];
-                colliderData.isUsed = false;
-                spriteColliderDataDictionary[assetGuid] = colliderData;
-            }
+            // var colliderDataKeyList = new List<string>(spriteColliderDataDictionary.Keys);
+            // foreach (var assetGuid in colliderDataKeyList)
+            // {
+            //     var colliderDataArray = spriteColliderDataDictionary[assetGuid];
+            //
+            //     for (int i = 0; i < colliderDataArray.Length; i++)
+            //     {
+            //         colliderDataArray[i].enabled = false;
+            //     }
+            //
+            //     spriteColliderDataDictionary[assetGuid] = colliderDataArray;
+            // }
         }
 
         private static bool ValidateSortingComponent(List<int> selectedLayers, SpriteRenderer spriteRenderer,
@@ -261,10 +265,11 @@ namespace SpriteSortingPlugin
 
             ObjectOrientedBoundingBox oobbToCheck = null;
             PolygonCollider2D polygonColliderToCheck = null;
+            string assetGuid = null;
 
             if (hasSpriteAlphaData)
             {
-                var assetGuid =
+                assetGuid =
                     AssetDatabase.AssetPathToGUID(
                         AssetDatabase.GetAssetPath(sortingComponentToCheck.spriteRenderer.sprite.GetInstanceID()));
 
@@ -281,16 +286,8 @@ namespace SpriteSortingPlugin
 
                     if (outlineType.HasFlag(OutlineType.Outline) && spriteDataItem.IsValidOutline())
                     {
-                        var polyColliderGameObject =
-                            new GameObject("ToCheck- PolygonCollider " + sortingComponentToCheck.spriteRenderer.name);
-
-                        var currentTransform = sortingComponentToCheck.spriteRenderer.transform;
-                        polyColliderGameObject.transform.SetPositionAndRotation(
-                            currentTransform.position, currentTransform.rotation);
-                        polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
-
-                        polygonColliderToCheck = polyColliderGameObject.AddComponent<PolygonCollider2D>();
-                        polygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
+                        polygonColliderToCheck = GetCachedColliderOrCreateNewCollider(assetGuid, spriteDataItem,
+                            sortingComponentToCheck.spriteRenderer.transform);
                     }
                 }
             }
@@ -335,12 +332,12 @@ namespace SpriteSortingPlugin
                 {
                     if (hasSortingComponentToCheckSpriteDataItem)
                     {
-                        var assetGuid =
+                        var otherAssetGuid =
                             AssetDatabase.AssetPathToGUID(
                                 AssetDatabase.GetAssetPath(sortingComponent.spriteRenderer.sprite.GetInstanceID()));
 
                         var hasSortingComponentSpriteDataItem =
-                            spriteAlphaData.spriteDataDictionary.TryGetValue(assetGuid,
+                            spriteAlphaData.spriteDataDictionary.TryGetValue(otherAssetGuid,
                                 out var spriteDataItem);
 
                         if (hasSortingComponentSpriteDataItem)
@@ -349,18 +346,11 @@ namespace SpriteSortingPlugin
 
                             if (outlineType.HasFlag(OutlineType.Outline) && spriteDataItem.IsValidOutline())
                             {
-                                //TODO destroy polyColliderGameObject
-                                var polyColliderGameObject =
-                                    new GameObject("PolygonCollider " + sortingComponent.spriteRenderer.name);
-                                polyColliderGameObject.transform.SetPositionAndRotation(
-                                    currentTransform.position, currentTransform.rotation);
-                                polyColliderGameObject.transform.localScale = currentTransform.lossyScale;
-
-                                var otherPolygonColliderToCheck =
-                                    polyColliderGameObject.AddComponent<PolygonCollider2D>();
-                                otherPolygonColliderToCheck.points = spriteDataItem.outlinePoints.ToArray();
+                                var otherPolygonColliderToCheck = GetCachedColliderOrCreateNewCollider(otherAssetGuid,
+                                    spriteDataItem, sortingComponent.spriteRenderer.transform);
 
                                 var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
+                                DisableCachedCollider(otherAssetGuid, otherPolygonColliderToCheck.GetInstanceID());
 
                                 // Object.DestroyImmediate(polyColliderGameObject);
 
@@ -400,8 +390,10 @@ namespace SpriteSortingPlugin
                 overlappingComponents.Add(sortingComponent);
             }
 
-            //TODO destroy polygonColliderToCheck
-            // Object.DestroyImmediate(polygonColliderToCheck);
+            if (polygonColliderToCheck != null)
+            {
+                DisableCachedCollider(assetGuid, polygonColliderToCheck.GetInstanceID());
+            }
 
             if (overlappingComponents.Count <= 0)
             {
@@ -411,6 +403,111 @@ namespace SpriteSortingPlugin
             baseItem = sortingComponentToCheck;
             Debug.Log("found " + (overlappingComponents.Count + 1) + " overlapping sprites");
             return true;
+        }
+
+        private static void DisableCachedCollider(string assetGuid, int polygonColliderInstanceId)
+        {
+            var containsColliderArray =
+                spriteColliderDataDictionary.TryGetValue(assetGuid, out var polygonColliderArray);
+            if (!containsColliderArray)
+            {
+                return;
+            }
+
+            foreach (var polygonCollider in polygonColliderArray)
+            {
+                if (polygonCollider == null)
+                {
+                    continue;
+                }
+
+                if (polygonCollider.GetInstanceID() != polygonColliderInstanceId)
+                {
+                    continue;
+                }
+
+                polygonCollider.enabled = false;
+                break;
+            }
+        }
+
+        public static void CleanUp()
+        {
+            foreach (var polygonColliders in spriteColliderDataDictionary.Values)
+            {
+                if (polygonColliders == null)
+                {
+                    continue;
+                }
+
+                foreach (var polygonCollider in polygonColliders)
+                {
+                    if (polygonCollider == null)
+                    {
+                        continue;
+                    }
+
+                    Object.DestroyImmediate(polygonCollider.gameObject);
+                }
+            }
+        }
+
+        private static PolygonCollider2D GetCachedColliderOrCreateNewCollider(string assetGuid,
+            SpriteDataItem spriteDataItem, Transform transform)
+        {
+            var containsColliderArray =
+                spriteColliderDataDictionary.TryGetValue(assetGuid, out var polygonColliderArray);
+            if (!containsColliderArray)
+            {
+                polygonColliderArray = new PolygonCollider2D[2];
+
+                var polyColliderGameObject =
+                    new GameObject("PolygonCollider " + spriteDataItem.AssetName);
+
+                polyColliderGameObject.transform.SetPositionAndRotation(transform.position, transform.rotation);
+                polyColliderGameObject.transform.localScale = transform.lossyScale;
+
+                var polygonCollider = polyColliderGameObject.AddComponent<PolygonCollider2D>();
+                polygonCollider.points = spriteDataItem.outlinePoints.ToArray();
+                polygonColliderArray[0] = polygonCollider;
+                spriteColliderDataDictionary[assetGuid] = polygonColliderArray;
+                return polygonCollider;
+            }
+
+            for (var i = 0; i < polygonColliderArray.Length; i++)
+            {
+                var polygonCollider = polygonColliderArray[i];
+
+                if (polygonCollider == null)
+                {
+                    var polyColliderGameObject =
+                        new GameObject("PolygonCollider " + spriteDataItem.AssetName);
+
+                    polyColliderGameObject.transform.SetPositionAndRotation(transform.position, transform.rotation);
+                    polyColliderGameObject.transform.localScale = transform.lossyScale;
+
+                    polygonCollider = polyColliderGameObject.AddComponent<PolygonCollider2D>();
+                    polygonCollider.points = spriteDataItem.outlinePoints.ToArray();
+                    polygonColliderArray[i] = polygonCollider;
+
+                    spriteColliderDataDictionary[assetGuid] = polygonColliderArray;
+                    return polygonCollider;
+                }
+
+                if (polygonCollider.enabled)
+                {
+                    continue;
+                }
+
+                polygonCollider.transform.SetPositionAndRotation(transform.position, transform.rotation);
+                polygonCollider.transform.localScale = transform.lossyScale;
+
+                polygonCollider.points = spriteDataItem.outlinePoints.ToArray();
+                polygonCollider.enabled = true;
+                return polygonCollider;
+            }
+
+            return null;
         }
 
         public static List<SortingGroup> FilterSortingGroups(IEnumerable<SortingGroup> groups)

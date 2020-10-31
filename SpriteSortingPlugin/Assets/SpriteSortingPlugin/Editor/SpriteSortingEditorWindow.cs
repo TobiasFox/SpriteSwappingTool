@@ -609,6 +609,7 @@ namespace SpriteSortingPlugin
         private void OnDestroy()
         {
             preview.CleanUpPreview();
+            SpriteSortingUtility.CleanUp();
         }
     }
 }
