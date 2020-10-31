@@ -244,6 +244,7 @@ namespace SpriteSortingPlugin
             return true;
         }
 
+        //TODO simplify parameters
         private static bool CheckOverlappingSprites(CameraProjectionType cameraProjectionType,
             IReadOnlyCollection<SortingComponent> filteredSortingComponents, SortingComponent sortingComponentToCheck,
             SpriteAlphaData spriteAlphaData, bool isCheckingForSameSortingOptions, AlphaAnalysisType alphaAnalysisType,
@@ -362,6 +363,7 @@ namespace SpriteSortingPlugin
                     continue;
                 }
 
+                //TODO simplify if
                 if (hasSpriteAlphaData)
                 {
                     if (hasSortingComponentToCheckSpriteDataItem)

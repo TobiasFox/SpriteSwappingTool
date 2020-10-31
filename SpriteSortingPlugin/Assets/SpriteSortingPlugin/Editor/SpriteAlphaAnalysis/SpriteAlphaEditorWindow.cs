@@ -24,6 +24,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private string searchString;
         private bool isShowingSpriteAlphaGUI = true;
         private bool isShowingOOBB = true;
+        private Color outlineColor = Color.green;
 
         private List<SpriteDataItem> spriteList;
         private ReorderableList reorderableSpriteList;
@@ -181,6 +182,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     //         true) as ObjectOrientedBoundingBoxComponent;
 
                     isShowingOOBB = EditorGUILayout.ToggleLeft("show OOBB?", isShowingOOBB);
+                    outlineColor = EditorGUILayout.ColorField("outline Color", outlineColor);
 
                     searchField.OnGUI(searchString);
 
@@ -223,27 +225,49 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             var textureRect = new Rect(0, 0, rightAreaRect.width, rightAreaRect.height);
             EditorGUI.DrawTextureTransparent(textureRect, selectedSprite.texture, ScaleMode.ScaleToFit);
 
+            var rectWithAlphaBorders = CalculateRectWithAlphaBorders(textureRect);
+            Handles.color = outlineColor;
+
             if (isShowingOOBB)
             {
-                DrawOOBB(textureRect, rightAreaRect);
+                DrawOOBB(rectWithAlphaBorders, rightAreaRect);
             }
             else
             {
-                DrawOutline(textureRect, rightAreaRect);
+                DrawOutline(rectWithAlphaBorders);
             }
 
             GUILayout.EndArea();
         }
 
-        private void DrawOutline(Rect textureRect, Rect rightAreaRect)
+        private void DrawOutline(Rect rectWithAlphaBorders)
         {
+            if (selectedSpriteDataItem.outlinePoints == null || selectedSpriteDataItem.outlinePoints.Count < 2)
+            {
+                return;
+            }
+
+            var scaleXFactor = rectWithAlphaBorders.width / selectedSprite.bounds.size.x;
+            var scaleYFactor = rectWithAlphaBorders.height / selectedSprite.bounds.size.y;
+
+            var scale = new Vector2(scaleYFactor, -scaleXFactor);
+
+            var lastPoint = selectedSpriteDataItem.outlinePoints[0] * scale + rectWithAlphaBorders.center;
+            for (var i = 1; i < selectedSpriteDataItem.outlinePoints.Count; i++)
+            {
+                var nextPoint = selectedSpriteDataItem.outlinePoints[i] * scale + rectWithAlphaBorders.center;
+                Handles.DrawLine(lastPoint, nextPoint);
+                Handles.DrawLine(new Vector2(lastPoint.x + 1, lastPoint.y), new Vector2(nextPoint.x + 1, nextPoint.y));
+                lastPoint = nextPoint;
+            }
         }
 
-        private void DrawOOBB(Rect textureRect, Rect rightAreaRect)
+        private void DrawOOBB(Rect rectWithAlphaBorders, Rect rightAreaRect)
         {
-            Handles.color = Color.green;
-
-            var rectWithAlphaBorders = CalculateRectWithAlphaBorders(textureRect);
+            if (selectedSpriteDataItem.objectOrientedBoundingBox == null)
+            {
+                return;
+            }
 
             var scaleXFactor = rectWithAlphaBorders.width / selectedSprite.bounds.size.x;
             var scaleYFactor = rectWithAlphaBorders.height / selectedSprite.bounds.size.y;
