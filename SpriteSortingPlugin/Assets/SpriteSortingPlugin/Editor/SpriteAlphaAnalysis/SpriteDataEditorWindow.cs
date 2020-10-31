@@ -31,8 +31,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private SearchField searchField;
         private Vector2 leftBarScrollPosition;
         private float lastHeight;
-        private Material material;
-        private Shader transparentUnlitShader;
 
         private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
@@ -113,11 +111,6 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 if (reorderableSpriteList == null)
                 {
                     InitReordableSpriteList();
-                }
-
-                if (transparentUnlitShader == null)
-                {
-                    transparentUnlitShader = Shader.Find("Unlit/Transparent");
                 }
             }
         }
@@ -269,6 +262,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void DrawSpriteDetails(Rect rightAreaRect)
         {
+            EditorGUILayout.BeginVertical(GUILayout.Height(130));
+            EditorGUILayout.Space();
+            EditorGUI.DrawTextureTransparent(new Rect(rightAreaRect.width / 2 - 50, rightAreaRect.y, 100, 100),
+                selectedSprite != null ? selectedSprite.texture : Texture2D.grayTexture, ScaleMode.ScaleToFit);
+
+            EditorGUILayout.EndVertical();
+
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Resolution");
             EditorGUI.BeginDisabledGroup(true);
