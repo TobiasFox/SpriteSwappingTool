@@ -297,7 +297,7 @@ namespace SpriteSortingPlugin
                     continue;
                 }
 
-                if (cameraProjectionType == CameraProjectionType.Orthogonal && Math.Abs(
+                if (cameraProjectionType == CameraProjectionType.Orthographic && Math.Abs(
                     sortingComponent.spriteRenderer.transform.position.z - boundsToCheck.center.z) > Tolerance)
                 {
                     //TODO: is z the distance to the camera? if not maybe create something to choose for the user
