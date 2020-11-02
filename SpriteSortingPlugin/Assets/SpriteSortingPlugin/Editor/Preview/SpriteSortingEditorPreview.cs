@@ -22,15 +22,6 @@ namespace SpriteSortingPlugin.Preview
         private OutlinePrecision outlinePrecision;
 
         private GUIStyle sortingOrderStyle;
-        private GUIStyle sortingLayerStyle;
-
-        public SpriteSortingEditorPreview()
-        {
-            sortingOrderStyle = new GUIStyle
-                {normal = {background = Texture2D.whiteTexture}, fontStyle = FontStyle.Bold};
-            sortingLayerStyle = new GUIStyle
-                {normal = {background = Texture2D.whiteTexture}, fontStyle = FontStyle.Bold};
-        }
 
         public bool IsVisualizingBoundsInScene => isVisualizingBoundsInScene;
 
@@ -72,7 +63,8 @@ namespace SpriteSortingPlugin.Preview
 
             EditorGUI.BeginChangeCheck();
             isVisualizingBoundsInScene =
-                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene", isVisualizingBoundsInScene, GUILayout.Width(180));
+                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene", isVisualizingBoundsInScene,
+                    GUILayout.Width(180));
             if (EditorGUI.EndChangeCheck())
             {
                 EnableSceneVisualization(isVisualizingBoundsInScene);
@@ -225,6 +217,12 @@ namespace SpriteSortingPlugin.Preview
             {
                 if (!isSceneVisualizingDelegateIsAdded)
                 {
+                    if (sortingOrderStyle == null)
+                    {
+                        sortingOrderStyle = new GUIStyle
+                            {normal = {background = Texture2D.whiteTexture}, fontStyle = FontStyle.Bold};
+                    }
+
                     isSceneVisualizingDelegateIsAdded = true;
                     SceneView.duringSceneGui += OnSceneGUI;
                 }
