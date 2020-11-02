@@ -86,7 +86,7 @@ namespace SpriteSortingPlugin
         }
 
         //TODO replace excludeRendererList with dictionary
-        private static List<SortingComponent> FilterSortingComponents(List<SpriteRenderer> spriteRenderers,
+        public static List<SortingComponent> FilterSortingComponents(List<SpriteRenderer> spriteRenderers,
             List<int> selectedLayers, List<SpriteRenderer> excludeRendererList = null)
         {
             var filteredSortingComponents = new List<SortingComponent>();
@@ -134,7 +134,7 @@ namespace SpriteSortingPlugin
         }
 
         //TODO: consider prefab scene
-        private static List<SpriteRenderer> InitializeSpriteRendererList(List<Transform> gameObjectsParents)
+        public static List<SpriteRenderer> InitializeSpriteRendererList(List<Transform> gameObjectsParents)
         {
             if (gameObjectsParents == null || gameObjectsParents.Count == 0)
             {

@@ -31,7 +31,7 @@ namespace SpriteSortingPlugin
             this.selectedLayers = selectedLayers;
             var result = new OverlappingSpriteDetectionResult();
 
-            InitializeSpriteRendererList(gameObjectsParents);
+            spriteRenderers = SpriteSortingUtility.InitializeSpriteRendererList(gameObjectsParents);
             if (spriteRenderers.Count < 2)
             {
                 return result;
@@ -71,7 +71,7 @@ namespace SpriteSortingPlugin
                 return result;
             }
 
-            InitializeSpriteRendererList(null);
+            spriteRenderers = SpriteSortingUtility.InitializeSpriteRendererList(null);
             if (spriteRenderers.Count < 2)
             {
                 return result;
@@ -133,23 +133,6 @@ namespace SpriteSortingPlugin
 
             sortingComponent = new SortingComponent(spriteRenderer, outmostSortingGroup);
             return true;
-        }
-
-        private void InitializeSpriteRendererList(List<Transform> gameObjectsParents)
-        {
-            if (gameObjectsParents == null || gameObjectsParents.Count == 0)
-            {
-                spriteRenderers = new List<SpriteRenderer>(Object.FindObjectsOfType<SpriteRenderer>());
-                return;
-            }
-
-            spriteRenderers = new List<SpriteRenderer>();
-            var validTransform = ValidateTransformParents(gameObjectsParents);
-
-            foreach (var parent in validTransform)
-            {
-                spriteRenderers.AddRange(parent.GetComponentsInChildren<SpriteRenderer>());
-            }
         }
 
         private List<Transform> ValidateTransformParents(List<Transform> gameObjectsParents)
