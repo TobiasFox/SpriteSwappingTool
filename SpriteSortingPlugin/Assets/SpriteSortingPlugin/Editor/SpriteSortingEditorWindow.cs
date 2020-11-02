@@ -231,7 +231,7 @@ namespace SpriteSortingPlugin
                         spriteData, typeof(SpriteData), false) as SpriteData;
                     if (EditorGUI.EndChangeCheck())
                     {
-                        preview.UpdateSpriteAlphaData(spriteData);
+                        preview.UpdateSpriteData(spriteData);
 
                         //TODO select default value
                         // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
@@ -362,7 +362,7 @@ namespace SpriteSortingPlugin
                     "No sorting order issues with overlapping sprites were found in the currently loaded scenes.",
                     EditorStyles.boldLabel);
                 CleanUpReordableList();
-                preview.EnableSceneVisualization(false);
+                preview.DisableSceneVisualizations();
 
                 EndScrollRect();
                 return;
@@ -562,13 +562,13 @@ namespace SpriteSortingPlugin
 
             overlappingItems = new OverlappingItems(result.baseItem, result.overlappingItems);
             preview.UpdateOverlappingItems(overlappingItems);
-            preview.UpdateSpriteAlphaData(spriteData);
+            preview.UpdateSpriteData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
         }
 
         private void OnDisable()
         {
-            preview.EnableSceneVisualization(false);
+            preview.DisableSceneVisualizations();
 
             CleanUpReordableList();
         }

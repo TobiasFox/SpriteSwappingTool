@@ -15,9 +15,22 @@ namespace SpriteSortingPlugin.Preview
         private Editor previewEditor;
         private bool isVisualizingBoundsInScene;
         private bool isSceneVisualizingDelegateIsAdded;
+        private bool isVisualizingSortingOrder;
+        private bool isVisualizingSortingLayer;
         private OverlappingItems overlappingItems;
         private SpriteData spriteData;
         private OutlinePrecision outlinePrecision;
+
+        private GUIStyle sortingOrderStyle;
+        private GUIStyle sortingLayerStyle;
+
+        public SpriteSortingEditorPreview()
+        {
+            sortingOrderStyle = new GUIStyle
+                {normal = {background = Texture2D.whiteTexture}, fontStyle = FontStyle.Bold};
+            sortingLayerStyle = new GUIStyle
+                {normal = {background = Texture2D.whiteTexture}, fontStyle = FontStyle.Bold};
+        }
 
         public bool IsVisualizingBoundsInScene => isVisualizingBoundsInScene;
 
@@ -26,7 +39,7 @@ namespace SpriteSortingPlugin.Preview
             this.overlappingItems = overlappingItems;
         }
 
-        public void UpdateSpriteAlphaData(SpriteData spriteData)
+        public void UpdateSpriteData(SpriteData spriteData)
         {
             this.spriteData = spriteData;
         }
@@ -59,13 +72,35 @@ namespace SpriteSortingPlugin.Preview
 
             EditorGUI.BeginChangeCheck();
             isVisualizingBoundsInScene =
-                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene ", isVisualizingBoundsInScene);
+                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene", isVisualizingBoundsInScene, GUILayout.Width(180));
             if (EditorGUI.EndChangeCheck())
             {
                 EnableSceneVisualization(isVisualizingBoundsInScene);
             }
 
-            if (GUILayout.Button("Reset rotation"))
+            EditorGUI.BeginChangeCheck();
+            isVisualizingSortingOrder =
+                EditorGUILayout.ToggleLeft("Display Sorting Order", isVisualizingSortingOrder, GUILayout.Width(160));
+            if (EditorGUI.EndChangeCheck())
+            {
+                EnableSceneVisualization(isVisualizingSortingOrder);
+            }
+
+            EditorGUI.BeginChangeCheck();
+            isVisualizingSortingLayer =
+                EditorGUILayout.ToggleLeft("Display Sorting Layer", isVisualizingSortingLayer, GUILayout.Width(170));
+            if (EditorGUI.EndChangeCheck())
+            {
+                EnableSceneVisualization(isVisualizingSortingLayer);
+            }
+
+            if (!isSceneVisualizingDelegateIsAdded &&
+                (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
+            {
+                EnableSceneVisualization(true);
+            }
+
+            if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
             {
                 previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
                 Object.DestroyImmediate(previewEditor);
@@ -186,7 +221,7 @@ namespace SpriteSortingPlugin.Preview
 
         public void EnableSceneVisualization(bool isEnabled)
         {
-            if (isEnabled && isVisualizingBoundsInScene)
+            if (isEnabled && (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
             {
                 if (!isSceneVisualizingDelegateIsAdded)
                 {
@@ -204,6 +239,17 @@ namespace SpriteSortingPlugin.Preview
             }
         }
 
+        public void DisableSceneVisualizations()
+        {
+            if (!isSceneVisualizingDelegateIsAdded)
+            {
+                return;
+            }
+
+            isSceneVisualizingDelegateIsAdded = false;
+            SceneView.duringSceneGui -= OnSceneGUI;
+        }
+
         private void OnSceneGUI(SceneView sceneView)
         {
             if (overlappingItems == null)
@@ -211,32 +257,86 @@ namespace SpriteSortingPlugin.Preview
                 return;
             }
 
-            var isUsingSpriteAlphaData = spriteData != null;
-
             foreach (var item in overlappingItems.Items)
             {
-                Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
+                DrawBounds(item);
+                DrawSortingOptions(item);
+            }
 
-                if (isUsingSpriteAlphaData)
+            if (overlappingItems.Items.Count > 0)
+            {
+                sceneView.Repaint();
+            }
+        }
+
+        private void DrawSortingOptions(OverlappingItem item)
+        {
+            if (!isVisualizingSortingOrder && !isVisualizingSortingLayer)
+            {
+                return;
+            }
+
+            Handles.BeginGUI();
+
+            var text = "";
+            if (isVisualizingSortingLayer)
+            {
+                text = item.sortingLayerName;
+                if (item.HasSortingLayerChanged())
                 {
-                    var hasSpriteDataItem =
-                        spriteData.spriteDataDictionary.TryGetValue(item.SpriteAssetGuid, out var spriteDataItem);
-
-                    if (hasSpriteDataItem && CanDrawOutlineType(spriteDataItem))
-                    {
-                        DrawOutline(spriteDataItem, item.originSpriteRenderer.transform);
-                    }
-                    else
-                    {
-                        var bounds = item.originSpriteRenderer.bounds;
-                        Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
-                    }
+                    text += " -> " + item.sortingLayerName;
                 }
+            }
 
-                if (overlappingItems.Items.Count > 0)
+            if (isVisualizingSortingOrder)
+            {
+                text += (isVisualizingSortingLayer ? "\n " : "") + item.originSortingOrder;
+                var newSortingOrder = item.GetNewSortingOrder();
+                if (item.originSortingOrder != newSortingOrder)
                 {
-                    sceneView.Repaint();
+                    text += " -> " + newSortingOrder;
                 }
+            }
+
+            Handles.Label(item.originSpriteRenderer.transform.position, text, sortingOrderStyle);
+
+            Handles.EndGUI();
+        }
+
+        private void DrawBounds(OverlappingItem item)
+        {
+            if (!isVisualizingBoundsInScene)
+            {
+                return;
+            }
+
+            Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
+
+            var isDrawingSpriteRendererBounds = false;
+
+            if (spriteData != null)
+            {
+                var hasSpriteDataItem =
+                    spriteData.spriteDataDictionary.TryGetValue(item.SpriteAssetGuid, out var spriteDataItem);
+
+                if (hasSpriteDataItem && CanDrawOutlineType(spriteDataItem))
+                {
+                    DrawOutline(spriteDataItem, item.originSpriteRenderer.transform);
+                }
+                else
+                {
+                    isDrawingSpriteRendererBounds = true;
+                }
+            }
+            else
+            {
+                isDrawingSpriteRendererBounds = true;
+            }
+
+            if (isDrawingSpriteRendererBounds)
+            {
+                var bounds = item.originSpriteRenderer.bounds;
+                Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
             }
         }
 
