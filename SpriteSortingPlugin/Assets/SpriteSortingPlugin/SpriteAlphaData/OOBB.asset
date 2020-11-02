@@ -13,43 +13,10 @@ MonoBehaviour:
   m_Name: OOBB
   m_EditorClassIdentifier: 
   spriteDataList:
-  - assetGuid: 35113396d246aff4bb0ff1190c7d5d68
-    assetName: caveElement
-    objectOrientedBoundingBox:
-      localWorldPoints:
-      - {x: -2.875, y: 2.495}
-      - {x: -2.875, y: -2.495}
-      - {x: 2.875, y: -2.495}
-      - {x: 2.875, y: 2.495}
-      originLocalWorldPoints:
-      - {x: -2.875, y: 2.495}
-      - {x: -2.875, y: -2.495}
-      - {x: 2.875, y: -2.495}
-      - {x: 2.875, y: 2.495}
-      zRotation: 0
-      boundsCenter: {x: 0, y: 0}
-      boundsSize: {x: 5.75, y: 4.99}
-      boundsCenterOffset: {x: 0, y: 0}
-      alphaRectangleBorder:
-        topBorder: 262
-        leftBorder: 224
-        bottomBorder: 263
-        rightBorder: 225
-        spriteWidth: 1024
-        spriteHeight: 1024
-        pixelPerUnit: 100
-      originAlphaRectangleBorder:
-        topBorder: 262
-        leftBorder: 224
-        bottomBorder: 263
-        rightBorder: 225
-        spriteWidth: 1024
-        spriteHeight: 1024
-        pixelPerUnit: 100
-    outlinePoints: []
   - assetGuid: 87fbc87560525ef4189940c80115072c
     assetName: plant
     objectOrientedBoundingBox:
+      isInitialized: 1
       localWorldPoints:
       - {x: -4.935, y: 4.185}
       - {x: -4.935, y: -4.185}
@@ -77,6 +44,41 @@ MonoBehaviour:
         leftBorder: 18
         bottomBorder: 94
         rightBorder: 19
+        spriteWidth: 1024
+        spriteHeight: 1024
+        pixelPerUnit: 100
+    outlinePoints: []
+  - assetGuid: 35113396d246aff4bb0ff1190c7d5d68
+    assetName: caveElement
+    objectOrientedBoundingBox:
+      isInitialized: 1
+      localWorldPoints:
+      - {x: -2.875, y: 2.495}
+      - {x: -2.875, y: -2.495}
+      - {x: 2.875, y: -2.495}
+      - {x: 2.875, y: 2.495}
+      originLocalWorldPoints:
+      - {x: -2.875, y: 2.495}
+      - {x: -2.875, y: -2.495}
+      - {x: 2.875, y: -2.495}
+      - {x: 2.875, y: 2.495}
+      zRotation: 0
+      boundsCenter: {x: 0, y: 0}
+      boundsSize: {x: 5.75, y: 4.99}
+      boundsCenterOffset: {x: 0, y: 0}
+      alphaRectangleBorder:
+        topBorder: 262
+        leftBorder: 224
+        bottomBorder: 263
+        rightBorder: 225
+        spriteWidth: 1024
+        spriteHeight: 1024
+        pixelPerUnit: 100
+      originAlphaRectangleBorder:
+        topBorder: 262
+        leftBorder: 224
+        bottomBorder: 263
+        rightBorder: 225
         spriteWidth: 1024
         spriteHeight: 1024
         pixelPerUnit: 100

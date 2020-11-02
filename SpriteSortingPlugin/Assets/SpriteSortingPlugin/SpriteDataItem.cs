@@ -24,7 +24,7 @@ namespace SpriteSortingPlugin
 
         public bool IsValidOOBB()
         {
-            return objectOrientedBoundingBox != null;
+            return objectOrientedBoundingBox != null && objectOrientedBoundingBox.IsInitialized;
         }
 
         public bool IsValidOutline()

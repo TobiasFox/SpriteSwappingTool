@@ -34,7 +34,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
-        private OutlineAnalysisType outlineAnalysisType;
+        private OutlineAnalysisType outlineAnalysisType = OutlineAnalysisType.All;
         private OutlinePrecision outlinePrecision;
 
         // private ObjectOrientedBoundingBoxComponent oobbComponent;
@@ -43,6 +43,10 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private bool isDisplayingSpriteOutline = true;
         private bool isDisplayingSpriteDetails;
+
+        private float blurriness;
+        private Color primaryColor;
+        private float brightness;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -291,17 +295,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             primaryColor = EditorGUILayout.ColorField("Primary Color", primaryColor);
         }
 
-        private float blurriness;
-        private Color primaryColor;
-        private float brightness;
-
         private void DrawOutlineContent(Rect rightAreaRect)
         {
-            // testSprite =
-            //     EditorGUILayout.ObjectField("test", testSprite, typeof(Sprite), false,
-            //             GUILayout.Height(EditorGUIUtility.singleLineHeight)) as
-            //         Sprite;
-
             var textureRect = new Rect(0, 0, rightAreaRect.width, rightAreaRect.height);
             EditorGUI.DrawTextureTransparent(textureRect, selectedSprite.texture, ScaleMode.ScaleToFit);
 
@@ -321,7 +316,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void DrawOutline(Rect rectWithAlphaBorders)
         {
-            if (selectedSpriteDataItem.outlinePoints == null || selectedSpriteDataItem.outlinePoints.Count < 2)
+            if (!selectedSpriteDataItem.IsValidOutline())
             {
                 return;
             }
@@ -343,7 +338,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void DrawOOBB(Rect rectWithAlphaBorders, Rect rightAreaRect)
         {
-            if (selectedSpriteDataItem.objectOrientedBoundingBox == null)
+            if (!selectedSpriteDataItem.IsValidOOBB())
             {
                 return;
             }

@@ -7,6 +7,7 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class ObjectOrientedBoundingBox : ISerializationCallbackReceiver, ICloneable
     {
+        [SerializeField] private bool isInitialized;
         [SerializeField, HideInInspector] private Vector2[] localWorldPoints = new Vector2[4];
         [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
@@ -21,6 +22,8 @@ namespace SpriteSortingPlugin
         private Vector2[] points;
         [SerializeField] private AlphaRectangleBorder alphaRectangleBorder;
         [SerializeField, HideInInspector] private AlphaRectangleBorder originAlphaRectangleBorder;
+
+        public bool IsInitialized => isInitialized;
 
         public AlphaRectangleBorder AlphaRectangleBorder
         {
@@ -50,6 +53,7 @@ namespace SpriteSortingPlugin
             ownBounds = new Bounds(boundsCenter, boundsSize);
 
             Initialize();
+            isInitialized = true;
         }
 
         public ObjectOrientedBoundingBox(ObjectOrientedBoundingBox otherOOBB)
@@ -86,6 +90,8 @@ namespace SpriteSortingPlugin
 
                 points[i] = new Vector2(worldPoint.x, worldPoint.y);
             }
+
+            isInitialized = true;
         }
 
         public Projection ProjectAxis(Vector2 axis)

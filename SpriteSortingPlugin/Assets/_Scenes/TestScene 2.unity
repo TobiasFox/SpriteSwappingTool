@@ -247,11 +247,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -394,6 +395,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 1
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -6.340937, y: 1.2887834}
     - {x: -2.3073802, y: -6.0452003}
@@ -5738,6 +5740,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -15.2, y: 13.22}
     - {x: -15.2, y: -13.22}
@@ -6178,6 +6181,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 1
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -6.340937, y: 1.2887834}
     - {x: -2.3073802, y: -6.0452003}
@@ -10998,11 +11002,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -11225,11 +11230,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -11354,11 +11360,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -3.7468212, y: 0.67229545}
     - {x: -1.1932304, y: -3.61481}
@@ -11484,11 +11491,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -11627,11 +11635,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -12218,11 +12227,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -12481,6 +12491,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -3.7934399, y: 5.2419715}
     - {x: -5.7912755, y: -2.8861005}
@@ -12705,6 +12716,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -3.7934399, y: 5.2419715}
     - {x: -5.7912755, y: -2.8861005}
@@ -13784,11 +13796,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -13927,11 +13940,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -16779,6 +16793,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -15.2, y: 13.22}
     - {x: -15.2, y: -13.22}
@@ -16875,7 +16890,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!210 &1586168376
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -17453,6 +17468,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -3.7934399, y: 5.2419715}
     - {x: -5.7912755, y: -2.8861005}
@@ -17840,6 +17856,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -3.7934399, y: 5.2419715}
     - {x: -5.7912755, y: -2.8861005}
@@ -18103,11 +18120,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338258353f988244cb3b16094992956a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: a6a03973ff535dc4691135990f31f855, type: 2}
+  data: {fileID: 0}
   isShowingOOBB: 1
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -2.5909486, y: 5.929202}
     - {x: -6.272824, y: -1.5874923}
@@ -18251,6 +18269,7 @@ MonoBehaviour:
   isUsingOOBBCopy: 0
   isShowingLocalPoints: 0
   oobb:
+    isInitialized: 0
     localWorldPoints:
     - {x: -3.7934399, y: 5.2419715}
     - {x: -5.7912755, y: -2.8861005}
