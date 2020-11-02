@@ -282,6 +282,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void DrawSpriteDetails(Rect rightAreaRect)
         {
+            var hasSelectedDataItem = selectedSpriteDataItem == null;
+
             EditorGUILayout.BeginVertical(GUILayout.Height(130));
             EditorGUILayout.Space();
             EditorGUI.DrawTextureTransparent(new Rect(rightAreaRect.width / 2 - 50, rightAreaRect.y, 100, 100),
@@ -292,53 +294,59 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Resolution");
             EditorGUI.BeginDisabledGroup(true);
-            if (selectedSpriteDataItem == null)
             {
-                EditorGUILayout.IntField("Width", 0);
-                EditorGUILayout.IntField("Height", 0);
+                if (hasSelectedDataItem)
+                {
+                    EditorGUILayout.IntField("Width", 0);
+                    EditorGUILayout.IntField("Height", 0);
+                }
+                else
+                {
+                    EditorGUILayout.IntField("Width", selectedSprite.texture.width);
+                    EditorGUILayout.IntField("Height", selectedSprite.texture.height);
+                }
             }
-            else
-            {
-                EditorGUILayout.IntField("Width", selectedSprite.texture.width);
-                EditorGUILayout.IntField("Height", selectedSprite.texture.height);
-            }
-
-            EditorGUILayout.EndHorizontal();
             EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
 
             var analyzeButtonWidth = GUILayout.Width(rightAreaRect.width / 8);
 
-            EditorGUILayout.BeginHorizontal();
-            brightness = EditorGUILayout.FloatField("Brightness", brightness);
-            if (GUILayout.Button("Analyze", analyzeButtonWidth))
+            EditorGUI.BeginDisabledGroup(hasSelectedDataItem);
             {
+                EditorGUILayout.BeginHorizontal();
+                brightness = EditorGUILayout.FloatField("Brightness", brightness);
+                if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                {
+                }
+
+                EditorGUILayout.EndHorizontal();
+
+
+                EditorGUILayout.BeginHorizontal();
+                blurriness = EditorGUILayout.FloatField("blurriness", blurriness);
+                if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                {
+                }
+
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                primaryColor = EditorGUILayout.ColorField("Primary Color", primaryColor);
+                if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                {
+                }
+
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("", "");
+                if (GUILayout.Button("Analyze All", analyzeButtonWidth))
+                {
+                }
+
+                EditorGUILayout.EndHorizontal();
             }
-
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            blurriness = EditorGUILayout.FloatField("blurriness", blurriness);
-            if (GUILayout.Button("Analyze", analyzeButtonWidth))
-            {
-            }
-
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            primaryColor = EditorGUILayout.ColorField("Primary Color", primaryColor);
-            if (GUILayout.Button("Analyze", analyzeButtonWidth))
-            {
-            }
-
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("", "");
-            if (GUILayout.Button("Analyze All", analyzeButtonWidth))
-            {
-            }
-
-            EditorGUILayout.EndHorizontal();
+            EditorGUI.EndDisabledGroup();
         }
 
         private void DrawOutlineContent(Rect rightAreaRect)
