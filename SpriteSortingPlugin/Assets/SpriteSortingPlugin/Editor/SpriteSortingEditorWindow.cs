@@ -37,10 +37,12 @@ namespace SpriteSortingPlugin
         private SpriteSortingEditorPreview preview;
 
         private bool analyzeButtonWasClicked;
+        private bool isAnalyzedButtonDisabled;
         private ReordableOverlappingItemList reordableOverlappingItemList;
 
         private bool isAnalyzingWithChangedLayerFirst;
         private GUIStyle centeredStyle;
+        private GUIStyle helpBoxStyle;
 
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
@@ -56,6 +58,7 @@ namespace SpriteSortingPlugin
             reordableOverlappingItemList = new ReordableOverlappingItemList();
             SortingLayerUtility.UpdateSortingLayerNames();
             centeredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
+            helpBoxStyle = new GUIStyle("HelpBox");
 
             //TODO: remove
             // SelectDefaultSpriteAlphaData();
@@ -163,15 +166,148 @@ namespace SpriteSortingPlugin
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
             serializedObject.Update();
 
-            bool isAnalyzedButtonDisabled = false;
+            isAnalyzedButtonDisabled = false;
             GUILayout.Label("Sprite Sorting", centeredStyle, GUILayout.ExpandWidth(true));
 
             EditorGUILayout.Space();
-            GUILayout.Label("General Options");
+            DrawGeneralOptions();
+
+            EditorGUILayout.Space();
+            DrawSortingOptions();
+
+            serializedObject.ApplyModifiedProperties();
+            bool isAnalyzedButtonClickedThisFrame = false;
+
+            EditorGUI.BeginDisabledGroup(isAnalyzedButtonDisabled);
+            if (GUILayout.Button("Analyze"))
+            {
+                Analyze();
+                isAnalyzedButtonClickedThisFrame = true;
+            }
+
+            EditorGUI.EndDisabledGroup();
+
+            if (!analyzeButtonWasClicked)
+            {
+                EndScrollRect();
+                return;
+            }
+
+            EditorGUILayout.Space();
+
+            if (result.overlappingItems == null || (result.overlappingItems.Count <= 0))
+            {
+                GUILayout.Label(
+                    "No sorting order issues with overlapping sprites were found in the currently loaded scenes.",
+                    EditorStyles.boldLabel);
+                CleanUpReordableList();
+                preview.DisableSceneVisualizations();
+
+                EndScrollRect();
+                return;
+            }
+
+            reordableOverlappingItemList.DoLayoutList();
+
+            EditorGUILayout.Space();
+
+            if (overlappingItems.HasChangedLayer)
+            {
+                isAnalyzingWithChangedLayerFirst = EditorGUILayout.ToggleLeft(
+                    "Analyse Sprites / Sorting Groups with changed Layer first?", isAnalyzingWithChangedLayerFirst);
+            }
+
+            var isConfirmButtonClicked = false;
+
+            EditorGUILayout.BeginHorizontal();
+            {
+                if (GUILayout.Button("Confirm"))
+                {
+                    ApplySortingOptions();
+                    isConfirmButtonClicked = true;
+                }
+
+                if (sortingType == SortingType.Layer && GUILayout.Button("Confirm and continue searching"))
+                {
+                    ApplySortingOptions();
+
+                    //TODO: check isAnalyzingWithChangedLayerFirst
+                    Analyze();
+
+                    isConfirmButtonClicked = true;
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (isConfirmButtonClicked)
+            {
+                EndScrollRect();
+                return;
+            }
+
+            preview.DoPreview(isAnalyzedButtonClickedThisFrame);
+
+            EndScrollRect();
+        }
+
+        private void DrawSortingOptions()
+        {
+            GUILayout.Label("Sorting Options");
             EditorGUILayout.BeginVertical("HelpBox");
             {
-                EditorGUI.indentLevel++;
+                sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
 
+                switch (sortingType)
+                {
+                    case SortingType.Layer:
+                        ShowSortingLayers();
+
+                        isUsingGameObjectParents =
+                            EditorGUILayout.BeginToggleGroup("use specific GameObject parents?",
+                                isUsingGameObjectParents);
+
+                        if (isUsingGameObjectParents)
+                        {
+                            var gameObjectParentsSerializedProp =
+                                serializedObject.FindProperty(nameof(gameObjectParents));
+                            if (isGameObjectParentsExpanded)
+                            {
+                                gameObjectParentsSerializedProp.isExpanded = true;
+                                isGameObjectParentsExpanded = false;
+                            }
+
+                            EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                        }
+
+                        EditorGUILayout.EndToggleGroup();
+
+                        break;
+                    case SortingType.Sprite:
+                        var serializedSpriteRenderer = serializedObject.FindProperty(nameof(spriteRenderer));
+                        EditorGUILayout.PropertyField(serializedSpriteRenderer, true);
+
+                        // //TODO: will not work for prefab scene
+                        if (serializedSpriteRenderer.objectReferenceValue == null ||
+                            !((SpriteRenderer) serializedSpriteRenderer.objectReferenceValue).gameObject.scene.isLoaded)
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUILayout.LabelField(new GUIContent("Please choose a SpriteRenderer within the scene",
+                                warnIcon));
+                            isAnalyzedButtonDisabled = true;
+                            EditorGUI.indentLevel--;
+                        }
+
+                        break;
+                }
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        private void DrawGeneralOptions()
+        {
+            GUILayout.Label("General Options");
+            EditorGUILayout.BeginVertical(helpBoxStyle);
+            {
                 var projectTransparencySortMode = GraphicsSettings.transparencySortMode;
 
                 EditorGUI.BeginDisabledGroup(true);
@@ -215,8 +351,6 @@ namespace SpriteSortingPlugin
                     case TransparencySortMode.CustomAxis:
                         break;
                 }
-
-                EditorGUI.indentLevel--;
 
                 useSpriteAlphaOutline = EditorGUILayout.BeginToggleGroup(
                     "Use a more precise sprite outline than the SpriteRenderers Bounding Box?", useSpriteAlphaOutline);
@@ -273,142 +407,6 @@ namespace SpriteSortingPlugin
                 EditorGUILayout.EndToggleGroup();
             }
             EditorGUILayout.EndVertical();
-
-            EditorGUILayout.Space();
-
-            GUILayout.Label("Sorting Options");
-            EditorGUILayout.BeginVertical("HelpBox");
-            {
-                EditorGUI.indentLevel++;
-
-                sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
-
-                switch (sortingType)
-                {
-                    case SortingType.Layer:
-                        ShowSortingLayers();
-
-                        isUsingGameObjectParents =
-                            EditorGUILayout.BeginToggleGroup("use specific GameObject parents?",
-                                isUsingGameObjectParents);
-
-                        if (isUsingGameObjectParents)
-                        {
-                            var gameObjectParentsSerializedProp =
-                                serializedObject.FindProperty(nameof(gameObjectParents));
-                            if (isGameObjectParentsExpanded)
-                            {
-                                gameObjectParentsSerializedProp.isExpanded = true;
-                                isGameObjectParentsExpanded = false;
-                            }
-
-                            EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
-                        }
-
-                        EditorGUILayout.EndToggleGroup();
-
-                        break;
-                    case SortingType.Sprite:
-                        var serializedSpriteRenderer = serializedObject.FindProperty(nameof(spriteRenderer));
-                        EditorGUILayout.PropertyField(serializedSpriteRenderer, true);
-
-                        // //TODO: will not work for prefab scene
-                        // if (spriteRenderer != null && !spriteRenderer.gameObject.scene.isLoaded)
-                        // {
-                        //     GUILayout.Label("Please choose a SpriteRenderer from an active Scene.");
-                        // }
-
-                        if (serializedSpriteRenderer.objectReferenceValue == null ||
-                            !((SpriteRenderer) serializedSpriteRenderer.objectReferenceValue).gameObject.scene.isLoaded)
-                        {
-                            EditorGUI.indentLevel++;
-                            EditorGUILayout.LabelField(new GUIContent("Please choose a SpriteRenderer within the scene",
-                                warnIcon));
-                            isAnalyzedButtonDisabled = true;
-                            EditorGUI.indentLevel--;
-                        }
-
-                        break;
-                }
-
-                EditorGUI.indentLevel--;
-            }
-            EditorGUILayout.EndVertical();
-
-            serializedObject.ApplyModifiedProperties();
-            bool isAnalyzedButtonClickedThisFrame = false;
-
-            EditorGUI.BeginDisabledGroup(isAnalyzedButtonDisabled);
-            if (GUILayout.Button("Analyze"))
-            {
-                Analyze();
-                isAnalyzedButtonClickedThisFrame = true;
-            }
-
-            EditorGUI.EndDisabledGroup();
-
-            if (!analyzeButtonWasClicked)
-            {
-                EndScrollRect();
-                return;
-            }
-
-            EditorGUILayout.Space();
-
-            if (result.overlappingItems == null || (result.overlappingItems.Count <= 0))
-                // if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
-            {
-                GUILayout.Label(
-                    "No sorting order issues with overlapping sprites were found in the currently loaded scenes.",
-                    EditorStyles.boldLabel);
-                CleanUpReordableList();
-                preview.DisableSceneVisualizations();
-
-                EndScrollRect();
-                return;
-            }
-
-            reordableOverlappingItemList.DoLayoutList();
-
-            EditorGUILayout.Space();
-
-            if (overlappingItems.HasChangedLayer)
-            {
-                isAnalyzingWithChangedLayerFirst = EditorGUILayout.ToggleLeft(
-                    "Analyse Sprites / Sorting Groups with changed Layer first?", isAnalyzingWithChangedLayerFirst);
-            }
-
-            var isConfirmButtonClicked = false;
-
-            EditorGUILayout.BeginHorizontal();
-            {
-                if (GUILayout.Button("Confirm"))
-                {
-                    ApplySortingOptions();
-                    isConfirmButtonClicked = true;
-                }
-
-                if (sortingType == SortingType.Layer && GUILayout.Button("Confirm and continue searching"))
-                {
-                    ApplySortingOptions();
-
-                    //TODO: check isAnalyzingWithChangedLayerFirst
-                    Analyze();
-
-                    isConfirmButtonClicked = true;
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-
-            if (isConfirmButtonClicked)
-            {
-                EndScrollRect();
-                return;
-            }
-
-            preview.DoPreview(isAnalyzedButtonClickedThisFrame);
-
-            EndScrollRect();
         }
 
         private void ApplySortingOptions()
