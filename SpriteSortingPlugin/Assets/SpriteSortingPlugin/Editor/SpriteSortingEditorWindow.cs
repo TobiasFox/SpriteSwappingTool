@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using SpriteSortingPlugin.Preview;
 using SpriteSortingPlugin.SpriteAlphaAnalysis;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin
 {
     public class SpriteSortingEditorWindow : EditorWindow
     {
         private const string SortingLayerNameDefault = "Default";
+
+        private static Texture warnIcon;
+        private static bool isIconInitialized;
 
         private Vector2 scrollPosition = Vector2.zero;
 
@@ -23,6 +24,7 @@ namespace SpriteSortingPlugin
         private SortingType sortingType;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private List<Transform> gameObjectParents;
+        [SerializeField] private Camera camera;
         private SerializedObject serializedObject;
 
         private int selectedSortingLayers;
@@ -38,6 +40,7 @@ namespace SpriteSortingPlugin
         private ReordableOverlappingItemList reordableOverlappingItemList;
 
         private bool isAnalyzingWithChangedLayerFirst;
+        private GUIStyle centeredStyle;
 
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
@@ -52,9 +55,16 @@ namespace SpriteSortingPlugin
             preview = new SpriteSortingEditorPreview();
             reordableOverlappingItemList = new ReordableOverlappingItemList();
             SortingLayerUtility.UpdateSortingLayerNames();
+            centeredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
 
             //TODO: remove
             SelectDefaultSpriteAlphaData();
+
+            if (!isIconInitialized)
+            {
+                warnIcon = EditorGUIUtility.IconContent("console.warnicon.sml").image;
+                isIconInitialized = true;
+            }
         }
 
         private void SelectDefaultSpriteAlphaData()
@@ -153,102 +163,189 @@ namespace SpriteSortingPlugin
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
             serializedObject.Update();
 
-            var style = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
-            GUILayout.Label("Sprite Sorting", style, GUILayout.ExpandWidth(true));
+            bool isAnalyzedButtonDisabled = false;
+            GUILayout.Label("Sprite Sorting", centeredStyle, GUILayout.ExpandWidth(true));
 
-            useSpriteAlphaOutline = EditorGUILayout.BeginToggleGroup(
-                "use more precise sprite outline than the SpriteRenderers Bounding Box?", useSpriteAlphaOutline);
-
-            if (useSpriteAlphaOutline)
+            EditorGUILayout.Space();
+            GUILayout.Label("General Options");
+            EditorGUILayout.BeginVertical("HelpBox");
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.BeginHorizontal();
 
-                EditorGUI.BeginChangeCheck();
-                spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
-                    spriteData, typeof(SpriteData), false) as SpriteData;
-                if (EditorGUI.EndChangeCheck())
+                var projectTransparencySortMode = GraphicsSettings.transparencySortMode;
+
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUIUtility.labelWidth = 350;
+                EditorGUILayout.LabelField("Transparency Sort Mode (Change via Project Settings):",
+                    projectTransparencySortMode.ToString());
+                EditorGUIUtility.labelWidth = 0;
+                EditorGUI.EndDisabledGroup();
+
+                switch (projectTransparencySortMode)
                 {
-                    preview.UpdateSpriteAlphaData(spriteData);
+                    case TransparencySortMode.Default:
+                        EditorGUI.indentLevel++;
+                        var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
 
-                    //TODO select default value
-                    // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
-                    // {
-                    //     if (spriteDataItem.outlinePoints != null)
-                    //     {
-                    //         alphaAnalysisType = AlphaAnalysisType.Outline;
-                    //     }
-                    // }
+                        EditorGUILayout.PropertyField(cameraSerializedProp, new GUIContent("Camera"));
+
+                        if (cameraSerializedProp.objectReferenceValue == null)
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUILayout.LabelField(new GUIContent("Please choose a camera", warnIcon));
+                            isAnalyzedButtonDisabled = true;
+                            EditorGUI.indentLevel--;
+                        }
+                        else
+                        {
+                            cameraProjectionType = ((Camera) cameraSerializedProp.objectReferenceValue).orthographic
+                                ? CameraProjectionType.Orthographic
+                                : CameraProjectionType.Perspective;
+                        }
+
+                        EditorGUI.indentLevel--;
+
+                        break;
+                    case TransparencySortMode.Perspective:
+                        cameraProjectionType = CameraProjectionType.Perspective;
+                        break;
+                    case TransparencySortMode.Orthographic:
+                        cameraProjectionType = CameraProjectionType.Orthographic;
+                        break;
+                    case TransparencySortMode.CustomAxis:
+                        break;
                 }
 
-                if (GUILayout.Button("Open Sprite Data editor window to create the data"))
+                EditorGUI.indentLevel--;
+
+                useSpriteAlphaOutline = EditorGUILayout.BeginToggleGroup(
+                    "Use a more precise sprite outline than the SpriteRenderers Bounding Box?", useSpriteAlphaOutline);
+
+                if (useSpriteAlphaOutline)
                 {
-                    var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
-                    spriteAlphaEditorWindow.Show();
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.BeginHorizontal();
+
+                    EditorGUI.BeginChangeCheck();
+                    spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
+                        spriteData, typeof(SpriteData), false) as SpriteData;
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        preview.UpdateSpriteAlphaData(spriteData);
+
+                        //TODO select default value
+                        // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
+                        // {
+                        //     if (spriteDataItem.outlinePoints != null)
+                        //     {
+                        //         alphaAnalysisType = AlphaAnalysisType.Outline;
+                        //     }
+                        // }
+                    }
+
+                    if (GUILayout.Button("Open Sprite Data editor window to create the data"))
+                    {
+                        var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
+                        spriteAlphaEditorWindow.Show();
+                    }
+
+                    EditorGUILayout.EndHorizontal();
+
+                    if (spriteData == null)
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.LabelField(new GUIContent("Please choose a Sprite Data Asset", warnIcon));
+                        isAnalyzedButtonDisabled = true;
+                        EditorGUI.indentLevel--;
+                    }
+
+                    EditorGUI.BeginChangeCheck();
+                    outlinePrecision =
+                        (OutlinePrecision) EditorGUILayout.EnumPopup("Outline Precision", outlinePrecision);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        preview.UpdateOutlineType(outlinePrecision);
+                    }
+
+                    EditorGUI.indentLevel--;
                 }
 
-                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndToggleGroup();
+            }
+            EditorGUILayout.EndVertical();
 
-                EditorGUI.BeginChangeCheck();
-                outlinePrecision = (OutlinePrecision) EditorGUILayout.EnumPopup("Outline Precision", outlinePrecision);
-                if (EditorGUI.EndChangeCheck())
+            EditorGUILayout.Space();
+
+            GUILayout.Label("Sorting Options");
+            EditorGUILayout.BeginVertical("HelpBox");
+            {
+                EditorGUI.indentLevel++;
+
+                sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
+
+                switch (sortingType)
                 {
-                    preview.UpdateOutlineType(outlinePrecision);
+                    case SortingType.Layer:
+                        ShowSortingLayers();
+
+                        isUsingGameObjectParents =
+                            EditorGUILayout.BeginToggleGroup("use specific GameObject parents?",
+                                isUsingGameObjectParents);
+
+                        if (isUsingGameObjectParents)
+                        {
+                            var gameObjectParentsSerializedProp =
+                                serializedObject.FindProperty(nameof(gameObjectParents));
+                            if (isGameObjectParentsExpanded)
+                            {
+                                gameObjectParentsSerializedProp.isExpanded = true;
+                                isGameObjectParentsExpanded = false;
+                            }
+
+                            EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                        }
+
+                        EditorGUILayout.EndToggleGroup();
+
+                        break;
+                    case SortingType.Sprite:
+                        var serializedSpriteRenderer = serializedObject.FindProperty(nameof(spriteRenderer));
+                        EditorGUILayout.PropertyField(serializedSpriteRenderer, true);
+
+                        // //TODO: will not work for prefab scene
+                        // if (spriteRenderer != null && !spriteRenderer.gameObject.scene.isLoaded)
+                        // {
+                        //     GUILayout.Label("Please choose a SpriteRenderer from an active Scene.");
+                        // }
+
+                        if (serializedSpriteRenderer.objectReferenceValue == null ||
+                            !((SpriteRenderer) serializedSpriteRenderer.objectReferenceValue).gameObject.scene.isLoaded)
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUILayout.LabelField(new GUIContent("Please choose a SpriteRenderer within the scene",
+                                warnIcon));
+                            isAnalyzedButtonDisabled = true;
+                            EditorGUI.indentLevel--;
+                        }
+
+                        break;
                 }
 
                 EditorGUI.indentLevel--;
             }
-
-            EditorGUILayout.EndToggleGroup();
-
-            cameraProjectionType =
-                (CameraProjectionType) EditorGUILayout.EnumPopup("Projection type of camera", cameraProjectionType);
-            sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
-
-            switch (sortingType)
-            {
-                case SortingType.Layer:
-                    ShowSortingLayers();
-
-                    isUsingGameObjectParents =
-                        EditorGUILayout.BeginToggleGroup("use specific GameObject parents?", isUsingGameObjectParents);
-
-                    if (isUsingGameObjectParents)
-                    {
-                        var gameObjectParentsSerializedProp = serializedObject.FindProperty(nameof(gameObjectParents));
-                        if (isGameObjectParentsExpanded)
-                        {
-                            gameObjectParentsSerializedProp.isExpanded = true;
-                            isGameObjectParentsExpanded = false;
-                        }
-
-                        EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
-                    }
-
-                    EditorGUILayout.EndToggleGroup();
-
-                    break;
-                case SortingType.Sprite:
-                    var serializedSpriteRenderer = serializedObject.FindProperty(nameof(spriteRenderer));
-                    EditorGUILayout.PropertyField(serializedSpriteRenderer, true);
-
-                    //TODO: will not work for prefab scene
-                    if (spriteRenderer != null && !spriteRenderer.gameObject.scene.isLoaded)
-                    {
-                        GUILayout.Label("Please choose a SpriteRenderer from an active Scene.");
-                    }
-
-                    break;
-            }
+            EditorGUILayout.EndVertical();
 
             serializedObject.ApplyModifiedProperties();
             bool isAnalyzedButtonClickedThisFrame = false;
 
+            EditorGUI.BeginDisabledGroup(isAnalyzedButtonDisabled);
             if (GUILayout.Button("Analyze"))
             {
                 Analyze();
                 isAnalyzedButtonClickedThisFrame = true;
             }
+
+            EditorGUI.EndDisabledGroup();
 
             if (!analyzeButtonWasClicked)
             {
