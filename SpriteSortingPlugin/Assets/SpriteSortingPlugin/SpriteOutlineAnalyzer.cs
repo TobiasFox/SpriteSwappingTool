@@ -88,8 +88,7 @@ namespace SpriteSortingPlugin
 
                     neighbourOfBoundaryPointIndex =
                         PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
-                    neighbourCounter = 0;
-                    // neighbourCounter = 1?
+                    neighbourCounter = 1;
                 }
                 else
                 {
@@ -98,6 +97,7 @@ namespace SpriteSortingPlugin
                     pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
                     neighbourOfBoundaryPointIndex =
                         PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
+                    neighbourCounter++;
 
                     // var boundaryWidth=boundaryPoint & spriteWidth;
                     //
