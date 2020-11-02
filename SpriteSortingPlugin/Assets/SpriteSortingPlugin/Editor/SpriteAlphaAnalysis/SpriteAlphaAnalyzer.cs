@@ -34,7 +34,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 if (!spriteIsReadable)
                 {
                     var isResetReadableFlagSuccessful = SetSpriteReadable(sprite.texture, true);
-                    if (isResetReadableFlagSuccessful)
+                    if (!isResetReadableFlagSuccessful)
                     {
                         // currentProgress+=2; or +1 error
                         continue;
@@ -76,12 +76,15 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 return false;
             }
 
+            var isSuccessfullyChangeReadableFlag = false;
+            
             try
             {
                 AssetDatabase.StartAssetEditing();
 
                 textureImporter.isReadable = isReadable;
                 AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                isSuccessfullyChangeReadableFlag = true;
             }
             catch (Exception e)
             {
@@ -93,7 +96,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 AssetDatabase.StopAssetEditing();
             }
 
-            return true;
+            return isSuccessfullyChangeReadableFlag;
         }
 
         private List<Vector2> GenerateAlphaOutline(Sprite sprite)
