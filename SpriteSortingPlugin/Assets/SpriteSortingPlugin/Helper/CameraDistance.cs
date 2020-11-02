@@ -24,6 +24,8 @@ namespace SpriteSortingPlugin
             }
 
             Handles.BeginGUI();
+            Handles.color = Color.blue;
+            var style = new GUIStyle {normal = {textColor = Color.white}};
             if (camera.orthographic)
             {
                 var positionOnCameraPlane =
@@ -31,7 +33,8 @@ namespace SpriteSortingPlugin
                 var distance = transform.position - positionOnCameraPlane;
                 var dist = distance.magnitude;
                 distance = distance * -0.5f + transform.position + offset;
-                Handles.Label(distance, dist.ToString("#.00"));
+
+                Handles.Label(distance, dist.ToString("#.00"), style);
                 Handles.DrawLine(transform.position, positionOnCameraPlane);
             }
             else
@@ -39,7 +42,7 @@ namespace SpriteSortingPlugin
                 var distance = transform.position - camera.transform.position;
                 var dist = distance.magnitude;
                 distance = distance * -0.5f + transform.position + offset;
-                Handles.Label(distance, dist.ToString("#.00"));
+                Handles.Label(distance, dist.ToString("#.00"), style);
                 Handles.DrawLine(transform.position, camera.transform.position);
             }
 
