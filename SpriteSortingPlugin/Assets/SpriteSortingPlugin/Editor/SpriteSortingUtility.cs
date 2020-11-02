@@ -368,8 +368,6 @@ namespace SpriteSortingPlugin
                                         DisableCachedCollider(otherAssetGuid,
                                             otherPolygonColliderToCheck.GetInstanceID());
 
-                                        // Object.DestroyImmediate(polyColliderGameObject);
-
                                         // Debug.DrawLine(distance.pointA,
                                         //     new Vector3(distance.pointA.x, distance.pointA.y, -15), Color.blue, 3);
                                         // Debug.DrawLine(distance.pointB,
@@ -527,7 +525,7 @@ namespace SpriteSortingPlugin
             return list;
         }
 
-        private static SortingGroup GetOutmostActiveSortingGroup(IReadOnlyList<SortingGroup> groups)
+        public static SortingGroup GetOutmostActiveSortingGroup(IReadOnlyList<SortingGroup> groups)
         {
             for (var i = groups.Count - 1; i >= 0; i--)
             {
@@ -656,7 +654,8 @@ namespace SpriteSortingPlugin
                     {
                         newSortingOrder = newBaseSortingOrder - 1;
                     }
-                    else if (currentBaseSortingOrder < currentSortingOrder && newBaseSortingOrder >= newSortingOrder)
+                    else if (currentBaseSortingOrder < currentSortingOrder &&
+                             newBaseSortingOrder >= newSortingOrder)
                     {
                         newSortingOrder = newBaseSortingOrder + 1;
                     }
@@ -670,7 +669,8 @@ namespace SpriteSortingPlugin
             }
         }
 
-        private static void SortOverlappingSortingComponents(ref List<SortingComponent> overlappingSortingComponents,
+        private static void SortOverlappingSortingComponents(
+            ref List<SortingComponent> overlappingSortingComponents,
             int currentBaseSortingOrder)
         {
             var sortingComponentsCount = overlappingSortingComponents.Count;

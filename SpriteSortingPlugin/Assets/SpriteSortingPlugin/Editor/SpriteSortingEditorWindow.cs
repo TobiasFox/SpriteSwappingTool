@@ -44,6 +44,8 @@ namespace SpriteSortingPlugin
         private GUIStyle centeredStyle;
         private GUIStyle helpBoxStyle;
 
+        private OverlappingSpriteDetector overlappingSpriteDetector;
+
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
         {
@@ -68,6 +70,8 @@ namespace SpriteSortingPlugin
                 warnIcon = EditorGUIUtility.IconContent("console.warnicon.sml").image;
                 isIconInitialized = true;
             }
+
+            overlappingSpriteDetector = new OverlappingSpriteDetector();
         }
 
         private void SelectDefaultSpriteAlphaData()
@@ -575,6 +579,7 @@ namespace SpriteSortingPlugin
         {
             preview.CleanUpPreview();
             SpriteSortingUtility.CleanUp();
+            PolygonColliderCacher.CleanUp();
         }
     }
 }
