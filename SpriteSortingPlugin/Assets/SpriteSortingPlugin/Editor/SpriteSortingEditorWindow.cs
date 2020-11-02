@@ -58,7 +58,7 @@ namespace SpriteSortingPlugin
             centeredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
 
             //TODO: remove
-            SelectDefaultSpriteAlphaData();
+            // SelectDefaultSpriteAlphaData();
 
             if (!isIconInitialized)
             {
@@ -353,6 +353,8 @@ namespace SpriteSortingPlugin
                 return;
             }
 
+            EditorGUILayout.Space();
+
             if (result.overlappingItems == null || (result.overlappingItems.Count <= 0))
                 // if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
             {
@@ -376,25 +378,31 @@ namespace SpriteSortingPlugin
                     "Analyse Sprites / Sorting Groups with changed Layer first?", isAnalyzingWithChangedLayerFirst);
             }
 
-            var buttonLabel = sortingType == SortingType.Layer ? "Confirm and continue searching" : "confirm";
-            if (GUILayout.Button(buttonLabel))
+            var isConfirmButtonClicked = false;
+
+            EditorGUILayout.BeginHorizontal();
             {
-                Debug.Log("sort sprites");
-
-                ApplySortingOptions();
-
-                analyzeButtonWasClicked = false;
-                result.overlappingItems = null;
-                preview.CleanUpPreview();
-
-                EndScrollRect();
-
-                if (sortingType == SortingType.Layer)
+                if (GUILayout.Button("Confirm"))
                 {
-                    //TODO: check isAnalyzingWithChangedLayerFirst
-                    Analyze();
+                    ApplySortingOptions();
+                    isConfirmButtonClicked = true;
                 }
 
+                if (sortingType == SortingType.Layer && GUILayout.Button("Confirm and continue searching"))
+                {
+                    ApplySortingOptions();
+
+                    //TODO: check isAnalyzingWithChangedLayerFirst
+                    Analyze();
+
+                    isConfirmButtonClicked = true;
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (isConfirmButtonClicked)
+            {
+                EndScrollRect();
                 return;
             }
 
@@ -405,6 +413,12 @@ namespace SpriteSortingPlugin
 
         private void ApplySortingOptions()
         {
+            Debug.Log("apply sorting options");
+
+            analyzeButtonWasClicked = false;
+            result.overlappingItems = null;
+            preview.CleanUpPreview();
+
             var itemCount = overlappingItems.Items.Count;
             for (var i = 0; i < itemCount; i++)
             {
