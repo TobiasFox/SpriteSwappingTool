@@ -21,12 +21,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private Sprite selectedSprite;
         private float selectedSpriteAspectRatio;
 
-        private string searchString;
+        private string searchString = "";
         private bool isShowingSpriteAlphaGUI = true;
         private bool isShowingOOBB = true;
         private Color outlineColor = Color.green;
 
-        private List<SpriteDataItem> spriteList;
+        private List<SpriteDataItem> spriteDataList;
         private ReorderableList reorderableSpriteList;
         private SearchField searchField;
         private Vector2 leftBarScrollPosition;
@@ -88,13 +88,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void ResetSpriteList()
         {
-            if (spriteList == null)
+            if (spriteDataList == null)
             {
-                spriteList = new List<SpriteDataItem>();
+                spriteDataList = new List<SpriteDataItem>();
             }
             else
             {
-                spriteList.Clear();
+                spriteDataList.Clear();
             }
         }
 
@@ -133,7 +133,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 if (GUILayout.Button("Load"))
                 {
                     Debug.Log("loaded sprite Alpha Data");
-                    LoadSpriteAlphaData();
+                    LoadSpriteDataList();
                     isShowingSpriteAlphaGUI = true;
                 }
 
@@ -226,7 +226,15 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     EditorGUILayout.Space();
 
                     GUILayout.Label("Sprites", centeredStyle, GUILayout.ExpandWidth(true));
-                    searchField.OnGUI(searchString);
+                    EditorGUI.BeginChangeCheck();
+                    searchString = searchField.OnGUI(searchString);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        if (spriteData != null && spriteData.spriteDataDictionary.Count > 0)
+                        {
+                            FilterSpriteDataList();
+                        }
+                    }
 
                     if (reorderableSpriteList == null)
                     {
@@ -462,18 +470,28 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             selectedSpriteDataItem.objectOrientedBoundingBox.AlphaRectangleBorder = alphaBorder;
         }
 
-        private void LoadSpriteAlphaData()
+        private void FilterSpriteDataList()
+        {
+            searchString = searchString.Trim();
+            spriteDataList.Clear();
+
+            foreach (var spriteDataItem in spriteData.spriteDataDictionary.Values)
+            {
+                if (searchString.Length == 0 || spriteDataItem.AssetName.Contains(searchString))
+                {
+                    spriteDataList.Add(spriteDataItem);
+                }
+            }
+        }
+
+        private void LoadSpriteDataList()
         {
             if (spriteData == null)
             {
                 return;
             }
 
-            spriteList.Clear();
-            foreach (var spriteDataItem in spriteData.spriteDataDictionary.Values)
-            {
-                spriteList.Add(spriteDataItem);
-            }
+            FilterSpriteDataList();
         }
 
         private void AnalyzeSpriteAlphas()
@@ -490,12 +508,14 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             reorderableSpriteList.index = -1;
             selectedSpriteDataItem = null;
-            spriteList.Clear();
+            spriteDataList.Clear();
 
             spriteData = CreateInstance<SpriteData>();
 
             GenerateSpriteDataItems();
             spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteData, outlineAnalysisType);
+
+            LoadSpriteDataList();
 
             var assetPathAndName =
                 AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteData) + ".asset");
@@ -528,14 +548,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                 var spriteDataItem = new SpriteDataItem(guid, spriteRenderer.sprite.name);
                 spriteData.spriteDataDictionary.Add(guid, spriteDataItem);
-
-                spriteList.Add(spriteDataItem);
             }
         }
 
         private void InitReordableSpriteList()
         {
-            reorderableSpriteList = new ReorderableList(spriteList, typeof(string), false, false, false, false);
+            reorderableSpriteList = new ReorderableList(spriteDataList, typeof(string), false, false, false, false);
             reorderableSpriteList.onSelectCallback += OnSpriteSelected;
             reorderableSpriteList.drawElementCallback += DrawElementCallBack;
             reorderableSpriteList.drawElementBackgroundCallback += DrawElementBackgroundCallBack;
@@ -564,7 +582,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void DrawElementCallBack(Rect rect, int index, bool isactive, bool isfocused)
         {
-            var oobb = spriteList[index];
+            var oobb = spriteDataList[index];
             EditorGUI.LabelField(rect, oobb.AssetName);
         }
 
@@ -575,7 +593,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                 return;
             }
 
-            selectedSpriteDataItem = spriteList[list.index];
+            selectedSpriteDataItem = spriteDataList[list.index];
 
             var path = AssetDatabase.GUIDToAssetPath(selectedSpriteDataItem.AssetGuid);
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
