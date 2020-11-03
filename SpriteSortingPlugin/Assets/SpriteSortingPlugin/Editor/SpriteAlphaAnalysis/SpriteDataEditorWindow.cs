@@ -323,7 +323,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
 
                 EditorGUILayout.BeginHorizontal();
-                blurriness = EditorGUILayout.FloatField("blurriness", blurriness);
+                blurriness = EditorGUILayout.FloatField("Blurriness", blurriness);
                 if (GUILayout.Button("Analyze", analyzeButtonWidth))
                 {
                 }

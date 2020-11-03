@@ -32,7 +32,6 @@ namespace SpriteSortingPlugin
         private bool isGameObjectParentsExpanded;
         private bool isUsingGameObjectParents;
 
-        private SpriteSortingAnalysisResult result;
         private OverlappingItems overlappingItems;
         private SpriteSortingEditorPreview preview;
 
@@ -45,6 +44,7 @@ namespace SpriteSortingPlugin
         private GUIStyle helpBoxStyle;
 
         private OverlappingSpriteDetector overlappingSpriteDetector;
+        private SpriteDetectionData spriteDetectionData;
 
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
@@ -113,8 +113,7 @@ namespace SpriteSortingPlugin
 
         private void UpdateChangedSortingLayerOrderInOverlappingItems()
         {
-            if (!analyzeButtonWasClicked || result.overlappingItems == null ||
-                result.overlappingItems.Count <= 0)
+            if (!analyzeButtonWasClicked || !HasOverlappingItems())
             {
                 return;
             }
@@ -137,11 +136,13 @@ namespace SpriteSortingPlugin
             for (var i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
             {
                 var layerName = SortingLayerUtility.SortingLayerNames[i];
-                if (oldSelectedLayerNames.Contains(layerName))
+                if (!oldSelectedLayerNames.Contains(layerName))
                 {
-                    selectedLayers.Add(layerName);
-                    selectedSortingLayers ^= 1 << i;
+                    continue;
                 }
+
+                selectedLayers.Add(layerName);
+                selectedSortingLayers ^= 1 << i;
             }
         }
 
@@ -154,12 +155,9 @@ namespace SpriteSortingPlugin
 
             SortingLayerUtility.UpdateSortingLayerNames();
 
-            if (analyzeButtonWasClicked)
+            if (analyzeButtonWasClicked && HasOverlappingItems())
             {
-                if (result.overlappingItems != null && result.overlappingItems.Count > 0)
-                {
-                    reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
-                }
+                reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
             }
 
             preview.EnableSceneVisualization(true);
@@ -199,7 +197,7 @@ namespace SpriteSortingPlugin
 
             EditorGUILayout.Space();
 
-            if (result.overlappingItems == null || (result.overlappingItems.Count <= 0))
+            if (!HasOverlappingItems())
             {
                 GUILayout.Label(
                     "No sorting order issues with overlapping sprites were found in the currently loaded scenes.",
@@ -417,10 +415,6 @@ namespace SpriteSortingPlugin
         {
             Debug.Log("apply sorting options");
 
-            analyzeButtonWasClicked = false;
-            result.overlappingItems = null;
-            preview.CleanUpPreview();
-
             var itemCount = overlappingItems.Items.Count;
             for (var i = 0; i < itemCount; i++)
             {
@@ -434,8 +428,12 @@ namespace SpriteSortingPlugin
                 overlappingItem.ApplySortingOption();
             }
 
-            var sortingOptions = SpriteSortingUtility.AnalyzeSurroundingSprites(cameraProjectionType,
-                overlappingItems.Items, spriteData, outlinePrecision);
+            spriteDetectionData.outlinePrecision = outlinePrecision;
+            spriteDetectionData.spriteData = spriteData;
+            spriteDetectionData.cameraProjectionType = cameraProjectionType;
+
+            var sortingOptions = overlappingSpriteDetector.AnalyzeSurroundingSpritesAndGetAdjustedSortingOptions(
+                overlappingItems.Items, spriteDetectionData);
 
             foreach (var sortingOption in sortingOptions)
             {
@@ -463,6 +461,10 @@ namespace SpriteSortingPlugin
                     EditorUtility.SetDirty(spriteRendererComponent);
                 }
             }
+
+            analyzeButtonWasClicked = false;
+            overlappingItems = null;
+            preview.CleanUpPreview();
         }
 
         private void EndScrollRect()
@@ -473,6 +475,11 @@ namespace SpriteSortingPlugin
         private void CleanUpReordableList()
         {
             reordableOverlappingItemList?.CleanUp();
+        }
+
+        private bool HasOverlappingItems()
+        {
+            return overlappingItems != null && overlappingItems.Items.Count > 0;
         }
 
         private void ShowSortingLayers()
@@ -511,11 +518,13 @@ namespace SpriteSortingPlugin
             var defaultIndex = 0;
             for (var i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
             {
-                if (SortingLayerUtility.SortingLayerNames[i].Equals(SortingLayerNameDefault))
+                if (!SortingLayerUtility.SortingLayerNames[i].Equals(SortingLayerNameDefault))
                 {
-                    defaultIndex = i;
-                    break;
+                    continue;
                 }
+
+                defaultIndex = i;
+                break;
             }
 
             selectedSortingLayers = 1 << defaultIndex;
@@ -533,6 +542,12 @@ namespace SpriteSortingPlugin
                 preview.EnableSceneVisualization(false);
             }
 
+            spriteDetectionData.outlinePrecision = outlinePrecision;
+            spriteDetectionData.spriteData = spriteData;
+            spriteDetectionData.cameraProjectionType = cameraProjectionType;
+
+            var overlappingSpriteDetectionResult = new OverlappingSpriteDetectionResult();
+
             switch (sortingType)
             {
                 case SortingType.Layer:
@@ -543,13 +558,22 @@ namespace SpriteSortingPlugin
                         selectedLayerIds.Add(SortingLayer.NameToID(selectedLayer));
                     }
 
-                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, selectedLayerIds,
-                        gameObjectParents, spriteData, outlinePrecision);
+                    overlappingSpriteDetectionResult = overlappingSpriteDetector.DetectOverlappingSprites(
+                        selectedLayerIds, gameObjectParents, spriteDetectionData);
                     break;
                 case SortingType.Sprite:
-                    result = SpriteSortingUtility.AnalyzeSpriteSorting(cameraProjectionType, spriteRenderer,
-                        spriteData, outlinePrecision);
+
+                    overlappingSpriteDetectionResult =
+                        overlappingSpriteDetector.DetectOverlappingSprites(spriteRenderer, spriteDetectionData);
                     break;
+            }
+
+            if (overlappingSpriteDetectionResult.overlappingSortingComponents == null ||
+                overlappingSpriteDetectionResult.overlappingSortingComponents.Count <= 0 ||
+                overlappingSpriteDetectionResult.baseItem == null)
+            {
+                overlappingItems = null;
+                return;
             }
 
             if (isVisualizingBoundsInScene)
@@ -557,12 +581,12 @@ namespace SpriteSortingPlugin
                 preview.EnableSceneVisualization(true);
             }
 
-            if (result.overlappingItems == null || result.overlappingItems.Count <= 0)
-            {
-                return;
-            }
+            overlappingSpriteDetectionResult.ConvertToOverlappingItems(out var overlappingItemList,
+                out var overlappingBaseItem);
 
-            overlappingItems = new OverlappingItems(result.baseItem, result.overlappingItems);
+            overlappingItemList.Insert(0, overlappingBaseItem);
+
+            overlappingItems = new OverlappingItems(overlappingBaseItem, overlappingItemList);
             preview.UpdateOverlappingItems(overlappingItems);
             preview.UpdateSpriteData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
@@ -578,7 +602,6 @@ namespace SpriteSortingPlugin
         private void OnDestroy()
         {
             preview.CleanUpPreview();
-            SpriteSortingUtility.CleanUp();
             PolygonColliderCacher.CleanUp();
         }
     }

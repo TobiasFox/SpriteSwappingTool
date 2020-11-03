@@ -176,7 +176,7 @@ namespace SpriteSortingPlugin.Preview
             PreviewItem lastPreviewGroup)
         {
             var activeSortingGroups =
-                SpriteSortingUtility.FilterSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
+                SpriteSortingUtility.GetAllEnabledSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
 
             for (int i = activeSortingGroups.Count - 1; i >= 0; i--)
             {

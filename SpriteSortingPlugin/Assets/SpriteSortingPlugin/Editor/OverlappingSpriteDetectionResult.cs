@@ -13,14 +13,13 @@ namespace SpriteSortingPlugin
             overlappingItems = null;
             overlappingBaseItem = null;
 
-            if (overlappingItems == null || baseItem == null)
+            if (overlappingSortingComponents == null || baseItem == null)
             {
                 return;
             }
 
             overlappingItems = new List<OverlappingItem>();
             overlappingBaseItem = new OverlappingItem(baseItem, true);
-            overlappingItems.Add(overlappingBaseItem);
 
             foreach (var overlappingSortingComponent in overlappingSortingComponents)
             {
