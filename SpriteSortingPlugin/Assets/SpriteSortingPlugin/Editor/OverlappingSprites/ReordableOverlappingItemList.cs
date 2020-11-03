@@ -5,7 +5,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.OverlappingSprites
 {
     [Serializable]
     public class ReordableOverlappingItemList

@@ -1,4 +1,5 @@
 ﻿using System;
+using SpriteSortingPlugin.OverlappingSprites;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -176,7 +177,7 @@ namespace SpriteSortingPlugin.Preview
             PreviewItem lastPreviewGroup)
         {
             var activeSortingGroups =
-                SpriteSortingUtility.GetAllEnabledSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
+                SortingGroupUtility.GetAllEnabledSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
 
             for (int i = activeSortingGroups.Count - 1; i >= 0; i--)
             {

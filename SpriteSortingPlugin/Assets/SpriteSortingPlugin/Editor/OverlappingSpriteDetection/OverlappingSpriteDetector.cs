@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpriteSortingPlugin.OverlappingSprites;
 using SpriteSortingPlugin.SAT;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.OverlappingSpriteDetection
 {
     public class OverlappingSpriteDetector
     {
@@ -304,7 +305,7 @@ namespace SpriteSortingPlugin
             }
 
             var sortingGroupArray = spriteRenderer.GetComponentsInParent<SortingGroup>();
-            var outmostSortingGroup = SpriteSortingUtility.GetOutmostActiveSortingGroup(sortingGroupArray);
+            var outmostSortingGroup = SortingGroupUtility.GetOutmostActiveSortingGroup(sortingGroupArray);
 
             var layerId = outmostSortingGroup == null
                 ? spriteRenderer.sortingLayerID

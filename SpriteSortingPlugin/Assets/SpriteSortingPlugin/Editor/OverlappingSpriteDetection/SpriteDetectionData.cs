@@ -1,4 +1,4 @@
-﻿namespace SpriteSortingPlugin
+﻿namespace SpriteSortingPlugin.OverlappingSpriteDetection
 {
     public struct SpriteDetectionData
     {

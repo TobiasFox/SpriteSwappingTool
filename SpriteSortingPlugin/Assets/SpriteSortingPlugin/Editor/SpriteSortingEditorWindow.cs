@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpriteSortingPlugin.OverlappingSpriteDetection;
+using SpriteSortingPlugin.OverlappingSprites;
 using SpriteSortingPlugin.Preview;
 using SpriteSortingPlugin.SpriteAlphaAnalysis;
 using UnityEditor;

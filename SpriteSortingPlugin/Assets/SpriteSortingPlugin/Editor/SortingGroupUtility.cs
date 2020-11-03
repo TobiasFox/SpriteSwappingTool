@@ -3,7 +3,7 @@ using UnityEngine.Rendering;
 
 namespace SpriteSortingPlugin
 {
-    public static class SpriteSortingUtility
+    public static class SortingGroupUtility
     {
         public static List<SortingGroup> GetAllEnabledSortingGroups(IEnumerable<SortingGroup> groups)
         {

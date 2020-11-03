@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using SpriteSortingPlugin.OverlappingSprites;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.OverlappingSpriteDetection
 {
     public struct OverlappingSpriteDetectionResult
     {
