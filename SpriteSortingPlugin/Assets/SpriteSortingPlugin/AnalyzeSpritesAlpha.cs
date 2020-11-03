@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ namespace SpriteSortingPlugin
 {
     public class AnalyzeSpritesAlpha : MonoBehaviour
     {
+        private const float Tolerance = 0.001f;
+
         [SerializeField] private bool liveUpdateBounds;
 
         private SpriteRenderer ownRenderer;
@@ -14,6 +17,33 @@ namespace SpriteSortingPlugin
 
         private readonly Vector3[] sourcePoints = new Vector3[4];
         private readonly Vector3[] points = new Vector3[4];
+
+        public SpriteData spriteData;
+        public Transform otherTransform;
+        private GameObject polygonGameobject;
+
+        public void CreateCollider()
+        {
+            var spriteRenderer = GetComponent<SpriteRenderer>();
+            var assetGuid =
+                AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID()));
+
+            var containsDataItem = spriteData.spriteDataDictionary.TryGetValue(assetGuid, out var spriteDataItem);
+            if (!containsDataItem)
+            {
+                return;
+            }
+
+            polygonGameobject = new GameObject("colliderGameobject");
+            var polyCol = polygonGameobject.AddComponent<PolygonCollider2D>();
+            polyCol.points = spriteDataItem.outlinePoints.ToArray();
+        }
+
+        public void SetColliderToOtherTransform()
+        {
+            polygonGameobject.transform.SetPositionAndRotation(otherTransform.position, otherTransform.rotation);
+            polygonGameobject.transform.localScale = otherTransform.lossyScale;
+        }
 
         public void Generate()
         {
@@ -26,30 +56,603 @@ namespace SpriteSortingPlugin
 
             // GenerateOutmostAlpha();
 
-            GenerateOutmostPolygon();
-            
+            // var pixelList = AnalyzeOutlinePixels();
+            // var pointList = SortOutlinePoints(pixelList);
+
+
+            // var pointList = AnalyzeAlphaOutline();
+            // var pointList = AnalyzeOutlineMooreNeighbourAlgortihm();
+
+            if (spriteOutlineAnalyzer == null)
+            {
+                spriteOutlineAnalyzer = new SpriteOutlineAnalyzer();
+            }
+
+            var pointList = spriteOutlineAnalyzer.Analyze(ownRenderer.sprite);
+
+            CreatePolygonCollider(pointList);
             Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
         }
 
-        private void GenerateOutmostPolygon()
+        private SpriteOutlineAnalyzer spriteOutlineAnalyzer;
+
+        private int startPixelIndex;
+        private PixelDirection startPixelEntryDirection;
+        private Color[] pixels;
+        private int spriteHeight;
+        private int spriteWidth;
+        private float spritePixelsPerUnit;
+        private Vector2 pixelOffset;
+
+        private List<Vector2> AnalyzeOutlineMooreNeighbourAlgortihm()
+        {
+            var colliderPointList = new List<Vector2>();
+            spritePixelsPerUnit = ownRenderer.sprite.pixelsPerUnit;
+            var spriteTexture = ownRenderer.sprite.texture;
+
+            pixels = spriteTexture.GetPixels();
+            spriteHeight = spriteTexture.height;
+            spriteWidth = spriteTexture.width;
+            PixelDirectionUtility.spriteWidth = spriteWidth;
+
+            startPixelIndex = GetFirstSpritePixelIndex(out startPixelEntryDirection);
+            if (startPixelIndex < 0)
+            {
+                Debug.Log("sprite is completely transparent");
+                return colliderPointList;
+            }
+
+            var rectCenter = ownRenderer.sprite.rect.center;
+            var halfPixelOffset = 1f / spritePixelsPerUnit / 2f;
+            pixelOffset = new Vector2(rectCenter.x / spritePixelsPerUnit - halfPixelOffset,
+                rectCenter.y / spritePixelsPerUnit - halfPixelOffset);
+
+
+            var point = ConvertToColliderPoint(startPixelIndex);
+            colliderPointList.Add(point);
+
+            var boundaryPoint = startPixelIndex;
+            var pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(startPixelEntryDirection);
+            var firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
+            var neighbourOfBoundaryPointIndex =
+                PixelDirectionUtility.GetIndexOfPixelDirection(startPixelIndex, pixelDirectionToCheck);
+            var counter = 0;
+
+            while (neighbourOfBoundaryPointIndex != startPixelIndex)
+            {
+                if (neighbourOfBoundaryPointIndex == startPixelIndex &&
+                    firstEntryDirection == startPixelEntryDirection)
+                {
+                    break;
+                }
+
+                if (pixels[neighbourOfBoundaryPointIndex].a > 0)
+                {
+                    //found pixel
+                    var nextPoint = ConvertToColliderPoint(neighbourOfBoundaryPointIndex);
+                    colliderPointList.Add(nextPoint);
+
+                    boundaryPoint = neighbourOfBoundaryPointIndex;
+
+                    var backtracedDirection =
+                        PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(pixelDirectionToCheck,
+                            firstEntryDirection);
+
+                    pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(backtracedDirection);
+                    firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
+
+                    neighbourOfBoundaryPointIndex =
+                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
+                }
+                else
+                {
+                    //TODO check against picture boundaries 
+                    //move to next clockwise pixel 
+                    pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
+                    neighbourOfBoundaryPointIndex =
+                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
+                }
+
+                counter++;
+            }
+
+            return colliderPointList;
+        }
+
+        private Vector2 ConvertToColliderPoint(int pixelIndex)
+        {
+            var pixelWidth = pixelIndex % spriteWidth;
+            var pixelHeight = pixelIndex / spriteWidth;
+
+            var point = new Vector2((pixelWidth / spritePixelsPerUnit),
+                (pixelHeight / spritePixelsPerUnit)) - pixelOffset;
+            // point *= 1 + (1f / spritePixelsPerUnit);
+
+            return point;
+        }
+
+        private int[] pixelDirections = new int[8];
+        private int[] pixelDirectionPriority = new int[8];
+        private int[] visitPixelSteps = new int[8];
+        private bool[] visitedPixels;
+        private int startPosition = -1;
+
+        private List<Vector2> AnalyzeAlphaOutline()
+        {
+            var colliderPointList = new List<Vector2>();
+            var spritePixelsPerUnit = ownRenderer.sprite.pixelsPerUnit;
+            var spriteTexture = ownRenderer.sprite.texture;
+
+            pixels = spriteTexture.GetPixels();
+            spriteHeight = spriteTexture.height;
+            spriteWidth = spriteTexture.width;
+            visitedPixels = new bool[pixels.Length];
+
+            var currentPixelIndex = GetFirstSpritePixelIndex(out var pixelDirection);
+            if (currentPixelIndex < 0)
+            {
+                Debug.Log("sprite is completely transparent");
+                return colliderPointList;
+            }
+
+            pixelDirections[0] = -spriteWidth;
+            pixelDirections[1] = -spriteWidth + 1;
+            pixelDirections[2] = +1;
+            pixelDirections[3] = spriteWidth + 1;
+            pixelDirections[4] = spriteWidth;
+            pixelDirections[5] = spriteWidth - 1;
+            pixelDirections[6] = -1;
+            pixelDirections[7] = -spriteWidth - 1;
+
+            pixelDirectionPriority[0] = 2;
+            pixelDirectionPriority[1] = 1;
+            pixelDirectionPriority[2] = 2;
+            pixelDirectionPriority[3] = 1;
+            pixelDirectionPriority[4] = 2;
+            pixelDirectionPriority[5] = 1;
+            pixelDirectionPriority[6] = 2;
+            pixelDirectionPriority[7] = 1;
+
+            visitPixelSteps[0] = -1;
+            visitPixelSteps[1] = 2;
+            visitPixelSteps[2] = -1;
+            visitPixelSteps[3] = 4;
+            visitPixelSteps[4] = -1;
+            visitPixelSteps[5] = 6;
+            visitPixelSteps[6] = -1;
+            visitPixelSteps[7] = 0;
+
+            var iterationsToAddCheckOfStartPosition = 3;
+            startPosition = -1;
+            var setStartPosition = true;
+            var newStartPosition = -1;
+
+            var rectCenter = ownRenderer.sprite.rect.center;
+            var halfPixelOffset = 1f / spritePixelsPerUnit / 2f;
+            var offset = new Vector2(rectCenter.x / spritePixelsPerUnit - halfPixelOffset,
+                rectCenter.y / spritePixelsPerUnit - halfPixelOffset);
+
+            var counter = 0;
+            var isSearching = true;
+
+            while (HasPixelOutlineNeighbour(currentPixelIndex, out var nextPixelIndex))
+            {
+                if (counter == 597)
+                {
+                    int i = 0;
+                }
+
+                var pixelWidth = nextPixelIndex % spriteWidth;
+                var pixelHeight = nextPixelIndex / spriteWidth;
+
+                var point = new Vector2((pixelWidth / spritePixelsPerUnit),
+                    (pixelHeight / spritePixelsPerUnit)) - offset;
+                // point *= 1 + (1f / spritePixelsPerUnit);
+                colliderPointList.Add(point);
+                currentPixelIndex = nextPixelIndex;
+
+                if (newStartPosition < 0)
+                {
+                    newStartPosition = nextPixelIndex;
+                }
+
+                if (iterationsToAddCheckOfStartPosition > 0)
+                {
+                    iterationsToAddCheckOfStartPosition--;
+                }
+                else if (setStartPosition)
+                {
+                    setStartPosition = false;
+                    startPosition = newStartPosition;
+                }
+
+                counter++;
+            }
+
+
+            return colliderPointList;
+        }
+
+        //TODO: consider edge pixel
+        private bool HasPixelOutlineNeighbour(int currentPixelIndex, out int nextPixelIndex)
+        {
+            var potentialNeighbours = new bool[8];
+
+            for (var i = 0; i < pixelDirections.Length; i++)
+            {
+                var pixelDirection = pixelDirections[i];
+                // if (currentPixelIndex + pixelDirection < 0 || currentPixelIndex + pixelDirection >= pixels.Length)
+                // {
+                //     Debug.Log("out of bound");
+                //     return false;
+                // }
+
+                var pixelIndexToCheck = currentPixelIndex + pixelDirection;
+
+                //start pixel reached
+                if (startPosition >= 0 && pixelIndexToCheck == startPosition)
+                {
+                    Debug.Log("start reached");
+                    nextPixelIndex = -1;
+                    return false;
+                }
+
+                //node already visited
+                if (visitedPixels[pixelIndexToCheck])
+                {
+                    continue;
+                }
+
+                if (pixels[pixelIndexToCheck].a == 0)
+                {
+                    potentialNeighbours[i] = true;
+                }
+            }
+
+            var lastNeighbourPriority = -1;
+            var validNeighbour = 0;
+            for (var i = potentialNeighbours.Length - 1; i >= 0; i--)
+            {
+                if (!potentialNeighbours[i])
+                {
+                    continue;
+                }
+
+                var currentNeighbourPriority = GetNeighbourPriorityOfPixel(currentPixelIndex + pixelDirections[i]);
+
+                if (currentNeighbourPriority == 0)
+                {
+                    continue;
+                }
+
+                if (lastNeighbourPriority == -1)
+                {
+                    lastNeighbourPriority = currentNeighbourPriority;
+                    validNeighbour = i;
+                    continue;
+                }
+
+                if (currentNeighbourPriority >= lastNeighbourPriority)
+                {
+                    validNeighbour = i;
+                }
+
+                break;
+            }
+
+            //no neighbour detected
+            if (lastNeighbourPriority < 0)
+            {
+                Debug.Log("no further neighbour");
+                nextPixelIndex = -1;
+                return false;
+            }
+
+            //found one neighbour
+            nextPixelIndex = currentPixelIndex + pixelDirections[validNeighbour];
+            visitedPixels[nextPixelIndex] = true;
+
+            if (visitPixelSteps[validNeighbour] >= 0)
+            {
+                visitedPixels[currentPixelIndex + pixelDirections[visitPixelSteps[validNeighbour]]] = true;
+            }
+
+            return true;
+        }
+
+        private int GetNeighbourPriorityOfPixel(int currentPixelIndex)
+        {
+            var currentWidth = currentPixelIndex % spriteWidth;
+            var currentHeight = currentPixelIndex / spriteWidth;
+            var currentPriority = 0;
+
+            for (var i = 0; i < pixelDirections.Length; i++)
+            {
+                if (currentWidth == 0)
+                {
+                    if (i >= 5)
+                    {
+                        return currentPriority;
+                    }
+                }
+                else if (currentWidth == spriteWidth - 1)
+                {
+                    if (i >= 1 && i <= 3)
+                    {
+                        continue;
+                    }
+                }
+
+                if (currentHeight == 0)
+                {
+                    if (i == 0 || i == 1 || i == 7)
+                    {
+                        continue;
+                    }
+                }
+                else if (currentHeight == spriteHeight - 1)
+                {
+                    if (i >= 3 && i <= 5)
+                    {
+                        continue;
+                    }
+                }
+
+                var pixelDirection = pixelDirections[i];
+                var pixelToCheckIndex = currentPixelIndex + pixelDirection;
+
+                if (pixels[pixelToCheckIndex].a > 0)
+                {
+                    currentPriority += pixelDirectionPriority[i];
+                }
+            }
+
+            return currentPriority;
+        }
+
+        // nextPixelIndex = currentPixelIndex + pixelDirections[neighbourOne];
+        // //found one neighbour
+        // if (neighbourTwo < 0)
+        // {
+        //     visitedPixels[nextPixelIndex] = true;
+        //
+        //     if (visitPixelSteps[neighbourOne] > 0)
+        //     {
+        //         visitedPixels[currentPixelIndex + pixelDirections[visitPixelSteps[neighbourOne]]] = true;
+        //     }
+        //
+        //     return true;
+        // }
+
+        //found two neighbours, check priority
+
+        // var lastNeighbourPrioritys = GetNeighbourPriorityOfPixel(nextPixelIndex);
+        // var secondToLastNeighbourPriority =
+        //     GetNeighbourPriorityOfPixel(currentPixelIndex + pixelDirections[neighbourTwo]);
+        // var activeNeighbour = neighbourOne;
+        //
+        // if (secondToLastNeighbourPriority > lastNeighbourPrioritys)
+        // {
+        //     nextPixelIndex = currentPixelIndex + pixelDirections[neighbourTwo];
+        //     activeNeighbour = neighbourTwo;
+        // }
+        //
+        // visitedPixels[nextPixelIndex] = true;
+        //
+        // if (visitPixelSteps[activeNeighbour] > 0)
+        // {
+        //     visitedPixels[currentPixelIndex + pixelDirections[visitPixelSteps[activeNeighbour]]] = true;
+        // }
+
+        // return true;
+
+
+        private int GetFirstSpritePixelIndex(out PixelDirection entryDirection)
+        {
+            var counter = 0;
+            entryDirection = PixelDirection.East;
+
+            for (var y = spriteHeight - 1; y >= 0; y--)
+            {
+                for (var x = 0; x < spriteWidth; x++)
+                {
+                    var alphaValue = pixels[counter].a;
+
+                    if (alphaValue > 0)
+                    {
+                        return counter;
+                    }
+
+                    counter++;
+                }
+            }
+
+            return -1;
+        }
+
+        private List<Vector2> SortOutlinePoints(List<Vector2> pixelList)
+        {
+            var colliderPointList = new List<Vector2>();
+            var spritePixelsPerUnit = ownRenderer.sprite.pixelsPerUnit;
+
+            var firstPoint = pixelList[0];
+            var secondPoint = pixelList[1];
+
+            if (secondPoint.x < firstPoint.x)
+            {
+                firstPoint = pixelList[1];
+                secondPoint = pixelList[0];
+            }
+
+            Debug.Log("first point " + firstPoint);
+            Debug.Log("second Point " + secondPoint);
+
+            pixelList.RemoveAt(0);
+            pixelList.RemoveAt(0);
+
+            colliderPointList.Add(firstPoint / spritePixelsPerUnit);
+            colliderPointList.Add(secondPoint / spritePixelsPerUnit);
+
+            var lastEdge = firstPoint - secondPoint;
+            var lastPoint = secondPoint;
+
+            while (pixelList.Count != 0)
+            {
+                var nextPointIndex = 0;
+                var maxAngle = float.NegativeInfinity;
+                for (var i = 0; i < pixelList.Count; i++)
+                {
+                    var point = pixelList[i];
+                    var nextEdge = point - lastPoint;
+                    var angle = Vector2.SignedAngle(lastEdge, nextEdge);
+                    if (angle < 0)
+                    {
+                        angle = 360f - Mathf.Abs(angle);
+                    }
+
+                    if (angle > maxAngle)
+                    {
+                        maxAngle = angle;
+                        nextPointIndex = i;
+                    }
+                }
+
+                var nextPoint = pixelList[nextPointIndex];
+                pixelList.RemoveAt(nextPointIndex);
+                colliderPointList.Add(nextPoint / spritePixelsPerUnit);
+                Debug.Log("found next point " + nextPoint + " with angle " + maxAngle);
+
+                lastEdge = nextPoint - lastPoint;
+                lastPoint = nextPoint;
+            }
+
+            // var item = new Vector2(point.x / spritePixelsPerUnit, point.y / spritePixelsPerUnit);
+            // colliderPointList.Add(item);
+            // Debug.LogFormat("found outline pixel on ({0},{1}) resulting in colliderPoint ({2},{3})", point.x,
+            //     point.y, item.x, item.y);
+            return colliderPointList;
+        }
+
+        private void CreatePolygonCollider(List<Vector2> pixelList)
+        {
+            var hasPolygonCollider = TryGetComponent<PolygonCollider2D>(out var polyCollider);
+            if (hasPolygonCollider)
+            {
+                polyCollider.points = null;
+            }
+            else
+            {
+                polyCollider = gameObject.AddComponent<PolygonCollider2D>();
+            }
+
+            polyCollider.points = pixelList.ToArray();
+        }
+
+        private Vector2[] GetFirstPolygonEdge(List<Vector2> pointList)
+        {
+            if (pointList == null || pointList.Count < 3)
+            {
+                return null;
+            }
+
+            var firstPoint = pointList[0];
+            var secondPoint = pointList[1];
+
+            if (firstPoint.x >= secondPoint.x)
+            {
+                return new[] {firstPoint, secondPoint};
+            }
+
+            return new[] {secondPoint, firstPoint};
+
+            // for (var i = 0; i < pointList.Count; i++)
+            // {
+            //     var point = pointList[i];
+            //     if (Math.Abs(point.y - minY) > Tolerance)
+            //     {
+            //         return i;
+            //     }
+            // }
+            //
+            // return -1;
+        }
+
+        private List<Vector2> AnalyzeOutlinePixels()
         {
             var spriteTexture = ownRenderer.sprite.texture;
             var pixelArray = spriteTexture.GetPixels();
             var counter = 0;
+            var outlineList = new List<Vector2>();
 
-            for (int y = 0; y < spriteTexture.height; y++)
+            for (int y = spriteTexture.height - 1; y >= 0; y--)
             {
                 for (int x = 0; x < spriteTexture.width; x++)
                 {
-                    var color = pixelArray[counter];
+                    var alphaValue = pixelArray[counter].a;
 
-                    
-                    
-                    
-                    
+                    if (alphaValue > 0)
+                    {
+                        counter++;
+                        continue;
+                    }
+
+                    //TODO consider edge pixel
+                    // if (y == 0 || y == spriteTexture.height - 1 || x == 0 || x == spriteTexture.width - 1)
+                    // {
+                    //     //edge pixel
+                    //     outlineList.Add(new Point(x, y));
+                    //     continue;
+                    // }
+
+                    //left
+                    if (x > 0)
+                    {
+                        if (pixelArray[counter - 1].a > 0)
+                        {
+                            outlineList.Add(new Vector2(x, y));
+                            counter++;
+                            continue;
+                        }
+                    }
+
+                    //right
+                    if (x < spriteTexture.width - 1)
+                    {
+                        if (pixelArray[counter + 1].a > 0)
+                        {
+                            outlineList.Add(new Vector2(x, y));
+                            counter++;
+                            continue;
+                        }
+                    }
+
+                    //top
+                    if (y > 0)
+                    {
+                        if (pixelArray[counter + spriteTexture.width].a > 0)
+                        {
+                            outlineList.Add(new Vector2(x, y));
+                            counter++;
+                            continue;
+                        }
+                    }
+
+                    //bottom
+                    if (y < spriteTexture.height - 1)
+                    {
+                        if (pixelArray[counter - spriteTexture.width].a > 0)
+                        {
+                            outlineList.Add(new Vector2(x, y));
+                            counter++;
+                            continue;
+                        }
+                    }
+
                     counter++;
                 }
             }
+
+            return outlineList;
         }
 
         private void GenerateOutmostAlpha()
@@ -226,6 +829,39 @@ namespace SpriteSortingPlugin
 
             return true;
         }
+
+        public void Optimize()
+        {
+            var direction =
+                PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(PixelDirection.Northwest,
+                    PixelDirection.East);
+
+            var direction2 =
+                PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(PixelDirection.Northwest,
+                    PixelDirection.South);
+
+            var direction3 =
+                PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(PixelDirection.Northwest,
+                    PixelDirection.West);
+
+            var direction4 =
+                PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(PixelDirection.Northwest,
+                    PixelDirection.North);
+
+            int i = 0;
+        }
+    }
+
+    struct Point
+    {
+        public int x;
+        public int y;
+
+        public Point(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
     }
 
 
@@ -240,6 +876,21 @@ namespace SpriteSortingPlugin
             if (GUILayout.Button("Regenerate Collider"))
             {
                 analyzeSpritesAlpha.Generate();
+            }
+
+            if (GUILayout.Button("Optimize"))
+            {
+                analyzeSpritesAlpha.Optimize();
+            }
+
+            if (GUILayout.Button("ColliderTest"))
+            {
+                analyzeSpritesAlpha.CreateCollider();
+            }
+
+            if (GUILayout.Button("SetColliderToOtherTransform"))
+            {
+                analyzeSpritesAlpha.SetColliderToOtherTransform();
             }
         }
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.OverlappingSprites
 {
     [Serializable]
     public class OverlappingItem
@@ -24,7 +24,6 @@ namespace SpriteSortingPlugin
         public bool IsItemSelected { get; set; }
         public int OriginSortedIndex { get; set; }
         public bool IsBaseItem { get; private set; }
-
         public string SpriteAssetGuid { get; private set; }
 
         public OverlappingItem(SpriteRenderer originSpriteRenderer)

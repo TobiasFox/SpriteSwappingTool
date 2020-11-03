@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.OverlappingSprites
 {
     public class OverlappingItemIndexComparer : Comparer<OverlappingItem>
     {

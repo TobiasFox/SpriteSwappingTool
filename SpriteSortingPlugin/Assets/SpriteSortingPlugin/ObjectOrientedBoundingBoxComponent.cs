@@ -5,7 +5,8 @@ namespace SpriteSortingPlugin
 {
     public class ObjectOrientedBoundingBoxComponent : MonoBehaviour
     {
-        public SpriteAlphaData data;
+        public SpriteData data;
+        public bool isShowingOOBB = true;
         public bool isUsingOOBBCopy;
         public bool isShowingLocalPoints;
 
@@ -13,7 +14,7 @@ namespace SpriteSortingPlugin
 
         private void OnDrawGizmosSelected()
         {
-            if (data == null)
+            if (data == null || !isShowingOOBB)
             {
                 return;
             }
@@ -24,10 +25,12 @@ namespace SpriteSortingPlugin
             }
 
             var spriteGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(spriteRenderer.sprite));
-            if (!data.objectOrientedBoundingBoxDictionary.TryGetValue(spriteGuid, out oobb))
+            if (!data.spriteDataDictionary.TryGetValue(spriteGuid, out var spriteDataItem))
             {
                 return;
             }
+
+            oobb = spriteDataItem.objectOrientedBoundingBox;
 
             if (isUsingOOBBCopy)
             {

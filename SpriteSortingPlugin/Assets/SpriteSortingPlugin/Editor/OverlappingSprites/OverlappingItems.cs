@@ -2,14 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.OverlappingSprites
 {
     [Serializable]
     public class OverlappingItems
     {
         private List<OverlappingItem> items;
         private OverlappingItem baseItem;
-        private List<OverlappingItem> itemsForNewSortingGroup;
 
         private bool hasChangedLayer;
         private OverlappingItemIndexComparer originIndexComparer;
@@ -17,7 +16,6 @@ namespace SpriteSortingPlugin
 
         public List<OverlappingItem> Items => items;
         public OverlappingItem BaseItem => baseItem;
-        public List<OverlappingItem> ItemsForNewSortingGroup => itemsForNewSortingGroup;
         public bool HasChangedLayer => hasChangedLayer;
 
         public OverlappingItems(OverlappingItem baseItem, List<OverlappingItem> items)

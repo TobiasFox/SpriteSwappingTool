@@ -1,4 +1,5 @@
 ﻿using System;
+using SpriteSortingPlugin.OverlappingSprites;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -15,8 +16,13 @@ namespace SpriteSortingPlugin.Preview
         private Editor previewEditor;
         private bool isVisualizingBoundsInScene;
         private bool isSceneVisualizingDelegateIsAdded;
+        private bool isVisualizingSortingOrder;
+        private bool isVisualizingSortingLayer;
         private OverlappingItems overlappingItems;
-        private SpriteAlphaData spriteAlphaData;
+        private SpriteData spriteData;
+        private OutlinePrecision outlinePrecision;
+
+        private GUIStyle sortingOrderStyle;
 
         public bool IsVisualizingBoundsInScene => isVisualizingBoundsInScene;
 
@@ -25,9 +31,14 @@ namespace SpriteSortingPlugin.Preview
             this.overlappingItems = overlappingItems;
         }
 
-        public void UpdateSpriteAlphaData(SpriteAlphaData spriteAlphaData)
+        public void UpdateSpriteData(SpriteData spriteData)
         {
-            this.spriteAlphaData = spriteAlphaData;
+            this.spriteData = spriteData;
+        }
+
+        public void UpdateOutlineType(OutlinePrecision outlinePrecision)
+        {
+            this.outlinePrecision = outlinePrecision;
         }
 
         public void DoPreview(bool isUpdatePreview)
@@ -53,13 +64,36 @@ namespace SpriteSortingPlugin.Preview
 
             EditorGUI.BeginChangeCheck();
             isVisualizingBoundsInScene =
-                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene ", isVisualizingBoundsInScene);
+                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene", isVisualizingBoundsInScene,
+                    GUILayout.Width(180));
             if (EditorGUI.EndChangeCheck())
             {
                 EnableSceneVisualization(isVisualizingBoundsInScene);
             }
 
-            if (GUILayout.Button("Reset rotation"))
+            EditorGUI.BeginChangeCheck();
+            isVisualizingSortingOrder =
+                EditorGUILayout.ToggleLeft("Display Sorting Order", isVisualizingSortingOrder, GUILayout.Width(160));
+            if (EditorGUI.EndChangeCheck())
+            {
+                EnableSceneVisualization(isVisualizingSortingOrder);
+            }
+
+            EditorGUI.BeginChangeCheck();
+            isVisualizingSortingLayer =
+                EditorGUILayout.ToggleLeft("Display Sorting Layer", isVisualizingSortingLayer, GUILayout.Width(170));
+            if (EditorGUI.EndChangeCheck())
+            {
+                EnableSceneVisualization(isVisualizingSortingLayer);
+            }
+
+            if (!isSceneVisualizingDelegateIsAdded &&
+                (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
+            {
+                EnableSceneVisualization(true);
+            }
+
+            if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
             {
                 previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
                 Object.DestroyImmediate(previewEditor);
@@ -143,7 +177,7 @@ namespace SpriteSortingPlugin.Preview
             PreviewItem lastPreviewGroup)
         {
             var activeSortingGroups =
-                SpriteSortingUtility.FilterSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
+                SortingGroupUtility.GetAllEnabledSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
 
             for (int i = activeSortingGroups.Count - 1; i >= 0; i--)
             {
@@ -180,10 +214,16 @@ namespace SpriteSortingPlugin.Preview
 
         public void EnableSceneVisualization(bool isEnabled)
         {
-            if (isEnabled && isVisualizingBoundsInScene)
+            if (isEnabled && (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
             {
                 if (!isSceneVisualizingDelegateIsAdded)
                 {
+                    if (sortingOrderStyle == null)
+                    {
+                        sortingOrderStyle = new GUIStyle
+                            {normal = {background = Texture2D.whiteTexture}, fontStyle = FontStyle.Bold};
+                    }
+
                     isSceneVisualizingDelegateIsAdded = true;
                     SceneView.duringSceneGui += OnSceneGUI;
                 }
@@ -198,6 +238,17 @@ namespace SpriteSortingPlugin.Preview
             }
         }
 
+        public void DisableSceneVisualizations()
+        {
+            if (!isSceneVisualizingDelegateIsAdded)
+            {
+                return;
+            }
+
+            isSceneVisualizingDelegateIsAdded = false;
+            SceneView.duringSceneGui -= OnSceneGUI;
+        }
+
         private void OnSceneGUI(SceneView sceneView)
         {
             if (overlappingItems == null)
@@ -205,34 +256,130 @@ namespace SpriteSortingPlugin.Preview
                 return;
             }
 
-            var isUsingSpriteAlphaData = spriteAlphaData != null;
-
             foreach (var item in overlappingItems.Items)
             {
-                Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
-
-                if (isUsingSpriteAlphaData &&
-                    spriteAlphaData.objectOrientedBoundingBoxDictionary.TryGetValue(item.SpriteAssetGuid,
-                        out var objectOrientedBoundingBox))
-                {
-                    objectOrientedBoundingBox.UpdateBox(item.originSpriteRenderer.transform);
-                    var oobbPoints = objectOrientedBoundingBox.Points;
-
-                    Handles.DrawLine(oobbPoints[0], oobbPoints[1]);
-                    Handles.DrawLine(oobbPoints[1], oobbPoints[2]);
-                    Handles.DrawLine(oobbPoints[2], oobbPoints[3]);
-                    Handles.DrawLine(oobbPoints[3], oobbPoints[0]);
-                }
-                else
-                {
-                    var bounds = item.originSpriteRenderer.bounds;
-                    Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
-                }
+                DrawBounds(item);
+                DrawSortingOptions(item);
             }
 
             if (overlappingItems.Items.Count > 0)
             {
                 sceneView.Repaint();
+            }
+        }
+
+        private void DrawSortingOptions(OverlappingItem item)
+        {
+            if (!isVisualizingSortingOrder && !isVisualizingSortingLayer)
+            {
+                return;
+            }
+
+            Handles.BeginGUI();
+
+            var text = "";
+            if (isVisualizingSortingLayer)
+            {
+                text = item.sortingLayerName;
+                if (item.HasSortingLayerChanged())
+                {
+                    text += " -> " + item.sortingLayerName;
+                }
+            }
+
+            if (isVisualizingSortingOrder)
+            {
+                text += (isVisualizingSortingLayer ? "\n " : "") + item.originSortingOrder;
+                var newSortingOrder = item.GetNewSortingOrder();
+                if (item.originSortingOrder != newSortingOrder)
+                {
+                    text += " -> " + newSortingOrder;
+                }
+            }
+
+            Handles.Label(item.originSpriteRenderer.transform.position, text, sortingOrderStyle);
+
+            Handles.EndGUI();
+        }
+
+        private void DrawBounds(OverlappingItem item)
+        {
+            if (!isVisualizingBoundsInScene)
+            {
+                return;
+            }
+
+            Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
+
+            var isDrawingSpriteRendererBounds = false;
+
+            if (spriteData != null)
+            {
+                var hasSpriteDataItem =
+                    spriteData.spriteDataDictionary.TryGetValue(item.SpriteAssetGuid, out var spriteDataItem);
+
+                if (hasSpriteDataItem && CanDrawOutlineType(spriteDataItem))
+                {
+                    DrawOutline(spriteDataItem, item.originSpriteRenderer.transform);
+                }
+                else
+                {
+                    isDrawingSpriteRendererBounds = true;
+                }
+            }
+            else
+            {
+                isDrawingSpriteRendererBounds = true;
+            }
+
+            if (isDrawingSpriteRendererBounds)
+            {
+                var bounds = item.originSpriteRenderer.bounds;
+                Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
+            }
+        }
+
+        private void DrawOutline(SpriteDataItem spriteDataItem, Transform itemTransform)
+        {
+            switch (outlinePrecision)
+            {
+                case OutlinePrecision.ObjectOrientedBoundingBox:
+                    spriteDataItem.objectOrientedBoundingBox.UpdateBox(itemTransform);
+                    var oobbPoints = spriteDataItem.objectOrientedBoundingBox.Points;
+
+                    Handles.DrawLine(oobbPoints[0], oobbPoints[1]);
+                    Handles.DrawLine(oobbPoints[1], oobbPoints[2]);
+                    Handles.DrawLine(oobbPoints[2], oobbPoints[3]);
+                    Handles.DrawLine(oobbPoints[3], oobbPoints[0]);
+                    break;
+                case OutlinePrecision.PixelPerfect:
+                    var lastPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[0]);
+                    for (var i = 1; i < spriteDataItem.outlinePoints.Count; i++)
+                    {
+                        var nextPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[i]);
+                        Handles.DrawLine(lastPoint, nextPoint);
+                        lastPoint = nextPoint;
+                    }
+
+                    break;
+            }
+        }
+
+        private bool CanDrawOutlineType(SpriteDataItem spriteDataItem)
+        {
+            if (spriteDataItem == null)
+            {
+                return false;
+            }
+
+            switch (outlinePrecision)
+            {
+                case OutlinePrecision.ObjectOrientedBoundingBox:
+                    return spriteDataItem.IsValidOOBB();
+                case OutlinePrecision.PixelPerfect:
+                    return spriteDataItem.IsValidOutline();
+                default:
+                    return false;
             }
         }
 

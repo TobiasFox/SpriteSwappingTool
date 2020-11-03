@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eb8c2846e9ff464cbd83851b830f40d, type: 3}
+  m_Name: OOBB
+  m_EditorClassIdentifier: 
+  spriteDataList:
+  - assetGuid: 87fbc87560525ef4189940c80115072c
+    assetName: plant
+    objectOrientedBoundingBox:
+      isInitialized: 1
+      localWorldPoints:
+      - {x: -4.935, y: 4.185}
+      - {x: -4.935, y: -4.185}
+      - {x: 4.935, y: -4.185}
+      - {x: 4.935, y: 4.185}
+      originLocalWorldPoints:
+      - {x: -4.935, y: 4.185}
+      - {x: -4.935, y: -4.185}
+      - {x: 4.935, y: -4.185}
+      - {x: 4.935, y: 4.185}
+      zRotation: 0
+      boundsCenter: {x: 0, y: 0}
+      boundsSize: {x: 9.87, y: 8.37}
+      boundsCenterOffset: {x: 0, y: 0}
+      alphaRectangleBorder:
+        topBorder: 93
+        leftBorder: 18
+        bottomBorder: 94
+        rightBorder: 19
+        spriteWidth: 1024
+        spriteHeight: 1024
+        pixelPerUnit: 100
+      originAlphaRectangleBorder:
+        topBorder: 93
+        leftBorder: 18
+        bottomBorder: 94
+        rightBorder: 19
+        spriteWidth: 1024
+        spriteHeight: 1024
+        pixelPerUnit: 100
+    outlinePoints: []
+  - assetGuid: 35113396d246aff4bb0ff1190c7d5d68
+    assetName: caveElement
+    objectOrientedBoundingBox:
+      isInitialized: 1
+      localWorldPoints:
+      - {x: -2.875, y: 2.495}
+      - {x: -2.875, y: -2.495}
+      - {x: 2.875, y: -2.495}
+      - {x: 2.875, y: 2.495}
+      originLocalWorldPoints:
+      - {x: -2.875, y: 2.495}
+      - {x: -2.875, y: -2.495}
+      - {x: 2.875, y: -2.495}
+      - {x: 2.875, y: 2.495}
+      zRotation: 0
+      boundsCenter: {x: 0, y: 0}
+      boundsSize: {x: 5.75, y: 4.99}
+      boundsCenterOffset: {x: 0, y: 0}
+      alphaRectangleBorder:
+        topBorder: 262
+        leftBorder: 224
+        bottomBorder: 263
+        rightBorder: 225
+        spriteWidth: 1024
+        spriteHeight: 1024
+        pixelPerUnit: 100
+      originAlphaRectangleBorder:
+        topBorder: 262
+        leftBorder: 224
+        bottomBorder: 263
+        rightBorder: 225
+        spriteWidth: 1024
+        spriteHeight: 1024
+        pixelPerUnit: 100
+    outlinePoints: []
