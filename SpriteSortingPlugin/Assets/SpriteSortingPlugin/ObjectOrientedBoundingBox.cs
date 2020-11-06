@@ -176,6 +176,55 @@ namespace SpriteSortingPlugin
             boundsCenterOffset = Vector2.zero;
         }
 
+        public bool Contains(ObjectOrientedBoundingBox otherOOBB)
+        {
+            foreach (var otherPoint1 in otherOOBB.points)
+            {
+                for (int j = 0; j < points.Length; j++)
+                {
+                    var ownPoint1 = points[j];
+                    var ownPoint2 = points[(j + 1) % points.Length];
+                    var isIntersecting = AreLinesIntersecting(ownPoint1, ownPoint2, otherPoint1, ownBounds.center);
+
+                    if (isIntersecting)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        //http://thirdpartyninjas.com/blog/2008/10/07/line-segment-intersection/
+        private bool AreLinesIntersecting(Vector2 line1Point1, Vector2 line1Point2, Vector2 line2Point1,
+            Vector2 line2Point2)
+        {
+            var isIntersecting = false;
+
+            var denominator = (line2Point2.y - line2Point1.y) * (line1Point2.x - line1Point1.x) -
+                              (line2Point2.x - line2Point1.x) * (line1Point2.y - line1Point1.y);
+
+            //check for parallelism
+            if (denominator == 0f)
+            {
+                return false;
+            }
+
+            var u = ((line2Point2.x - line2Point1.x) * (line1Point1.y - line2Point1.y) -
+                     (line2Point2.y - line2Point1.y) * (line1Point1.x - line2Point1.x)) / denominator;
+            var v = ((line1Point2.x - line1Point1.x) * (line1Point1.y - line2Point1.y) -
+                     (line1Point2.y - line1Point1.y) * (line1Point1.x - line2Point1.x)) / denominator;
+
+            // check if line intersection lies on line segment (including start and end)
+            if (u >= 0 && u <= 1 && v >= 0 && v <= 1)
+            {
+                isIntersecting = true;
+            }
+
+            return isIntersecting;
+        }
+
         private void Initialize()
         {
             originLocalWorldPoints[0] = new Vector3(ownBounds.min.x, ownBounds.max.y, 0); // top left 
