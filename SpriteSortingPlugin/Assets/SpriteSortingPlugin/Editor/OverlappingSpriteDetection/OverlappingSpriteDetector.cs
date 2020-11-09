@@ -97,6 +97,24 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
             return result;
         }
 
+        public List<SortingComponent> DetectOverlappingSortingComponents(SortingComponent baseItem,
+            List<SortingComponent> sortingComponentsToCheck, SpriteDetectionData spriteDetectionData)
+        {
+            if (baseItem == null || sortingComponentsToCheck == null)
+            {
+                return null;
+            }
+
+            this.spriteDetectionData = spriteDetectionData;
+            isCheckingForIdenticalSortingOptions = false;
+            filteredSortingComponents = sortingComponentsToCheck;
+
+            DetectOverlappingSortingComponents(baseItem, out var resultList,
+                out var selfBaseItem);
+
+            return resultList;
+        }
+        
         public Dictionary<int, int> AnalyzeSurroundingSpritesAndGetAdjustedSortingOptions(
             List<OverlappingItem> overlappingItems, SpriteDetectionData spriteDetectionData)
         {

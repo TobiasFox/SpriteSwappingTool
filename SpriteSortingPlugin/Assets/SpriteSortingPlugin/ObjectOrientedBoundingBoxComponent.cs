@@ -72,6 +72,11 @@ namespace SpriteSortingPlugin
             Gizmos.DrawSphere(oobbPoints[3], 0.3f);
             Gizmos.DrawLine(oobbPoints[3], oobbPoints[0]);
         }
+
+        public void TestSurfaceArea()
+        {
+            Debug.Log(oobb.GetSurfaceArea());
+        }
     }
 
     [CustomEditor(typeof(ObjectOrientedBoundingBoxComponent))]
@@ -82,6 +87,15 @@ namespace SpriteSortingPlugin
         private void OnEnable()
         {
             targetObject = (ObjectOrientedBoundingBoxComponent) target;
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            if (GUILayout.Button("surfaceArea"))
+            {
+                targetObject.TestSurfaceArea();
+            }
         }
 
         // private void OnSceneGUI()

@@ -18,6 +18,7 @@ namespace SpriteSortingPlugin
         [SerializeField] private Vector2 boundsSize;
         [SerializeField] private Vector2 boundsCenterOffset;
 
+        private Vector2 lastGlobalScale;
         private Vector2[] axes;
         private Vector2[] points;
         [SerializeField] private AlphaRectangleBorder alphaRectangleBorder;
@@ -125,10 +126,11 @@ namespace SpriteSortingPlugin
             UpdateLocalWorldPoints(false);
 
             // Apply scaling
-            var globalScale = transform.lossyScale;
+            lastGlobalScale = transform.lossyScale;
             for (var i = 0; i < localWorldPoints.Length; i++)
             {
-                points[i] = new Vector2(localWorldPoints[i].x * globalScale.x, localWorldPoints[i].y * globalScale.y);
+                points[i] = new Vector2(localWorldPoints[i].x * lastGlobalScale.x,
+                    localWorldPoints[i].y * lastGlobalScale.y);
             }
 
             // Transform points from local to world space
@@ -278,6 +280,11 @@ namespace SpriteSortingPlugin
             axes = new Vector2[2];
             axes[0] = Vector2.Perpendicular(points[3] - points[0]);
             axes[1] = Vector2.Perpendicular(points[0] - points[1]);
+        }
+
+        public float GetSurfaceArea()
+        {
+            return boundsSize.x * lastGlobalScale.x * boundsSize.y * lastGlobalScale.y;
         }
 
         public void OnBeforeSerialize()

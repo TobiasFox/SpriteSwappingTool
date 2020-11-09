@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpriteSortingPlugin.AutomaticSorting;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
 using SpriteSortingPlugin.OverlappingSprites;
 using SpriteSortingPlugin.Preview;
 using SpriteSortingPlugin.SpriteAlphaAnalysis;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -27,6 +29,7 @@ namespace SpriteSortingPlugin
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private List<Transform> gameObjectParents;
         [SerializeField] private Camera camera;
+        private bool isApplyingAutoSorting;
         private SerializedObject serializedObject;
 
         private int selectedSortingLayers;
@@ -47,6 +50,10 @@ namespace SpriteSortingPlugin
 
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private SpriteDetectionData spriteDetectionData;
+
+        private OverlappingItemSortingOrderAnalyzer overlappingItemSortingOrderAnalyzer;
+        private List<string> autoSortingResultNames;
+        private ReorderableList autoSortingResultList;
 
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
@@ -178,6 +185,17 @@ namespace SpriteSortingPlugin
 
             EditorGUILayout.Space();
             DrawSortingOptions();
+            EditorGUILayout.Space();
+            isApplyingAutoSorting = EditorGUILayout.BeginToggleGroup(
+                "generate automatic order of overlapping renderer?",
+                isApplyingAutoSorting);
+
+            if (isApplyingAutoSorting)
+            {
+                //TODO add auto sorting dependent options
+            }
+
+            EditorGUILayout.EndToggleGroup();
 
             serializedObject.ApplyModifiedProperties();
             bool isAnalyzedButtonClickedThisFrame = false;
@@ -242,6 +260,8 @@ namespace SpriteSortingPlugin
                 }
             }
             EditorGUILayout.EndHorizontal();
+
+            autoSortingResultList.DoLayoutList();
 
             if (isConfirmButtonClicked)
             {
@@ -477,6 +497,7 @@ namespace SpriteSortingPlugin
         private void CleanUpReordableList()
         {
             reordableOverlappingItemList?.CleanUp();
+            autoSortingResultList = null;
         }
 
         private bool HasOverlappingItems()
@@ -549,6 +570,10 @@ namespace SpriteSortingPlugin
             spriteDetectionData.cameraProjectionType = cameraProjectionType;
 
             var overlappingSpriteDetectionResult = new OverlappingSpriteDetectionResult();
+            if (overlappingSpriteDetector == null)
+            {
+                overlappingSpriteDetector = new OverlappingSpriteDetector();
+            }
 
             switch (sortingType)
             {
@@ -583,6 +608,13 @@ namespace SpriteSortingPlugin
                 preview.EnableSceneVisualization(true);
             }
 
+            if (isApplyingAutoSorting)
+            {
+                var sortingComponents =
+                    new List<SortingComponent>(overlappingSpriteDetectionResult.overlappingSortingComponents);
+                ApplyAutoSorting(overlappingSpriteDetectionResult.baseItem, sortingComponents);
+            }
+
             overlappingSpriteDetectionResult.ConvertToOverlappingItems(out var overlappingItemList,
                 out var overlappingBaseItem);
 
@@ -592,6 +624,29 @@ namespace SpriteSortingPlugin
             preview.UpdateOverlappingItems(overlappingItems);
             preview.UpdateSpriteData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
+        }
+
+        private void ApplyAutoSorting(SortingComponent baseItem, List<SortingComponent> sortingComponents)
+        {
+            overlappingItemSortingOrderAnalyzer = new OverlappingItemSortingOrderAnalyzer();
+
+            spriteDetectionData.outlinePrecision = outlinePrecision;
+            spriteDetectionData.spriteData = spriteData;
+            spriteDetectionData.cameraProjectionType = cameraProjectionType;
+
+            var resultList =
+                overlappingItemSortingOrderAnalyzer.GenerateAutomaticSortingOrder(baseItem, sortingComponents,
+                    spriteDetectionData);
+
+            //TODO: temp, replace this by overwriting directly the overlappingItemList
+            autoSortingResultNames = new List<string>();
+            for (var i = 0; i < resultList.Count; i++)
+            {
+                autoSortingResultNames.Add((i + 1) + ". " + resultList[i]);
+            }
+
+            autoSortingResultList =
+                new ReorderableList(autoSortingResultNames, typeof(string), false, false, false, false);
         }
 
         private void OnDisable()
