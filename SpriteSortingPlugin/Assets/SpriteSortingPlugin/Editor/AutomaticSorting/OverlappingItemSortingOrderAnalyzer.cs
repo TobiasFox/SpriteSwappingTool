@@ -24,27 +24,157 @@ namespace SpriteSortingPlugin.AutomaticSorting
             sortingCriterias.Add(sortingCriteria);
         }
 
-        public List<SortingComponent> GenerateAutomaticSortingOrder(SortingComponent baseItem,
+        public List<AutoSortingComponent> GenerateAutomaticSortingOrder(SortingComponent baseItem,
             List<SortingComponent> overlappingSortingComponents, SpriteDetectionData spriteDetectionData)
         {
-            if (overlappingSortingComponents == null || overlappingSortingComponents.Count <= 1)
+            resultList = new List<AutoSortingComponent>();
+
+            if (overlappingSortingComponents == null || overlappingSortingComponents.Count + 1 <= 1)
             {
-                return overlappingSortingComponents;
+                return resultList;
             }
 
-            resultList = new List<AutoSortingComponent>();
             this.overlappingSortingComponents = overlappingSortingComponents;
             this.baseItem = baseItem;
             this.spriteDetectionData = spriteDetectionData;
-            overlappingSortingComponents.Add(baseItem);
-            var autoSortingComponents = InitSortingDataList();
+            overlappingSortingComponents.Insert(0, baseItem);
 
+            var autoSortingComponents = InitSortingDataList();
             AnalyzeContainment(ref autoSortingComponents);
 
-            var result = new List<SortingComponent>();
+            SplitAutoSortingComponentsByContainment(autoSortingComponents, out var notContainedComponents,
+                out var containedComponents);
+
+            SortNotContainedComponents(notContainedComponents);
+            SortContainedComponents(containedComponents);
+
+            //TODO consider baseItem
+            
+            return resultList;
+        }
+
+        private void SortContainedComponents(List<AutoSortingComponent> containedComponents)
+        {
+            AddFirstComponentIfPossible(containedComponents);
+
+            foreach (var containedComponent in containedComponents)
+            {
+                var correspondingIndex = GetCorrespondingAutoSortingComponentIndex(resultList,
+                    containedComponent.containedByAutoSortingComponent);
+                if (correspondingIndex < 0)
+                {
+                    Debug.LogWarning("should not happen, break while");
+                    break;
+                }
+
+                var beginCheckIndex = correspondingIndex + 1;
+                containedComponent.sortingOrder =
+                    containedComponent.containedByAutoSortingComponent.CurrentSortingOrder + 1;
+
+                if (beginCheckIndex >= resultList.Count)
+                {
+                    resultList.Add(containedComponent);
+                    continue;
+                }
+
+                InsertInResultList(containedComponent, beginCheckIndex);
+            }
+        }
+
+        private void AddFirstComponentIfPossible(List<AutoSortingComponent> components)
+        {
+            if (resultList.Count != 0 || components.Count <= 0)
+            {
+                return;
+            }
+
+            var firstComponent = components[0];
+            components.RemoveAt(0);
+
+            resultList.Add(firstComponent);
+            firstComponent.sortingOrder = firstComponent.CurrentSortingOrder;
+        }
+
+        private void SortNotContainedComponents(List<AutoSortingComponent> notContainedComponents)
+        {
+            AddFirstComponentIfPossible(notContainedComponents);
+
+            foreach (var notContainedComponent in notContainedComponents)
+            {
+                InsertInResultList(notContainedComponent);
+            }
+        }
+
+        private void InsertInResultList(AutoSortingComponent currentItem, int beginCheckIndex = 0)
+        {
+            var isInsertedInResultList = false;
+            for (int i = beginCheckIndex; i < resultList.Count; i++)
+            {
+                //check against each of the items which are already in the resultList
+
+                var autoSortingComponent = resultList[i];
+
+                var sortingResult = CompareWithSortingCriterias(currentItem, autoSortingComponent);
+                if (!sortingResult.isOverlapping)
+                {
+                    continue;
+                }
+
+                if (sortingResult.order < 0)
+                {
+                    currentItem.sortingOrder = autoSortingComponent.sortingOrder;
+                    resultList.Insert(i, currentItem);
+
+                    for (int j = i + 1; j < resultList.Count; j++)
+                    {
+                        var sortingComponent = resultList[j];
+                        if (currentItem.IsOverlapping(sortingComponent))
+                        {
+                            sortingComponent.sortingOrder++;
+                        }
+                    }
+
+                    isInsertedInResultList = true;
+                    break;
+                }
+
+                currentItem.sortingOrder = autoSortingComponent.sortingOrder + 1;
+            }
+
+            if (!isInsertedInResultList)
+            {
+                resultList.Add(currentItem);
+            }
+        }
+
+        private void SplitAutoSortingComponentsByContainment(List<AutoSortingComponent> autoSortingComponents,
+            out List<AutoSortingComponent> notContainedComponents, out List<AutoSortingComponent> containedComponents)
+        {
+            notContainedComponents = new List<AutoSortingComponent>();
+            containedComponents = new List<AutoSortingComponent>();
+
             foreach (var autoSortingComponent in autoSortingComponents)
             {
-                result.Add(autoSortingComponent);
+                if (autoSortingComponent.containedByAutoSortingComponent == null)
+                {
+                    notContainedComponents.Add(autoSortingComponent);
+                }
+                else
+                {
+                    containedComponents.Add(autoSortingComponent);
+                }
+            }
+        }
+
+        private AutoSortingResult CompareWithSortingCriterias(AutoSortingComponent unsortedItem,
+            AutoSortingComponent sortedItem)
+        {
+            //check each sorting criteria
+            var result = new AutoSortingResult {isOverlapping = unsortedItem.IsOverlapping(sortedItem)};
+
+            if (!result.isOverlapping)
+            {
+                return result;
             }
 
             return result;
@@ -57,36 +187,43 @@ namespace SpriteSortingPlugin.AutomaticSorting
             foreach (var autoSortingComponent in autoSortingComponents)
             {
                 var containedSortingComponent = spriteContainmentDetector.DetectContainedBySortingComponent(
-                    autoSortingComponent,
-                    overlappingSortingComponents, spriteDetectionData);
+                    autoSortingComponent, overlappingSortingComponents, spriteDetectionData);
 
-                if (containedSortingComponent != null)
-                {
-                    var correspondingAutoSortingComponent =
-                        GetCorrespondingAutoSortingComponent(autoSortingComponents, containedSortingComponent);
-
-                    autoSortingComponent.containedByAutoSortingComponent = correspondingAutoSortingComponent;
-
-                    Debug.LogFormat("containment found: {0} in {1} ", containedSortingComponent.spriteRenderer.name,
-                        autoSortingComponent.spriteRenderer.name);
-                }
-            }
-        }
-
-        private AutoSortingComponent GetCorrespondingAutoSortingComponent(
-            List<AutoSortingComponent> autoSortingComponents, SortingComponent sortingComponent)
-        {
-            foreach (var autoSortingComponent in autoSortingComponents)
-            {
-                if (!autoSortingComponent.Equals(sortingComponent))
+                if (containedSortingComponent == null)
                 {
                     continue;
                 }
 
-                return autoSortingComponent;
+                var correspondingAutoSortingComponentIndex =
+                    GetCorrespondingAutoSortingComponentIndex(autoSortingComponents, containedSortingComponent);
+
+                if (correspondingAutoSortingComponentIndex < 0)
+                {
+                    continue;
+                }
+
+                autoSortingComponent.containedByAutoSortingComponent =
+                    autoSortingComponents[correspondingAutoSortingComponentIndex];
+
+                Debug.LogFormat("containment found: {0} in {1} ", containedSortingComponent.spriteRenderer.name,
+                    autoSortingComponent.spriteRenderer.name);
+            }
+        }
+
+        private int GetCorrespondingAutoSortingComponentIndex(List<AutoSortingComponent> autoSortingComponents,
+            SortingComponent sortingComponent)
+        {
+            for (var i = 0; i < autoSortingComponents.Count; i++)
+            {
+                if (!autoSortingComponents[i].Equals(sortingComponent))
+                {
+                    continue;
+                }
+
+                return i;
             }
 
-            return null;
+            return -1;
         }
 
         private List<AutoSortingComponent> InitSortingDataList()

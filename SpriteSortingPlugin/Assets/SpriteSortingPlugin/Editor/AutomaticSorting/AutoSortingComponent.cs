@@ -22,6 +22,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
             sortingComponent.outmostSortingGroup)
         {
             id = globalID++;
+            sortingOrder = CurrentSortingOrder;
         }
 
         public void AddOverlappingSortingComponent(SortingComponent sortingComponent)
