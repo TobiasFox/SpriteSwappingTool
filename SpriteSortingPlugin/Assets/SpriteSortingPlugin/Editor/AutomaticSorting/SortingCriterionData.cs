@@ -7,6 +7,5 @@ namespace SpriteSortingPlugin.AutomaticSorting
         public bool isActive;
         public bool isExpanded;
         public int priority;
-        public string name = "";
     }
 }

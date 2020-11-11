@@ -30,6 +30,11 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
         protected abstract void OnInspectorGuiInternal();
 
+        protected virtual string GetTitleName()
+        {
+            return "Criteria";
+        }
+
         private new void DrawHeader()
         {
             var backgroundRect = GUILayoutUtility.GetRect(1f, 17f);
@@ -56,7 +61,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 sortingCriterionData.priority =
                     EditorGUI.IntField(priorityRect, "Priority", sortingCriterionData.priority);
                 EditorGUIUtility.labelWidth = 0;
-                EditorGUI.LabelField(labelRect, sortingCriterionData.name, EditorStyles.boldLabel);
+                EditorGUI.LabelField(labelRect, GetTitleName(), EditorStyles.boldLabel);
             }
 
             sortingCriterionData.isExpanded = GUI.Toggle(foldoutRect, sortingCriterionData.isExpanded, GUIContent.none,

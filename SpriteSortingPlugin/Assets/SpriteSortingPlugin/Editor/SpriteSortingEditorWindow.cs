@@ -56,8 +56,7 @@ namespace SpriteSortingPlugin
         private bool isLargeSpritesInForeground;
         private List<string> autoSortingResultNames;
         private ReorderableList autoSortingResultList;
-        private List<SortingCriterionData> sortingCriterionDataList;
-        private List<Editor> sortingCriterionDataEditorList;
+        private List<SortingCriteriaComponent> sortingCriteriaComponents;
 
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
@@ -281,34 +280,42 @@ namespace SpriteSortingPlugin
 
         private void InitializeSortingCriteriaDataAndEditors()
         {
-            sortingCriterionDataList = new List<SortingCriterionData>();
-            sortingCriterionDataEditorList = new List<Editor>();
+            sortingCriteriaComponents = new List<SortingCriteriaComponent>();
 
-            var sizeSortingCriterionData = CreateInstance<SizeSortingCriterionData>();
-            sortingCriterionDataList.Add(sizeSortingCriterionData);
-            var testEditor = Editor.CreateEditor(sizeSortingCriterionData);
-            var specificEditor = (SizeCriterionDataEditor) testEditor;
-            specificEditor.Initialize(sizeSortingCriterionData);
-            sortingCriterionDataEditorList.Add(testEditor);
+            //Size criterion
+            {
+                var sizeSortingCriterionData = CreateInstance<SizeSortingCriterionData>();
+                var sortingCriterion = new SizeSortingCriterion(sizeSortingCriterionData);
+                var sizeSortingCriteriaComponent = new SortingCriteriaComponent
+                {
+                    sortingCriterionData = sizeSortingCriterionData,
+                    sortingCriterion = sortingCriterion
+                };
+                sortingCriteriaComponents.Add(sizeSortingCriteriaComponent);
+            }
 
-            var sizeSortingCriterionData2 = CreateInstance<SizeSortingCriterionData>();
-            sortingCriterionDataList.Add(sizeSortingCriterionData2);
-            testEditor = Editor.CreateEditor(sizeSortingCriterionData2);
-            specificEditor = (SizeCriterionDataEditor) testEditor;
-            specificEditor.Initialize(sizeSortingCriterionData2);
-            sortingCriterionDataEditorList.Add(testEditor);
+            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
+            {
+                var sortingCriteriaComponent = sortingCriteriaComponents[i];
+                var specificEditor = Editor.CreateEditor(sortingCriteriaComponent.sortingCriterionData);
+                var criterionDataBaseEditor = (CriterionDataBaseEditor<SortingCriterionData>) specificEditor;
+                criterionDataBaseEditor.Initialize(sortingCriteriaComponent.sortingCriterionData);
+                sortingCriteriaComponent.criterionDataBaseEditor = criterionDataBaseEditor;
+
+                sortingCriteriaComponents[i] = sortingCriteriaComponent;
+            }
         }
 
         private void DrawAutoSortingOptions()
         {
-            if (sortingCriterionDataList == null)
+            if (sortingCriteriaComponents == null)
             {
                 InitializeSortingCriteriaDataAndEditors();
             }
 
-            foreach (var editor in sortingCriterionDataEditorList)
+            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
             {
-                editor.OnInspectorGUI();
+                sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
             }
         }
 
@@ -536,6 +543,14 @@ namespace SpriteSortingPlugin
         {
             reordableOverlappingItemList?.CleanUp();
             autoSortingResultList = null;
+
+            if (sortingCriteriaComponents != null)
+            {
+                foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                {
+                    DestroyImmediate(sortingCriteriaComponent.criterionDataBaseEditor);
+                }
+            }
         }
 
         private bool HasOverlappingItems()
@@ -667,6 +682,16 @@ namespace SpriteSortingPlugin
         private void ApplyAutoSorting(SortingComponent baseItem, List<SortingComponent> sortingComponents)
         {
             overlappingItemSortingOrderAnalyzer = new OverlappingItemSortingOrderAnalyzer();
+
+            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+            {
+                if (!sortingCriteriaComponent.sortingCriterionData.isActive)
+                {
+                    continue;
+                }
+
+                overlappingItemSortingOrderAnalyzer.AddSortingCriteria(sortingCriteriaComponent.sortingCriterion);
+            }
 
             spriteDetectionData.outlinePrecision = outlinePrecision;
             spriteDetectionData.spriteData = spriteData;
