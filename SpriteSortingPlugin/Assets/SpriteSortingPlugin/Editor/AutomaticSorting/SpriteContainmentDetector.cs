@@ -14,6 +14,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
         private SpriteDataItem baseItemSpriteDataItem;
         private PolygonCollider2D basePolygonCollider;
         private ObjectOrientedBoundingBox baseOOBB;
+        private PolygonColliderCacher polygonColliderCacher;
 
         public SortingComponent DetectContainedBySortingComponent(SortingComponent baseItem,
             List<SortingComponent> sortingComponentsToCheck, SpriteDetectionData spriteDetectionData)
@@ -22,6 +23,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
             {
                 return null;
             }
+
+            polygonColliderCacher = PolygonColliderCacher.GetInstance();
 
             this.baseItem = baseItem;
             this.spriteDetectionData = spriteDetectionData;
@@ -47,7 +50,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
             if (basePolygonCollider != null)
             {
-                PolygonColliderCacher.DisableCachedCollider(baseItemAssetGuid,
+                polygonColliderCacher.DisableCachedCollider(baseItemAssetGuid,
                     basePolygonCollider.GetInstanceID());
             }
 
@@ -86,7 +89,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                         return;
                     }
 
-                    basePolygonCollider = PolygonColliderCacher.GetCachedColliderOrCreateNewCollider(
+                    basePolygonCollider = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
                         baseItemAssetGuid, baseItemSpriteDataItem, baseItem.spriteRenderer.transform);
                     break;
             }
@@ -152,7 +155,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                         return Contains(baseItemBounds, sortingComponentsBounds);
                     }
 
-                    var otherPolygonCollider = PolygonColliderCacher.GetCachedColliderOrCreateNewCollider(
+                    var otherPolygonCollider = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
                         sortingComponentAssetGuid, sortingComponentSpriteDataItem,
                         sortingComponent.spriteRenderer.transform);
 
@@ -182,7 +185,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                                 .transform);
                     }
 
-                    PolygonColliderCacher.DisableCachedCollider(sortingComponentAssetGuid,
+                    polygonColliderCacher.DisableCachedCollider(sortingComponentAssetGuid,
                         otherPolygonCollider.GetInstanceID());
 
                     return isContained;

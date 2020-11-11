@@ -11,7 +11,7 @@
             this.isInitializingData = isInitializingData;
         }
 
-        public int[] Sort(AutoSortingComponent overlappingItem, AutoSortingComponent otherOverlappingItem,
+        public int[] Sort(AutoSortingComponent autoSortingComponent, AutoSortingComponent otherAutoSortingComponent,
             SpriteData spriteData)
         {
             if (isInitializingData)
@@ -19,11 +19,11 @@
                 InitializeData();
             }
 
-            return InternalSort(overlappingItem, otherOverlappingItem, spriteData);
+            return InternalSort(autoSortingComponent, otherAutoSortingComponent, spriteData);
         }
 
-        protected abstract int[] InternalSort(AutoSortingComponent overlappingItem,
-            AutoSortingComponent otherOverlappingItem, SpriteData spriteData);
+        protected abstract int[] InternalSort(AutoSortingComponent autoSortingComponent,
+            AutoSortingComponent otherAutoSortingComponent, SpriteData spriteData);
 
         private void InitializeData()
         {

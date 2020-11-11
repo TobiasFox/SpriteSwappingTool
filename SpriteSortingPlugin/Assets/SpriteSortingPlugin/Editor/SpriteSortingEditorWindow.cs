@@ -265,7 +265,7 @@ namespace SpriteSortingPlugin
             }
             EditorGUILayout.EndHorizontal();
 
-            autoSortingResultList.DoLayoutList();
+            autoSortingResultList?.DoLayoutList();
 
             if (isConfirmButtonClicked)
             {
@@ -724,7 +724,7 @@ namespace SpriteSortingPlugin
         private void OnDestroy()
         {
             preview.CleanUpPreview();
-            PolygonColliderCacher.CleanUp();
+            PolygonColliderCacher.GetInstance().CleanUp();
         }
     }
 }

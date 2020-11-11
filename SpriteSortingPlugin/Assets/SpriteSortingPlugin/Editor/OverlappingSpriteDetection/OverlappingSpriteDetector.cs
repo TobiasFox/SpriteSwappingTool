@@ -27,6 +27,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
         private PolygonCollider2D polygonColliderToCheck;
         private string assetGuid;
         private Bounds boundsToCheck;
+        private PolygonColliderCacher polygonColliderCacher;
 
         public OverlappingSpriteDetectionResult DetectOverlappingSprites(List<int> selectedLayers,
             List<Transform> gameObjectsParents, SpriteDetectionData spriteDetectionData)
@@ -114,7 +115,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
 
             return resultList;
         }
-        
+
         public Dictionary<int, int> AnalyzeSurroundingSpritesAndGetAdjustedSortingOptions(
             List<OverlappingItem> overlappingItems, SpriteDetectionData spriteDetectionData)
         {
@@ -396,6 +397,10 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
             baseItem = null;
             Debug.Log("start search in " + filteredSortingComponents.Count + " sprite renderers for an overlap with " +
                       sortingComponentToCheck.spriteRenderer.name);
+            if (polygonColliderToCheck == null)
+            {
+                polygonColliderCacher = PolygonColliderCacher.GetInstance();
+            }
 
             ResetOverlappingDetectionVariables();
 
@@ -440,7 +445,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
 
             if (polygonColliderToCheck != null)
             {
-                PolygonColliderCacher.DisableCachedCollider(assetGuid, polygonColliderToCheck.GetInstanceID());
+                polygonColliderCacher.DisableCachedCollider(assetGuid, polygonColliderToCheck.GetInstanceID());
             }
 
             if (overlappingComponents.Count <= 0)
@@ -492,7 +497,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
                         return;
                     }
 
-                    polygonColliderToCheck = PolygonColliderCacher.GetCachedColliderOrCreateNewCollider(assetGuid,
+                    polygonColliderToCheck = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(assetGuid,
                         spriteDataItem,
                         spriteRenderer.transform);
 
@@ -562,12 +567,12 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
                         return true;
                     }
 
-                    var otherPolygonColliderToCheck = PolygonColliderCacher.GetCachedColliderOrCreateNewCollider(
+                    var otherPolygonColliderToCheck = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
                         otherAssetGuid,
                         spriteDataItem, spriteRenderer.transform);
 
                     var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
-                    PolygonColliderCacher.DisableCachedCollider(otherAssetGuid,
+                    polygonColliderCacher.DisableCachedCollider(otherAssetGuid,
                         otherPolygonColliderToCheck.GetInstanceID());
 
                     return distance.isOverlapped;
