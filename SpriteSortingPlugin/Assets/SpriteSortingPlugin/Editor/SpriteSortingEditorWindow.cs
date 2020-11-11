@@ -52,8 +52,12 @@ namespace SpriteSortingPlugin
         private SpriteDetectionData spriteDetectionData;
 
         private OverlappingItemSortingOrderAnalyzer overlappingItemSortingOrderAnalyzer;
+        private bool useSizeAsSortingCriteria;
+        private bool isLargeSpritesInForeground;
         private List<string> autoSortingResultNames;
         private ReorderableList autoSortingResultList;
+        private List<SortingCriterionData> sortingCriterionDataList;
+        private List<Editor> sortingCriterionDataEditorList;
 
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
@@ -190,15 +194,16 @@ namespace SpriteSortingPlugin
                 "generate automatic order of overlapping renderer?",
                 isApplyingAutoSorting);
 
+            //TODO add auto sorting dependent options
             if (isApplyingAutoSorting)
             {
-                //TODO add auto sorting dependent options
+                DrawAutoSortingOptions();
             }
 
             EditorGUILayout.EndToggleGroup();
 
             serializedObject.ApplyModifiedProperties();
-            bool isAnalyzedButtonClickedThisFrame = false;
+            var isAnalyzedButtonClickedThisFrame = false;
 
             EditorGUI.BeginDisabledGroup(isAnalyzedButtonDisabled);
             if (GUILayout.Button("Analyze"))
@@ -272,6 +277,39 @@ namespace SpriteSortingPlugin
             preview.DoPreview(isAnalyzedButtonClickedThisFrame);
 
             EndScrollRect();
+        }
+
+        private void InitializeSortingCriteriaDataAndEditors()
+        {
+            sortingCriterionDataList = new List<SortingCriterionData>();
+            sortingCriterionDataEditorList = new List<Editor>();
+
+            var sizeSortingCriterionData = CreateInstance<SizeSortingCriterionData>();
+            sortingCriterionDataList.Add(sizeSortingCriterionData);
+            var testEditor = Editor.CreateEditor(sizeSortingCriterionData);
+            var specificEditor = (SizeCriterionDataEditor) testEditor;
+            specificEditor.Initialize(sizeSortingCriterionData);
+            sortingCriterionDataEditorList.Add(testEditor);
+
+            var sizeSortingCriterionData2 = CreateInstance<SizeSortingCriterionData>();
+            sortingCriterionDataList.Add(sizeSortingCriterionData2);
+            testEditor = Editor.CreateEditor(sizeSortingCriterionData2);
+            specificEditor = (SizeCriterionDataEditor) testEditor;
+            specificEditor.Initialize(sizeSortingCriterionData2);
+            sortingCriterionDataEditorList.Add(testEditor);
+        }
+
+        private void DrawAutoSortingOptions()
+        {
+            if (sortingCriterionDataList == null)
+            {
+                InitializeSortingCriteriaDataAndEditors();
+            }
+
+            foreach (var editor in sortingCriterionDataEditorList)
+            {
+                editor.OnInspectorGUI();
+            }
         }
 
         private void DrawSortingOptions()
@@ -642,7 +680,9 @@ namespace SpriteSortingPlugin
             autoSortingResultNames = new List<string>();
             for (var i = 0; i < resultList.Count; i++)
             {
-                autoSortingResultNames.Add((i + 1) + ". " + resultList[i]);
+                var autoSortingComponent = resultList[i];
+                autoSortingResultNames.Add((i + 1) + ". new sortingOrder: " + autoSortingComponent.sortingOrder + ", " +
+                                           autoSortingComponent);
             }
 
             autoSortingResultList =

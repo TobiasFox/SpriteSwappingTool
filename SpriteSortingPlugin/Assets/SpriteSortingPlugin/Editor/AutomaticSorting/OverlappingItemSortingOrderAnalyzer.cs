@@ -7,21 +7,21 @@ namespace SpriteSortingPlugin.AutomaticSorting
 {
     public class OverlappingItemSortingOrderAnalyzer
     {
-        private List<SortingCriteria> sortingCriterias;
+        private List<SortingCriterion<SortingCriterionData>> sortingCriterias;
         private SpriteDetectionData spriteDetectionData;
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private List<AutoSortingComponent> resultList;
         private List<SortingComponent> overlappingSortingComponents;
         private SortingComponent baseItem;
 
-        public void AddSortingCriteria(SortingCriteria sortingCriteria)
+        public void AddSortingCriteria(SortingCriterion<SortingCriterionData> sortingCriterion)
         {
             if (sortingCriterias == null)
             {
-                sortingCriterias = new List<SortingCriteria>();
+                sortingCriterias = new List<SortingCriterion<SortingCriterionData>>();
             }
 
-            sortingCriterias.Add(sortingCriteria);
+            sortingCriterias.Add(sortingCriterion);
         }
 
         public List<AutoSortingComponent> GenerateAutomaticSortingOrder(SortingComponent baseItem,
@@ -63,7 +63,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                     containedComponent.containedByAutoSortingComponent);
                 if (correspondingIndex < 0)
                 {
-                    Debug.LogWarning("should not happen, break while");
+                    Debug.LogWarning("should not happen, break for");
                     break;
                 }
 
@@ -176,6 +176,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
             {
                 return result;
             }
+            
+            
 
             return result;
         }
