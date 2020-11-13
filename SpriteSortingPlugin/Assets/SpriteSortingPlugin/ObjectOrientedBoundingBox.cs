@@ -182,16 +182,29 @@ namespace SpriteSortingPlugin
         {
             foreach (var otherPoint1 in otherOOBB.points)
             {
-                for (int j = 0; j < points.Length; j++)
-                {
-                    var ownPoint1 = points[j];
-                    var ownPoint2 = points[(j + 1) % points.Length];
-                    var isIntersecting = AreLinesIntersecting(ownPoint1, ownPoint2, otherPoint1, ownBounds.center);
+                var isContaining = Contains(otherPoint1);
 
-                    if (isIntersecting)
-                    {
-                        return false;
-                    }
+                if (!isContaining)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        //TODO test it and if succeeded replace it above
+        public bool Contains(Vector2 point)
+        {
+            for (int i = 0; i < points.Length; i++)
+            {
+                var ownPoint1 = points[i];
+                var ownPoint2 = points[(i + 1) % points.Length];
+                var isIntersecting = AreLinesIntersecting(ownPoint1, ownPoint2, point, ownBounds.center);
+
+                if (isIntersecting)
+                {
+                    return false;
                 }
             }
 

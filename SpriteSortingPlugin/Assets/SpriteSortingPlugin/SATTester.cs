@@ -73,6 +73,17 @@ namespace SpriteSortingPlugin
             Debug.Log(AreLinesIntersecting(point1, point2, point3, point4));
         }
 
+        public void ContainingPointTest()
+        {
+            var spriteRenderer = spriteRenderers[0];
+            var assetGuid1 =
+                AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID()));
+
+            var oobb = spriteData.spriteDataDictionary[assetGuid1].objectOrientedBoundingBox;
+            oobb.UpdateBox(spriteRenderer.transform);
+            Debug.Log(oobb.Contains(point1));
+        }
+
         private bool AreLinesIntersecting(Vector2 line1Point1, Vector2 line1Point2, Vector2 line2Point1,
             Vector2 line2Point2)
         {
@@ -123,6 +134,11 @@ namespace SpriteSortingPlugin
             if (GUILayout.Button("Test3"))
             {
                 satTester.Test3();
+            }
+
+            if (GUILayout.Button(nameof(SATTester.ContainingPointTest)))
+            {
+                satTester.ContainingPointTest();
             }
         }
     }
