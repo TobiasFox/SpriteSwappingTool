@@ -408,8 +408,6 @@ namespace SpriteSortingPlugin
                                 : CameraProjectionType.Perspective;
                         }
 
-                        EditorGUI.indentLevel--;
-
                         break;
                     case TransparencySortMode.Perspective:
                         cameraProjectionType = CameraProjectionType.Perspective;
@@ -421,59 +419,59 @@ namespace SpriteSortingPlugin
                         break;
                 }
 
-                useSpriteAlphaOutline = EditorGUILayout.BeginToggleGroup(
-                    "Use a more precise sprite outline than the SpriteRenderers Bounding Box?", useSpriteAlphaOutline);
-
-                if (useSpriteAlphaOutline)
+                EditorGUI.BeginChangeCheck();
+                outlinePrecision =
+                    (OutlinePrecision) EditorGUILayout.EnumPopup("Outline Precision", outlinePrecision);
+                if (EditorGUI.EndChangeCheck())
                 {
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.BeginHorizontal();
-
-                    EditorGUI.BeginChangeCheck();
-                    spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
-                        spriteData, typeof(SpriteData), false) as SpriteData;
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        preview.UpdateSpriteData(spriteData);
-
-                        //TODO select default value
-                        // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
-                        // {
-                        //     if (spriteDataItem.outlinePoints != null)
-                        //     {
-                        //         alphaAnalysisType = AlphaAnalysisType.Outline;
-                        //     }
-                        // }
-                    }
-
-                    if (GUILayout.Button("Open Sprite Data editor window to create the data"))
-                    {
-                        var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
-                        spriteAlphaEditorWindow.Show();
-                    }
-
-                    EditorGUILayout.EndHorizontal();
-
-                    if (spriteData == null)
-                    {
-                        EditorGUI.indentLevel++;
-                        EditorGUILayout.LabelField(new GUIContent("Please choose a Sprite Data Asset", warnIcon));
-                        isAnalyzedButtonDisabled = true;
-                        EditorGUI.indentLevel--;
-                    }
-
-                    EditorGUI.BeginChangeCheck();
-                    outlinePrecision =
-                        (OutlinePrecision) EditorGUILayout.EnumPopup("Outline Precision", outlinePrecision);
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        preview.UpdateOutlineType(outlinePrecision);
-                    }
-
-                    EditorGUI.indentLevel--;
+                    preview.UpdateOutlineType(outlinePrecision);
                 }
 
-                EditorGUILayout.EndToggleGroup();
+                switch (outlinePrecision)
+                {
+                    case OutlinePrecision.ObjectOrientedBoundingBox:
+                    case OutlinePrecision.PixelPerfect:
+
+                        EditorGUI.indentLevel++;
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUI.BeginChangeCheck();
+                            spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
+                                spriteData, typeof(SpriteData), false) as SpriteData;
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                preview.UpdateSpriteData(spriteData);
+
+                                //TODO select default value
+                                // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
+                                // {
+                                //     if (spriteDataItem.outlinePoints != null)
+                                //     {
+                                //         alphaAnalysisType = AlphaAnalysisType.Outline;
+                                //     }
+                                // }
+                            }
+
+                            if (GUILayout.Button("Open Sprite Data editor window to create the data"))
+                            {
+                                var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
+                                spriteAlphaEditorWindow.Show();
+                            }
+                        }
+
+                        if (spriteData == null)
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUILayout.LabelField(new GUIContent("Please choose a Sprite Data Asset", warnIcon));
+                            isAnalyzedButtonDisabled = true;
+                            EditorGUI.indentLevel--;
+                        }
+
+                        EditorGUI.indentLevel--;
+                        break;
+                }
+
+                EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndVertical();
         }

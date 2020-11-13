@@ -359,6 +359,9 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             switch (outlinePrecision)
             {
+                case OutlinePrecision.AxisAlignedBoundingBox:
+                    DrawAABB(rectWithAlphaBorders);
+                    break;
                 case OutlinePrecision.ObjectOrientedBoundingBox:
                     DrawOOBB(rectWithAlphaBorders, rightAreaRect);
                     break;
@@ -366,6 +369,13 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
                     DrawOutline(rectWithAlphaBorders);
                     break;
             }
+        }
+
+        private void DrawAABB(Rect rectWithAlphaBorders)
+        {
+            Handles.DrawWireCube(rectWithAlphaBorders.center, rectWithAlphaBorders.size);
+            Handles.DrawWireCube(rectWithAlphaBorders.center,
+                new Vector3(rectWithAlphaBorders.size.x - 1, rectWithAlphaBorders.size.y - 1));
         }
 
         private void DrawOutline(Rect rectWithAlphaBorders)
