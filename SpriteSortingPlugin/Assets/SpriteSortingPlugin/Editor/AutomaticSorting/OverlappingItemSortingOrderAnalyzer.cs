@@ -7,7 +7,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
 {
     public class OverlappingItemSortingOrderAnalyzer
     {
-        private List<SortingCriterion<SortingCriterionData>> sortingCriterias;
+        private readonly List<SortingCriterion<SortingCriterionData>> sortingCriterias =
+            new List<SortingCriterion<SortingCriterionData>>();
+
         private SpriteDetectionData spriteDetectionData;
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private List<AutoSortingComponent> resultList;
@@ -16,11 +18,6 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
         public void AddSortingCriteria(SortingCriterion<SortingCriterionData> sortingCriterion)
         {
-            if (sortingCriterias == null)
-            {
-                sortingCriterias = new List<SortingCriterion<SortingCriterionData>>();
-            }
-
             sortingCriterias.Add(sortingCriterion);
         }
 
@@ -39,6 +36,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
             this.spriteDetectionData = spriteDetectionData;
             overlappingSortingComponents.Insert(0, baseItem);
 
+            var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
+            spriteDataItemValidatorCache.UpdateSpriteData(spriteDetectionData.spriteData);
+
             var autoSortingComponents = InitSortingDataList();
             AnalyzeContainment(ref autoSortingComponents);
 
@@ -48,8 +48,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
             SortNotContainedComponents(notContainedComponents);
             SortContainedComponents(containedComponents);
 
+            spriteDataItemValidatorCache.Clear();
+
             //TODO consider baseItem
-            
             return resultList;
         }
 
@@ -176,8 +177,28 @@ namespace SpriteSortingPlugin.AutomaticSorting
             {
                 return result;
             }
-            
-            
+
+            var resultCounter = new int[2];
+            foreach (var sortingCriteria in sortingCriterias)
+            {
+                var tempResults = sortingCriteria.Sort(unsortedItem, sortedItem, spriteDetectionData.spriteData,
+                    spriteDetectionData.outlinePrecision);
+
+                for (int i = 0; i < resultCounter.Length; i++)
+                {
+                    resultCounter[i] += tempResults[i];
+                }
+            }
+
+            //TODO analyze all results
+            if (resultCounter[0] >= resultCounter[1])
+            {
+                result.order = 1;
+            }
+            else
+            {
+                result.order = -1;
+            }
 
             return result;
         }

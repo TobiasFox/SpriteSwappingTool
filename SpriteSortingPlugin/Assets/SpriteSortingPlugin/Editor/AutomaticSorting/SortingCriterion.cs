@@ -1,32 +1,36 @@
-﻿namespace SpriteSortingPlugin.AutomaticSorting
+﻿using SpriteSortingPlugin.OverlappingSprites;
+
+namespace SpriteSortingPlugin.AutomaticSorting
 {
     public abstract class SortingCriterion<T> where T : SortingCriterionData
     {
-        protected T sortingCriterionData;
-        private bool isInitializingData;
+        protected readonly T sortingCriterionData;
+        protected SpriteDataItemValidator spriteDataItemValidator;
+        protected SpriteDataItemValidator otherSpriteDataItemValidator;
+        protected SpriteData spriteData;
+        protected OutlinePrecision preferredOutlinePrecision;
 
-        public SortingCriterion(T sortingCriterionData, bool isInitializingData)
+        protected SortingCriterion(T sortingCriterionData)
         {
             this.sortingCriterionData = sortingCriterionData;
-            this.isInitializingData = isInitializingData;
         }
 
         public int[] Sort(AutoSortingComponent autoSortingComponent, AutoSortingComponent otherAutoSortingComponent,
-            SpriteData spriteData)
+            SpriteData spriteData, OutlinePrecision preferredOutlinePrecision)
         {
-            if (isInitializingData)
-            {
-                InitializeData();
-            }
+            this.spriteData = spriteData;
+            this.preferredOutlinePrecision = preferredOutlinePrecision;
 
-            return InternalSort(autoSortingComponent, otherAutoSortingComponent, spriteData);
+            var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
+            spriteDataItemValidator =
+                spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.spriteRenderer);
+            otherSpriteDataItemValidator =
+                spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.spriteRenderer);
+
+            return InternalSort(autoSortingComponent, otherAutoSortingComponent);
         }
 
         protected abstract int[] InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent, SpriteData spriteData);
-
-        private void InitializeData()
-        {
-        }
+            AutoSortingComponent otherAutoSortingComponent);
     }
 }

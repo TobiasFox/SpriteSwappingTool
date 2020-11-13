@@ -16,12 +16,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
 
         public static PolygonColliderCacher GetInstance()
         {
-            if (instance == null)
-            {
-                instance = new PolygonColliderCacher();
-            }
-
-            return instance;
+            return instance ?? (instance = new PolygonColliderCacher());
         }
 
         public PolygonCollider2D GetCachedColliderOrCreateNewCollider(string assetGuid,
