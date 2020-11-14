@@ -1,8 +1,9 @@
-﻿using SpriteSortingPlugin.OverlappingSpriteDetection;
+﻿using SpriteSortingPlugin.AutomaticSorting.Data;
+using SpriteSortingPlugin.OverlappingSpriteDetection;
 using SpriteSortingPlugin.OverlappingSprites;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.AutomaticSorting
+namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
     public class SizeSortingCriterion : SortingCriterion<SortingCriterionData>
     {
@@ -27,7 +28,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
             var otherSurfaceArea = CalculateSurfaceArea(otherSpriteRenderer, otherSpriteDataItemValidator);
             var isAutoSortingComponentIsLarger = surfaceArea >= otherSurfaceArea;
 
-            if (SizeSortingCriterionData.isLargeSpritesInForeground)
+            if (SizeSortingCriterionData.isLargeSpriteInForeground)
             {
                 results[isAutoSortingComponentIsLarger ? 0 : 1]++;
             }
@@ -57,10 +58,10 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
             var distanceFromSpriteRenderer = Vector2.Distance(enclosingBoundingBox.center, spriteSortPoint);
             var otherDistanceFromSpriteRenderer = Vector2.Distance(enclosingBoundingBox.center, otherSpriteSortPoint);
-            
+
             var isSpriteRendererCloser = distanceFromSpriteRenderer <= otherDistanceFromSpriteRenderer;
 
-            if (SizeSortingCriterionData.isLargeSpritesInForeground)
+            if (SizeSortingCriterionData.isLargeSpriteInForeground)
             {
                 results[isSpriteRendererCloser ? 0 : 1]++;
             }
@@ -98,21 +99,22 @@ namespace SpriteSortingPlugin.AutomaticSorting
         {
             var returnBool = false;
 
-            switch (validator.GetValidOutlinePrecision(preferredOutlinePrecision))
+            switch (validator.GetValidOutlinePrecision(autoSortingCalculationData.outlinePrecision))
             {
                 case OutlinePrecision.AxisAlignedBoundingBox:
                     returnBool = otherSpriteRenderer.bounds.Contains(spriteSortPoint);
                     break;
                 case OutlinePrecision.ObjectOrientedBoundingBox:
 
-                    var oobb = spriteData.spriteDataDictionary[validator.AssetGuid].objectOrientedBoundingBox;
+                    var oobb = autoSortingCalculationData.spriteData.spriteDataDictionary[validator.AssetGuid]
+                        .objectOrientedBoundingBox;
                     oobb.UpdateBox(otherSpriteRenderer.transform);
                     returnBool = oobb.Contains(spriteSortPoint);
 
                     break;
                 case OutlinePrecision.PixelPerfect:
 
-                    var spriteDataItem = spriteData.spriteDataDictionary[validator.AssetGuid];
+                    var spriteDataItem = autoSortingCalculationData.spriteData.spriteDataDictionary[validator.AssetGuid];
                     var polygonColliderCacher = PolygonColliderCacher.GetInstance();
                     var polygonCollider = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
                         validator.AssetGuid, spriteDataItem, otherSpriteRenderer.transform);
@@ -130,20 +132,21 @@ namespace SpriteSortingPlugin.AutomaticSorting
         {
             var returnValue = 0f;
 
-            switch (validator.GetValidOutlinePrecision(preferredOutlinePrecision))
+            switch (validator.GetValidOutlinePrecision(autoSortingCalculationData.outlinePrecision))
             {
                 case OutlinePrecision.AxisAlignedBoundingBox:
                     var bounds = spriteRenderer.bounds;
                     returnValue = bounds.size.x * bounds.size.y;
                     break;
                 case OutlinePrecision.ObjectOrientedBoundingBox:
-                    var oobb = spriteData.spriteDataDictionary[validator.AssetGuid].objectOrientedBoundingBox;
+                    var oobb = autoSortingCalculationData.spriteData.spriteDataDictionary[validator.AssetGuid]
+                        .objectOrientedBoundingBox;
                     oobb.UpdateBox(spriteRenderer.transform);
                     returnValue = oobb.GetSurfaceArea();
 
                     break;
                 case OutlinePrecision.PixelPerfect:
-                    var spriteDataItem = spriteData.spriteDataDictionary[validator.AssetGuid];
+                    var spriteDataItem = autoSortingCalculationData.spriteData.spriteDataDictionary[validator.AssetGuid];
 
                     returnValue = spriteDataItem.CalculatePolygonArea(spriteRenderer.transform);
                     break;

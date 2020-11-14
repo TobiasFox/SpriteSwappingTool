@@ -1,14 +1,14 @@
-﻿using SpriteSortingPlugin.OverlappingSprites;
+﻿using SpriteSortingPlugin.AutomaticSorting.Data;
+using SpriteSortingPlugin.OverlappingSprites;
 
-namespace SpriteSortingPlugin.AutomaticSorting
+namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
     public abstract class SortingCriterion<T> where T : SortingCriterionData
     {
         protected readonly T sortingCriterionData;
         protected SpriteDataItemValidator spriteDataItemValidator;
         protected SpriteDataItemValidator otherSpriteDataItemValidator;
-        protected SpriteData spriteData;
-        protected OutlinePrecision preferredOutlinePrecision;
+        protected AutoSortingCalculationData autoSortingCalculationData;
 
         protected SortingCriterion(T sortingCriterionData)
         {
@@ -16,10 +16,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
         }
 
         public int[] Sort(AutoSortingComponent autoSortingComponent, AutoSortingComponent otherAutoSortingComponent,
-            SpriteData spriteData, OutlinePrecision preferredOutlinePrecision)
+            AutoSortingCalculationData autoSortingCalculationData)
         {
-            this.spriteData = spriteData;
-            this.preferredOutlinePrecision = preferredOutlinePrecision;
+            this.autoSortingCalculationData = autoSortingCalculationData;
 
             var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
             spriteDataItemValidator =
@@ -27,7 +26,14 @@ namespace SpriteSortingPlugin.AutomaticSorting
             otherSpriteDataItemValidator =
                 spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.spriteRenderer);
 
-            return InternalSort(autoSortingComponent, otherAutoSortingComponent);
+            var results = InternalSort(autoSortingComponent, otherAutoSortingComponent);
+
+            for (int i = 0; i < results.Length; i++)
+            {
+                results[i] *= sortingCriterionData.priority;
+            }
+
+            return results;
         }
 
         protected abstract int[] InternalSort(AutoSortingComponent autoSortingComponent,

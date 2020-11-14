@@ -1,4 +1,7 @@
-﻿namespace SpriteSortingPlugin.AutomaticSorting
+﻿using SpriteSortingPlugin.AutomaticSorting.Criterias;
+using SpriteSortingPlugin.AutomaticSorting.CustomEditors;
+
+namespace SpriteSortingPlugin.AutomaticSorting.Data
 {
     public struct SortingCriteriaComponent
     {

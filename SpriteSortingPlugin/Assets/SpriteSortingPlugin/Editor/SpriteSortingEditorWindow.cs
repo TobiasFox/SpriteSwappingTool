@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using SpriteSortingPlugin.AutomaticSorting;
+using SpriteSortingPlugin.AutomaticSorting.Criterias;
+using SpriteSortingPlugin.AutomaticSorting.CustomEditors;
+using SpriteSortingPlugin.AutomaticSorting.Data;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
 using SpriteSortingPlugin.OverlappingSprites;
 using SpriteSortingPlugin.Preview;
@@ -57,6 +60,7 @@ namespace SpriteSortingPlugin
         private List<string> autoSortingResultNames;
         private ReorderableList autoSortingResultList;
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
+        private AutoSortingCalculationData autoSortingCalculationData;
 
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
@@ -294,6 +298,19 @@ namespace SpriteSortingPlugin
                 sortingCriteriaComponents.Add(sizeSortingCriteriaComponent);
             }
 
+            //position
+            {
+                var positionSizeData = CreateInstance<PositionSortingCriterionData>();
+                var sortingCriterion = new PositionSortingCriterion(positionSizeData);
+                var positionSortingCriteriaComponent = new SortingCriteriaComponent
+                {
+                    sortingCriterionData = positionSizeData,
+                    sortingCriterion = sortingCriterion
+                };
+                sortingCriteriaComponents.Add(positionSortingCriteriaComponent);
+            }
+
+
             for (var i = 0; i < sortingCriteriaComponents.Count; i++)
             {
                 var sortingCriteriaComponent = sortingCriteriaComponents[i];
@@ -493,9 +510,7 @@ namespace SpriteSortingPlugin
                 overlappingItem.ApplySortingOption();
             }
 
-            spriteDetectionData.outlinePrecision = outlinePrecision;
-            spriteDetectionData.spriteData = spriteData;
-            spriteDetectionData.cameraProjectionType = cameraProjectionType;
+            FillSpriteDetectionData();
 
             var sortingOptions = overlappingSpriteDetector.AnalyzeSurroundingSpritesAndGetAdjustedSortingOptions(
                 overlappingItems.Items, spriteDetectionData);
@@ -530,6 +545,18 @@ namespace SpriteSortingPlugin
             analyzeButtonWasClicked = false;
             overlappingItems = null;
             preview.CleanUpPreview();
+        }
+
+        private void FillSpriteDetectionData()
+        {
+            if (spriteDetectionData == null)
+            {
+                spriteDetectionData = new SpriteDetectionData();
+            }
+
+            spriteDetectionData.outlinePrecision = outlinePrecision;
+            spriteDetectionData.spriteData = spriteData;
+            spriteDetectionData.cameraProjectionType = cameraProjectionType;
         }
 
         private void EndScrollRect()
@@ -616,9 +643,7 @@ namespace SpriteSortingPlugin
                 preview.EnableSceneVisualization(false);
             }
 
-            spriteDetectionData.outlinePrecision = outlinePrecision;
-            spriteDetectionData.spriteData = spriteData;
-            spriteDetectionData.cameraProjectionType = cameraProjectionType;
+            FillSpriteDetectionData();
 
             var overlappingSpriteDetectionResult = new OverlappingSpriteDetectionResult();
             if (overlappingSpriteDetector == null)
@@ -691,13 +716,11 @@ namespace SpriteSortingPlugin
                 overlappingItemSortingOrderAnalyzer.AddSortingCriteria(sortingCriteriaComponent.sortingCriterion);
             }
 
-            spriteDetectionData.outlinePrecision = outlinePrecision;
-            spriteDetectionData.spriteData = spriteData;
-            spriteDetectionData.cameraProjectionType = cameraProjectionType;
+            FillAutoSortingCalculationData();
 
             var resultList =
                 overlappingItemSortingOrderAnalyzer.GenerateAutomaticSortingOrder(baseItem, sortingComponents,
-                    spriteDetectionData);
+                    autoSortingCalculationData);
 
             //TODO: temp, replace this by overwriting directly the overlappingItemList
             autoSortingResultNames = new List<string>();
@@ -710,6 +733,19 @@ namespace SpriteSortingPlugin
 
             autoSortingResultList =
                 new ReorderableList(autoSortingResultNames, typeof(string), false, false, false, false);
+        }
+
+        private void FillAutoSortingCalculationData()
+        {
+            if (autoSortingCalculationData == null)
+            {
+                autoSortingCalculationData = new AutoSortingCalculationData();
+            }
+
+            autoSortingCalculationData.outlinePrecision = outlinePrecision;
+            autoSortingCalculationData.spriteData = spriteData;
+            autoSortingCalculationData.cameraProjectionType = cameraProjectionType;
+            autoSortingCalculationData.cameraTransform = camera.transform;
         }
 
         private void OnDisable()

@@ -1,4 +1,4 @@
-﻿namespace SpriteSortingPlugin.AutomaticSorting
+﻿namespace SpriteSortingPlugin.AutomaticSorting.Data
 {
     public struct AutoSortingResult
     {

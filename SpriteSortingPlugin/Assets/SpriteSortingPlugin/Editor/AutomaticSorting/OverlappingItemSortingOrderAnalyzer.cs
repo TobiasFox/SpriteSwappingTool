@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using SpriteSortingPlugin.AutomaticSorting.Criterias;
+using SpriteSortingPlugin.AutomaticSorting.Data;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
 using SpriteSortingPlugin.OverlappingSprites;
 using UnityEngine;
@@ -10,7 +12,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
         private readonly List<SortingCriterion<SortingCriterionData>> sortingCriterias =
             new List<SortingCriterion<SortingCriterionData>>();
 
-        private SpriteDetectionData spriteDetectionData;
+        private AutoSortingCalculationData autoSortingCalculationData;
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private List<AutoSortingComponent> resultList;
         private List<SortingComponent> overlappingSortingComponents;
@@ -22,7 +24,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
         }
 
         public List<AutoSortingComponent> GenerateAutomaticSortingOrder(SortingComponent baseItem,
-            List<SortingComponent> overlappingSortingComponents, SpriteDetectionData spriteDetectionData)
+            List<SortingComponent> overlappingSortingComponents, AutoSortingCalculationData autoSortingCalculationData)
         {
             resultList = new List<AutoSortingComponent>();
 
@@ -33,11 +35,11 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
             this.overlappingSortingComponents = overlappingSortingComponents;
             this.baseItem = baseItem;
-            this.spriteDetectionData = spriteDetectionData;
+            this.autoSortingCalculationData = autoSortingCalculationData;
             overlappingSortingComponents.Insert(0, baseItem);
 
             var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
-            spriteDataItemValidatorCache.UpdateSpriteData(spriteDetectionData.spriteData);
+            spriteDataItemValidatorCache.UpdateSpriteData(this.autoSortingCalculationData.spriteData);
 
             var autoSortingComponents = InitSortingDataList();
             AnalyzeContainment(ref autoSortingComponents);
@@ -181,8 +183,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
             var resultCounter = new int[2];
             foreach (var sortingCriteria in sortingCriterias)
             {
-                var tempResults = sortingCriteria.Sort(unsortedItem, sortedItem, spriteDetectionData.spriteData,
-                    spriteDetectionData.outlinePrecision);
+                var tempResults = sortingCriteria.Sort(unsortedItem, sortedItem, autoSortingCalculationData);
 
                 for (int i = 0; i < resultCounter.Length; i++)
                 {
@@ -210,7 +211,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
             foreach (var autoSortingComponent in autoSortingComponents)
             {
                 var containedSortingComponent = spriteContainmentDetector.DetectContainedBySortingComponent(
-                    autoSortingComponent, overlappingSortingComponents, spriteDetectionData);
+                    autoSortingComponent, overlappingSortingComponents, autoSortingCalculationData);
 
                 if (containedSortingComponent == null)
                 {
@@ -261,7 +262,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 var autoSortingComponent = new AutoSortingComponent(overlappingItem);
 
                 var overlappingItems = overlappingSpriteDetector.DetectOverlappingSortingComponents(overlappingItem,
-                    overlappingSortingComponents, spriteDetectionData);
+                    overlappingSortingComponents, autoSortingCalculationData);
 
                 foreach (var overlappingSortingItem in overlappingItems)
                 {
@@ -272,44 +273,6 @@ namespace SpriteSortingPlugin.AutomaticSorting
             }
 
             return autoSortingComponents;
-        }
-
-        private int AnalyzeSortingCriterias(OverlappingItem currentOverlappingItem)
-        {
-            //TODO: sort after sorting layer, highest first
-
-            // this.spriteDetectionData = spriteDetectionData;
-            // var resultList = new List<OverlappingItem> {list[0]};
-            //
-            // var currentOverlappingItem = list[0];
-            //
-            // while (list.Count > 0)
-            // {
-            //     var nextOverlappingItem = list[0];
-            //
-            //     var currentSortingResultOverlappingItem = AnalyzeSortingCriterias(currentOverlappingItem);
-            //     var nextSortingResultOverlappingItem = AnalyzeSortingCriterias(currentOverlappingItem);
-            //
-            //     var overlappingItemToCheck = nextOverlappingItem;
-            //     if (nextSortingResultOverlappingItem > currentSortingResultOverlappingItem)
-            //     {
-            //     }
-            // }
-
-
-            // foreach (var sortingStrategy in sortingStrategies)
-            // {
-            //     
-            //     
-            //     resultList = sortingStrategy.Sort(resultList, spriteData);
-            // }
-
-            foreach (var sortingCriteria in sortingCriterias)
-            {
-                //analyze sorting criteria
-            }
-
-            return 0;
         }
     }
 }

@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿using SpriteSortingPlugin.AutomaticSorting.Data;
+using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.AutomaticSorting
+namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 {
     public abstract class CriterionDataBaseEditor<T> : Editor where T : SortingCriterionData
     {
@@ -43,8 +44,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
             labelRect.xMin += 37f;
 
             var priorityRect = backgroundRect;
-            priorityRect.xMax -= priorityRect.width / 2f - 25;
-            priorityRect.xMin = priorityRect.xMax - 100;
+            priorityRect.xMax -= priorityRect.width / 2f - 100;
+            priorityRect.xMin = priorityRect.xMax - 200;
 
             var foldoutRect = new Rect(backgroundRect.x, backgroundRect.y + 2, 13, 13);
             var toggleRect = new Rect(backgroundRect.x + 16, backgroundRect.y + 2, 13, 13);
@@ -59,7 +60,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
             {
                 EditorGUIUtility.labelWidth = 45;
                 sortingCriterionData.priority =
-                    EditorGUI.IntField(priorityRect, "Priority", sortingCriterionData.priority);
+                    EditorGUI.IntSlider(priorityRect, "Priority", sortingCriterionData.priority, 1, 5);
                 EditorGUIUtility.labelWidth = 0;
                 EditorGUI.LabelField(labelRect, GetTitleName(), EditorStyles.boldLabel);
             }

@@ -1,6 +1,7 @@
-﻿using UnityEditor;
+﻿using SpriteSortingPlugin.AutomaticSorting.Data;
+using UnityEditor;
 
-namespace SpriteSortingPlugin.AutomaticSorting
+namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 {
     [CustomEditor(typeof(SizeSortingCriterionData))]
     public class SizeCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
@@ -9,8 +10,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
         protected override void OnInspectorGuiInternal()
         {
-            SizeSortingCriterionData.isLargeSpritesInForeground = EditorGUILayout.ToggleLeft(
-                "is Large Sprites In Foreground", SizeSortingCriterionData.isLargeSpritesInForeground);
+            SizeSortingCriterionData.isLargeSpriteInForeground = EditorGUILayout.ToggleLeft(
+                "is large sprite in foreground", SizeSortingCriterionData.isLargeSpriteInForeground);
         }
 
         protected override string GetTitleName()
