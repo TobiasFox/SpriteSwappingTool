@@ -1,8 +1,7 @@
-﻿using SpriteSortingPlugin.AutomaticSorting.Criterias;
-using SpriteSortingPlugin.AutomaticSorting.Data;
+﻿using SpriteSortingPlugin.AutomaticSorting.Data;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
+namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
     public class PositionSortingCriterion : SortingCriterion<SortingCriterionData>
     {

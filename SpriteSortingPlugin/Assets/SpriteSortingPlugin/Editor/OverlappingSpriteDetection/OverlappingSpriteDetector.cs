@@ -511,6 +511,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
 
         private bool IsOverlapping(SpriteRenderer spriteRenderer)
         {
+            //TODO bounds are not overlapping if they dont share the same z coordinate
             if (!spriteRenderer.bounds.Intersects(boundsToCheck))
             {
                 return false;

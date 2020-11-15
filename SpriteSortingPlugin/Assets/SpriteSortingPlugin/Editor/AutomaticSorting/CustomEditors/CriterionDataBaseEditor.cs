@@ -26,6 +26,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             {
                 EditorGUI.indentLevel++;
                 OnInspectorGuiInternal();
+                EditorGUI.indentLevel--;
             }
         }
 

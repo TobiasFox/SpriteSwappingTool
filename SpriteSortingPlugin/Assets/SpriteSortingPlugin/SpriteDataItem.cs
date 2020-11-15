@@ -7,11 +7,12 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class SpriteDataItem
     {
-        [SerializeField] private string assetGuid;
+        [SerializeField, HideInInspector] private string assetGuid;
         [SerializeField] private string assetName;
 
         public ObjectOrientedBoundingBox objectOrientedBoundingBox;
         public List<Vector2> outlinePoints;
+        public SpriteAnalysisData spriteAnalysisData;
 
         public string AssetGuid => assetGuid;
         public string AssetName => assetName;

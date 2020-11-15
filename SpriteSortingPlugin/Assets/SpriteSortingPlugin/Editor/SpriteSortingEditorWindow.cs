@@ -310,6 +310,30 @@ namespace SpriteSortingPlugin
                 sortingCriteriaComponents.Add(positionSortingCriteriaComponent);
             }
 
+            //Resolution criterion
+            {
+                var sortingCriterionData = CreateInstance<ResolutionSortingCriterionData>();
+                var sortingCriterion = new ResolutionSortingCriterion(sortingCriterionData);
+                var sortingCriteriaComponent = new SortingCriteriaComponent
+                {
+                    sortingCriterionData = sortingCriterionData,
+                    sortingCriterion = sortingCriterion
+                };
+                sortingCriteriaComponents.Add(sortingCriteriaComponent);
+            }
+
+            //Blurriness criterion
+            {
+                var sortingCriterionData = CreateInstance<BlurrinessSortingCriterionData>();
+                var sortingCriterion = new BlurrinessSortingCriterion(sortingCriterionData);
+                var sortingCriteriaComponent = new SortingCriteriaComponent
+                {
+                    sortingCriterionData = sortingCriterionData,
+                    sortingCriterion = sortingCriterion
+                };
+                sortingCriteriaComponents.Add(sortingCriteriaComponent);
+            }
+
 
             for (var i = 0; i < sortingCriteriaComponents.Count; i++)
             {
