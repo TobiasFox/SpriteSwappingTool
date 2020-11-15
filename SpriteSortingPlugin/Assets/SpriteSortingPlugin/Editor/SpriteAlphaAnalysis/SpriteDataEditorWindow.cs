@@ -37,17 +37,12 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
         private OutlineAnalysisType outlineAnalysisType = OutlineAnalysisType.All;
         private OutlinePrecision outlinePrecision;
 
-        // private ObjectOrientedBoundingBoxComponent oobbComponent;
         private SpriteDataItem selectedSpriteDataItem;
         private GUIStyle centeredStyle;
         private GUIStyle helpBoxStyle;
 
         private bool isDisplayingSpriteOutline = true;
         private bool isDisplayingSpriteDetails;
-
-        private float blurriness;
-        private Color primaryColor;
-        private float brightness;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -282,7 +277,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private void DrawSpriteDetails(Rect rightAreaRect)
         {
-            var hasSelectedDataItem = selectedSpriteDataItem == null;
+            var hasSelectedDataItem = selectedSpriteDataItem != null;
 
             EditorGUILayout.BeginVertical(GUILayout.Height(130));
             EditorGUILayout.Space();
@@ -295,7 +290,7 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
             GUILayout.Label("Resolution");
             EditorGUI.BeginDisabledGroup(true);
             {
-                if (hasSelectedDataItem)
+                if (!hasSelectedDataItem)
                 {
                     EditorGUILayout.IntField("Width", 0);
                     EditorGUILayout.IntField("Height", 0);
@@ -311,40 +306,58 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
             var analyzeButtonWidth = GUILayout.Width(rightAreaRect.width / 8);
 
-            EditorGUI.BeginDisabledGroup(hasSelectedDataItem);
+            EditorGUI.BeginDisabledGroup(!hasSelectedDataItem);
             {
-                EditorGUILayout.BeginHorizontal();
-                brightness = EditorGUILayout.FloatField("Brightness", brightness);
-                if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                // EditorGUILayout.BeginHorizontal();
+                // EditorGUI.BeginChangeCheck();
+                // brightness = EditorGUILayout.FloatField("Brightness", brightness);
+                //
+                // if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                // {
+                // }
+                //
+                // EditorGUILayout.EndHorizontal();
+
+
+                using (new EditorGUILayout.HorizontalScope())
                 {
+                    EditorGUI.BeginChangeCheck();
+                    var blurriness = hasSelectedDataItem ? selectedSpriteDataItem.spriteAnalysisData.blurriness : 0;
+                    blurriness = EditorGUILayout.FloatField("Blurriness", blurriness);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        selectedSpriteDataItem.spriteAnalysisData.blurriness = blurriness;
+                    }
+
+                    if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                    {
+                    }
                 }
 
-                EditorGUILayout.EndHorizontal();
-
-
-                EditorGUILayout.BeginHorizontal();
-                blurriness = EditorGUILayout.FloatField("Blurriness", blurriness);
-                if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                using (new EditorGUILayout.HorizontalScope())
                 {
+                    EditorGUI.BeginChangeCheck();
+                    var primaryColor = hasSelectedDataItem
+                        ? selectedSpriteDataItem.spriteAnalysisData.primaryColor
+                        : Color.black;
+                    primaryColor = EditorGUILayout.ColorField("Primary Color", primaryColor);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        selectedSpriteDataItem.spriteAnalysisData.primaryColor = primaryColor;
+                    }
+
+                    if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                    {
+                    }
                 }
 
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.BeginHorizontal();
-                primaryColor = EditorGUILayout.ColorField("Primary Color", primaryColor);
-                if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                using (new EditorGUILayout.HorizontalScope())
                 {
+                    EditorGUILayout.LabelField("", "");
+                    if (GUILayout.Button("Analyze All", analyzeButtonWidth))
+                    {
+                    }
                 }
-
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("", "");
-                if (GUILayout.Button("Analyze All", analyzeButtonWidth))
-                {
-                }
-
-                EditorGUILayout.EndHorizontal();
             }
             EditorGUI.EndDisabledGroup();
         }
