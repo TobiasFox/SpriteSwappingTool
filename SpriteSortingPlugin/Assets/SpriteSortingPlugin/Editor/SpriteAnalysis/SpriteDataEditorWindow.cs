@@ -11,6 +11,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
     {
         private const int MinWidthRightContentBar = 200;
         private const float LineSpacing = 1.5f;
+        private const float RightAreaOffset = 3f;
 
         private static Texture moveIcon;
         private static bool isIconInitialized;
@@ -34,7 +35,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
         private OutlineAnalysisType outlineAnalysisType = OutlineAnalysisType.All;
+        private SpriteDataAnalysisType spriteDataAnalysisType = SpriteDataAnalysisType.Outline;
         private OutlinePrecision outlinePrecision;
+        private SpriteDataAnalysisType[] spriteAnalyzerTypes;
 
         private SpriteDataItem selectedSpriteDataItem;
         private GUIStyle centeredStyle;
@@ -69,6 +72,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
             centeredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
             helpBoxStyle = new GUIStyle("HelpBox");
+            spriteAnalyzerTypes = (SpriteDataAnalysisType[]) Enum.GetValues(typeof(SpriteDataAnalysisType));
         }
 
         private void SelectDefaultSpriteAlphaData()
@@ -142,8 +146,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
             DrawLeftContentBar(leftBarWidth);
 
-            var rightAreaRect = new Rect(leftBarWidth, lastHeight, position.width - leftBarWidth,
-                position.height - lastHeight);
+            var rightAreaRect = new Rect(leftBarWidth + RightAreaOffset, lastHeight + RightAreaOffset,
+                position.width - leftBarWidth - RightAreaOffset, position.height - lastHeight - RightAreaOffset);
 
             GUILayout.BeginArea(rightAreaRect, new GUIStyle {normal = {background = Texture2D.whiteTexture}});
 
@@ -237,44 +241,57 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void DrawToolbar()
         {
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-
-            EditorGUIUtility.labelWidth = 110;
-            spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"), spriteData,
-                typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
-            EditorGUIUtility.labelWidth = 0;
-
-            if (GUILayout.Button("Load"))
+            using (new EditorGUILayout.HorizontalScope())
             {
-                Debug.Log("loaded sprite Alpha Data");
-                LoadSpriteDataList();
-                hasLoadedSpriteDataAsset = true;
+                using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+                {
+                    EditorGUIUtility.labelWidth = 110;
+                    spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"), spriteData,
+                        typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
+                    EditorGUIUtility.labelWidth = 0;
+
+                    if (GUILayout.Button("Load"))
+                    {
+                        Debug.Log("loaded sprite Alpha Data");
+                        LoadSpriteDataList();
+                        hasLoadedSpriteDataAsset = true;
+                    }
+                }
+
+                GUILayout.FlexibleSpace();
+
+                using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUIUtility.labelWidth = 80;
+                        EditorGUI.BeginChangeCheck();
+                        spriteDataAnalysisType = (SpriteDataAnalysisType) EditorGUILayout.EnumFlagsField(
+                            "Analysis Type", spriteDataAnalysisType, GUILayout.MinWidth(200));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            if (!spriteDataAnalysisType.HasFlag(SpriteDataAnalysisType.Outline))
+                            {
+                                spriteDataAnalysisType |= SpriteDataAnalysisType.Outline;
+                            }
+                        }
+
+                        outlineAnalysisType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField("Outline Type",
+                            outlineAnalysisType, GUILayout.MinWidth(200));
+
+                        EditorGUIUtility.labelWidth = 0;
+                    }
+
+                    if (GUILayout.Button("Analyze sprite outlines"))
+                    {
+                        Debug.Log("analyze alpha");
+
+                        AnalyzeSpriteAlphas();
+
+                        hasLoadedSpriteDataAsset = true;
+                    }
+                }
             }
-
-            // //TODO remove
-            // if (GUILayout.Button("Reset List"))
-            // {
-            //     ResetSpriteList();
-            // }
-
-            GUILayout.FlexibleSpace();
-
-            EditorGUIUtility.labelWidth = 80;
-            outlineAnalysisType =
-                (OutlineAnalysisType) EditorGUILayout.EnumFlagsField("Outline Type", outlineAnalysisType,
-                    GUILayout.MinWidth(200));
-            EditorGUIUtility.labelWidth = 0;
-
-            if (GUILayout.Button("Analyze sprite outlines"))
-            {
-                Debug.Log("analyze alpha");
-
-                AnalyzeSpriteAlphas();
-
-                hasLoadedSpriteDataAsset = true;
-            }
-
-            EditorGUILayout.EndHorizontal();
         }
 
         private void DrawSpriteDetails(Rect rightAreaRect)
@@ -377,7 +394,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             EditorGUI.EndDisabledGroup();
         }
 
-        private void AnalyzeSprite(params SpriteAnalyzerType[] spriteAnalyzerTypes)
+        private void AnalyzeSprite(params SpriteAnalyzerType[] currentSpriteAnalyzerTypes)
         {
             if (spriteDataAnalyzerContext == null)
             {
@@ -385,7 +402,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             }
 
             spriteDataAnalyzerContext.ClearSpriteDataAnalyzers();
-            foreach (var spriteAnalyzerType in spriteAnalyzerTypes)
+            foreach (var spriteAnalyzerType in currentSpriteAnalyzerTypes)
             {
                 spriteDataAnalyzerContext.AddSpriteDataAnalyzer(spriteAnalyzerType);
             }
@@ -611,7 +628,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             spriteAnalyzeInputData.outlineAnalysisType = outlineAnalysisType;
 
             GenerateSpriteDataItems();
-            AnalyzeSprite(SpriteAnalyzerType.Outline);
+
+            var currentSpriteAnalyzerTypes = CreateSpriteAnalyzerTypeArray();
+            AnalyzeSprite(currentSpriteAnalyzerTypes);
 
             LoadSpriteDataList();
 
@@ -622,6 +641,45 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        private SpriteAnalyzerType[] CreateSpriteAnalyzerTypeArray()
+        {
+            var typeList = new List<SpriteAnalyzerType>();
+
+            if (spriteDataAnalysisType == SpriteDataAnalysisType.Nothing)
+            {
+                return typeList.ToArray();
+            }
+
+            foreach (var spriteAnalyzerType in spriteAnalyzerTypes)
+            {
+                if (spriteAnalyzerType == SpriteDataAnalysisType.Nothing ||
+                    spriteAnalyzerType == SpriteDataAnalysisType.All ||
+                    !spriteDataAnalysisType.HasFlag(spriteAnalyzerType))
+                {
+                    continue;
+                }
+
+                var type = SpriteAnalyzerType.Outline;
+
+                switch (spriteAnalyzerType)
+                {
+                    case SpriteDataAnalysisType.Blurriness:
+                        type = SpriteAnalyzerType.Blurriness;
+                        break;
+                    case SpriteDataAnalysisType.Brightness:
+                        type = SpriteAnalyzerType.Brightness;
+                        break;
+                    case SpriteDataAnalysisType.PrimaryColor:
+                        type = SpriteAnalyzerType.PrimaryColor;
+                        break;
+                }
+
+                typeList.Add(type);
+            }
+
+            return typeList.ToArray();
         }
 
         private void GenerateSpriteDataItems()

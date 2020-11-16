@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SpriteSortingPlugin
 {
     [Serializable]
-    public class SpriteAnalysisData
+    public struct SpriteAnalysisData
     {
         public double blurriness;
         public float brightness;
