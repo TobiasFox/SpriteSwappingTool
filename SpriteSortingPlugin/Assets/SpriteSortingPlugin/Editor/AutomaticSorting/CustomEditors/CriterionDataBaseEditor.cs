@@ -11,6 +11,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         public void Initialize(T sortingCriterionData)
         {
             this.sortingCriterionData = sortingCriterionData;
+            InternalInitialize();
+        }
+
+        protected virtual void InternalInitialize()
+        {
         }
 
         public override void OnInspectorGUI()

@@ -6,9 +6,6 @@ namespace SpriteSortingPlugin
     public class BlurrinessAnalyzer
     {
         private const int OwnPixelFactor = -4;
-        private const float PerceivedRedColor = 0.299f;
-        private const float PerceivedGreenColor = 0.587f;
-        private const float PerceivedBlueColor = 0.114f;
 
         private static readonly KernelItem[] kernelItems =
         {
@@ -71,8 +68,7 @@ namespace SpriteSortingPlugin
                 }
                 else
                 {
-                    greyScalePixels[i] = PerceivedRedColor * pixel.r + PerceivedGreenColor * pixel.g +
-                                         PerceivedBlueColor * pixel.b;
+                    greyScalePixels[i] = pixel.grayscale;
                 }
             }
 

@@ -334,6 +334,18 @@ namespace SpriteSortingPlugin
                 sortingCriteriaComponents.Add(sortingCriteriaComponent);
             }
 
+            //Brightness criterion
+            {
+                var sortingCriterionData = CreateInstance<BrightnessSortingCriterionData>();
+                var sortingCriterion = new BrightnessSortingCriterion(sortingCriterionData);
+                var sortingCriteriaComponent = new SortingCriteriaComponent
+                {
+                    sortingCriterionData = sortingCriterionData,
+                    sortingCriterion = sortingCriterion
+                };
+                sortingCriteriaComponents.Add(sortingCriteriaComponent);
+            }
+
 
             for (var i = 0; i < sortingCriteriaComponents.Count; i++)
             {
