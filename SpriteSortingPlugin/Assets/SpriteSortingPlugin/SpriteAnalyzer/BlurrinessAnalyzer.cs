@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.SpriteAnalyzer
 {
     public class BlurrinessAnalyzer
     {

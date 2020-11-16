@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.SpriteAnalyzer
 {
     /**
      * analysis is based on https://stackoverflow.com/a/56678483

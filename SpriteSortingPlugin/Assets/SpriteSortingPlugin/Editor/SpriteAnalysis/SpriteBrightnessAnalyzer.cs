@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SpriteSortingPlugin.SpriteAnalyzer;
+using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis
 {
