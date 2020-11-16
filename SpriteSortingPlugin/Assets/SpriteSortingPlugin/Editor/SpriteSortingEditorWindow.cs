@@ -346,6 +346,18 @@ namespace SpriteSortingPlugin
                 sortingCriteriaComponents.Add(sortingCriteriaComponent);
             }
 
+            //Primary Color criterion
+            {
+                var sortingCriterionData = CreateInstance<PrimaryColorSortingCriterionData>();
+                var sortingCriterion = new PrimaryColorSortingCriterion(sortingCriterionData);
+                var sortingCriteriaComponent = new SortingCriteriaComponent
+                {
+                    sortingCriterionData = sortingCriterionData,
+                    sortingCriterion = sortingCriterion
+                };
+                sortingCriteriaComponents.Add(sortingCriteriaComponent);
+            }
+
 
             for (var i = 0; i < sortingCriteriaComponents.Count; i++)
             {
