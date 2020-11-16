@@ -378,10 +378,31 @@ namespace SpriteSortingPlugin
                 InitializeSortingCriteriaDataAndEditors();
             }
 
-            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
             {
+                var sortingCriteriaComponent = sortingCriteriaComponents[i];
                 sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
+                if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
+                {
+                    DrawSplitter();
+                }
             }
+        }
+
+        private static void DrawSplitter()
+        {
+            var rect = GUILayoutUtility.GetRect(1f, 1f);
+
+            // Splitter rect should be full-width
+            rect.xMin = 0f;
+            rect.width += 4f;
+
+            if (Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
+            EditorGUI.DrawRect(rect, EditorBackgroundColors.Splitter);
         }
 
         private void DrawSortingOptions()

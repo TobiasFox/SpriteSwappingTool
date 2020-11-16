@@ -44,14 +44,18 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
         private new void DrawHeader()
         {
-            var backgroundRect = GUILayoutUtility.GetRect(1f, 17f);
+            var backgroundRect = GUILayoutUtility.GetRect(1f, 22);
 
             var labelRect = backgroundRect;
             labelRect.xMin += 37f;
 
             var priorityRect = backgroundRect;
-            priorityRect.xMax -= priorityRect.width / 2f - 100;
-            priorityRect.xMin = priorityRect.xMax - 200;
+            // priorityRect.xMax -= priorityRect.width / 2f - 100;
+            // priorityRect.xMin = priorityRect.xMax - 200;
+            priorityRect.xMax = priorityRect.width-10;
+            priorityRect.xMin = priorityRect.width - 200;
+            priorityRect.yMax -= 2;
+            priorityRect.yMin += 2;
 
             var foldoutRect = new Rect(backgroundRect.x, backgroundRect.y + 2, 13, 13);
             var toggleRect = new Rect(backgroundRect.x + 16, backgroundRect.y + 2, 13, 13);
@@ -59,7 +63,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             // adjust rect, to draw it completely
             backgroundRect.xMin = 0f;
             backgroundRect.width += 4f;
-            EditorGUI.DrawRect(backgroundRect, ReordableBackgroundColors.HeaderBackgroundLight);
+            EditorGUI.DrawRect(backgroundRect, EditorBackgroundColors.HeaderBackgroundLight);
 
 
             using (new EditorGUI.DisabledScope(!sortingCriterionData.isActive))

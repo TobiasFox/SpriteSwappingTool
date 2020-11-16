@@ -494,7 +494,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             {
                 GUILayout.BeginArea(new Rect(0, position.height - 125, rightAreaRect.width, 100));
                 var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 125);
-                EditorGUI.DrawRect(alphaRectangleBorderRect, ReordableBackgroundColors.TransparentBackgroundColor);
+                EditorGUI.DrawRect(alphaRectangleBorderRect, EditorBackgroundColors.TransparentBackgroundColor);
 
                 EditorGUI.BeginChangeCheck();
 
@@ -720,17 +720,17 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             Color color;
             if (isActive)
             {
-                color = ReordableBackgroundColors.ActiveColor;
+                color = EditorBackgroundColors.ActiveColor;
             }
             else if (isFocused)
             {
-                color = ReordableBackgroundColors.FocussingColor;
+                color = EditorBackgroundColors.FocussingColor;
             }
             else
             {
                 color = index % 2 == 0
-                    ? ReordableBackgroundColors.BackgroundColor1
-                    : ReordableBackgroundColors.BackgroundColor2;
+                    ? EditorBackgroundColors.BackgroundColor1
+                    : EditorBackgroundColors.BackgroundColor2;
             }
 
             EditorGUI.DrawRect(rect, color);
