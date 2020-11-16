@@ -18,12 +18,22 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
             var results = new int[2];
 
-            var primaryColor = autoSortingCalculationData.spriteData
-                .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
+            Color primaryColor;
+            Color otherPrimaryColor;
 
-            var otherPrimaryColor = autoSortingCalculationData.spriteData
-                .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
+            if (PrimaryColorSortingCriterionData.isUsingSpriteColor)
+            {
+                primaryColor = autoSortingCalculationData.spriteData
+                    .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
 
+                otherPrimaryColor = autoSortingCalculationData.spriteData
+                    .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
+            }
+            else
+            {
+                primaryColor = autoSortingComponent.spriteRenderer.color;
+                otherPrimaryColor = otherAutoSortingComponent.spriteRenderer.color;
+            }
 
             for (var i = 0; i < 3; i++)
             {

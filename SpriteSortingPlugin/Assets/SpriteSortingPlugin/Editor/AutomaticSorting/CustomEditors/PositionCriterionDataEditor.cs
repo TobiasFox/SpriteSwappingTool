@@ -1,8 +1,7 @@
-﻿using SpriteSortingPlugin.AutomaticSorting.CustomEditors;
-using SpriteSortingPlugin.AutomaticSorting.Data;
+﻿using SpriteSortingPlugin.AutomaticSorting.Data;
 using UnityEditor;
 
-namespace SpriteSortingPlugin.AutomaticSorting.Criterias
+namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 {
     [CustomEditor(typeof(PositionSortingCriterionData))]
     public class PositionCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
