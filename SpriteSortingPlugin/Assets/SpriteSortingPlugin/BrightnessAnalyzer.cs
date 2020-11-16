@@ -2,6 +2,9 @@
 
 namespace SpriteSortingPlugin
 {
+    /**
+     * analysis is based on https://stackoverflow.com/a/56678483
+     */
     public class BrightnessAnalyzer
     {
         public float Analyze(Sprite sprite)

@@ -6,7 +6,8 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class SpriteAnalysisData
     {
-        public float blurriness;
+        public double blurriness;
+        public float brightness;
         public Color primaryColor;
     }
 }

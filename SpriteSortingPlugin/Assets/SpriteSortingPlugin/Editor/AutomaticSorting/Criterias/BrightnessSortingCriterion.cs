@@ -19,8 +19,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
             var results = new int[2];
 
-            var blurriness = 0f;
-            var otherBlurriness = 0f;
+            var blurriness = 0d;
+            var otherBlurriness = 0d;
 
             if (BrightnessSortingCriterionData.isUsingSpriteColor)
             {

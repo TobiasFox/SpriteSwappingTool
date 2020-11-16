@@ -32,7 +32,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private Vector2 leftBarScrollPosition;
         private float lastHeight;
 
-        private SpriteAlphaAnalyzer spriteAlphaAnalyzer;
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
         private OutlineAnalysisType outlineAnalysisType = OutlineAnalysisType.All;
         private OutlinePrecision outlinePrecision;
@@ -44,7 +43,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private bool isDisplayingSpriteOutline = true;
         private bool isDisplayingSpriteDetails;
 
-        private BrightnessAnalyzer brightnessAnalyzer;
+        private SpriteDataAnalyzerContext spriteDataAnalyzerContext;
+        private SpriteAnalyzeInputData spriteAnalyzeInputData;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -310,22 +310,11 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
             EditorGUI.BeginDisabledGroup(!hasSelectedDataItem);
             {
-                // EditorGUILayout.BeginHorizontal();
-                // EditorGUI.BeginChangeCheck();
-                // brightness = EditorGUILayout.FloatField("Brightness", brightness);
-                //
-                // if (GUILayout.Button("Analyze", analyzeButtonWidth))
-                // {
-                // }
-                //
-                // EditorGUILayout.EndHorizontal();
-
-
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUI.BeginChangeCheck();
                     var blurriness = hasSelectedDataItem ? selectedSpriteDataItem.spriteAnalysisData.blurriness : 0;
-                    blurriness = EditorGUILayout.FloatField("Blurriness", blurriness);
+                    blurriness = EditorGUILayout.DoubleField("Blurriness", blurriness);
                     if (EditorGUI.EndChangeCheck())
                     {
                         selectedSpriteDataItem.spriteAnalysisData.blurriness = blurriness;
@@ -333,6 +322,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
+                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        AnalyzeSprite(SpriteAnalyzerType.Blurriness);
                     }
                 }
 
@@ -348,10 +339,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
-                        if (brightnessAnalyzer == null)
-                        {
-                            brightnessAnalyzer = new BrightnessAnalyzer();
-                        }
+                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        AnalyzeSprite(SpriteAnalyzerType.Brightness);
                     }
                 }
 
@@ -369,6 +358,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
+                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        AnalyzeSprite(SpriteAnalyzerType.PrimaryColor);
                     }
                 }
 
@@ -377,10 +368,29 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     EditorGUILayout.LabelField("", "");
                     if (GUILayout.Button("Analyze All", analyzeButtonWidth))
                     {
+                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        AnalyzeSprite(SpriteAnalyzerType.Brightness, SpriteAnalyzerType.Blurriness,
+                            SpriteAnalyzerType.PrimaryColor);
                     }
                 }
             }
             EditorGUI.EndDisabledGroup();
+        }
+
+        private void AnalyzeSprite(params SpriteAnalyzerType[] spriteAnalyzerTypes)
+        {
+            if (spriteDataAnalyzerContext == null)
+            {
+                spriteDataAnalyzerContext = new SpriteDataAnalyzerContext();
+            }
+
+            spriteDataAnalyzerContext.ClearSpriteDataAnalyzers();
+            foreach (var spriteAnalyzerType in spriteAnalyzerTypes)
+            {
+                spriteDataAnalyzerContext.AddSpriteDataAnalyzer(spriteAnalyzerType);
+            }
+
+            spriteDataAnalyzerContext.Analyze(ref spriteData, spriteAnalyzeInputData);
         }
 
         private void DrawOutlineContent(Rect rightAreaRect)
@@ -591,19 +601,17 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 return;
             }
 
-            if (spriteAlphaAnalyzer == null)
-            {
-                spriteAlphaAnalyzer = new SpriteAlphaAnalyzer();
-            }
-
             reorderableSpriteList.index = -1;
             selectedSpriteDataItem = null;
             spriteDataList.Clear();
 
             spriteData = CreateInstance<SpriteData>();
 
+            spriteAnalyzeInputData.assetGuid = null;
+            spriteAnalyzeInputData.outlineAnalysisType = outlineAnalysisType;
+
             GenerateSpriteDataItems();
-            spriteAlphaAnalyzer.AddAlphaShapeToSpriteAlphaData(ref spriteData, outlineAnalysisType);
+            AnalyzeSprite(SpriteAnalyzerType.Outline);
 
             LoadSpriteDataList();
 
