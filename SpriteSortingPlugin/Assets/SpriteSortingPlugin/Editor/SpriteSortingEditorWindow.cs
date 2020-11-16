@@ -7,7 +7,7 @@ using SpriteSortingPlugin.AutomaticSorting.Data;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
 using SpriteSortingPlugin.OverlappingSprites;
 using SpriteSortingPlugin.Preview;
-using SpriteSortingPlugin.SpriteAlphaAnalysis;
+using SpriteSortingPlugin.SpriteAnalysis;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;

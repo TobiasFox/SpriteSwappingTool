@@ -5,7 +5,7 @@ using UnityEditor.IMGUI.Controls;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteAlphaAnalysis
+namespace SpriteSortingPlugin.SpriteAnalysis
 {
     public class SpriteDataEditorWindow : EditorWindow
     {
@@ -43,6 +43,8 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
         private bool isDisplayingSpriteOutline = true;
         private bool isDisplayingSpriteDetails;
+
+        private BrightnessAnalyzer brightnessAnalyzer;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -331,6 +333,25 @@ namespace SpriteSortingPlugin.SpriteAlphaAnalysis
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
+                    }
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUI.BeginChangeCheck();
+                    var brightness = hasSelectedDataItem ? selectedSpriteDataItem.spriteAnalysisData.brightness : 0;
+                    brightness = EditorGUILayout.FloatField("Brightness", brightness);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        selectedSpriteDataItem.spriteAnalysisData.brightness = brightness;
+                    }
+
+                    if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                    {
+                        if (brightnessAnalyzer == null)
+                        {
+                            brightnessAnalyzer = new BrightnessAnalyzer();
+                        }
                     }
                 }
 

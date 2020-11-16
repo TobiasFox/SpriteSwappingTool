@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteAlphaAnalysis
+namespace SpriteSortingPlugin.SpriteAnalysis
 {
     public class SpriteAlphaAnalyzer
     {
