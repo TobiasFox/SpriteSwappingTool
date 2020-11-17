@@ -46,7 +46,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 "is lighter sprite in foreground", BrightnessSortingCriterionData.isLighterSpriteIsInForeground);
         }
 
-        protected override string GetTitleName()
+        public override string GetTitleName()
         {
             return "Sprite Brightness";
         }

@@ -6,15 +6,17 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
     [CustomEditor(typeof(ResolutionSortingCriterionData))]
     public class ResolutionCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
     {
-        private ResolutionSortingCriterionData ResolutionSortingCriterionData => (ResolutionSortingCriterionData) sortingCriterionData;
+        private ResolutionSortingCriterionData ResolutionSortingCriterionData =>
+            (ResolutionSortingCriterionData) sortingCriterionData;
 
         protected override void OnInspectorGuiInternal()
         {
             ResolutionSortingCriterionData.isSpriteWithHigherResolutionInForeground = EditorGUILayout.ToggleLeft(
-                "is sprite with higher pixel density in foreground", ResolutionSortingCriterionData.isSpriteWithHigherResolutionInForeground);
+                "is sprite with higher pixel density in foreground",
+                ResolutionSortingCriterionData.isSpriteWithHigherResolutionInForeground);
         }
 
-        protected override string GetTitleName()
+        public override string GetTitleName()
         {
             return "Sprite Resolution";
         }

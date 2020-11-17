@@ -20,6 +20,7 @@ namespace SpriteSortingPlugin
         private const string SortingLayerNameDefault = "Default";
 
         private static Texture warnIcon;
+        private static Texture addIcon;
         private static bool isIconInitialized;
 
         private Vector2 scrollPosition = Vector2.zero;
@@ -32,7 +33,7 @@ namespace SpriteSortingPlugin
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private List<Transform> gameObjectParents;
         [SerializeField] private Camera camera;
-        private bool isApplyingAutoSorting;
+        [SerializeField] private bool isApplyingAutoSorting;
         private SerializedObject serializedObject;
 
         private int selectedSortingLayers;
@@ -55,8 +56,6 @@ namespace SpriteSortingPlugin
         private SpriteDetectionData spriteDetectionData;
 
         private OverlappingItemSortingOrderAnalyzer overlappingItemSortingOrderAnalyzer;
-        private bool useSizeAsSortingCriteria;
-        private bool isLargeSpritesInForeground;
         private List<string> autoSortingResultNames;
         private ReorderableList autoSortingResultList;
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
@@ -84,6 +83,7 @@ namespace SpriteSortingPlugin
             if (!isIconInitialized)
             {
                 warnIcon = EditorGUIUtility.IconContent("console.warnicon.sml").image;
+                addIcon = EditorGUIUtility.IconContent("Toolbar Plus").image;
                 isIconInitialized = true;
             }
 
@@ -192,18 +192,9 @@ namespace SpriteSortingPlugin
 
             EditorGUILayout.Space();
             DrawSortingOptions();
+
             EditorGUILayout.Space();
-            isApplyingAutoSorting = EditorGUILayout.BeginToggleGroup(
-                "generate automatic order of overlapping renderer?",
-                isApplyingAutoSorting);
-
-            //TODO add auto sorting dependent options
-            if (isApplyingAutoSorting)
-            {
-                DrawAutoSortingOptions();
-            }
-
-            EditorGUILayout.EndToggleGroup();
+            DrawAutoSortingOptions();
 
             serializedObject.ApplyModifiedProperties();
             var isAnalyzedButtonClickedThisFrame = false;
@@ -365,6 +356,7 @@ namespace SpriteSortingPlugin
                 var specificEditor = Editor.CreateEditor(sortingCriteriaComponent.sortingCriterionData);
                 var criterionDataBaseEditor = (CriterionDataBaseEditor<SortingCriterionData>) specificEditor;
                 criterionDataBaseEditor.Initialize(sortingCriteriaComponent.sortingCriterionData);
+                criterionDataBaseEditor.removeCallback += RemoveSortingCriteriaCallback;
                 sortingCriteriaComponent.criterionDataBaseEditor = criterionDataBaseEditor;
 
                 sortingCriteriaComponents[i] = sortingCriteriaComponent;
@@ -373,29 +365,135 @@ namespace SpriteSortingPlugin
 
         private void DrawAutoSortingOptions()
         {
-            if (sortingCriteriaComponents == null)
+            GUILayout.Label("Automatic Sorting");
+            using (new EditorGUILayout.VerticalScope(helpBoxStyle))
             {
-                InitializeSortingCriteriaDataAndEditors();
-            }
+                isApplyingAutoSorting = EditorGUILayout.Toggle("use automatic sorting?", isApplyingAutoSorting);
 
-            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
-            {
-                var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
-                if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
+                if (!isApplyingAutoSorting)
                 {
-                    DrawSplitter();
+                    return;
+                }
+
+                EditorGUILayout.Space();
+                if (sortingCriteriaComponents == null)
+                {
+                    InitializeSortingCriteriaDataAndEditors();
+                }
+
+                using (var headerScope = new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUI.DrawRect(headerScope.rect, EditorBackgroundColors.HeaderBackgroundLight);
+                    GUILayout.Label("Sorting Criteria");
+
+                    GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button("Save", GUILayout.Width(40)))
+                    {
+                    }
+
+                    if (GUILayout.Button("Load", GUILayout.Width(40)))
+                    {
+                    }
+                }
+
+                DrawSplitter(true);
+
+                for (var i = 0; i < sortingCriteriaComponents.Count; i++)
+                {
+                    var sortingCriteriaComponent = sortingCriteriaComponents[i];
+                    if (!sortingCriteriaComponent.isActive)
+                    {
+                        continue;
+                    }
+
+                    sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
+                    if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
+                    {
+                        DrawSplitter();
+                    }
+                }
+
+                DrawSplitter(true);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
+                    using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
+                    {
+                        if (GUILayout.Button(addIcon, GUILayout.Width(40)))
+                        {
+                            DrawSortingCriteriaMenu();
+                        }
+                    }
                 }
             }
         }
 
-        private static void DrawSplitter()
+        private void DrawSortingCriteriaMenu()
         {
-            var rect = GUILayoutUtility.GetRect(1f, 1f);
+            var menu = new GenericMenu();
+
+            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
+            {
+                var sortingCriteriaComponent = sortingCriteriaComponents[i];
+                if (sortingCriteriaComponent.isActive)
+                {
+                    continue;
+                }
+
+                var content =
+                    new GUIContent(sortingCriteriaComponent.criterionDataBaseEditor.GetTitleName());
+                menu.AddItem(content, false, AddSortingCriteria, i);
+            }
+
+            menu.ShowAsContext();
+        }
+
+        private bool IsEverySortingCriteriaIsUsed()
+        {
+            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+            {
+                if (!sortingCriteriaComponent.isActive)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void AddSortingCriteria(object userdata)
+        {
+            var index = (int) userdata;
+            var sortingCriteriaComponent = sortingCriteriaComponents[index];
+            sortingCriteriaComponent.isActive = true;
+            sortingCriteriaComponents[index] = sortingCriteriaComponent;
+        }
+
+        private void RemoveSortingCriteriaCallback(
+            CriterionDataBaseEditor<SortingCriterionData> criterionDataBaseEditor)
+        {
+            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
+            {
+                var sortingCriteriaComponent = sortingCriteriaComponents[i];
+                if (sortingCriteriaComponent.criterionDataBaseEditor != criterionDataBaseEditor)
+                {
+                    continue;
+                }
+
+                sortingCriteriaComponent.isActive = false;
+                sortingCriteriaComponents[i] = sortingCriteriaComponent;
+            }
+        }
+
+        private static void DrawSplitter(bool isBig = false)
+        {
+            var rect = GUILayoutUtility.GetRect(1f, isBig ? 1.5f : 1f);
 
             // Splitter rect should be full-width
-            rect.xMin = 0f;
-            rect.width += 4f;
+            // rect.xMin = 0f;
+            // rect.width += 4f;
 
             if (Event.current.type != EventType.Repaint)
             {

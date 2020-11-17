@@ -15,7 +15,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 "is further away Sprite in foreground", PositionSortingCriterionData.isFurtherAwaySpriteInForeground);
         }
 
-        protected override string GetTitleName()
+        public override string GetTitleName()
         {
             return "Position difference";
         }

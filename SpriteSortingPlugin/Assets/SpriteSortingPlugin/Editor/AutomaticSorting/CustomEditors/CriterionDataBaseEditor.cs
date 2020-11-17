@@ -6,12 +6,26 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 {
     public abstract class CriterionDataBaseEditor<T> : Editor where T : SortingCriterionData
     {
+        private static Texture removeIcon;
+        private static bool isIconInitialized;
+
         protected T sortingCriterionData;
+
+        private Rect headerRect;
+
+        public delegate void RemoveCallback(CriterionDataBaseEditor<T> criterionDataBaseEditor);
+        public RemoveCallback removeCallback;
 
         public void Initialize(T sortingCriterionData)
         {
             this.sortingCriterionData = sortingCriterionData;
             InternalInitialize();
+
+            if (!isIconInitialized)
+            {
+                removeIcon = EditorGUIUtility.IconContent("Toolbar Minus@2x").image;
+                isIconInitialized = true;
+            }
         }
 
         protected virtual void InternalInitialize()
@@ -37,7 +51,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
         protected abstract void OnInspectorGuiInternal();
 
-        protected virtual string GetTitleName()
+        public virtual string GetTitleName()
         {
             return "Criteria";
         }
@@ -45,25 +59,38 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         private new void DrawHeader()
         {
             var backgroundRect = GUILayoutUtility.GetRect(1f, 22);
+            DrawHeader(backgroundRect);
+        }
 
-            var labelRect = backgroundRect;
+        private void DrawHeader(Rect backgroundRect)
+        {
+            if (Event.current.type == EventType.Repaint)
+            {
+                headerRect = new Rect(backgroundRect) {height = 22};
+            }
+
+            var labelRect = headerRect;
             labelRect.xMin += 37f;
 
-            var priorityRect = backgroundRect;
-            // priorityRect.xMax -= priorityRect.width / 2f - 100;
-            // priorityRect.xMin = priorityRect.xMax - 200;
-            priorityRect.xMax = priorityRect.width-10;
-            priorityRect.xMin = priorityRect.width - 200;
+            var priorityRect = headerRect;
+            priorityRect.xMax = priorityRect.width - 60;
+            priorityRect.xMin = priorityRect.width - 220;
             priorityRect.yMax -= 2;
             priorityRect.yMin += 2;
 
-            var foldoutRect = new Rect(backgroundRect.x, backgroundRect.y + 2, 13, 13);
-            var toggleRect = new Rect(backgroundRect.x + 16, backgroundRect.y + 2, 13, 13);
+            var removeButtonRect = headerRect;
+            removeButtonRect.xMax = removeButtonRect.width + 7.5f;
+            removeButtonRect.xMin = removeButtonRect.width - 33f;
+            removeButtonRect.yMax -= 2;
+            removeButtonRect.yMin += 2;
+
+            var foldoutRect = new Rect(headerRect.x, headerRect.y + 2, 13, 13);
+            var toggleRect = new Rect(headerRect.x + 16, headerRect.y + 2, 13, 13);
 
             // adjust rect, to draw it completely
-            backgroundRect.xMin = 0f;
-            backgroundRect.width += 4f;
-            EditorGUI.DrawRect(backgroundRect, EditorBackgroundColors.HeaderBackgroundLight);
+            // headerRect.xMin = 0f;
+            // headerRect.width += 4f;
+            EditorGUI.DrawRect(headerRect, EditorBackgroundColors.HeaderBackgroundLight);
 
 
             using (new EditorGUI.DisabledScope(!sortingCriterionData.isActive))
@@ -73,6 +100,14 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                     EditorGUI.IntSlider(priorityRect, "Priority", sortingCriterionData.priority, 1, 5);
                 EditorGUIUtility.labelWidth = 0;
                 EditorGUI.LabelField(labelRect, GetTitleName(), EditorStyles.boldLabel);
+            }
+
+            if (GUI.Button(removeButtonRect, removeIcon))
+            {
+                if (removeCallback != null)
+                {
+                    removeCallback(this);
+                }
             }
 
             sortingCriterionData.isExpanded = GUI.Toggle(foldoutRect, sortingCriterionData.isExpanded, GUIContent.none,

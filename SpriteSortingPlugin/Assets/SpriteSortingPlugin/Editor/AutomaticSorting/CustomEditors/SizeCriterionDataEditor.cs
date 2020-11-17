@@ -14,7 +14,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 "is large sprite in foreground", SizeSortingCriterionData.isLargeSpriteInForeground);
         }
 
-        protected override string GetTitleName()
+        public override string GetTitleName()
         {
             return "Size";
         }

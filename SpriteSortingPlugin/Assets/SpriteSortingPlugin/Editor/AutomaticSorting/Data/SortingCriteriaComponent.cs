@@ -8,5 +8,6 @@ namespace SpriteSortingPlugin.AutomaticSorting.Data
         public SortingCriterionData sortingCriterionData;
         public SortingCriterion<SortingCriterionData> sortingCriterion;
         public CriterionDataBaseEditor<SortingCriterionData> criterionDataBaseEditor;
+        public bool isActive;
     }
 }

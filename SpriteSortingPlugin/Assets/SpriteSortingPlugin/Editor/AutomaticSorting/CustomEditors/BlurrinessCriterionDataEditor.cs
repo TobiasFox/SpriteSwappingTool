@@ -15,7 +15,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 "is more blurry sprite in foreground", BlurrinessSortingCriterionData.isMoreBlurrySpriteInForeground);
         }
 
-        protected override string GetTitleName()
+        public override string GetTitleName()
         {
             return "Sprite Blurriness";
         }

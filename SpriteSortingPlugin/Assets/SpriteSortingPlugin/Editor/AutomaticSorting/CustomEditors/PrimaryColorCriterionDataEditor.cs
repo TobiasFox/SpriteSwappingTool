@@ -84,7 +84,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 PrimaryColorSortingCriterionData.foregroundColor);
         }
 
-        protected override string GetTitleName()
+        public override string GetTitleName()
         {
             return "Primary Color";
         }
