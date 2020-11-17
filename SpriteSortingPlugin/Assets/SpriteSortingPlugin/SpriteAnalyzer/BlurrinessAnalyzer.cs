@@ -24,20 +24,23 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             var pixels = spriteTexture.GetPixels();
             spriteHeight = spriteTexture.height;
             spriteWidth = spriteTexture.width;
+            PixelDirectionUtility.spriteWidth = spriteWidth;
 
             var modifiedPixelArray = ConvertToGreyScale(pixels);
+
             modifiedPixelArray = ApplyLaplacian(modifiedPixelArray);
 
             var standardDeviation = CalculateStandardDeviation(modifiedPixelArray);
-            return standardDeviation;
+            var squaredStandardDeviation = standardDeviation * standardDeviation;
+            return squaredStandardDeviation;
         }
 
         private double[] ApplyLaplacian(double[] modifiedPixelArray)
         {
             var returnArray = new double[modifiedPixelArray.Length];
-            for (var i = 1; i < spriteHeight - 1; i++)
+            for (var i = 0; i < spriteHeight; i++)
             {
-                for (var j = 1; j < spriteWidth - 1; j++)
+                for (var j = 0; j < spriteWidth; j++)
                 {
                     var index = i * spriteWidth + j;
                     var blurriness = modifiedPixelArray[index] * OwnPixelFactor;
@@ -46,6 +49,24 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                     {
                         var neighbourPixelIndex =
                             PixelDirectionUtility.GetIndexOfPixelDirection(index, kernelItem.direction);
+
+                        if (neighbourPixelIndex < 0 || neighbourPixelIndex >= modifiedPixelArray.Length - 1)
+                        {
+                            continue;
+                        }
+
+                        //outside of left image side
+                        if (index % spriteWidth == 0 && neighbourPixelIndex == index - 1)
+                        {
+                            continue;
+                        }
+
+                        //outside of right image side
+                        if (neighbourPixelIndex % spriteWidth == 0 && neighbourPixelIndex == index + 1)
+                        {
+                            continue;
+                        }
+
                         blurriness += modifiedPixelArray[neighbourPixelIndex] * kernelItem.factor;
                     }
 
@@ -68,13 +89,12 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                 }
                 else
                 {
-                    greyScalePixels[i] = pixel.grayscale;
+                    greyScalePixels[i] = pixel.grayscale * 255;
                 }
             }
 
             return greyScalePixels;
         }
-
 
         private double CalculateStandardDeviation(double[] values)
         {
@@ -82,12 +102,11 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             var derivationSum = 0d;
             foreach (var value in values)
             {
-                derivationSum += value * value;
+                var temp = value - average;
+                derivationSum += (temp * temp);
             }
 
-            var derivationAverageSum = derivationSum / (values.Length - 1);
-            var squaredAverage = average * average;
-            return Math.Sqrt(derivationAverageSum - squaredAverage);
+            return Math.Sqrt(derivationSum / (values.Length - 1));
         }
 
         private double CalculateAverage(double[] values)
