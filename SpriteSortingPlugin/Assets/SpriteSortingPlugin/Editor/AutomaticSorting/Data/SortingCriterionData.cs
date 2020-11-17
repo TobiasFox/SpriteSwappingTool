@@ -2,10 +2,21 @@
 
 namespace SpriteSortingPlugin.AutomaticSorting.Data
 {
-    public class SortingCriterionData : ScriptableObject
+    public abstract class SortingCriterionData : ScriptableObject
     {
         public bool isActive;
-        public bool isExpanded;
         public int priority = 1;
+        [HideInInspector] public bool isExpanded;
+        [HideInInspector] public bool isAddedToEditorList;
+
+        protected void CopyDataTo(SortingCriterionData copy)
+        {
+            copy.isActive = isActive;
+            copy.priority = priority;
+            copy.isExpanded = isExpanded;
+            copy.isAddedToEditorList = isAddedToEditorList;
+        }
+
+        public abstract SortingCriterionData Copy();
     }
 }

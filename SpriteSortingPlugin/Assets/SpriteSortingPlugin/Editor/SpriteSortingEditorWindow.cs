@@ -61,6 +61,8 @@ namespace SpriteSortingPlugin
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
         private AutoSortingCalculationData autoSortingCalculationData;
 
+        private SortingCriteriaPresetSelector sortingCriteriaPresetSelector;
+
         [MenuItem("Window/Sprite Sorting %q")]
         public static void ShowWindow()
         {
@@ -88,6 +90,9 @@ namespace SpriteSortingPlugin
             }
 
             overlappingSpriteDetector = new OverlappingSpriteDetector();
+
+            sortingCriteriaPresetSelector = CreateInstance<SortingCriteriaPresetSelector>();
+            sortingCriteriaPresetSelector.Init(this);
         }
 
         private void SelectDefaultSpriteAlphaData()
@@ -356,7 +361,6 @@ namespace SpriteSortingPlugin
                 var specificEditor = Editor.CreateEditor(sortingCriteriaComponent.sortingCriterionData);
                 var criterionDataBaseEditor = (CriterionDataBaseEditor<SortingCriterionData>) specificEditor;
                 criterionDataBaseEditor.Initialize(sortingCriteriaComponent.sortingCriterionData);
-                criterionDataBaseEditor.removeCallback += RemoveSortingCriteriaCallback;
                 sortingCriteriaComponent.criterionDataBaseEditor = criterionDataBaseEditor;
 
                 sortingCriteriaComponents[i] = sortingCriteriaComponent;
@@ -388,12 +392,9 @@ namespace SpriteSortingPlugin
 
                     GUILayout.FlexibleSpace();
 
-                    if (GUILayout.Button("Save", GUILayout.Width(40)))
+                    if (GUILayout.Button("Save or Load Preset", GUILayout.Width(135)))
                     {
-                    }
-
-                    if (GUILayout.Button("Load", GUILayout.Width(40)))
-                    {
+                        sortingCriteriaPresetSelector.ShowPresetSelector();
                     }
                 }
 
@@ -402,7 +403,7 @@ namespace SpriteSortingPlugin
                 for (var i = 0; i < sortingCriteriaComponents.Count; i++)
                 {
                     var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                    if (!sortingCriteriaComponent.isActive)
+                    if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
                     {
                         continue;
                     }
@@ -437,7 +438,7 @@ namespace SpriteSortingPlugin
             for (var i = 0; i < sortingCriteriaComponents.Count; i++)
             {
                 var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                if (sortingCriteriaComponent.isActive)
+                if (sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
                 {
                     continue;
                 }
@@ -454,7 +455,7 @@ namespace SpriteSortingPlugin
         {
             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
             {
-                if (!sortingCriteriaComponent.isActive)
+                if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
                 {
                     return false;
                 }
@@ -467,24 +468,8 @@ namespace SpriteSortingPlugin
         {
             var index = (int) userdata;
             var sortingCriteriaComponent = sortingCriteriaComponents[index];
-            sortingCriteriaComponent.isActive = true;
+            sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
             sortingCriteriaComponents[index] = sortingCriteriaComponent;
-        }
-
-        private void RemoveSortingCriteriaCallback(
-            CriterionDataBaseEditor<SortingCriterionData> criterionDataBaseEditor)
-        {
-            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
-            {
-                var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                if (sortingCriteriaComponent.criterionDataBaseEditor != criterionDataBaseEditor)
-                {
-                    continue;
-                }
-
-                sortingCriteriaComponent.isActive = false;
-                sortingCriteriaComponents[i] = sortingCriteriaComponent;
-            }
         }
 
         private static void DrawSplitter(bool isBig = false)
@@ -920,12 +905,39 @@ namespace SpriteSortingPlugin
             preview.DisableSceneVisualizations();
 
             CleanUpReordableList();
+            DestroyImmediate(sortingCriteriaPresetSelector);
         }
 
         private void OnDestroy()
         {
             preview.CleanUpPreview();
             PolygonColliderCacher.GetInstance().CleanUp();
+        }
+
+        public SortingCriteriaPreset GenerateSortingCriteriaPreset()
+        {
+            var preset = CreateInstance<SortingCriteriaPreset>();
+            preset.sortingCriterionData = new SortingCriterionData[sortingCriteriaComponents.Count];
+
+            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
+            {
+                var sortingCriteriaComponent = sortingCriteriaComponents[i];
+                preset.sortingCriterionData[i] = sortingCriteriaComponent.sortingCriterionData.Copy();
+            }
+
+            return preset;
+        }
+
+        public void UpdateSortingCriteriaFromPreset(SortingCriteriaPreset preset)
+        {
+            for (var i = 0; i < preset.sortingCriterionData.Length; i++)
+            {
+                var sortingCriteriaComponent = sortingCriteriaComponents[i];
+                sortingCriteriaComponent.sortingCriterionData = preset.sortingCriterionData[i];
+                sortingCriteriaComponent.criterionDataBaseEditor.UpdateSortingCriterionData(sortingCriteriaComponent
+                    .sortingCriterionData);
+                sortingCriteriaComponents[i] = sortingCriteriaComponent;
+            }
         }
     }
 }

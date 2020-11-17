@@ -13,9 +13,6 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
         private Rect headerRect;
 
-        public delegate void RemoveCallback(CriterionDataBaseEditor<T> criterionDataBaseEditor);
-        public RemoveCallback removeCallback;
-
         public void Initialize(T sortingCriterionData)
         {
             this.sortingCriterionData = sortingCriterionData;
@@ -30,6 +27,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
         protected virtual void InternalInitialize()
         {
+        }
+
+        public void UpdateSortingCriterionData(T sortingCriterionData)
+        {
+            this.sortingCriterionData = sortingCriterionData;
         }
 
         public override void OnInspectorGUI()
@@ -104,10 +106,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
             if (GUI.Button(removeButtonRect, removeIcon))
             {
-                if (removeCallback != null)
-                {
-                    removeCallback(this);
-                }
+                sortingCriterionData.isAddedToEditorList = false;
             }
 
             sortingCriterionData.isExpanded = GUI.Toggle(foldoutRect, sortingCriterionData.isExpanded, GUIContent.none,
