@@ -33,10 +33,5 @@ namespace SpriteSortingPlugin.AutomaticSorting.SortingPreset
 
             currentWindow.UpdateSortingCriteriaFromPreset(currentPreset.Copy());
         }
-
-        public override void OnSelectionClosed(Preset selection)
-        {
-            OnSelectionChanged(selection);
-        }
     }
 }

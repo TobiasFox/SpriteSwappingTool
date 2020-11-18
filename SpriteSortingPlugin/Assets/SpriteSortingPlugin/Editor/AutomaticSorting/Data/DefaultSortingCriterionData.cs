@@ -9,9 +9,10 @@
         public override SortingCriterionData Copy()
         {
             var clone = CreateInstance<DefaultSortingCriterionData>();
+            CopyDataTo(clone);
             clone.isSortingInForeground = isSortingInForeground;
-            clone.foregroundSortingName = foregroundSortingName;
-            clone.criterionName = criterionName;
+            clone.foregroundSortingName = (string) foregroundSortingName.Clone();
+            clone.criterionName = (string) criterionName.Clone();
             return clone;
         }
     }
