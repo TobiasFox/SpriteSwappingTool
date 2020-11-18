@@ -59,51 +59,55 @@ namespace SpriteSortingPlugin.Preview
 
             GeneratePreview();
 
-            var horizontalRect = EditorGUILayout.BeginHorizontal();
-            EditorGUI.indentLevel++;
-
-            EditorGUI.BeginChangeCheck();
-            isVisualizingBoundsInScene =
-                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene", isVisualizingBoundsInScene,
-                    GUILayout.Width(180));
-            if (EditorGUI.EndChangeCheck())
+            float previewHeight;
+            using (var horizontalScope = new EditorGUILayout.HorizontalScope())
             {
-                EnableSceneVisualization(isVisualizingBoundsInScene);
-            }
+                previewHeight = horizontalScope.rect.height;
+                EditorGUI.indentLevel++;
 
-            EditorGUI.BeginChangeCheck();
-            isVisualizingSortingOrder =
-                EditorGUILayout.ToggleLeft("Display Sorting Order", isVisualizingSortingOrder, GUILayout.Width(160));
-            if (EditorGUI.EndChangeCheck())
-            {
-                EnableSceneVisualization(isVisualizingSortingOrder);
-            }
+                EditorGUI.BeginChangeCheck();
+                isVisualizingBoundsInScene =
+                    EditorGUILayout.ToggleLeft("Visualize Bounds in Scene", isVisualizingBoundsInScene,
+                        GUILayout.Width(180));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EnableSceneVisualization(isVisualizingBoundsInScene);
+                }
 
-            EditorGUI.BeginChangeCheck();
-            isVisualizingSortingLayer =
-                EditorGUILayout.ToggleLeft("Display Sorting Layer", isVisualizingSortingLayer, GUILayout.Width(170));
-            if (EditorGUI.EndChangeCheck())
-            {
-                EnableSceneVisualization(isVisualizingSortingLayer);
-            }
+                EditorGUI.BeginChangeCheck();
+                isVisualizingSortingOrder =
+                    EditorGUILayout.ToggleLeft("Display Sorting Order", isVisualizingSortingOrder,
+                        GUILayout.Width(160));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EnableSceneVisualization(isVisualizingSortingOrder);
+                }
 
-            if (!isSceneVisualizingDelegateIsAdded &&
-                (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
-            {
-                EnableSceneVisualization(true);
-            }
+                EditorGUI.BeginChangeCheck();
+                isVisualizingSortingLayer =
+                    EditorGUILayout.ToggleLeft("Display Sorting Layer", isVisualizingSortingLayer,
+                        GUILayout.Width(170));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EnableSceneVisualization(isVisualizingSortingLayer);
+                }
 
-            if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
-            {
-                previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
-                Object.DestroyImmediate(previewEditor);
-                previewEditor = Editor.CreateEditor(previewGameObject);
-            }
+                if (!isSceneVisualizingDelegateIsAdded &&
+                    (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
+                {
+                    EnableSceneVisualization(true);
+                }
 
-            EditorGUILayout.EndHorizontal();
+                if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
+                {
+                    previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
+                    Object.DestroyImmediate(previewEditor);
+                    previewEditor = Editor.CreateEditor(previewGameObject);
+                }
+            }
 
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
-            var previewRect = EditorGUILayout.GetControlRect(false, 256 + horizontalRect.height);
+            var previewRect = EditorGUILayout.GetControlRect(false, 256 + previewHeight);
 
             //hack for not seeing the previewGameObject in the scene view 
             previewGameObject.SetActive(true);
@@ -177,7 +181,8 @@ namespace SpriteSortingPlugin.Preview
             PreviewItem lastPreviewGroup)
         {
             var activeSortingGroups =
-                SortingGroupUtility.GetAllEnabledSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
+                SortingGroupUtility.GetAllEnabledSortingGroups(
+                    currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
 
             for (int i = activeSortingGroups.Count - 1; i >= 0; i--)
             {
