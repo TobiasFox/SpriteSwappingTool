@@ -205,14 +205,14 @@ namespace SpriteSortingPlugin
             serializedObject.ApplyModifiedProperties();
             var isAnalyzedButtonClickedThisFrame = false;
 
-            EditorGUI.BeginDisabledGroup(isAnalyzedButtonDisabled);
-            if (GUILayout.Button("Analyze"))
+            using (new EditorGUI.DisabledScope(isAnalyzedButtonDisabled))
             {
-                Analyze();
-                isAnalyzedButtonClickedThisFrame = true;
+                if (GUILayout.Button("Analyze"))
+                {
+                    Analyze();
+                    isAnalyzedButtonClickedThisFrame = true;
+                }
             }
-
-            EditorGUI.EndDisabledGroup();
 
             if (!analyzeButtonWasClicked)
             {
@@ -246,7 +246,7 @@ namespace SpriteSortingPlugin
 
             var isConfirmButtonClicked = false;
 
-            EditorGUILayout.BeginHorizontal();
+            using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Confirm"))
                 {
@@ -264,7 +264,6 @@ namespace SpriteSortingPlugin
                     isConfirmButtonClicked = true;
                 }
             }
-            EditorGUILayout.EndHorizontal();
 
             autoSortingResultList?.DoLayoutList();
 
@@ -448,7 +447,7 @@ namespace SpriteSortingPlugin
         private void DrawSortingOptions()
         {
             GUILayout.Label("Sorting Options");
-            EditorGUILayout.BeginVertical("HelpBox");
+            using (new EditorGUILayout.VerticalScope(helpBoxStyle))
             {
                 sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
 
@@ -457,24 +456,25 @@ namespace SpriteSortingPlugin
                     case SortingType.Layer:
                         ShowSortingLayers();
 
-                        isUsingGameObjectParents =
-                            EditorGUILayout.BeginToggleGroup("use specific GameObject parents?",
-                                isUsingGameObjectParents);
-
-                        if (isUsingGameObjectParents)
+                        using (var gameObjectParentScope =
+                            new EditorGUILayout.ToggleGroupScope("use specific GameObject parents?",
+                                isUsingGameObjectParents))
                         {
-                            var gameObjectParentsSerializedProp =
-                                serializedObject.FindProperty(nameof(gameObjectParents));
-                            if (isGameObjectParentsExpanded)
+                            isUsingGameObjectParents = gameObjectParentScope.enabled;
+
+                            if (isUsingGameObjectParents)
                             {
-                                gameObjectParentsSerializedProp.isExpanded = true;
-                                isGameObjectParentsExpanded = false;
+                                var gameObjectParentsSerializedProp =
+                                    serializedObject.FindProperty(nameof(gameObjectParents));
+                                if (isGameObjectParentsExpanded)
+                                {
+                                    gameObjectParentsSerializedProp.isExpanded = true;
+                                    isGameObjectParentsExpanded = false;
+                                }
+
+                                EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
                             }
-
-                            EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
                         }
-
-                        EditorGUILayout.EndToggleGroup();
 
                         break;
                     case SortingType.Sprite:
@@ -495,22 +495,22 @@ namespace SpriteSortingPlugin
                         break;
                 }
             }
-            EditorGUILayout.EndVertical();
         }
 
         private void DrawGeneralOptions()
         {
             GUILayout.Label("General Options");
-            EditorGUILayout.BeginVertical(helpBoxStyle);
+            using (new EditorGUILayout.VerticalScope(helpBoxStyle))
             {
                 var projectTransparencySortMode = GraphicsSettings.transparencySortMode;
 
-                EditorGUI.BeginDisabledGroup(true);
-                EditorGUIUtility.labelWidth = 350;
-                EditorGUILayout.LabelField("Transparency Sort Mode (Change via Project Settings):",
-                    projectTransparencySortMode.ToString());
-                EditorGUIUtility.labelWidth = 0;
-                EditorGUI.EndDisabledGroup();
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUIUtility.labelWidth = 350;
+                    EditorGUILayout.LabelField("Transparency Sort Mode (Change via Project Settings):",
+                        projectTransparencySortMode.ToString());
+                    EditorGUIUtility.labelWidth = 0;
+                }
 
                 switch (projectTransparencySortMode)
                 {
@@ -599,7 +599,6 @@ namespace SpriteSortingPlugin
 
                 EditorGUI.indentLevel--;
             }
-            EditorGUILayout.EndVertical();
         }
 
         private void ApplySortingOptions()
