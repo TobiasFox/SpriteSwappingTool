@@ -283,94 +283,10 @@ namespace SpriteSortingPlugin
         {
             sortingCriteriaComponents = new List<SortingCriteriaComponent>();
 
-            //Size criterion
+            foreach (SortingCriterionType sortingCriterionType in Enum.GetValues(typeof(SortingCriterionType)))
             {
-                var sortingCriterionData = CreateInstance<DefaultSortingCriterionData>();
-                sortingCriterionData.criterionName = "Size";
-                sortingCriterionData.foregroundSortingName = "is large sprite in foreground";
-                var sortingCriterion = new SizeSortingCriterion(sortingCriterionData);
-                var sizeSortingCriteriaComponent = new SortingCriteriaComponent
-                {
-                    sortingCriterionData = sortingCriterionData,
-                    sortingCriterion = sortingCriterion
-                };
-                sortingCriteriaComponents.Add(sizeSortingCriteriaComponent);
-            }
-
-            //position
-            {
-                var positionSizeData = CreateInstance<PositionSortingCriterionData>();
-                var sortingCriterion = new PositionSortingCriterion(positionSizeData);
-                var positionSortingCriteriaComponent = new SortingCriteriaComponent
-                {
-                    sortingCriterionData = positionSizeData,
-                    sortingCriterion = sortingCriterion
-                };
-                sortingCriteriaComponents.Add(positionSortingCriteriaComponent);
-            }
-
-            //Resolution criterion
-            {
-                var sortingCriterionData = CreateInstance<DefaultSortingCriterionData>();
-                sortingCriterionData.criterionName = "Sprite Resolution";
-                sortingCriterionData.foregroundSortingName = "is sprite with higher pixel density in foreground";
-                var sortingCriterion = new ResolutionSortingCriterion(sortingCriterionData);
-                var sortingCriteriaComponent = new SortingCriteriaComponent
-                {
-                    sortingCriterionData = sortingCriterionData,
-                    sortingCriterion = sortingCriterion
-                };
-                sortingCriteriaComponents.Add(sortingCriteriaComponent);
-            }
-
-            //Blurriness criterion
-            {
-                var sortingCriterionData = CreateInstance<DefaultSortingCriterionData>();
-                sortingCriterionData.criterionName = "Sprite Blurriness";
-                sortingCriterionData.foregroundSortingName = "is more blurry sprite in foreground";
-                var sortingCriterion = new BlurrinessSortingCriterion(sortingCriterionData);
-                var sortingCriteriaComponent = new SortingCriteriaComponent
-                {
-                    sortingCriterionData = sortingCriterionData,
-                    sortingCriterion = sortingCriterion
-                };
-                sortingCriteriaComponents.Add(sortingCriteriaComponent);
-            }
-
-            //Brightness criterion
-            {
-                var sortingCriterionData = CreateInstance<BrightnessSortingCriterionData>();
-                var sortingCriterion = new BrightnessSortingCriterion(sortingCriterionData);
-                var sortingCriteriaComponent = new SortingCriteriaComponent
-                {
-                    sortingCriterionData = sortingCriterionData,
-                    sortingCriterion = sortingCriterion
-                };
-                sortingCriteriaComponents.Add(sortingCriteriaComponent);
-            }
-
-            //Primary Color criterion
-            {
-                var sortingCriterionData = CreateInstance<PrimaryColorSortingCriterionData>();
-                var sortingCriterion = new PrimaryColorSortingCriterion(sortingCriterionData);
-                var sortingCriteriaComponent = new SortingCriteriaComponent
-                {
-                    sortingCriterionData = sortingCriterionData,
-                    sortingCriterion = sortingCriterion
-                };
-                sortingCriteriaComponents.Add(sortingCriteriaComponent);
-            }
-
-
-            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
-            {
-                var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                var specificEditor = Editor.CreateEditor(sortingCriteriaComponent.sortingCriterionData);
-                var criterionDataBaseEditor = (CriterionDataBaseEditor<SortingCriterionData>) specificEditor;
-                criterionDataBaseEditor.Initialize(sortingCriteriaComponent.sortingCriterionData);
-                sortingCriteriaComponent.criterionDataBaseEditor = criterionDataBaseEditor;
-
-                sortingCriteriaComponents[i] = sortingCriteriaComponent;
+                sortingCriteriaComponents.Add(
+                    SortingCriteriaComponentFactory.CreateSortingCriteriaComponent(sortingCriterionType));
             }
         }
 
@@ -426,12 +342,33 @@ namespace SpriteSortingPlugin
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     GUILayout.FlexibleSpace();
+
                     var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
                     using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
                     {
-                        if (GUILayout.Button(addIcon, GUILayout.Width(40)))
+                        if (GUILayout.Button("Add Criterion", GUILayout.Width(85)))
                         {
                             DrawSortingCriteriaMenu();
+                        }
+
+                        if (GUILayout.Button("All", GUILayout.Width(40)))
+                        {
+                            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                            {
+                                sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
+                            }
+                        }
+                    }
+
+                    var isMinOneSortingCriteriaIsUsed = IsMinOneSortingCriteriaIsUsed();
+                    using (new EditorGUI.DisabledScope(!isMinOneSortingCriteriaIsUsed))
+                    {
+                        if (GUILayout.Button("None", GUILayout.Width(40)))
+                        {
+                            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                            {
+                                sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = false;
+                            }
                         }
                     }
                 }
@@ -469,6 +406,19 @@ namespace SpriteSortingPlugin
             }
 
             return true;
+        }
+
+        private bool IsMinOneSortingCriteriaIsUsed()
+        {
+            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+            {
+                if (sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void AddSortingCriteria(object userdata)
