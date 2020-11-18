@@ -194,7 +194,10 @@ namespace SpriteSortingPlugin
             GUILayout.Label("Sprite Sorting", centeredStyle, GUILayout.ExpandWidth(true));
 
             EditorGUILayout.Space();
-            DrawGeneralOptions();
+            DrawCameraOptions();
+
+            EditorGUILayout.Space();
+            DrawSpriteDataAssetOptions();
 
             EditorGUILayout.Space();
             DrawSortingOptions();
@@ -276,6 +279,103 @@ namespace SpriteSortingPlugin
             preview.DoPreview(isAnalyzedButtonClickedThisFrame);
 
             EndScrollRect();
+        }
+
+        private bool IsUsingSpriteData(out string usedBy)
+        {
+            usedBy = "";
+            var isUsingSpriteData = false;
+
+            switch (outlinePrecision)
+            {
+                case OutlinePrecision.ObjectOrientedBoundingBox:
+                case OutlinePrecision.PixelPerfect:
+                    isUsingSpriteData = true;
+                    usedBy = "Outline Precision";
+                    break;
+            }
+
+            if (!isApplyingAutoSorting)
+            {
+                return isUsingSpriteData;
+            }
+
+            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+            {
+                if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList ||
+                    !sortingCriteriaComponent.sortingCriterionData.isActive)
+                {
+                    continue;
+                }
+
+                if (sortingCriteriaComponent.sortingCriterion.IsUsingSpriteData())
+                {
+                    isUsingSpriteData = true;
+                    if (usedBy.Length > 0)
+                    {
+                        usedBy += " and ";
+                    }
+
+                    usedBy += "Automatic Sorting";
+                    break;
+                }
+            }
+
+            return isUsingSpriteData;
+        }
+
+        private void DrawSpriteDataAssetOptions()
+        {
+            GUILayout.Label("Sprite Data");
+            var isUsingSpriteData = IsUsingSpriteData(out var errorMessage);
+            using (new EditorGUI.DisabledScope(!isUsingSpriteData))
+            {
+                using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUI.BeginChangeCheck();
+                        spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
+                            spriteData, typeof(SpriteData), false) as SpriteData;
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            preview.UpdateSpriteData(spriteData);
+
+                            //TODO select default value
+                            // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
+                            // {
+                            //     if (spriteDataItem.outlinePoints != null)
+                            //     {
+                            //         alphaAnalysisType = AlphaAnalysisType.Outline;
+                            //     }
+                            // }
+                        }
+
+                        if (GUILayout.Button("Open Sprite Data editor window to create the data"))
+                        {
+                            var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
+                            spriteAlphaEditorWindow.Show();
+                        }
+                    }
+
+                    if (!isUsingSpriteData)
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.LabelField(
+                            new GUIContent("Sprite Data Asset is not used by Sprite Sorting tool."));
+                        EditorGUI.indentLevel--;
+                    }
+                    else if (spriteData == null)
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.LabelField(
+                            new GUIContent("Please choose a Sprite Data Asset. It is used by " + errorMessage+".",
+                                warnIcon));
+                        isAnalyzedButtonDisabled = true;
+                        EditorGUI.indentLevel--;
+                    }
+                }
+            }
         }
 
         private void InitializeSortingCriteriaDataAndEditors()
@@ -497,7 +597,7 @@ namespace SpriteSortingPlugin
             }
         }
 
-        private void DrawGeneralOptions()
+        private void DrawCameraOptions()
         {
             GUILayout.Label("General Options");
             using (new EditorGUILayout.VerticalScope(helpBoxStyle))
@@ -551,50 +651,6 @@ namespace SpriteSortingPlugin
                 if (EditorGUI.EndChangeCheck())
                 {
                     preview.UpdateOutlineType(outlinePrecision);
-                }
-
-                switch (outlinePrecision)
-                {
-                    case OutlinePrecision.ObjectOrientedBoundingBox:
-                    case OutlinePrecision.PixelPerfect:
-
-                        EditorGUI.indentLevel++;
-                        using (new EditorGUILayout.HorizontalScope())
-                        {
-                            EditorGUI.BeginChangeCheck();
-                            spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"),
-                                spriteData, typeof(SpriteData), false) as SpriteData;
-                            if (EditorGUI.EndChangeCheck())
-                            {
-                                preview.UpdateSpriteData(spriteData);
-
-                                //TODO select default value
-                                // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
-                                // {
-                                //     if (spriteDataItem.outlinePoints != null)
-                                //     {
-                                //         alphaAnalysisType = AlphaAnalysisType.Outline;
-                                //     }
-                                // }
-                            }
-
-                            if (GUILayout.Button("Open Sprite Data editor window to create the data"))
-                            {
-                                var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
-                                spriteAlphaEditorWindow.Show();
-                            }
-                        }
-
-                        if (spriteData == null)
-                        {
-                            EditorGUI.indentLevel++;
-                            EditorGUILayout.LabelField(new GUIContent("Please choose a Sprite Data Asset", warnIcon));
-                            isAnalyzedButtonDisabled = true;
-                            EditorGUI.indentLevel--;
-                        }
-
-                        EditorGUI.indentLevel--;
-                        break;
                 }
 
                 EditorGUI.indentLevel--;

@@ -52,6 +52,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             return results;
         }
 
+        public override bool IsUsingSpriteData()
+        {
+            return PrimaryColorSortingCriterionData.isUsingSpriteColor;
+        }
+
         private bool IsInForeground(Color primaryColor, Color otherPrimaryColor, int channel)
         {
             var from = PrimaryColorSortingCriterionData.backgroundColor[channel];

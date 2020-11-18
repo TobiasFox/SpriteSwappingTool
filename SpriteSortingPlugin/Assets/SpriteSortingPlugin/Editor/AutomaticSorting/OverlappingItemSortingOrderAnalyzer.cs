@@ -191,7 +191,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 }
             }
 
-            //TODO analyze all results
+            Debug.Log("result sum: [" + resultCounter[0] + "," + resultCounter[1] + "]");
+
             if (resultCounter[0] >= resultCounter[1])
             {
                 result.order = 1;

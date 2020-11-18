@@ -1,5 +1,6 @@
 ﻿using SpriteSortingPlugin.AutomaticSorting.Data;
 using SpriteSortingPlugin.OverlappingSprites;
+using UnityEngine;
 
 namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
@@ -24,7 +25,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             spriteDataItemValidator =
                 spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.spriteRenderer);
             otherSpriteDataItemValidator =
-                spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.spriteRenderer);
+                spriteDataItemValidatorCache.GetOrCreateValidator(otherAutoSortingComponent.spriteRenderer);
 
             var results = InternalSort(autoSortingComponent, otherAutoSortingComponent);
 
@@ -33,10 +34,14 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
                 results[i] *= sortingCriterionData.priority;
             }
 
+            Debug.Log(GetType().Name + " sorted: [" + results[0] + "," + results[1] + "]");
+
             return results;
         }
 
         protected abstract int[] InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent);
+
+        public abstract bool IsUsingSpriteData();
     }
 }

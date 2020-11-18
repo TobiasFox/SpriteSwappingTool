@@ -54,6 +54,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             return results;
         }
 
+        public override bool IsUsingSpriteData()
+        {
+            return false;
+        }
+
         private float CalculatePerspectiveDistance(Transform spriteRendererTransform, Transform cameraTransform)
         {
             var distance = spriteRendererTransform.position - cameraTransform.position;

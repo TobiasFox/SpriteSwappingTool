@@ -23,7 +23,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var blurriness = 0d;
             var otherBlurriness = 0d;
 
-            if (BrightnessSortingCriterionData.isUsingSpriteColor)
+            if (BrightnessSortingCriterionData.isUsingSpriteRendererColor)
             {
                 if (brightnessAnalyzer == null)
                 {
@@ -57,6 +57,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             }
 
             return results;
+        }
+
+        public override bool IsUsingSpriteData()
+        {
+            return BrightnessSortingCriterionData.isUsingSpriteColor;
         }
     }
 }

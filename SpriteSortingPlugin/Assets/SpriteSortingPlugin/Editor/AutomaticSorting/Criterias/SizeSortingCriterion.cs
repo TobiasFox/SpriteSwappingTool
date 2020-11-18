@@ -73,6 +73,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             return results;
         }
 
+        public override bool IsUsingSpriteData()
+        {
+            return false;
+        }
+
         private void DrawBoundingBox(Bounds enclosingBoundingBox)
         {
             var points = new Vector2[4];

@@ -34,6 +34,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             return results;
         }
 
+        public override bool IsUsingSpriteData()
+        {
+            return false;
+        }
+
         private float CalculateSpriteResolution(SpriteRenderer spriteRenderer)
         {
             //rotate sprite to identity to use correct bounds

@@ -22,7 +22,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
                 .spriteAnalysisData.blurriness;
 
             var otherBlurriness = autoSortingCalculationData.spriteData
-                .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
+                .spriteDataDictionary[otherSpriteDataItemValidator.AssetGuid]
                 .spriteAnalysisData.blurriness;
 
 
@@ -38,6 +38,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             }
 
             return results;
+        }
+
+        public override bool IsUsingSpriteData()
+        {
+            return true;
         }
     }
 }
