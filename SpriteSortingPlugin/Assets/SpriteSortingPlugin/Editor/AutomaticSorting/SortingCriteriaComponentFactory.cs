@@ -32,6 +32,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 case SortingCriterionType.PrimaryColor:
                     CreatePrimaryColorDataAndCriterion(ref sortingCriteriaComponent);
                     break;
+                case SortingCriterionType.Containment:
+                    CreateContainmentDataAndCriterion(ref sortingCriteriaComponent);
+                    break;
             }
 
             var specificEditor = Editor.CreateEditor(sortingCriteriaComponent.sortingCriterionData);
@@ -87,6 +90,12 @@ namespace SpriteSortingPlugin.AutomaticSorting
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<BrightnessSortingCriterionData>();
             sortingCriteriaComponent.sortingCriterion = new BrightnessSortingCriterion(sortingCriterionData);
+            sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
+        }
+        
+        private static void CreateContainmentDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
+        {
+            var sortingCriterionData = ScriptableObject.CreateInstance<ContainmentSortingCriterionData>();
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
     }

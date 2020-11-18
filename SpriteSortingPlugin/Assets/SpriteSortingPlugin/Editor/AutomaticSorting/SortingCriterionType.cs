@@ -2,6 +2,7 @@
 {
     public enum SortingCriterionType
     {
+        Containment,
         Size,
         Position,
         Resolution,

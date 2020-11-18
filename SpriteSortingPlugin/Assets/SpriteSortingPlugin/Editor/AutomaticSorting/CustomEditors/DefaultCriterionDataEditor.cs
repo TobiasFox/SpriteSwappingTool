@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 {
-    [CustomEditor(typeof(DefaultSortingCriterionData))]
+    [CustomEditor(typeof(DefaultSortingCriterionData), true)]
     public class DefaultCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>

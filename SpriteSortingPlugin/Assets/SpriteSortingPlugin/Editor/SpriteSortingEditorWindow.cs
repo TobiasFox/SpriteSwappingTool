@@ -21,7 +21,6 @@ namespace SpriteSortingPlugin
         private const string SortingLayerNameDefault = "Default";
 
         private static Texture warnIcon;
-        private static Texture addIcon;
         private static bool isIconInitialized;
 
         private Vector2 scrollPosition = Vector2.zero;
@@ -61,7 +60,8 @@ namespace SpriteSortingPlugin
         private ReorderableList autoSortingResultList;
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
         private AutoSortingCalculationData autoSortingCalculationData;
-
+        private bool isUsingContainment;
+        private bool isContainedSpriteInForeground;
         private SortingCriteriaPresetSelector sortingCriteriaPresetSelector;
 
         [MenuItem("Window/Sprite Sorting %q")]
@@ -86,7 +86,6 @@ namespace SpriteSortingPlugin
             if (!isIconInitialized)
             {
                 warnIcon = EditorGUIUtility.IconContent("console.warnicon.sml").image;
-                addIcon = EditorGUIUtility.IconContent("Toolbar Plus").image;
                 isIconInitialized = true;
             }
 
@@ -308,7 +307,8 @@ namespace SpriteSortingPlugin
                     continue;
                 }
 
-                if (sortingCriteriaComponent.sortingCriterion.IsUsingSpriteData())
+                if (sortingCriteriaComponent.sortingCriterion != null &&
+                    sortingCriteriaComponent.sortingCriterion.IsUsingSpriteData())
                 {
                     isUsingSpriteData = true;
                     if (usedBy.Length > 0)
@@ -369,7 +369,7 @@ namespace SpriteSortingPlugin
                     {
                         EditorGUI.indentLevel++;
                         EditorGUILayout.LabelField(
-                            new GUIContent("Please choose a Sprite Data Asset. It is used by " + errorMessage+".",
+                            new GUIContent("Please choose a Sprite Data Asset. It is used by " + errorMessage + ".",
                                 warnIcon));
                         isAnalyzedButtonDisabled = true;
                         EditorGUI.indentLevel--;
@@ -384,8 +384,15 @@ namespace SpriteSortingPlugin
 
             foreach (SortingCriterionType sortingCriterionType in Enum.GetValues(typeof(SortingCriterionType)))
             {
-                sortingCriteriaComponents.Add(
-                    SortingCriteriaComponentFactory.CreateSortingCriteriaComponent(sortingCriterionType));
+                var sortingCriteriaComponent =
+                    SortingCriteriaComponentFactory.CreateSortingCriteriaComponent(sortingCriterionType);
+                sortingCriteriaComponents.Add(sortingCriteriaComponent);
+
+                if (sortingCriterionType == SortingCriterionType.Containment)
+                {
+                    sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
+                    sortingCriteriaComponent.sortingCriterionData.isActive = true;
+                }
             }
         }
 
@@ -402,6 +409,7 @@ namespace SpriteSortingPlugin
                 }
 
                 EditorGUILayout.Space();
+
                 if (sortingCriteriaComponents == null)
                 {
                     InitializeSortingCriteriaDataAndEditors();
@@ -872,6 +880,22 @@ namespace SpriteSortingPlugin
 
             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
             {
+                if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
+                {
+                    continue;
+                }
+
+                if (sortingCriteriaComponent.sortingCriterionData is ContainmentSortingCriterionData
+                    containmentSortingCriterionData)
+                {
+                    overlappingItemSortingOrderAnalyzer.IsAnalyzingContainment =
+                        containmentSortingCriterionData.isActive;
+                    overlappingItemSortingOrderAnalyzer.IsContainedSpriteInForeground =
+                        containmentSortingCriterionData.isSortingInForeground;
+
+                    continue;
+                }
+
                 if (!sortingCriteriaComponent.sortingCriterionData.isActive)
                 {
                     continue;

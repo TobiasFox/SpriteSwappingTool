@@ -18,6 +18,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
         private List<SortingComponent> overlappingSortingComponents;
         private SortingComponent baseItem;
 
+        public bool IsAnalyzingContainment { get; set; }
+        public bool IsContainedSpriteInForeground { get; set; }
+
         public void AddSortingCriteria(SortingCriterion<SortingCriterionData> sortingCriterion)
         {
             sortingCriterias.Add(sortingCriterion);
@@ -42,13 +45,21 @@ namespace SpriteSortingPlugin.AutomaticSorting
             spriteDataItemValidatorCache.UpdateSpriteData(this.autoSortingCalculationData.spriteData);
 
             var autoSortingComponents = InitSortingDataList();
-            AnalyzeContainment(ref autoSortingComponents);
 
-            SplitAutoSortingComponentsByContainment(autoSortingComponents, out var notContainedComponents,
-                out var containedComponents);
+            if (IsAnalyzingContainment)
+            {
+                AnalyzeContainment(ref autoSortingComponents);
 
-            SortNotContainedComponents(notContainedComponents);
-            SortContainedComponents(containedComponents);
+                SplitAutoSortingComponentsByContainment(autoSortingComponents, out var notContainedComponents,
+                    out var containedComponents);
+
+                SortNotContainedComponents(notContainedComponents);
+                SortContainedComponents(containedComponents);
+            }
+            else
+            {
+                SortNotContainedComponents(autoSortingComponents);
+            }
 
             spriteDataItemValidatorCache.Clear();
 
@@ -70,17 +81,34 @@ namespace SpriteSortingPlugin.AutomaticSorting
                     break;
                 }
 
-                var beginCheckIndex = correspondingIndex + 1;
-                containedComponent.sortingOrder =
-                    containedComponent.containedByAutoSortingComponent.CurrentSortingOrder + 1;
-
-                if (beginCheckIndex >= resultList.Count)
+                if (IsContainedSpriteInForeground)
                 {
-                    resultList.Add(containedComponent);
-                    continue;
-                }
+                    var beginCheckIndex = correspondingIndex + 1;
+                    containedComponent.sortingOrder =
+                        containedComponent.containedByAutoSortingComponent.CurrentSortingOrder + 1;
 
-                InsertInResultList(containedComponent, beginCheckIndex);
+                    if (beginCheckIndex >= resultList.Count)
+                    {
+                        containedComponent.sortingOrder = resultList[resultList.Count - 1].sortingOrder + 1;
+                        resultList.Add(containedComponent);
+                        continue;
+                    }
+
+                    InsertInResultList(containedComponent, beginCheckIndex);
+                }
+                else
+                {
+                    if (correspondingIndex == 0)
+                    {
+                        containedComponent.sortingOrder =
+                            containedComponent.containedByAutoSortingComponent.CurrentSortingOrder;
+                        InsertInResultListAndIncreaseSortingOrderAfterIndex(containedComponent, 0);
+
+                        continue;
+                    }
+
+                    InsertInResultList(containedComponent, 0, correspondingIndex);
+                }
             }
         }
 
@@ -108,13 +136,22 @@ namespace SpriteSortingPlugin.AutomaticSorting
             }
         }
 
-        private void InsertInResultList(AutoSortingComponent currentItem, int beginCheckIndex = 0)
+        private void InsertInResultList(AutoSortingComponent currentItem, int beginCheckIndex = 0,
+            int endCheckIndex = -1)
         {
+            if (beginCheckIndex < 0 || beginCheckIndex > resultList.Count || endCheckIndex > resultList.Count)
+            {
+                return;
+            }
+
             var isInsertedInResultList = false;
-            for (int i = beginCheckIndex; i < resultList.Count; i++)
+            var endIndex = endCheckIndex < 0 ? resultList.Count : endCheckIndex;
+            var lastIndex = beginCheckIndex;
+
+            for (var i = beginCheckIndex; i < endIndex; i++)
             {
                 //check against each of the items which are already in the resultList
-
+                lastIndex++;
                 var autoSortingComponent = resultList[i];
 
                 var sortingResult = CompareWithSortingCriterias(currentItem, autoSortingComponent);
@@ -126,16 +163,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 if (sortingResult.order < 0)
                 {
                     currentItem.sortingOrder = autoSortingComponent.sortingOrder;
-                    resultList.Insert(i, currentItem);
-
-                    for (int j = i + 1; j < resultList.Count; j++)
-                    {
-                        var sortingComponent = resultList[j];
-                        if (currentItem.IsOverlapping(sortingComponent))
-                        {
-                            sortingComponent.sortingOrder++;
-                        }
-                    }
+                    InsertInResultListAndIncreaseSortingOrderAfterIndex(currentItem, i);
 
                     isInsertedInResultList = true;
                     break;
@@ -146,7 +174,28 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
             if (!isInsertedInResultList)
             {
-                resultList.Add(currentItem);
+                if (endCheckIndex < 0)
+                {
+                    resultList.Add(currentItem);
+                }
+                else
+                {
+                    InsertInResultListAndIncreaseSortingOrderAfterIndex(currentItem, lastIndex);
+                }
+            }
+        }
+
+        private void InsertInResultListAndIncreaseSortingOrderAfterIndex(AutoSortingComponent currentItem, int index)
+        {
+            resultList.Insert(index, currentItem);
+
+            for (var i = index + 1; i < resultList.Count; i++)
+            {
+                var sortingComponent = resultList[i];
+                if (currentItem.IsOverlapping(sortingComponent))
+                {
+                    sortingComponent.sortingOrder++;
+                }
             }
         }
 

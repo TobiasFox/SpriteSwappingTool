@@ -97,10 +97,18 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
             using (new EditorGUI.DisabledScope(!sortingCriterionData.isActive))
             {
-                EditorGUIUtility.labelWidth = 45;
-                sortingCriterionData.priority =
-                    EditorGUI.IntSlider(priorityRect, "Priority", sortingCriterionData.priority, 1, 5);
-                EditorGUIUtility.labelWidth = 0;
+                if (sortingCriterionData is ContainmentSortingCriterionData)
+                {
+                    GUI.Label(priorityRect, "Preferred over all other criteria");
+                }
+                else
+                {
+                    EditorGUIUtility.labelWidth = 45;
+                    sortingCriterionData.priority =
+                        EditorGUI.IntSlider(priorityRect, "Priority", sortingCriterionData.priority, 1, 5);
+                    EditorGUIUtility.labelWidth = 0;
+                }
+
                 EditorGUI.LabelField(labelRect, GetTitleName(), EditorStyles.boldLabel);
             }
 
