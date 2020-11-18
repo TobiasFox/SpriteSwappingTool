@@ -7,9 +7,9 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
     public class SizeSortingCriterion : SortingCriterion<SortingCriterionData>
     {
-        private SizeSortingCriterionData SizeSortingCriterionData => (SizeSortingCriterionData) sortingCriterionData;
+        private DefaultSortingCriterionData SizeSortingCriterionData => (DefaultSortingCriterionData) sortingCriterionData;
 
-        public SizeSortingCriterion(SizeSortingCriterionData sortingCriterionData) : base(sortingCriterionData)
+        public SizeSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(sortingCriterionData)
         {
         }
 
@@ -28,7 +28,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var otherSurfaceArea = CalculateSurfaceArea(otherSpriteRenderer, otherSpriteDataItemValidator);
             var isAutoSortingComponentIsLarger = surfaceArea >= otherSurfaceArea;
 
-            if (SizeSortingCriterionData.isLargeSpriteInForeground)
+            if (SizeSortingCriterionData.isSortingInForeground)
             {
                 results[isAutoSortingComponentIsLarger ? 0 : 1]++;
             }
@@ -61,7 +61,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             var isSpriteRendererCloser = distanceFromSpriteRenderer <= otherDistanceFromSpriteRenderer;
 
-            if (SizeSortingCriterionData.isLargeSpriteInForeground)
+            if (SizeSortingCriterionData.isSortingInForeground)
             {
                 results[isSpriteRendererCloser ? 0 : 1]++;
             }

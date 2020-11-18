@@ -284,11 +284,13 @@ namespace SpriteSortingPlugin
 
             //Size criterion
             {
-                var sizeSortingCriterionData = CreateInstance<SizeSortingCriterionData>();
-                var sortingCriterion = new SizeSortingCriterion(sizeSortingCriterionData);
+                var sortingCriterionData = CreateInstance<DefaultSortingCriterionData>();
+                sortingCriterionData.criterionName = "Size";
+                sortingCriterionData.foregroundSortingName = "is large sprite in foreground";
+                var sortingCriterion = new SizeSortingCriterion(sortingCriterionData);
                 var sizeSortingCriteriaComponent = new SortingCriteriaComponent
                 {
-                    sortingCriterionData = sizeSortingCriterionData,
+                    sortingCriterionData = sortingCriterionData,
                     sortingCriterion = sortingCriterion
                 };
                 sortingCriteriaComponents.Add(sizeSortingCriteriaComponent);
@@ -308,7 +310,9 @@ namespace SpriteSortingPlugin
 
             //Resolution criterion
             {
-                var sortingCriterionData = CreateInstance<ResolutionSortingCriterionData>();
+                var sortingCriterionData = CreateInstance<DefaultSortingCriterionData>();
+                sortingCriterionData.criterionName = "Sprite Resolution";
+                sortingCriterionData.foregroundSortingName = "is sprite with higher pixel density in foreground";
                 var sortingCriterion = new ResolutionSortingCriterion(sortingCriterionData);
                 var sortingCriteriaComponent = new SortingCriteriaComponent
                 {
@@ -320,7 +324,9 @@ namespace SpriteSortingPlugin
 
             //Blurriness criterion
             {
-                var sortingCriterionData = CreateInstance<BlurrinessSortingCriterionData>();
+                var sortingCriterionData = CreateInstance<DefaultSortingCriterionData>();
+                sortingCriterionData.criterionName = "Sprite Blurriness";
+                sortingCriterionData.foregroundSortingName = "is more blurry sprite in foreground";
                 var sortingCriterion = new BlurrinessSortingCriterion(sortingCriterionData);
                 var sortingCriteriaComponent = new SortingCriteriaComponent
                 {

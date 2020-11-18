@@ -4,10 +4,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
     public class BlurrinessSortingCriterion : SortingCriterion<SortingCriterionData>
     {
-        private BlurrinessSortingCriterionData BlurrinessSortingCriterionData =>
-            (BlurrinessSortingCriterionData) sortingCriterionData;
+        private DefaultSortingCriterionData DefaultSortingCriterionData =>
+            (DefaultSortingCriterionData) sortingCriterionData;
 
-        public BlurrinessSortingCriterion(BlurrinessSortingCriterionData sortingCriterionData) : base(
+        public BlurrinessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
         }
@@ -28,7 +28,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             var isAutoSortingComponentIsMoreBlurry = blurriness >= otherBlurriness;
 
-            if (BlurrinessSortingCriterionData.isMoreBlurrySpriteInForeground)
+            if (DefaultSortingCriterionData.isSortingInForeground)
             {
                 results[isAutoSortingComponentIsMoreBlurry ? 0 : 1]++;
             }

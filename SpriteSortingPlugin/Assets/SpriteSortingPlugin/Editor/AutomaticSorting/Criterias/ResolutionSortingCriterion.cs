@@ -5,10 +5,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
     public class ResolutionSortingCriterion : SortingCriterion<SortingCriterionData>
     {
-        private ResolutionSortingCriterionData ResolutionSortingCriterionData =>
-            (ResolutionSortingCriterionData) sortingCriterionData;
+        private DefaultSortingCriterionData DefaultSortingCriterionData =>
+            (DefaultSortingCriterionData) sortingCriterionData;
 
-        public ResolutionSortingCriterion(ResolutionSortingCriterionData sortingCriterionData) : base(
+        public ResolutionSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
         }
@@ -22,7 +22,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var otherSpriteResolution = CalculateSpriteResolution(otherAutoSortingComponent.spriteRenderer);
             var hasAutoSortingComponentHigherResolution = spriteResolution >= otherSpriteResolution;
 
-            if (ResolutionSortingCriterionData.isSpriteWithHigherResolutionInForeground)
+            if (DefaultSortingCriterionData.isSortingInForeground)
             {
                 results[hasAutoSortingComponentHigherResolution ? 0 : 1]++;
             }
