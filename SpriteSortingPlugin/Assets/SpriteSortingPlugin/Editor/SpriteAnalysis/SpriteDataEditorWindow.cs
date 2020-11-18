@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpriteSortingPlugin.SpriteAnalysis.Analyzer;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEditorInternal;

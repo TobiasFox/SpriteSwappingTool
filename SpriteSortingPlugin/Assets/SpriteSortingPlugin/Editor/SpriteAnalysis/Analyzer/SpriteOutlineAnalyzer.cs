@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteAnalysis
+namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 {
     public class SpriteOutlineAnalyzer : ISpriteDataAnalyzer
     {

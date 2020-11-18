@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteAnalysis
+namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 {
     public interface ISpriteDataAnalyzer
     {
