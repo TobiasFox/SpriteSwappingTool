@@ -335,6 +335,11 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     blurriness = EditorGUILayout.DoubleField("Blurriness", blurriness);
                     if (EditorGUI.EndChangeCheck())
                     {
+                        if (blurriness < 0)
+                        {
+                            blurriness = 0d;
+                        }
+
                         selectedSpriteDataItem.spriteAnalysisData.blurriness = blurriness;
                     }
 
@@ -352,6 +357,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     brightness = EditorGUILayout.FloatField("Brightness", brightness);
                     if (EditorGUI.EndChangeCheck())
                     {
+                        brightness = Mathf.Clamp(brightness, 0f, 100f);
                         selectedSpriteDataItem.spriteAnalysisData.brightness = brightness;
                     }
 
