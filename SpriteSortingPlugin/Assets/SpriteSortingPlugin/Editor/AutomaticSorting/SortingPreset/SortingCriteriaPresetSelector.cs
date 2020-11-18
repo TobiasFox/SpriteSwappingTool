@@ -1,6 +1,6 @@
 ﻿using UnityEditor.Presets;
 
-namespace SpriteSortingPlugin.AutomaticSorting
+namespace SpriteSortingPlugin.AutomaticSorting.SortingPreset
 {
     public class SortingCriteriaPresetSelector : PresetSelectorReceiver
     {

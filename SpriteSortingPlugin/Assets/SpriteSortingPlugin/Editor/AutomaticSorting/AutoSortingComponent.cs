@@ -4,24 +4,14 @@ namespace SpriteSortingPlugin.AutomaticSorting
 {
     public class AutoSortingComponent : SortingComponent
     {
-        private static int globalID = 0;
-
-        public readonly int id;
-
         public int sortingOrder;
         public AutoSortingComponent containedByAutoSortingComponent;
 
         private List<SortingComponent> overlappingSortingComponents;
 
-        public static void ResetID()
-        {
-            globalID = 0;
-        }
-
         public AutoSortingComponent(SortingComponent sortingComponent) : base(sortingComponent.spriteRenderer,
             sortingComponent.outmostSortingGroup)
         {
-            id = globalID++;
             sortingOrder = CurrentSortingOrder;
         }
 

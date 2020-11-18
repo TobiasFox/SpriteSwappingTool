@@ -4,6 +4,7 @@ using SpriteSortingPlugin.AutomaticSorting;
 using SpriteSortingPlugin.AutomaticSorting.Criterias;
 using SpriteSortingPlugin.AutomaticSorting.CustomEditors;
 using SpriteSortingPlugin.AutomaticSorting.Data;
+using SpriteSortingPlugin.AutomaticSorting.SortingPreset;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
 using SpriteSortingPlugin.OverlappingSprites;
 using SpriteSortingPlugin.Preview;

@@ -252,8 +252,6 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
         private List<AutoSortingComponent> InitSortingDataList()
         {
-            AutoSortingComponent.ResetID();
-
             overlappingSpriteDetector = new OverlappingSpriteDetector();
             var autoSortingComponents = new List<AutoSortingComponent>();
 

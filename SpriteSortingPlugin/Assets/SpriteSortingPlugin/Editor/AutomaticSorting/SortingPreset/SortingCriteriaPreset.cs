@@ -1,7 +1,7 @@
 ﻿using SpriteSortingPlugin.AutomaticSorting.Data;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.AutomaticSorting
+namespace SpriteSortingPlugin.AutomaticSorting.SortingPreset
 {
     public class SortingCriteriaPreset : ScriptableObject
     {
