@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using SpriteSortingPlugin.AutomaticSorting;
-using SpriteSortingPlugin.AutomaticSorting.Criterias;
-using SpriteSortingPlugin.AutomaticSorting.CustomEditors;
 using SpriteSortingPlugin.AutomaticSorting.Data;
 using SpriteSortingPlugin.AutomaticSorting.SortingPreset;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
@@ -25,7 +23,6 @@ namespace SpriteSortingPlugin
 
         private Vector2 scrollPosition = Vector2.zero;
 
-        private bool useSpriteAlphaOutline = true;
         [SerializeField] private SpriteData spriteData;
         [SerializeField] private OutlinePrecision outlinePrecision;
         private CameraProjectionType cameraProjectionType;
@@ -60,8 +57,7 @@ namespace SpriteSortingPlugin
         private ReorderableList autoSortingResultList;
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
         private AutoSortingCalculationData autoSortingCalculationData;
-        private bool isUsingContainment;
-        private bool isContainedSpriteInForeground;
+        private bool isReplacingOverlappingItemsWithAutoSortedResult = true;
         private SortingCriteriaPresetSelector sortingCriteriaPresetSelector;
 
         [MenuItem("Window/Sprite Sorting %q")]
@@ -533,6 +529,7 @@ namespace SpriteSortingPlugin
             var index = (int) userdata;
             var sortingCriteriaComponent = sortingCriteriaComponents[index];
             sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
+            sortingCriteriaComponent.sortingCriterionData.isActive = true;
             sortingCriteriaComponents[index] = sortingCriteriaComponent;
         }
 
@@ -856,25 +853,70 @@ namespace SpriteSortingPlugin
                 preview.EnableSceneVisualization(true);
             }
 
+            List<OverlappingItem> overlappingItemList;
+            OverlappingItem overlappingBaseItem;
+
             if (isApplyingAutoSorting)
             {
                 var sortingComponents =
                     new List<SortingComponent>(overlappingSpriteDetectionResult.overlappingSortingComponents);
-                ApplyAutoSorting(overlappingSpriteDetectionResult.baseItem, sortingComponents);
+                CreateAndInitOverlappingItemSortingOrderAnalyzer();
+                FillAutoSortingCalculationData();
+
+                var resultList = overlappingItemSortingOrderAnalyzer.GenerateAutomaticSortingOrder(
+                    overlappingSpriteDetectionResult.baseItem, sortingComponents, autoSortingCalculationData);
+
+                if (isReplacingOverlappingItemsWithAutoSortedResult)
+                {
+                    var sortingComponentList = new List<SortingComponent>(resultList);
+                    overlappingSpriteDetectionResult.overlappingSortingComponents = sortingComponentList;
+
+                    overlappingSpriteDetectionResult.ConvertToOverlappingItems(out overlappingItemList,
+                        out overlappingBaseItem);
+
+                    for (var i = 0; i < overlappingItemList.Count; i++)
+                    {
+                        var overlappingItem = overlappingItemList[i];
+                        overlappingItem.AutoSortingOrder = resultList[i].sortingOrder;
+                    }
+                }
+                else
+                {
+                    DrawAdditionalListOfAutoSortingResult(resultList);
+                    overlappingSpriteDetectionResult.ConvertToOverlappingItems(out overlappingItemList,
+                        out overlappingBaseItem);
+                    overlappingItemList.Insert(0, overlappingBaseItem);
+                }
+            }
+            else
+            {
+                overlappingSpriteDetectionResult.ConvertToOverlappingItems(out overlappingItemList,
+                    out overlappingBaseItem);
+                overlappingItemList.Insert(0, overlappingBaseItem);
             }
 
-            overlappingSpriteDetectionResult.ConvertToOverlappingItems(out var overlappingItemList,
-                out var overlappingBaseItem);
-
-            overlappingItemList.Insert(0, overlappingBaseItem);
-
-            overlappingItems = new OverlappingItems(overlappingBaseItem, overlappingItemList);
+            overlappingItems = new OverlappingItems(overlappingBaseItem, overlappingItemList,
+                isApplyingAutoSorting && isReplacingOverlappingItemsWithAutoSortedResult);
             preview.UpdateOverlappingItems(overlappingItems);
             preview.UpdateSpriteData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
         }
 
-        private void ApplyAutoSorting(SortingComponent baseItem, List<SortingComponent> sortingComponents)
+        private void DrawAdditionalListOfAutoSortingResult(List<AutoSortingComponent> resultList)
+        {
+            autoSortingResultNames = new List<string>();
+            for (var i = 0; i < resultList.Count; i++)
+            {
+                var autoSortingComponent = resultList[i];
+                autoSortingResultNames.Add((i + 1) + ". new sortingOrder: " + autoSortingComponent.sortingOrder + ", " +
+                                           autoSortingComponent);
+            }
+
+            autoSortingResultList =
+                new ReorderableList(autoSortingResultNames, typeof(string), false, false, false, false);
+        }
+
+        private void CreateAndInitOverlappingItemSortingOrderAnalyzer()
         {
             overlappingItemSortingOrderAnalyzer = new OverlappingItemSortingOrderAnalyzer();
 
@@ -903,24 +945,6 @@ namespace SpriteSortingPlugin
 
                 overlappingItemSortingOrderAnalyzer.AddSortingCriteria(sortingCriteriaComponent.sortingCriterion);
             }
-
-            FillAutoSortingCalculationData();
-
-            var resultList =
-                overlappingItemSortingOrderAnalyzer.GenerateAutomaticSortingOrder(baseItem, sortingComponents,
-                    autoSortingCalculationData);
-
-            //TODO: temp, replace this by overwriting directly the overlappingItemList
-            autoSortingResultNames = new List<string>();
-            for (var i = 0; i < resultList.Count; i++)
-            {
-                var autoSortingComponent = resultList[i];
-                autoSortingResultNames.Add((i + 1) + ". new sortingOrder: " + autoSortingComponent.sortingOrder + ", " +
-                                           autoSortingComponent);
-            }
-
-            autoSortingResultList =
-                new ReorderableList(autoSortingResultNames, typeof(string), false, false, false, false);
         }
 
         private void FillAutoSortingCalculationData()

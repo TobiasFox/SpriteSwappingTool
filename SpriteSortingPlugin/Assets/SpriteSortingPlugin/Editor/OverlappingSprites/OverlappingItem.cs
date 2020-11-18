@@ -23,6 +23,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
 
         public bool IsItemSelected { get; set; }
         public int OriginSortedIndex { get; set; }
+        public int AutoSortingOrder { get; set; }
         public bool IsBaseItem { get; private set; }
         public string SpriteAssetGuid { get; private set; }
 

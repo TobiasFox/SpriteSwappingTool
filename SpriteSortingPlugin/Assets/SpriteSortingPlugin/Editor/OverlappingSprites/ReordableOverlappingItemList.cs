@@ -254,6 +254,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 preview.UpdatePreviewEditor();
 
                 lastFocussedIndex = -1;
+                reordableSpriteSortingList.index = lastFocussedIndex;
             }
         }
 

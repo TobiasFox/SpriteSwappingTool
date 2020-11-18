@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SpriteSortingPlugin.AutomaticSorting.Criterias;
 using SpriteSortingPlugin.AutomaticSorting.Data;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
@@ -62,6 +63,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
             }
 
             spriteDataItemValidatorCache.Clear();
+
+            resultList.Reverse();
 
             //TODO consider baseItem
             return resultList;

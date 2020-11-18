@@ -13,15 +13,17 @@ namespace SpriteSortingPlugin.OverlappingSprites
         private bool hasChangedLayer;
         private OverlappingItemIndexComparer originIndexComparer;
         private OverlappingItemIdentityComparer overlappingItemIdentityComparer;
+        private bool isAlreadySorted;
 
         public List<OverlappingItem> Items => items;
         public OverlappingItem BaseItem => baseItem;
         public bool HasChangedLayer => hasChangedLayer;
 
-        public OverlappingItems(OverlappingItem baseItem, List<OverlappingItem> items)
+        public OverlappingItems(OverlappingItem baseItem, List<OverlappingItem> items, bool isAlreadySorted = false)
         {
             this.baseItem = baseItem;
             this.items = items;
+            this.isAlreadySorted = isAlreadySorted;
 
             InitOverlappingItems(false);
         }
@@ -286,7 +288,14 @@ namespace SpriteSortingPlugin.OverlappingSprites
                     overlappingItem.OriginSortedIndex = i;
                 }
 
-                overlappingItem.sortingOrder = items.Count - (i + 1);
+                if (!isAlreadySorted)
+                {
+                    overlappingItem.sortingOrder = items.Count - (i + 1);
+                }
+                else
+                {
+                    overlappingItem.sortingOrder = overlappingItem.AutoSortingOrder;
+                }
 
                 overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
                 overlappingItem.sortingLayerName =
