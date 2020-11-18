@@ -26,6 +26,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
         private ObjectOrientedBoundingBox oobbToCheck;
         private PolygonCollider2D polygonColliderToCheck;
         private Bounds boundsToCheck;
+        private Bounds planeBoundsToCheck;
         private PolygonColliderCacher polygonColliderCacher;
 
         public OverlappingSpriteDetectionResult DetectOverlappingSprites(List<int> selectedLayers,
@@ -474,9 +475,16 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
             return true;
         }
 
+        private Bounds CreatePlaneBounds(Bounds originBounds)
+        {
+            return new Bounds(new Vector3(originBounds.center.x, originBounds.center.y, 0),
+                new Vector3(originBounds.size.x, originBounds.size.y, 0));
+        }
+
         private void SetSpriteOutline(SpriteRenderer spriteRenderer)
         {
             boundsToCheck = spriteRenderer.bounds;
+            planeBoundsToCheck = CreatePlaneBounds(boundsToCheck);
 
             spriteDataItemValidator = SpriteDataItemValidatorCache.GetInstance().GetOrCreateValidator(spriteRenderer);
             currentValidOutlinePrecision =
@@ -511,8 +519,9 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
 
         private bool IsOverlapping(SpriteRenderer spriteRenderer)
         {
-            //TODO bounds are not overlapping if they dont share the same z coordinate
-            if (!spriteRenderer.bounds.Intersects(boundsToCheck))
+            var otherPlaneBounds = CreatePlaneBounds(spriteRenderer.bounds);
+
+            if (!planeBoundsToCheck.Intersects(otherPlaneBounds))
             {
                 return false;
             }
