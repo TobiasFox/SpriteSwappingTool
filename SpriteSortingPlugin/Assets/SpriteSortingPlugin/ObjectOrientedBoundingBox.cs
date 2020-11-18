@@ -193,7 +193,6 @@ namespace SpriteSortingPlugin
             return true;
         }
 
-        //TODO test it and if succeeded replace it above
         public bool Contains(Vector2 point)
         {
             for (int i = 0; i < points.Length; i++)

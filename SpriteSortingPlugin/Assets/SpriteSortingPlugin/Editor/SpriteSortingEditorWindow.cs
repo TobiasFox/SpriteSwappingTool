@@ -336,15 +336,6 @@ namespace SpriteSortingPlugin
                         if (EditorGUI.EndChangeCheck())
                         {
                             preview.UpdateSpriteData(spriteData);
-
-                            //TODO select default value
-                            // foreach (var spriteDataItem in spriteAlphaData.spriteDataDictionary.Values)
-                            // {
-                            //     if (spriteDataItem.outlinePoints != null)
-                            //     {
-                            //         alphaAnalysisType = AlphaAnalysisType.Outline;
-                            //     }
-                            // }
                         }
 
                         if (GUILayout.Button("Open Sprite Data editor window to create the data"))
