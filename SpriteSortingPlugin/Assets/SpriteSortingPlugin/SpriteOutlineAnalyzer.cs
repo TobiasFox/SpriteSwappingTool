@@ -5,6 +5,8 @@ namespace SpriteSortingPlugin
 {
     public class SpriteOutlineAnalyzer
     {
+        private const float Tolerance = 0.0001f;
+
         private int startPixelIndex;
         private PixelDirection startPixelEntryDirection;
         private Color[] pixels;
@@ -13,11 +15,20 @@ namespace SpriteSortingPlugin
         private float spritePixelsPerUnit;
         private Vector2 pixelOffset;
 
+        private Vector2 origin;
+        private Vector2 direction;
+
         public List<Vector2> Analyze(Sprite sprite)
         {
             var pointList = AnalyzeSpriteOutline(sprite);
-            //TODO flatten colliderPoints
 
+            FlattenPointList(ref pointList);
+
+            var first = pointList[0];
+            if (!first.Equals(pointList[pointList.Count - 1]))
+            {
+                pointList.Add(first);
+            }
 
             pixels = null;
             return pointList;
@@ -161,6 +172,51 @@ namespace SpriteSortingPlugin
             }
 
             return -1;
+        }
+
+        private void FlattenPointList(ref List<Vector2> pointList)
+        {
+            if (pointList.Count < 3)
+            {
+                return;
+            }
+
+            var currentIndex = 0;
+            origin = pointList[currentIndex++];
+            direction = pointList[currentIndex++] - origin;
+
+            while (currentIndex < pointList.Count - 1)
+            {
+                var nextPoint = pointList[currentIndex];
+                if (IsOnLine(nextPoint.x, nextPoint.y))
+                {
+                    pointList.RemoveAt(currentIndex - 1);
+                    continue;
+                }
+
+                origin = pointList[currentIndex - 1];
+                direction = nextPoint - origin;
+
+                currentIndex++;
+            }
+        }
+
+        private bool IsOnLine(float x, float y)
+        {
+            if (direction.x == 0)
+            {
+                return Mathf.Abs(x - origin.x) < Tolerance;
+            }
+
+            if (direction.y == 0)
+            {
+                return Mathf.Abs(y - origin.y) < Tolerance;
+            }
+
+            var t1 = (x - origin.x) / direction.x;
+            var t2 = (y - origin.y) / direction.y;
+
+            return Mathf.Abs(t1 - t2) < Tolerance;
         }
     }
 }
