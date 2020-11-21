@@ -31,8 +31,8 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             modifiedPixelArray = ApplyLaplacian(modifiedPixelArray);
 
             var standardDeviation = CalculateStandardDeviation(modifiedPixelArray);
-            var squaredStandardDeviation = standardDeviation * standardDeviation;
-            return squaredStandardDeviation;
+            var variance = standardDeviation * standardDeviation;
+            return variance;
         }
 
         private double[] ApplyLaplacian(double[] modifiedPixelArray)

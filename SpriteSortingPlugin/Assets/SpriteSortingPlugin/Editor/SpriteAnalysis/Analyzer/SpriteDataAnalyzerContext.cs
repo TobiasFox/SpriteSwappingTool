@@ -30,7 +30,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
                     case SpriteAnalyzerType.Blurriness:
                         spriteDataAnalyzer = new SpriteBlurrinessAnalyzer();
                         break;
-                    case SpriteAnalyzerType.Brightness:
+                    case SpriteAnalyzerType.Lightness:
                         spriteDataAnalyzer = new SpriteBrightnessAnalyzer();
                         break;
                     case SpriteAnalyzerType.PrimaryColor:

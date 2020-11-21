@@ -5,17 +5,17 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 {
     public class SpriteBrightnessAnalyzer : ISpriteDataAnalyzer
     {
-        private BrightnessAnalyzer brightnessAnalyzer;
+        private LightnessAnalyzer lightnessAnalyzer;
 
         public void Analyse(ref SpriteDataItem spriteDataItem, Sprite sprite,
             SpriteAnalyzeInputData spriteAnalyzeInputData)
         {
-            if (brightnessAnalyzer == null)
+            if (lightnessAnalyzer == null)
             {
-                brightnessAnalyzer = new BrightnessAnalyzer();
+                lightnessAnalyzer = new LightnessAnalyzer();
             }
 
-            spriteDataItem.spriteAnalysisData.brightness = brightnessAnalyzer.Analyze(sprite);
+            spriteDataItem.spriteAnalysisData.perceivedLightness = lightnessAnalyzer.Analyze(sprite);
         }
     }
 }

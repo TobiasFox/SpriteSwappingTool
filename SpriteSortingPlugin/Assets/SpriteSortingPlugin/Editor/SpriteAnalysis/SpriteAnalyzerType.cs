@@ -4,7 +4,7 @@
     {
         Outline,
         Blurriness,
-        Brightness,
+        Lightness,
         PrimaryColor
     }
 }

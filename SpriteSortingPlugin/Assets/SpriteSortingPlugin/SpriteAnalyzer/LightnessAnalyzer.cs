@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalyzer
 {
     /**
      * analysis is based on https://stackoverflow.com/a/56678483
      */
-    public class BrightnessAnalyzer
+    public class LightnessAnalyzer
     {
         public float Analyze(Sprite sprite)
         {
@@ -21,7 +22,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
             var pixels = sprite.texture.GetPixels();
 
-            var averageBrightness = 0f;
+            var averagePerceivedLightness = 0f;
             var pixelCounter = 0;
             foreach (var pixel in pixels)
             {
@@ -32,16 +33,13 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
                 pixelCounter++;
 
-                var luminance = CalculateLuminance(pixel);
-                var convertedLuminance = LuminanceToLStar(luminance);
-
-                averageBrightness += convertedLuminance;
+                var pixelLightness = CalculatePerceivedLightness(pixel);
+                averagePerceivedLightness += pixelLightness;
             }
 
-            averageBrightness /= pixelCounter;
+            averagePerceivedLightness /= pixelCounter;
 
-
-            return averageBrightness;
+            return averagePerceivedLightness;
         }
 
         public float Analyze(SpriteRenderer spriteRenderer)
@@ -51,39 +49,39 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                 return 0;
             }
 
-            var spriteRendererColor = spriteRenderer.color;
-            var luminance = CalculateLuminance(spriteRendererColor);
-            var convertedLuminance = LuminanceToLStar(luminance);
+            return CalculatePerceivedLightness(spriteRenderer.color);
+        }
+
+        public float Analyze2(SpriteRenderer spriteRenderer)
+        {
+            var color = spriteRenderer.color;
+            var redColor = color.r * color.r * 0.299f;
+            var blueColor = color.g * color.g * 0.587f;
+            var greenColor = color.b * color.b * 0.114f;
+
+            return Mathf.Sqrt(redColor + blueColor + greenColor);
+        }
+
+        private static float CalculatePerceivedLightness(Color color)
+        {
+            var luminance = CalculateLuminance(color);
+            var convertedLuminance = LuminanceToCIELAB(luminance);
 
             return convertedLuminance;
         }
 
-        /**
-         * <param name="colorChannel">sRGB gamma encoded color value between 0.0 and 1.0</param>
-         * <returns>linearized value</returns>
-         */
-        private float ConvertsRGBtoLinear(float colorChannel)
+        private static float CalculateLuminance(Color color)
         {
-            if (colorChannel <= 0.04045)
-            {
-                return colorChannel / 12.92f;
-            }
-
-            return Mathf.Pow(((colorChannel + 0.055f) / 1.055f), 2.4f);
-        }
-
-        private float CalculateLuminance(Color color)
-        {
-            return (0.2126f * ConvertsRGBtoLinear(color.r) + 0.7152f * ConvertsRGBtoLinear(color.g) +
-                    0.0722f * ConvertsRGBtoLinear(color.b));
+            var linearColor = color.linear;
+            return (0.2126f * linearColor.r + 0.7152f * linearColor.g + 0.0722f * linearColor.b);
         }
 
         /**
          * return perceptual lightness in L*
-         * <param name="luminance"> current luminance calue between 0.0 and 1.0</param>
+         * <param name="luminance"> current luminance value between 0.0 and 1.0</param>
          * <returns>value between 0 and 100, 0 means dark, 100 means light</returns>
          */
-        private float LuminanceToLStar(float luminance)
+        private static float LuminanceToCIELAB(float luminance)
         {
             if (luminance < 0)
             {

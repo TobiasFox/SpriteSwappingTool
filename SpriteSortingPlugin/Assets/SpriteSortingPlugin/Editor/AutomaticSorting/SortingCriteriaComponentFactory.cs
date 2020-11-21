@@ -88,8 +88,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
         private static void CreateBrightnessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<BrightnessSortingCriterionData>();
-            sortingCriteriaComponent.sortingCriterion = new BrightnessSortingCriterion(sortingCriterionData);
+            var sortingCriterionData = ScriptableObject.CreateInstance<LightnessSortingCriterionData>();
+            sortingCriteriaComponent.sortingCriterion = new LightnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
         
