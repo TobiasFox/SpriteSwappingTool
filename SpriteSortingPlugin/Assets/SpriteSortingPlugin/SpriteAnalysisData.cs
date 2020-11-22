@@ -7,7 +7,7 @@ namespace SpriteSortingPlugin
     public struct SpriteAnalysisData
     {
         public double blurriness;
-        public float brightness;
+        public float perceivedLightness;
         public Color primaryColor;
     }
 }
