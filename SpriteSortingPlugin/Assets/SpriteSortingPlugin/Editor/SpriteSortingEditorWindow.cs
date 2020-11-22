@@ -433,19 +433,27 @@ namespace SpriteSortingPlugin
                 }
 
                 DrawSplitter(true);
+                var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     GUILayout.FlexibleSpace();
 
-                    var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
                     using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
                     {
-                        if (GUILayout.Button("Add Criterion", GUILayout.Width(85)))
+                        if (GUILayout.Button("Add Criterion", GUILayout.Width(103)))
                         {
                             DrawSortingCriteriaMenu();
                         }
+                    }
+                }
 
-                        if (GUILayout.Button("All", GUILayout.Width(40)))
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+
+                    using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
+                    {
+                        if (GUILayout.Button("All", GUILayout.Width(50)))
                         {
                             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
                             {
@@ -457,7 +465,7 @@ namespace SpriteSortingPlugin
                     var isMinOneSortingCriteriaIsUsed = IsMinOneSortingCriteriaIsUsed();
                     using (new EditorGUI.DisabledScope(!isMinOneSortingCriteriaIsUsed))
                     {
-                        if (GUILayout.Button("None", GUILayout.Width(40)))
+                        if (GUILayout.Button("None", GUILayout.Width(50)))
                         {
                             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
                             {
