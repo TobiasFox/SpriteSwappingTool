@@ -23,9 +23,9 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
             spriteDataItemValidator =
-                spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.spriteRenderer);
+                spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.OriginSpriteRenderer);
             otherSpriteDataItemValidator =
-                spriteDataItemValidatorCache.GetOrCreateValidator(otherAutoSortingComponent.spriteRenderer);
+                spriteDataItemValidatorCache.GetOrCreateValidator(otherAutoSortingComponent.OriginSpriteRenderer);
 
             var results = InternalSort(autoSortingComponent, otherAutoSortingComponent);
 

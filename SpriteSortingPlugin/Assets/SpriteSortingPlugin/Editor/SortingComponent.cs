@@ -7,46 +7,49 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class SortingComponent
     {
-        public readonly SpriteRenderer spriteRenderer;
-        public readonly SortingGroup outmostSortingGroup;
+        private SpriteRenderer originSpriteRenderer;
+        private SortingGroup outmostSortingGroup;
 
-        public SortingComponent(SpriteRenderer spriteRenderer, SortingGroup outmostSortingGroup = null)
+        public SpriteRenderer OriginSpriteRenderer => originSpriteRenderer;
+        public SortingGroup OutmostSortingGroup => outmostSortingGroup;
+
+        public SortingComponent(SpriteRenderer originSpriteRenderer, SortingGroup outmostSortingGroup = null)
         {
-            this.spriteRenderer = spriteRenderer;
+            this.originSpriteRenderer = originSpriteRenderer;
             this.outmostSortingGroup = outmostSortingGroup;
         }
 
-        public int CurrentSortingOrder
+        public int OriginSortingOrder
         {
             get
             {
-                if (outmostSortingGroup != null)
+                if (OutmostSortingGroup != null)
                 {
-                    return outmostSortingGroup.sortingOrder;
+                    return OutmostSortingGroup.sortingOrder;
                 }
 
-                return spriteRenderer != null ? spriteRenderer.sortingOrder : 0;
+                return OriginSpriteRenderer != null ? OriginSpriteRenderer.sortingOrder : 0;
             }
         }
 
-        public int CurrentSortingLayer
+        public int OriginSortingLayer
         {
             get
             {
-                if (outmostSortingGroup != null)
+                if (OutmostSortingGroup != null)
                 {
-                    return outmostSortingGroup.sortingLayerID;
+                    return OutmostSortingGroup.sortingLayerID;
                 }
 
-                return spriteRenderer != null ? spriteRenderer.sortingLayerID : 0;
+                return OriginSpriteRenderer != null ? OriginSpriteRenderer.sortingLayerID : 0;
             }
         }
 
         public int GetInstanceId()
         {
-            return outmostSortingGroup != null
-                ? outmostSortingGroup.GetInstanceID()
-                : spriteRenderer.GetInstanceID();
+            return OutmostSortingGroup != null
+                ? OutmostSortingGroup.GetInstanceID()
+                : OriginSpriteRenderer.GetInstanceID();
         }
 
         public override bool Equals(object obj)
@@ -61,15 +64,16 @@ namespace SpriteSortingPlugin
 
         public bool Equals(SortingComponent other)
         {
-            return spriteRenderer == other.spriteRenderer && outmostSortingGroup == other.outmostSortingGroup;
+            return OriginSpriteRenderer == other.OriginSpriteRenderer &&
+                   OutmostSortingGroup == other.OutmostSortingGroup;
         }
 
         public override int GetHashCode()
         {
-            var hashcode = spriteRenderer.GetHashCode();
-            if (outmostSortingGroup != null)
+            var hashcode = OriginSpriteRenderer.GetHashCode();
+            if (OutmostSortingGroup != null)
             {
-                hashcode ^= outmostSortingGroup.GetHashCode();
+                hashcode ^= OutmostSortingGroup.GetHashCode();
             }
 
             return hashcode;
@@ -77,8 +81,9 @@ namespace SpriteSortingPlugin
 
         public override string ToString()
         {
-            return "SortingComponent[" + spriteRenderer.name + ", " + CurrentSortingLayer + ", " + CurrentSortingOrder +
-                   ", SG:" + (outmostSortingGroup != null) + "]";
+            return "SortingComponent[" + OriginSpriteRenderer.name + ", " + OriginSortingLayer + ", " +
+                   OriginSortingOrder +
+                   ", SG:" + (OutmostSortingGroup != null) + "]";
         }
     }
 }

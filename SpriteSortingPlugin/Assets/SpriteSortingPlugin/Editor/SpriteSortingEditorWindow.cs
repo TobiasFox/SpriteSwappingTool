@@ -680,6 +680,11 @@ namespace SpriteSortingPlugin
 
             FillSpriteDetectionData();
 
+            if (overlappingSpriteDetector == null)
+            {
+                overlappingSpriteDetector = new OverlappingSpriteDetector();
+            }
+
             var sortingOptions = overlappingSpriteDetector.AnalyzeSurroundingSpritesAndGetAdjustedSortingOptions(
                 overlappingItems.Items, spriteDetectionData);
 

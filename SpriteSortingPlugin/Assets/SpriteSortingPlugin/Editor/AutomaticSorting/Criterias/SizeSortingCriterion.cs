@@ -18,8 +18,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
             var results = new int[2];
 
-            var spriteRenderer = autoSortingComponent.spriteRenderer;
-            var otherSpriteRenderer = otherAutoSortingComponent.spriteRenderer;
+            var spriteRenderer = autoSortingComponent.OriginSpriteRenderer;
+            var otherSpriteRenderer = otherAutoSortingComponent.OriginSpriteRenderer;
             var spriteSortPoint = GetSpriteSortPoint(spriteRenderer);
             var otherSpriteSortPoint = GetSpriteSortPoint(otherSpriteRenderer);
 

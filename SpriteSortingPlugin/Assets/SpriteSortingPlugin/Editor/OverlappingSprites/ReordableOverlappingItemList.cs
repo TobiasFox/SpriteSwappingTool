@@ -113,7 +113,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
         private float ElementHeightCallback(int index)
         {
             var element = (OverlappingItem) reordableSpriteSortingList.list[index];
-            if (element.originSortingGroup == null)
+            if (element.OutmostSortingGroup == null)
             {
                 return EditorGUIUtility.singleLineHeight * 2 + LineSpacing + LineSpacing * 3;
             }
@@ -143,20 +143,21 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 lastElementRectWidth = rect.width;
             }
 
+            var guiContent = new GUIContent("\"" + element.OriginSpriteRenderer.name + "\"", spriteIcon);
             EditorGUI.LabelField(
                 new Rect(startX, rect.y, lastElementRectWidth - SelectButtonWidth - 90,
                     EditorGUIUtility.singleLineHeight),
-                new GUIContent("\"" + element.originSpriteRenderer.name + "\"", spriteIcon));
+                guiContent);
 
             if (GUI.Button(new Rect(rect.width - 28, rect.y, SelectButtonWidth, EditorGUIUtility.singleLineHeight),
                 "Select"))
             {
-                Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
-                SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
-                EditorGUIUtility.PingObject(element.originSpriteRenderer);
+                Selection.objects = new Object[] {element.OriginSpriteRenderer.gameObject};
+                SceneView.lastActiveSceneView.Frame(element.OriginSpriteRenderer.bounds);
+                EditorGUIUtility.PingObject(element.OriginSpriteRenderer);
             }
 
-            if (element.originSortingGroup != null)
+            if (element.OutmostSortingGroup != null)
             {
                 rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
 
@@ -165,15 +166,15 @@ namespace SpriteSortingPlugin.OverlappingSprites
 
                 EditorGUI.LabelField(
                     new Rect(rect.x + 160 + 2.5f, rect.y, 120, EditorGUIUtility.singleLineHeight),
-                    "\"" + element.originSortingGroup.name + "\"");
+                    "\"" + element.OutmostSortingGroup.name + "\"");
 
                 if (GUI.Button(
                     new Rect(rect.width - 56, rect.y, 83,
                         EditorGUIUtility.singleLineHeight), "Select Group"))
                 {
-                    Selection.objects = new Object[] {element.originSortingGroup.gameObject};
-                    SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
-                    EditorGUIUtility.PingObject(element.originSortingGroup);
+                    Selection.objects = new Object[] {element.OutmostSortingGroup.gameObject};
+                    SceneView.lastActiveSceneView.Frame(element.OriginSpriteRenderer.bounds);
+                    EditorGUIUtility.PingObject(element.OutmostSortingGroup);
                 }
             }
 

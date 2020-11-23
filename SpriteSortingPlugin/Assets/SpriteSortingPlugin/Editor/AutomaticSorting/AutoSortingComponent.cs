@@ -9,10 +9,10 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
         private List<SortingComponent> overlappingSortingComponents;
 
-        public AutoSortingComponent(SortingComponent sortingComponent) : base(sortingComponent.spriteRenderer,
-            sortingComponent.outmostSortingGroup)
+        public AutoSortingComponent(SortingComponent sortingComponent) : base(sortingComponent.OriginSpriteRenderer,
+            sortingComponent.OutmostSortingGroup)
         {
-            sortingOrder = CurrentSortingOrder;
+            sortingOrder = OriginSortingOrder;
         }
 
         public void AddOverlappingSortingComponent(SortingComponent sortingComponent)

@@ -137,34 +137,34 @@ namespace SpriteSortingPlugin.Preview
 
             foreach (var overlappingItem in overlappingItems.Items)
             {
-                if (overlappingItem.originSortingGroup == null)
+                if (overlappingItem.OutmostSortingGroup == null)
                 {
-                    var previewSpriteRenderer = previewRoot.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
+                    var previewSpriteRenderer = previewRoot.AddSpriteRenderer(overlappingItem.OriginSpriteRenderer);
                     overlappingItem.previewSpriteRenderer = previewSpriteRenderer;
                     overlappingItem.UpdatePreviewSortingLayer();
                     overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
                     continue;
                 }
 
-                var spritePreviewItem = GetAppropriatePreviewItem(overlappingItem.originSpriteRenderer, previewRoot);
-                spritePreviewItem.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
+                var spritePreviewItem = GetAppropriatePreviewItem(overlappingItem.OriginSpriteRenderer, previewRoot);
+                spritePreviewItem.AddSpriteRenderer(overlappingItem.OriginSpriteRenderer);
 
-                previewRoot.TryGetSortingGroup(overlappingItem.originSortingGroup,
+                previewRoot.TryGetSortingGroup(overlappingItem.OutmostSortingGroup,
                     out overlappingItem.previewSortingGroup);
                 overlappingItem.UpdatePreviewSortingLayer();
                 overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
 
-                var childSpriteRenderer = overlappingItem.originSortingGroup
+                var childSpriteRenderer = overlappingItem.OutmostSortingGroup
                     .GetComponentsInChildren<SpriteRenderer>();
 
                 foreach (var spriteRenderer in childSpriteRenderer)
                 {
-                    if (spriteRenderer == overlappingItem.originSpriteRenderer)
+                    if (spriteRenderer == overlappingItem.OriginSpriteRenderer)
                     {
                         continue;
                     }
 
-                    if (!overlappingItem.originSpriteRenderer.bounds.Intersects(spriteRenderer.bounds))
+                    if (!overlappingItem.OriginSpriteRenderer.bounds.Intersects(spriteRenderer.bounds))
                     {
                         continue;
                     }
@@ -302,7 +302,7 @@ namespace SpriteSortingPlugin.Preview
                 }
             }
 
-            Handles.Label(item.originSpriteRenderer.transform.position, text, sortingOrderStyle);
+            Handles.Label(item.OriginSpriteRenderer.transform.position, text, sortingOrderStyle);
 
             Handles.EndGUI();
         }
@@ -325,7 +325,7 @@ namespace SpriteSortingPlugin.Preview
 
                 if (hasSpriteDataItem && CanDrawOutlineType(spriteDataItem))
                 {
-                    DrawOutline(spriteDataItem, item.originSpriteRenderer.transform);
+                    DrawOutline(spriteDataItem, item.OriginSpriteRenderer.transform);
                 }
                 else
                 {
@@ -339,7 +339,7 @@ namespace SpriteSortingPlugin.Preview
 
             if (isDrawingSpriteRendererBounds)
             {
-                var bounds = item.originSpriteRenderer.bounds;
+                var bounds = item.OriginSpriteRenderer.bounds;
                 Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
             }
         }

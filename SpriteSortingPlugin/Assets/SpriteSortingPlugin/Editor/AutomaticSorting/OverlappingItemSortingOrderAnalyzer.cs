@@ -88,7 +88,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 {
                     var beginCheckIndex = correspondingIndex + 1;
                     containedComponent.sortingOrder =
-                        containedComponent.containedByAutoSortingComponent.CurrentSortingOrder + 1;
+                        containedComponent.containedByAutoSortingComponent.OriginSortingOrder + 1;
 
                     if (beginCheckIndex >= resultList.Count)
                     {
@@ -104,7 +104,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                     if (correspondingIndex == 0)
                     {
                         containedComponent.sortingOrder =
-                            containedComponent.containedByAutoSortingComponent.CurrentSortingOrder;
+                            containedComponent.containedByAutoSortingComponent.OriginSortingOrder;
                         InsertInResultListAndIncreaseSortingOrderAfterIndex(containedComponent, 0);
 
                         continue;
@@ -126,7 +126,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
             components.RemoveAt(0);
 
             resultList.Add(firstComponent);
-            firstComponent.sortingOrder = firstComponent.CurrentSortingOrder;
+            firstComponent.sortingOrder = firstComponent.OriginSortingOrder;
         }
 
         private void SortNotContainedComponents(List<AutoSortingComponent> notContainedComponents)
@@ -282,8 +282,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 autoSortingComponent.containedByAutoSortingComponent =
                     autoSortingComponents[correspondingAutoSortingComponentIndex];
 
-                Debug.LogFormat("containment found: {0} in {1} ", containedSortingComponent.spriteRenderer.name,
-                    autoSortingComponent.spriteRenderer.name);
+                Debug.LogFormat("containment found: {0} in {1} ", containedSortingComponent.OriginSpriteRenderer.name,
+                    autoSortingComponent.OriginSpriteRenderer.name);
             }
         }
 

@@ -31,8 +31,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             }
             else
             {
-                primaryColor = autoSortingComponent.spriteRenderer.color;
-                otherPrimaryColor = otherAutoSortingComponent.spriteRenderer.color;
+                primaryColor = autoSortingComponent.OriginSpriteRenderer.color;
+                otherPrimaryColor = otherAutoSortingComponent.OriginSpriteRenderer.color;
             }
 
             for (var i = 0; i < 3; i++)

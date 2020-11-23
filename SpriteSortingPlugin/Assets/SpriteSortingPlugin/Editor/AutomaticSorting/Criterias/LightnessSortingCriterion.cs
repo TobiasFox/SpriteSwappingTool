@@ -30,8 +30,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
                     lightnessAnalyzer = new LightnessAnalyzer();
                 }
 
-                blurriness = lightnessAnalyzer.Analyze(autoSortingComponent.spriteRenderer);
-                otherBlurriness = lightnessAnalyzer.Analyze(otherAutoSortingComponent.spriteRenderer);
+                blurriness = lightnessAnalyzer.Analyze(autoSortingComponent.OriginSpriteRenderer);
+                otherBlurriness = lightnessAnalyzer.Analyze(otherAutoSortingComponent.OriginSpriteRenderer);
             }
             else
             {
