@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.AutomaticSorting
 {
-    public class OverlappingItemSortingOrderAnalyzer
+    public class AutoSortingGenerator
     {
         private readonly List<SortingCriterion<SortingCriterionData>> sortingCriterias =
             new List<SortingCriterion<SortingCriterionData>>();

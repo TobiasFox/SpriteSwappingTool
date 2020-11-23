@@ -52,7 +52,7 @@ namespace SpriteSortingPlugin
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private SpriteDetectionData spriteDetectionData;
 
-        private OverlappingItemSortingOrderAnalyzer overlappingItemSortingOrderAnalyzer;
+        private AutoSortingGenerator autoSortingGenerator;
         private List<string> autoSortingResultNames;
         private ReorderableList autoSortingResultList;
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
@@ -867,7 +867,7 @@ namespace SpriteSortingPlugin
                 CreateAndInitOverlappingItemSortingOrderAnalyzer();
                 FillAutoSortingCalculationData();
 
-                var resultList = overlappingItemSortingOrderAnalyzer.GenerateAutomaticSortingOrder(
+                var resultList = autoSortingGenerator.GenerateAutomaticSortingOrder(
                     overlappingSpriteDetectionResult.baseItem, sortingComponents, autoSortingCalculationData);
 
                 if (isReplacingOverlappingItemsWithAutoSortedResult)
@@ -922,7 +922,7 @@ namespace SpriteSortingPlugin
 
         private void CreateAndInitOverlappingItemSortingOrderAnalyzer()
         {
-            overlappingItemSortingOrderAnalyzer = new OverlappingItemSortingOrderAnalyzer();
+            autoSortingGenerator = new AutoSortingGenerator();
 
             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
             {
@@ -934,9 +934,9 @@ namespace SpriteSortingPlugin
                 if (sortingCriteriaComponent.sortingCriterionData is ContainmentSortingCriterionData
                     containmentSortingCriterionData)
                 {
-                    overlappingItemSortingOrderAnalyzer.IsAnalyzingContainment =
+                    autoSortingGenerator.IsAnalyzingContainment =
                         containmentSortingCriterionData.isActive;
-                    overlappingItemSortingOrderAnalyzer.IsContainedSpriteInForeground =
+                    autoSortingGenerator.IsContainedSpriteInForeground =
                         containmentSortingCriterionData.isSortingInForeground;
 
                     continue;
@@ -947,7 +947,7 @@ namespace SpriteSortingPlugin
                     continue;
                 }
 
-                overlappingItemSortingOrderAnalyzer.AddSortingCriteria(sortingCriteriaComponent.sortingCriterion);
+                autoSortingGenerator.AddSortingCriteria(sortingCriteriaComponent.sortingCriterion);
             }
         }
 

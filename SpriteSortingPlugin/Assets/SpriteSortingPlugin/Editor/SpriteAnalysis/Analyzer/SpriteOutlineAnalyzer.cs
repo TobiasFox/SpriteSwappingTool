@@ -5,7 +5,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 {
     public class SpriteOutlineAnalyzer : ISpriteDataAnalyzer
     {
-        private SpriteSortingPlugin.SpriteOutlineAnalyzer outlineAnalyzer;
+        private SpriteAnalyzer.SpriteOutlineAnalyzer outlineAnalyzer;
         private OOBBGenerator oOBBGenerator;
 
         public void Analyse(ref SpriteDataItem spriteDataItem, Sprite sprite,
@@ -37,7 +37,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
         {
             if (outlineAnalyzer == null)
             {
-                outlineAnalyzer = new SpriteSortingPlugin.SpriteOutlineAnalyzer();
+                outlineAnalyzer = new SpriteAnalyzer.SpriteOutlineAnalyzer();
             }
 
             var points = outlineAnalyzer.Analyze(sprite);
