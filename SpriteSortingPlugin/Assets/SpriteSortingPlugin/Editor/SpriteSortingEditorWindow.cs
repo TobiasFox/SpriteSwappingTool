@@ -43,7 +43,6 @@ namespace SpriteSortingPlugin
         private ReordableOverlappingItemList reordableOverlappingItemList;
 
         private bool isAnalyzingWithChangedLayerFirst;
-        private GUIStyle centeredStyle;
 
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private SpriteDetectionData spriteDetectionData;
@@ -174,7 +173,7 @@ namespace SpriteSortingPlugin
             serializedObject.Update();
 
             isAnalyzedButtonDisabled = false;
-            GUILayout.Label("Sprite Sorting", centeredStyle, GUILayout.ExpandWidth(true));
+            GUILayout.Label("Sprite Sorting", Styling.CenteredStyle, GUILayout.ExpandWidth(true));
 
             EditorGUILayout.Space();
             DrawCameraOptions();
