@@ -18,7 +18,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
         private Vector2 origin;
         private Vector2 direction;
 
-        public List<Vector2> Analyze(Sprite sprite)
+        public Vector2[] Analyze(Sprite sprite)
         {
             var pointList = AnalyzeSpriteOutline(sprite);
 
@@ -31,7 +31,47 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             }
 
             pixels = null;
-            return pointList;
+            return pointList.ToArray();
+        }
+
+        public bool Simplify(Vector2[] points, float outlineTolerance, out Vector2[] simplifiedPoints)
+        {
+            var convertedV3Points = new Vector3[points.Length];
+            for (var i = 0; i < points.Length; i++)
+            {
+                convertedV3Points[i] = (Vector3) points[i];
+            }
+
+            var lineRendererGameObject = new GameObject("LineRendererHelper")
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            var lineRenderer = lineRendererGameObject.AddComponent<LineRenderer>();
+
+            lineRenderer.positionCount = convertedV3Points.Length;
+            lineRenderer.SetPositions(convertedV3Points);
+
+            lineRenderer.Simplify(outlineTolerance);
+
+            //validate min points
+            if (lineRenderer.positionCount < 4)
+            {
+                simplifiedPoints = null;
+                return false;
+            }
+
+            var positions = new Vector3[lineRenderer.positionCount];
+            lineRenderer.GetPositions(positions);
+
+            Object.DestroyImmediate(lineRendererGameObject);
+
+            simplifiedPoints = new Vector2[positions.Length];
+            for (var i = 0; i < positions.Length; i++)
+            {
+                simplifiedPoints[i] = (Vector2) positions[i];
+            }
+
+            return true;
         }
 
         private List<Vector2> AnalyzeSpriteOutline(Sprite sprite)

@@ -18,9 +18,6 @@ namespace SpriteSortingPlugin
     {
         private const string SortingLayerNameDefault = "Default";
 
-        private static Texture warnIcon;
-        private static bool isIconInitialized;
-
         private Vector2 scrollPosition = Vector2.zero;
 
         [SerializeField] private SpriteData spriteData;
@@ -47,7 +44,6 @@ namespace SpriteSortingPlugin
 
         private bool isAnalyzingWithChangedLayerFirst;
         private GUIStyle centeredStyle;
-        private GUIStyle helpBoxStyle;
 
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private SpriteDetectionData spriteDetectionData;
@@ -73,17 +69,9 @@ namespace SpriteSortingPlugin
             preview = new SpriteSortingEditorPreview();
             reordableOverlappingItemList = new ReordableOverlappingItemList();
             SortingLayerUtility.UpdateSortingLayerNames();
-            centeredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
-            helpBoxStyle = new GUIStyle("HelpBox");
 
             //TODO: remove
             // SelectDefaultSpriteAlphaData();
-
-            if (!isIconInitialized)
-            {
-                warnIcon = EditorGUIUtility.IconContent("console.warnicon.sml").image;
-                isIconInitialized = true;
-            }
 
             overlappingSpriteDetector = new OverlappingSpriteDetector();
 
@@ -326,7 +314,7 @@ namespace SpriteSortingPlugin
             var isUsingSpriteData = IsUsingSpriteData(out var errorMessage);
             using (new EditorGUI.DisabledScope(!isUsingSpriteData))
             {
-                using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
@@ -357,7 +345,7 @@ namespace SpriteSortingPlugin
                         EditorGUI.indentLevel++;
                         EditorGUILayout.LabelField(
                             new GUIContent("Please choose a Sprite Data Asset. It is used by " + errorMessage + ".",
-                                warnIcon));
+                                Styling.WarnIcon));
                         isAnalyzedButtonDisabled = true;
                         EditorGUI.indentLevel--;
                     }
@@ -386,7 +374,7 @@ namespace SpriteSortingPlugin
         private void DrawAutoSortingOptions()
         {
             GUILayout.Label("Automatic Sorting");
-            using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 isApplyingAutoSorting = EditorGUILayout.Toggle("use automatic sorting?", isApplyingAutoSorting);
 
@@ -551,7 +539,7 @@ namespace SpriteSortingPlugin
         private void DrawSortingOptions()
         {
             GUILayout.Label("Sorting Options");
-            using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 sortingType = (SortingType) EditorGUILayout.EnumPopup("Sorting Type", sortingType);
 
@@ -591,7 +579,7 @@ namespace SpriteSortingPlugin
                         {
                             EditorGUI.indentLevel++;
                             EditorGUILayout.LabelField(new GUIContent("Please choose a SpriteRenderer within the scene",
-                                warnIcon));
+                                Styling.WarnIcon));
                             isAnalyzedButtonDisabled = true;
                             EditorGUI.indentLevel--;
                         }
@@ -604,7 +592,7 @@ namespace SpriteSortingPlugin
         private void DrawCameraOptions()
         {
             GUILayout.Label("General Options");
-            using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 var projectTransparencySortMode = GraphicsSettings.transparencySortMode;
 
@@ -627,7 +615,7 @@ namespace SpriteSortingPlugin
                         if (cameraSerializedProp.objectReferenceValue == null)
                         {
                             EditorGUI.indentLevel++;
-                            EditorGUILayout.LabelField(new GUIContent("Please choose a camera", warnIcon));
+                            EditorGUILayout.LabelField(new GUIContent("Please choose a camera", Styling.WarnIcon));
                             isAnalyzedButtonDisabled = true;
                             EditorGUI.indentLevel--;
                         }

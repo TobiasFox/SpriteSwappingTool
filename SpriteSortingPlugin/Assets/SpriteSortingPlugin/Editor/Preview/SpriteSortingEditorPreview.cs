@@ -359,7 +359,7 @@ namespace SpriteSortingPlugin.Preview
                     break;
                 case OutlinePrecision.PixelPerfect:
                     var lastPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[0]);
-                    for (var i = 1; i < spriteDataItem.outlinePoints.Count; i++)
+                    for (var i = 1; i < spriteDataItem.outlinePoints.Length; i++)
                     {
                         var nextPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[i]);
                         Handles.DrawLine(lastPoint, nextPoint);

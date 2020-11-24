@@ -55,7 +55,7 @@ namespace SpriteSortingPlugin
             var polygonColliderToCheck = polyColliderGameObject1.AddComponent<PolygonCollider2D>();
             var guid1 = AssetDatabase.AssetPathToGUID(
                 AssetDatabase.GetAssetPath(spriteRenderer1.sprite.GetInstanceID()));
-            polygonColliderToCheck.points = spriteData.spriteDataDictionary[guid1].outlinePoints.ToArray();
+            polygonColliderToCheck.points = spriteData.spriteDataDictionary[guid1].outlinePoints;
 
 
             var polyColliderGameObject =
@@ -69,7 +69,7 @@ namespace SpriteSortingPlugin
                 polyColliderGameObject.AddComponent<PolygonCollider2D>();
             var guid2 = AssetDatabase.AssetPathToGUID(
                 AssetDatabase.GetAssetPath(spriteRenderer2.sprite.GetInstanceID()));
-            otherPolygonColliderToCheck.points = spriteData.spriteDataDictionary[guid2].outlinePoints.ToArray();
+            otherPolygonColliderToCheck.points = spriteData.spriteDataDictionary[guid2].outlinePoints;
 
 
             var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
@@ -135,7 +135,8 @@ namespace SpriteSortingPlugin
             for (int i = 0; i < polyColliderPoints.Length; i++)
             {
                 var point1 = polyCollider.transform.TransformPoint(polyColliderPoints[i]);
-                var point2 = polyCollider.transform.TransformPoint(polyColliderPoints[(i + 1) % polyColliderPoints.Length]);
+                var point2 =
+                    polyCollider.transform.TransformPoint(polyColliderPoints[(i + 1) % polyColliderPoints.Length]);
 
                 float mulA = point1.x * point2.y;
                 float mulB = point2.x * point1.y;

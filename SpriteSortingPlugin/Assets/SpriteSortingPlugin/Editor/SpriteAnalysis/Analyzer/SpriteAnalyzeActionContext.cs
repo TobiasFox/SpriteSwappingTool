@@ -25,13 +25,13 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
                 switch (spriteAnalyzerType)
                 {
                     case SpriteAnalyzerType.Outline:
-                        spriteDataAnalyzer = new SpriteOutlineAnalyzer();
+                        spriteDataAnalyzer = new SpriteOutlineAnalyzeAction();
                         break;
                     case SpriteAnalyzerType.Blurriness:
                         spriteDataAnalyzer = new SpriteBlurrinessAnalyzer();
                         break;
                     case SpriteAnalyzerType.Lightness:
-                        spriteDataAnalyzer = new SpriteBrightnessAnalyzer();
+                        spriteDataAnalyzer = new SpriteBrightnessAnalyzeAction();
                         break;
                     case SpriteAnalyzerType.PrimaryColor:
                         spriteDataAnalyzer = new SpritePrimaryColorAnalyzer();

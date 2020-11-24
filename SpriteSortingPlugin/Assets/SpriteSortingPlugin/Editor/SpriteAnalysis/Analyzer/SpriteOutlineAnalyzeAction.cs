@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 {
-    public class SpriteOutlineAnalyzer : ISpriteDataAnalyzer
+    public class SpriteOutlineAnalyzeAction : ISpriteDataAnalyzer
     {
         private SpriteAnalyzer.SpriteOutlineAnalyzer outlineAnalyzer;
         private OOBBGenerator oOBBGenerator;
@@ -33,7 +32,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
             }
         }
 
-        private List<Vector2> GenerateAlphaOutline(Sprite sprite)
+        private Vector2[] GenerateAlphaOutline(Sprite sprite)
         {
             if (outlineAnalyzer == null)
             {

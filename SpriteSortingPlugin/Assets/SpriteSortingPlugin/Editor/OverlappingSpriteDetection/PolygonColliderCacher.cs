@@ -75,7 +75,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
             polygonCollider.transform.SetPositionAndRotation(transform.position, transform.rotation);
             polygonCollider.transform.localScale = transform.lossyScale;
 
-            polygonCollider.points = spriteDataItem.outlinePoints.ToArray();
+            polygonCollider.points = spriteDataItem.outlinePoints;
         }
 
         public void DisableCachedCollider(string assetGuid, int polygonColliderInstanceId)

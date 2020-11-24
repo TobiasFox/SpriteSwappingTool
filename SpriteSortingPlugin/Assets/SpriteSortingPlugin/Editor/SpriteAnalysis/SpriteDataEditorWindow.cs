@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SpriteSortingPlugin.SpriteAnalysis.Analyzer;
+using SpriteSortingPlugin.SpriteAnalyzer;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEditorInternal;
@@ -14,9 +15,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private const float LineSpacing = 1.5f;
         private const float RightAreaOffset = 3f;
 
-        private static Texture moveIcon;
-        private static bool isIconInitialized;
-
         private SerializedObject serializedObject;
 
         [SerializeField] private SpriteData spriteData;
@@ -25,7 +23,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private string searchString = "";
         private bool hasLoadedSpriteDataAsset = true;
-        private bool isShowingOOBB = true;
         private Color outlineColor = Color.green;
 
         private List<SpriteDataItem> spriteDataList;
@@ -41,14 +38,17 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private SpriteDataAnalysisType[] spriteAnalyzerTypes;
 
         private SpriteDataItem selectedSpriteDataItem;
-        private GUIStyle centeredStyle;
-        private GUIStyle helpBoxStyle;
 
         private bool isDisplayingSpriteOutline = true;
         private bool isDisplayingSpriteDetails;
 
         private SpriteDataAnalyzerContext spriteDataAnalyzerContext;
         private SpriteAnalyzeInputData spriteAnalyzeInputData;
+
+        private SpriteOutlineAnalyzer spriteOutlineAnalyzer;
+        private float outlineTolerance = 0.5f;
+        private Dictionary<string, Vector2[]> originOutlines;
+        private SimplifiedOutlineToleranceErrorAppearance simplifiedOutlineToleranceErrorAppearance;
 
         [MenuItem("Window/Sprite Alpha Analysis %e")]
         public static void ShowWindow()
@@ -65,14 +65,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             //TODO: remove
             SelectDefaultSpriteAlphaData();
 
-            if (!isIconInitialized)
-            {
-                moveIcon = EditorGUIUtility.IconContent("MoveTool@2x").image;
-                isIconInitialized = true;
-            }
-
-            centeredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
-            helpBoxStyle = new GUIStyle("HelpBox");
             spriteAnalyzerTypes = (SpriteDataAnalysisType[]) Enum.GetValues(typeof(SpriteDataAnalysisType));
         }
 
@@ -88,6 +80,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             {
                 Debug.Log("auto selection of SpriteAlphaData went wrong");
             }
+
+            LoadSpriteDataList();
         }
 
         private void ResetSpriteList()
@@ -161,6 +155,12 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 }
 
                 DrawOutlineContent(rightAreaRect);
+
+                if (outlinePrecision == OutlinePrecision.PixelPerfect &&
+                    !originOutlines.ContainsKey(selectedSpriteDataItem.AssetGuid))
+                {
+                    originOutlines.Add(selectedSpriteDataItem.AssetGuid, selectedSpriteDataItem.outlinePoints);
+                }
             }
             else if (isDisplayingSpriteDetails)
             {
@@ -178,11 +178,11 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 using (var scrollScope = new EditorGUILayout.ScrollViewScope(leftBarScrollPosition))
                 {
                     leftBarScrollPosition = scrollScope.scrollPosition;
-                    using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                     {
-                        GUILayout.Label("Edit Sprite Data", centeredStyle, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("Edit Sprite Data", Styling.CenteredStyle, GUILayout.ExpandWidth(true));
 
-                        using (new EditorGUILayout.HorizontalScope(helpBoxStyle))
+                        using (new EditorGUILayout.HorizontalScope(Styling.HelpBoxStyle))
                         {
                             EditorGUI.BeginChangeCheck();
                             isDisplayingSpriteOutline =
@@ -215,7 +215,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
 
-                    GUILayout.Label("Sprites", centeredStyle, GUILayout.ExpandWidth(true));
+                    GUILayout.Label("Sprites", Styling.CenteredStyle, GUILayout.ExpandWidth(true));
                     EditorGUI.BeginChangeCheck();
                     searchString = searchField.OnGUI(searchString);
                     if (EditorGUI.EndChangeCheck())
@@ -240,7 +240,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         {
             using (new EditorGUILayout.HorizontalScope())
             {
-                using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
                     EditorGUIUtility.labelWidth = 110;
                     spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"), spriteData,
@@ -251,13 +251,12 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     {
                         Debug.Log("loaded sprite Alpha Data");
                         LoadSpriteDataList();
-                        hasLoadedSpriteDataAsset = true;
                     }
                 }
 
                 GUILayout.FlexibleSpace();
 
-                using (new EditorGUILayout.VerticalScope(helpBoxStyle))
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
@@ -284,8 +283,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         Debug.Log("analyze alpha");
 
                         AnalyzeSpriteAlphas();
-
-                        hasLoadedSpriteDataAsset = true;
                     }
                 }
             }
@@ -433,7 +430,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     DrawOOBB(rectWithAlphaBorders, rightAreaRect);
                     break;
                 case OutlinePrecision.PixelPerfect:
-                    DrawOutline(rectWithAlphaBorders);
+                    DrawOutline(rectWithAlphaBorders, rightAreaRect);
                     break;
             }
         }
@@ -445,7 +442,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 new Vector3(rectWithAlphaBorders.size.x - 1, rectWithAlphaBorders.size.y - 1));
         }
 
-        private void DrawOutline(Rect rectWithAlphaBorders)
+        private void DrawOutline(Rect rectWithAlphaBorders, Rect rightAreaRect)
         {
             if (!selectedSpriteDataItem.IsValidOutline())
             {
@@ -457,14 +454,134 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             var scale = new Vector2(scaleYFactor, -scaleXFactor);
 
             var lastPoint = selectedSpriteDataItem.outlinePoints[0] * scale + rectWithAlphaBorders.center;
-            for (var i = 1;
-                i < selectedSpriteDataItem.outlinePoints.Count;
-                i++)
+            for (var i = 1; i < selectedSpriteDataItem.outlinePoints.Length; i++)
             {
                 var nextPoint = selectedSpriteDataItem.outlinePoints[i] * scale + rectWithAlphaBorders.center;
                 Handles.DrawLine(lastPoint, nextPoint);
                 Handles.DrawLine(new Vector2(lastPoint.x + 1, lastPoint.y), new Vector2(nextPoint.x + 1, nextPoint.y));
                 lastPoint = nextPoint;
+            }
+
+            using (new GUILayout.AreaScope(new Rect(0, position.height - 122, rightAreaRect.width, 75)))
+            {
+                var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 75);
+                EditorGUI.DrawRect(alphaRectangleBorderRect, EditorBackgroundColors.TransparentBackgroundColor);
+
+                DrawOutlineBorderSettings();
+            }
+        }
+
+        private void DrawOutlineBorderSettings()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+                GUILayout.Label("Outline Options");
+                GUILayout.FlexibleSpace();
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+
+                if (GUILayout.Button("Re-Analyze", GUILayout.Width(90)))
+                {
+                    Undo.RegisterCompleteObjectUndo(spriteData, "reanalyzed outline");
+                    spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                    spriteAnalyzeInputData.outlineAnalysisType = OutlineAnalysisType.PixelPerfect;
+                    AnalyzeSprite(SpriteAnalyzerType.Outline);
+
+                    simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
+                }
+
+                if (GUILayout.Button("Reset (last loaded Outline)", GUILayout.Width(160)))
+                {
+                    Undo.RegisterCompleteObjectUndo(spriteData, "Reset to last loaded outline");
+                    var isContainingOutline =
+                        originOutlines.TryGetValue(selectedSpriteDataItem.AssetGuid, out var originOutline);
+                    if (isContainingOutline)
+                    {
+                        selectedSpriteDataItem.outlinePoints = originOutline;
+                        simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
+                    }
+                }
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUI.BeginChangeCheck();
+                outlineTolerance = EditorGUILayout.FloatField("Outline Tolerance", outlineTolerance);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    if (outlineTolerance < 0)
+                    {
+                        outlineTolerance = 0;
+                    }
+                }
+
+                if (GUILayout.Button("Simplify", GUILayout.Width(253)))
+                {
+                    Undo.RegisterCompleteObjectUndo(spriteData, "simplified outline");
+                    SimplifyOutline();
+                }
+            }
+
+            if (simplifiedOutlineToleranceErrorAppearance != SimplifiedOutlineToleranceErrorAppearance.Nothing)
+            {
+                EditorGUI.indentLevel++;
+                var outlineErrorContent = new GUIContent();
+
+                switch (simplifiedOutlineToleranceErrorAppearance)
+                {
+                    case SimplifiedOutlineToleranceErrorAppearance.NotValid:
+                        outlineErrorContent.image = Styling.WarnIcon;
+                        outlineErrorContent.text =
+                            "Simplified Outline was not valid, please lower the outline tolerance";
+                        break;
+                    case SimplifiedOutlineToleranceErrorAppearance.ReplacedByOOBB:
+                        outlineErrorContent.text =
+                            "Simplified Outline was not valid and replaced by current OOBB. Please lower the outline tolerance next time.";
+                        break;
+                }
+
+                GUILayout.Label(outlineErrorContent);
+                EditorGUI.indentLevel--;
+            }
+
+            GUILayout.FlexibleSpace();
+        }
+
+        private void SimplifyOutline()
+        {
+            if (spriteOutlineAnalyzer == null)
+            {
+                spriteOutlineAnalyzer = new SpriteOutlineAnalyzer();
+            }
+
+            var isSimplified = spriteOutlineAnalyzer.Simplify(selectedSpriteDataItem.outlinePoints,
+                outlineTolerance, out var simplifiedPoints);
+
+            if (isSimplified)
+            {
+                selectedSpriteDataItem.outlinePoints = simplifiedPoints;
+            }
+            else if (selectedSpriteDataItem.IsValidOOBB())
+            {
+                var colliderPoints = new Vector2[5];
+                var oobbLocalWorldPoints = selectedSpriteDataItem.objectOrientedBoundingBox.LocalWorldPoints;
+                colliderPoints[4] = new Vector2(oobbLocalWorldPoints[0].x, oobbLocalWorldPoints[0].y);
+
+                for (var i = 0; i < oobbLocalWorldPoints.Length; i++)
+                {
+                    var point = oobbLocalWorldPoints[i];
+                    colliderPoints[i] = new Vector2(point.x, point.y);
+                }
+
+                selectedSpriteDataItem.outlinePoints = colliderPoints;
+            }
+            else
+            {
+                simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.NotValid;
             }
         }
 
@@ -500,8 +617,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
             Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x - 1, scaledSize.y - 1));
 
+            using (new GUILayout.AreaScope(new Rect(0, position.height - 147, rightAreaRect.width, 100)))
             {
-                GUILayout.BeginArea(new Rect(0, position.height - 125, rightAreaRect.width, 100));
                 var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 125);
                 EditorGUI.DrawRect(alphaRectangleBorderRect, EditorBackgroundColors.TransparentBackgroundColor);
 
@@ -514,8 +631,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     Undo.RegisterCompleteObjectUndo(spriteData, "changed OOBB size");
                     selectedSpriteDataItem.objectOrientedBoundingBox.UpdateBoxSizeWithBorder();
                 }
-
-                GUILayout.EndArea();
             }
         }
 
@@ -575,9 +690,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     new Rect(rect.x, rect.y, intFieldLength, EditorGUIUtility.singleLineHeight),
                     alphaBorder.leftBorder, 0, halfSpriteWidth);
 
-                EditorGUI.LabelField(new Rect(rect.width / 2 - moveIcon.width,
-                    rect.y - (moveIcon.height / 2f) + EditorGUIUtility.singleLineHeight / 2f, moveIcon.width,
-                    EditorGUIUtility.singleLineHeight * 2), new GUIContent(moveIcon));
+                EditorGUI.LabelField(new Rect(rect.width / 2 - Styling.MoveIcon.width,
+                    rect.y - (Styling.MoveIcon.height / 2f) + EditorGUIUtility.singleLineHeight / 2f,
+                    Styling.MoveIcon.width,
+                    EditorGUIUtility.singleLineHeight * 2), new GUIContent(Styling.MoveIcon));
 
                 alphaBorder.rightBorder = EditorGUI.IntSlider(
                     new Rect(rect.x + 2 * intFieldLength, rect.y, intFieldLength,
@@ -612,7 +728,16 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 return;
             }
 
+            hasLoadedSpriteDataAsset = true;
+            simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
             FilterSpriteDataList();
+
+            if (originOutlines == null)
+            {
+                originOutlines = new Dictionary<string, Vector2[]>();
+            }
+
+            originOutlines.Clear();
         }
 
         private void AnalyzeSpriteAlphas()
@@ -639,6 +764,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             AssetDatabase.CreateAsset(spriteData, assetPathAndName);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+
+            simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
         }
 
         private SpriteAnalyzerType[] CreateSpriteAnalyzerTypeArray()
@@ -752,6 +879,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
             selectedSprite = sprite;
             selectedSpriteAspectRatio = (float) selectedSprite.texture.width / (float) selectedSprite.texture.height;
+
+            simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
         }
 
         private void OnDestroy()
@@ -761,5 +890,12 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             reorderableSpriteList.drawElementBackgroundCallback = null;
             reorderableSpriteList = null;
         }
+    }
+
+    internal enum SimplifiedOutlineToleranceErrorAppearance
+    {
+        Nothing,
+        ReplacedByOOBB,
+        NotValid
     }
 }
