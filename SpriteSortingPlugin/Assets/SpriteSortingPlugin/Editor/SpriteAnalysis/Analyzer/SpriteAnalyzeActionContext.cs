@@ -36,6 +36,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
                     case SpriteAnalyzerType.PrimaryColor:
                         spriteDataAnalyzer = new SpritePrimaryColorAnalyzer();
                         break;
+                    case SpriteAnalyzerType.AverageAlpha:
+                        spriteDataAnalyzer = new SpriteAverageAlphaAnalyzer();
+                        break;
                 }
 
                 spriteDataAnalyzers.Add(spriteAnalyzerType, spriteDataAnalyzer);

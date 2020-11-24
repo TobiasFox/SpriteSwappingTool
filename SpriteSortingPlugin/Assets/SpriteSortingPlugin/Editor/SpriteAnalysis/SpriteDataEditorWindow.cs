@@ -388,12 +388,32 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
+                    EditorGUI.BeginChangeCheck();
+                    var averageAlpha = hasSelectedDataItem
+                        ? selectedSpriteDataItem.spriteAnalysisData.averageAlpha
+                        : 0;
+                    averageAlpha = EditorGUILayout.FloatField("Average alpha", averageAlpha);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        averageAlpha = Mathf.Clamp01(averageAlpha);
+                        selectedSpriteDataItem.spriteAnalysisData.averageAlpha = averageAlpha;
+                    }
+
+                    if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                    {
+                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        AnalyzeSprite(SpriteAnalyzerType.AverageAlpha);
+                    }
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
                     EditorGUILayout.LabelField("", "");
                     if (GUILayout.Button("Analyze All", analyzeButtonWidth))
                     {
                         spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
                         AnalyzeSprite(SpriteAnalyzerType.Lightness, SpriteAnalyzerType.Blurriness,
-                            SpriteAnalyzerType.PrimaryColor);
+                            SpriteAnalyzerType.PrimaryColor, SpriteAnalyzerType.AverageAlpha);
                     }
                 }
             }
@@ -797,6 +817,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         break;
                     case SpriteDataAnalysisType.PrimaryColor:
                         type = SpriteAnalyzerType.PrimaryColor;
+                        break;
+                    case SpriteDataAnalysisType.AverageAlpha:
+                        type = SpriteAnalyzerType.AverageAlpha;
                         break;
                 }
 

@@ -5,6 +5,7 @@
         Outline,
         Blurriness,
         Lightness,
-        PrimaryColor
+        PrimaryColor,
+        AverageAlpha
     }
 }

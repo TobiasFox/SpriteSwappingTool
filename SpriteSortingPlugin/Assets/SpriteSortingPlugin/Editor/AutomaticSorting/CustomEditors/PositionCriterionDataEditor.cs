@@ -12,7 +12,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         protected override void OnInspectorGuiInternal()
         {
             PositionSortingCriterionData.isFurtherAwaySpriteInForeground = EditorGUILayout.ToggleLeft(
-                "is further away Sprite in foreground", PositionSortingCriterionData.isFurtherAwaySpriteInForeground);
+                "Is further away Sprite in foreground", PositionSortingCriterionData.isFurtherAwaySpriteInForeground);
         }
 
         public override string GetTitleName()

@@ -49,7 +49,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.criterionName = "Size";
-            sortingCriterionData.foregroundSortingName = "is large sprite in foreground";
+            sortingCriterionData.foregroundSortingName = "Is large sprite in foreground";
             sortingCriteriaComponent.sortingCriterion = new SizeSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -65,7 +65,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.criterionName = "Sprite Resolution";
-            sortingCriterionData.foregroundSortingName = "is sprite with higher pixel density in foreground";
+            sortingCriterionData.foregroundSortingName = "Is sprite with higher pixel density in foreground";
             sortingCriteriaComponent.sortingCriterion = new ResolutionSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -73,8 +73,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
         private static void CreateBlurrinessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.criterionName = "Sprite Blurriness";
-            sortingCriterionData.foregroundSortingName = "is more blurry sprite in foreground";
+            sortingCriterionData.criterionName = "Sprite Sharpness";
+            sortingCriterionData.foregroundSortingName = "Is sharper sprite in foreground";
             sortingCriteriaComponent.sortingCriterion = new BlurrinessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -92,10 +92,11 @@ namespace SpriteSortingPlugin.AutomaticSorting
             sortingCriteriaComponent.sortingCriterion = new LightnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
-        
+
         private static void CreateContainmentDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<ContainmentSortingCriterionData>();
+            sortingCriteriaComponent.sortingCriterion = new ContainmentSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
     }

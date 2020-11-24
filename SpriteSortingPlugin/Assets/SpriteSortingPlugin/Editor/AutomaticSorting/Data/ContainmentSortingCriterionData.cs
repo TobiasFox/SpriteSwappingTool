@@ -1,12 +1,23 @@
 ﻿namespace SpriteSortingPlugin.AutomaticSorting.Data
 {
-    public class ContainmentSortingCriterionData : DefaultSortingCriterionData
+    public class ContainmentSortingCriterionData : SortingCriterionData
     {
-        public ContainmentSortingCriterionData()
+        public bool isCheckingAlpha;
+        public float alphaThreshold = 0.2f;
+        public bool isSortingEnclosedSpriteInForeground;
+        public bool isUsingSpriteColor = true;
+        public bool isUsingSpriteRendererColor;
+
+        public override SortingCriterionData Copy()
         {
-            isSortingInForeground = true;
-            criterionName = "Containment";
-            foregroundSortingName = "is contained sprite in foreground";
+            var clone = CreateInstance<ContainmentSortingCriterionData>();
+            CopyDataTo(clone);
+            clone.isSortingEnclosedSpriteInForeground = isSortingEnclosedSpriteInForeground;
+            clone.isCheckingAlpha = isCheckingAlpha;
+            clone.isUsingSpriteColor = isUsingSpriteColor;
+            clone.isUsingSpriteRendererColor = isUsingSpriteRendererColor;
+            clone.alphaThreshold = alphaThreshold;
+            return clone;
         }
     }
 }

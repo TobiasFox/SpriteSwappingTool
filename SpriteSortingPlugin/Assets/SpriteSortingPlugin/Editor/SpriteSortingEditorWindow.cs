@@ -921,11 +921,7 @@ namespace SpriteSortingPlugin
                 if (sortingCriteriaComponent.sortingCriterionData is ContainmentSortingCriterionData
                     containmentSortingCriterionData)
                 {
-                    autoSortingGenerator.IsAnalyzingContainment =
-                        containmentSortingCriterionData.isActive;
-                    autoSortingGenerator.IsContainedSpriteInForeground =
-                        containmentSortingCriterionData.isSortingInForeground;
-
+                    autoSortingGenerator.SetContainmentCriteria(containmentSortingCriterionData, sortingCriteriaComponent.sortingCriterion);
                     continue;
                 }
 

@@ -7,13 +7,6 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
     [CustomEditor(typeof(LightnessSortingCriterionData))]
     public class LightnessCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
     {
-        private GUIStyle buttonStyle;
-
-        protected override void InternalInitialize()
-        {
-            buttonStyle = new GUIStyle("Button");
-        }
-
         private LightnessSortingCriterionData LightnessSortingCriterionData =>
             (LightnessSortingCriterionData) sortingCriterionData;
 
@@ -23,8 +16,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             {
                 EditorGUI.BeginChangeCheck();
                 LightnessSortingCriterionData.isUsingSpriteColor =
-                    GUILayout.Toggle(LightnessSortingCriterionData.isUsingSpriteColor, "use Color of Sprite",
-                        buttonStyle);
+                    GUILayout.Toggle(LightnessSortingCriterionData.isUsingSpriteColor, "Use Color of Sprite",
+                        Styling.ButtonStyle);
                 if (EditorGUI.EndChangeCheck())
                 {
                     LightnessSortingCriterionData.isUsingSpriteRendererColor =
@@ -34,7 +27,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 EditorGUI.BeginChangeCheck();
                 LightnessSortingCriterionData.isUsingSpriteRendererColor =
                     GUILayout.Toggle(LightnessSortingCriterionData.isUsingSpriteRendererColor,
-                        "use Color of SpriteRenderer", buttonStyle);
+                        "Use Color of SpriteRenderer", Styling.ButtonStyle);
                 if (EditorGUI.EndChangeCheck())
                 {
                     LightnessSortingCriterionData.isUsingSpriteColor =
@@ -43,7 +36,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             }
 
             LightnessSortingCriterionData.isLighterSpriteIsInForeground = EditorGUILayout.ToggleLeft(
-                "is lighter sprite in foreground", LightnessSortingCriterionData.isLighterSpriteIsInForeground);
+                "Is lighter sprite in foreground", LightnessSortingCriterionData.isLighterSpriteIsInForeground);
         }
 
         public override string GetTitleName()

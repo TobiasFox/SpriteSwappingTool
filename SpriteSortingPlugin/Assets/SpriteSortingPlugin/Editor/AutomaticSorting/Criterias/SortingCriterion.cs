@@ -21,11 +21,14 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
             this.autoSortingCalculationData = autoSortingCalculationData;
 
-            var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
-            spriteDataItemValidator =
-                spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.OriginSpriteRenderer);
-            otherSpriteDataItemValidator =
-                spriteDataItemValidatorCache.GetOrCreateValidator(otherAutoSortingComponent.OriginSpriteRenderer);
+            if (IsUsingSpriteData())
+            {
+                var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
+                spriteDataItemValidator =
+                    spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.OriginSpriteRenderer);
+                otherSpriteDataItemValidator =
+                    spriteDataItemValidatorCache.GetOrCreateValidator(otherAutoSortingComponent.OriginSpriteRenderer);
+            }
 
             var results = InternalSort(autoSortingComponent, otherAutoSortingComponent);
 

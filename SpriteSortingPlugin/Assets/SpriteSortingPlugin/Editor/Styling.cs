@@ -14,7 +14,8 @@ namespace SpriteSortingPlugin
 
         public static readonly GUIStyle HelpBoxStyle;
         public static readonly GUIStyle CenteredStyle;
-        
+        public static readonly GUIStyle ButtonStyle;
+
         public static readonly Color ListElementBackground1 = new Color(0.83f, 0.83f, 0.83f);
         public static readonly Color ListElementBackground2 = new Color(0.76f, 0.76f, 0.76f);
         public static readonly Color ListElementActiveColor = new Color(0.1f, 0.69f, 1f, 0.7f);
@@ -33,6 +34,7 @@ namespace SpriteSortingPlugin
             SortingGroupIcon = EditorGUIUtility.IconContent("BlendTree Icon").image;
 
             HelpBoxStyle = new GUIStyle("HelpBox");
+            ButtonStyle = new GUIStyle("Button");
             CenteredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
         }
     }

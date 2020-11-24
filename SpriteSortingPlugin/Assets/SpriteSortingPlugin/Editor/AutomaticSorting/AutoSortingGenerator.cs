@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SpriteSortingPlugin.AutomaticSorting.Criterias;
 using SpriteSortingPlugin.AutomaticSorting.Data;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
@@ -18,13 +17,19 @@ namespace SpriteSortingPlugin.AutomaticSorting
         private List<AutoSortingComponent> resultList;
         private List<SortingComponent> overlappingSortingComponents;
         private SortingComponent baseItem;
-
-        public bool IsAnalyzingContainment { get; set; }
-        public bool IsContainedSpriteInForeground { get; set; }
+        private ContainmentSortingCriterionData containmentSortingCriterionData;
+        private SortingCriterion<SortingCriterionData> containmentSortingCriterion;
 
         public void AddSortingCriteria(SortingCriterion<SortingCriterionData> sortingCriterion)
         {
             sortingCriterias.Add(sortingCriterion);
+        }
+
+        public void SetContainmentCriteria(ContainmentSortingCriterionData containmentSortingCriterionData,
+            SortingCriterion<SortingCriterionData> containmentSortingCriterion)
+        {
+            this.containmentSortingCriterionData = containmentSortingCriterionData;
+            this.containmentSortingCriterion = containmentSortingCriterion;
         }
 
         public List<AutoSortingComponent> GenerateAutomaticSortingOrder(SortingComponent baseItem,
@@ -47,7 +52,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
             var autoSortingComponents = InitSortingDataList();
 
-            if (IsAnalyzingContainment)
+            if (containmentSortingCriterionData != null && containmentSortingCriterionData.isActive)
             {
                 AnalyzeContainment(ref autoSortingComponents);
 
@@ -67,6 +72,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
             resultList.Reverse();
 
             //TODO consider baseItem
+            containmentSortingCriterionData = null;
+            containmentSortingCriterion = null;
             return resultList;
         }
 
@@ -76,19 +83,33 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
             foreach (var containedComponent in containedComponents)
             {
+                var containedByAutoSortingComponent = containedComponent.containedByAutoSortingComponent;
                 var correspondingIndex = GetCorrespondingAutoSortingComponentIndex(resultList,
-                    containedComponent.containedByAutoSortingComponent);
+                    containedByAutoSortingComponent);
                 if (correspondingIndex < 0)
                 {
                     Debug.LogWarning("should not happen, break for");
                     break;
                 }
 
-                if (IsContainedSpriteInForeground)
+                var sortInForeground = containmentSortingCriterionData.isSortingEnclosedSpriteInForeground;
+
+                if (!sortInForeground)
+                {
+                    var results = containmentSortingCriterion.Sort(containedByAutoSortingComponent, containedComponent,
+                        autoSortingCalculationData);
+
+                    if (results[1] > results[0])
+                    {
+                        sortInForeground = true;
+                    }
+                }
+
+                if (sortInForeground)
                 {
                     var beginCheckIndex = correspondingIndex + 1;
                     containedComponent.sortingOrder =
-                        containedComponent.containedByAutoSortingComponent.OriginSortingOrder + 1;
+                        containedByAutoSortingComponent.OriginSortingOrder + 1;
 
                     if (beginCheckIndex >= resultList.Count)
                     {
@@ -104,7 +125,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                     if (correspondingIndex == 0)
                     {
                         containedComponent.sortingOrder =
-                            containedComponent.containedByAutoSortingComponent.OriginSortingOrder;
+                            containedByAutoSortingComponent.OriginSortingOrder;
                         InsertInResultListAndIncreaseSortingOrderAfterIndex(containedComponent, 0);
 
                         continue;

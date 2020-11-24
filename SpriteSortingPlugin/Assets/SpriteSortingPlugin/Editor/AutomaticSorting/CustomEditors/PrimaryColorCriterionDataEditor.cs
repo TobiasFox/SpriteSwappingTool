@@ -9,15 +9,9 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
     {
         private static readonly string[] ChannelNames = new string[] {"Red", "Green", "Blue"};
         private static readonly int[] ChannelLabelWidth = new[] {42, 50, 42};
-        private static GUIStyle buttonStyle;
 
         private PrimaryColorSortingCriterionData PrimaryColorSortingCriterionData =>
             (PrimaryColorSortingCriterionData) sortingCriterionData;
-
-        protected override void InternalInitialize()
-        {
-            buttonStyle = new GUIStyle("Button");
-        }
 
         protected override void OnInspectorGuiInternal()
         {
@@ -25,8 +19,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             {
                 EditorGUI.BeginChangeCheck();
                 PrimaryColorSortingCriterionData.isUsingSpriteColor =
-                    GUILayout.Toggle(PrimaryColorSortingCriterionData.isUsingSpriteColor, "use Color of Sprite",
-                        buttonStyle);
+                    GUILayout.Toggle(PrimaryColorSortingCriterionData.isUsingSpriteColor, "Use Color of Sprite",
+                        Styling.ButtonStyle);
                 if (EditorGUI.EndChangeCheck())
                 {
                     PrimaryColorSortingCriterionData.isUsingSpriteRendererColor =
@@ -36,7 +30,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 EditorGUI.BeginChangeCheck();
                 PrimaryColorSortingCriterionData.isUsingSpriteRendererColor =
                     GUILayout.Toggle(PrimaryColorSortingCriterionData.isUsingSpriteRendererColor,
-                        "use Color of SpriteRenderer", buttonStyle);
+                        "use Color of SpriteRenderer", Styling.ButtonStyle);
                 if (EditorGUI.EndChangeCheck())
                 {
                     PrimaryColorSortingCriterionData.isUsingSpriteColor =
@@ -80,6 +74,19 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
             PrimaryColorSortingCriterionData.backgroundColor = EditorGUILayout.ColorField("Background Color",
                 PrimaryColorSortingCriterionData.backgroundColor);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("\u2191 Switch \u2193", GUILayout.Width(152)))
+                {
+                    var tempColour = PrimaryColorSortingCriterionData.backgroundColor;
+                    PrimaryColorSortingCriterionData.backgroundColor = PrimaryColorSortingCriterionData.foregroundColor;
+                    PrimaryColorSortingCriterionData.foregroundColor = tempColour;
+                }
+
+                GUILayout.FlexibleSpace();
+            }
+
             PrimaryColorSortingCriterionData.foregroundColor = EditorGUILayout.ColorField("Foreground Color",
                 PrimaryColorSortingCriterionData.foregroundColor);
         }

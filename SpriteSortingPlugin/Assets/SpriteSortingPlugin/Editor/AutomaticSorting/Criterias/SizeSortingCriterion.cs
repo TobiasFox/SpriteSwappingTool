@@ -7,7 +7,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
     public class SizeSortingCriterion : SortingCriterion<SortingCriterionData>
     {
-        private DefaultSortingCriterionData SizeSortingCriterionData => (DefaultSortingCriterionData) sortingCriterionData;
+        private DefaultSortingCriterionData SizeSortingCriterionData =>
+            (DefaultSortingCriterionData) sortingCriterionData;
 
         public SizeSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(sortingCriterionData)
         {
@@ -75,7 +76,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
         public override bool IsUsingSpriteData()
         {
-            return false;
+            return true;
         }
 
         private void DrawBoundingBox(Bounds enclosingBoundingBox)
@@ -119,7 +120,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
                     break;
                 case OutlinePrecision.PixelPerfect:
 
-                    var spriteDataItem = autoSortingCalculationData.spriteData.spriteDataDictionary[validator.AssetGuid];
+                    var spriteDataItem =
+                        autoSortingCalculationData.spriteData.spriteDataDictionary[validator.AssetGuid];
                     var polygonColliderCacher = PolygonColliderCacher.GetInstance();
                     var polygonCollider = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
                         validator.AssetGuid, spriteDataItem, otherSpriteRenderer.transform);
@@ -151,7 +153,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
                     break;
                 case OutlinePrecision.PixelPerfect:
-                    var spriteDataItem = autoSortingCalculationData.spriteData.spriteDataDictionary[validator.AssetGuid];
+                    var spriteDataItem =
+                        autoSortingCalculationData.spriteData.spriteDataDictionary[validator.AssetGuid];
 
                     returnValue = spriteDataItem.CalculatePolygonArea(spriteRenderer.transform);
                     break;

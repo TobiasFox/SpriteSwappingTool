@@ -9,5 +9,6 @@ namespace SpriteSortingPlugin
         public double blurriness;
         public float perceivedLightness;
         public Color primaryColor;
+        public float averageAlpha;
     }
 }
