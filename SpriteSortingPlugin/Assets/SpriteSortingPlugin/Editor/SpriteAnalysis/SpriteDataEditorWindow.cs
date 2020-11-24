@@ -465,7 +465,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             using (new GUILayout.AreaScope(new Rect(0, position.height - 122, rightAreaRect.width, 75)))
             {
                 var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 75);
-                EditorGUI.DrawRect(alphaRectangleBorderRect, EditorBackgroundColors.TransparentBackgroundColor);
+                EditorGUI.DrawRect(alphaRectangleBorderRect, Styling.TransparentBackgroundColor);
 
                 DrawOutlineBorderSettings();
             }
@@ -620,7 +620,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             using (new GUILayout.AreaScope(new Rect(0, position.height - 147, rightAreaRect.width, 100)))
             {
                 var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 125);
-                EditorGUI.DrawRect(alphaRectangleBorderRect, EditorBackgroundColors.TransparentBackgroundColor);
+                EditorGUI.DrawRect(alphaRectangleBorderRect, Styling.TransparentBackgroundColor);
 
                 EditorGUI.BeginChangeCheck();
 
@@ -843,19 +843,19 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             Color color;
             if (isActive)
             {
-                color = EditorBackgroundColors.ActiveColor;
+                color = Styling.ListElementActiveColor;
             }
 
             else if (isFocused)
             {
-                color = EditorBackgroundColors.FocussingColor;
+                color = Styling.ListElementFocussingColor;
             }
 
             else
             {
                 color = index % 2 == 0
-                    ? EditorBackgroundColors.BackgroundColor1
-                    : EditorBackgroundColors.BackgroundColor2;
+                    ? Styling.ListElementBackground1
+                    : Styling.ListElementBackground2;
             }
 
             EditorGUI.DrawRect(rect, color);

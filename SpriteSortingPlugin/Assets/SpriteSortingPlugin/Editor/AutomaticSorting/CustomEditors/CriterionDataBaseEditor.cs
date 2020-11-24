@@ -92,7 +92,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             // adjust rect, to draw it completely
             // headerRect.xMin = 0f;
             // headerRect.width += 4f;
-            EditorGUI.DrawRect(headerRect, EditorBackgroundColors.HeaderBackgroundLight);
+            EditorGUI.DrawRect(headerRect, Styling.SortingCriteriaHeaderBackgroundLightColor);
 
 
             using (new EditorGUI.DisabledScope(!sortingCriterionData.isActive))

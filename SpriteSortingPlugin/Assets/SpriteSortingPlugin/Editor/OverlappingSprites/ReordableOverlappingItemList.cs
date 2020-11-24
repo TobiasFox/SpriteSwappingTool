@@ -82,17 +82,17 @@ namespace SpriteSortingPlugin.OverlappingSprites
             Color color;
             if (isActive)
             {
-                color = EditorBackgroundColors.ActiveColor;
+                color = Styling.ListElementActiveColor;
             }
             else if (isFocused)
             {
-                color = EditorBackgroundColors.FocussingColor;
+                color = Styling.ListElementFocussingColor;
             }
             else
             {
                 color = index % 2 == 0
-                    ? EditorBackgroundColors.BackgroundColor1
-                    : EditorBackgroundColors.BackgroundColor2;
+                    ? Styling.ListElementBackground1
+                    : Styling.ListElementBackground2;
             }
 
             EditorGUI.DrawRect(rect, color);

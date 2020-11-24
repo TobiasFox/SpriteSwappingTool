@@ -392,7 +392,7 @@ namespace SpriteSortingPlugin
 
                 using (var headerScope = new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUI.DrawRect(headerScope.rect, EditorBackgroundColors.HeaderBackgroundLight);
+                    EditorGUI.DrawRect(headerScope.rect, Styling.SortingCriteriaHeaderBackgroundLightColor);
                     GUILayout.Label("Sorting Criteria");
 
                     GUILayout.FlexibleSpace();
@@ -403,7 +403,7 @@ namespace SpriteSortingPlugin
                     }
                 }
 
-                DrawSplitter(true);
+                DrawHorizontalLine(true);
 
                 for (var i = 0; i < sortingCriteriaComponents.Count; i++)
                 {
@@ -416,11 +416,11 @@ namespace SpriteSortingPlugin
                     sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
                     if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
                     {
-                        DrawSplitter();
+                        DrawHorizontalLine();
                     }
                 }
 
-                DrawSplitter(true);
+                DrawHorizontalLine(true);
                 var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -520,7 +520,7 @@ namespace SpriteSortingPlugin
             sortingCriteriaComponents[index] = sortingCriteriaComponent;
         }
 
-        private static void DrawSplitter(bool isBig = false)
+        private static void DrawHorizontalLine(bool isBig = false)
         {
             var rect = GUILayoutUtility.GetRect(1f, isBig ? 1.5f : 1f);
 
@@ -533,7 +533,7 @@ namespace SpriteSortingPlugin
                 return;
             }
 
-            EditorGUI.DrawRect(rect, EditorBackgroundColors.Splitter);
+            EditorGUI.DrawRect(rect, Styling.HorizontalLineColor);
         }
 
         private void DrawSortingOptions()
