@@ -18,8 +18,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
             var results = new int[2];
 
-            var spriteResolution = CalculateSpriteResolution(autoSortingComponent.OriginSpriteRenderer);
-            var otherSpriteResolution = CalculateSpriteResolution(otherAutoSortingComponent.OriginSpriteRenderer);
+            // var spriteResolution = CalculateCurrentSpriteResolution(autoSortingComponent.OriginSpriteRenderer);
+            // var otherSpriteResolution = CalculateCurrentSpriteResolution(otherAutoSortingComponent.OriginSpriteRenderer);
+            var spriteResolution = CalculatePixelResolution(autoSortingComponent.OriginSpriteRenderer);
+            var otherSpriteResolution = CalculatePixelResolution(otherAutoSortingComponent.OriginSpriteRenderer);
+            
             var hasAutoSortingComponentHigherResolution = spriteResolution >= otherSpriteResolution;
 
             if (DefaultSortingCriterionData.isSortingInForeground)
@@ -39,8 +42,15 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             return false;
         }
 
-        private float CalculateSpriteResolution(SpriteRenderer spriteRenderer)
+        private float CalculatePixelResolution(SpriteRenderer spriteRenderer)
         {
+            var spriteTexture = spriteRenderer.sprite.texture;
+            return spriteTexture.width * spriteTexture.height;
+        }
+
+        private float CalculateCurrentSpriteResolution(SpriteRenderer spriteRenderer)
+        {
+            //TODO only width x height in pixels?
             //rotate sprite to identity to use correct bounds
             var spriteRendererTransform = spriteRenderer.transform;
             var previousRotation = spriteRendererTransform.rotation;
