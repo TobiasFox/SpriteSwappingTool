@@ -7,6 +7,10 @@ namespace SpriteSortingPlugin
     {
         public static readonly Texture MoveIcon;
         public static readonly Texture WarnIcon;
+        public static readonly Texture RemoveIcon;
+        public static readonly Texture SpriteIcon;
+        public static readonly Texture BaseItemIcon;
+        public static readonly Texture SortingGroupIcon;
 
         public static readonly GUIStyle HelpBoxStyle;
         public static readonly GUIStyle CenteredStyle;
@@ -23,6 +27,10 @@ namespace SpriteSortingPlugin
         {
             MoveIcon = EditorGUIUtility.IconContent("MoveTool@2x").image;
             WarnIcon = EditorGUIUtility.IconContent("console.warnicon.sml").image;
+            RemoveIcon = EditorGUIUtility.IconContent("Toolbar Minus@2x").image;
+            SpriteIcon = EditorGUIUtility.IconContent("Sprite Icon").image;
+            BaseItemIcon = EditorGUIUtility.IconContent("PreMatCylinder@2x").image;
+            SortingGroupIcon = EditorGUIUtility.IconContent("BlendTree Icon").image;
 
             HelpBoxStyle = new GUIStyle("HelpBox");
             CenteredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};

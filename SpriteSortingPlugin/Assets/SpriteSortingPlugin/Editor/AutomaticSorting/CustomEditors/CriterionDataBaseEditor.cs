@@ -6,9 +6,6 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 {
     public abstract class CriterionDataBaseEditor<T> : Editor where T : SortingCriterionData
     {
-        private static Texture removeIcon;
-        private static bool isIconInitialized;
-
         protected T sortingCriterionData;
 
         private Rect headerRect;
@@ -17,12 +14,6 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         {
             this.sortingCriterionData = sortingCriterionData;
             InternalInitialize();
-
-            if (!isIconInitialized)
-            {
-                removeIcon = EditorGUIUtility.IconContent("Toolbar Minus@2x").image;
-                isIconInitialized = true;
-            }
         }
 
         protected virtual void InternalInitialize()
@@ -112,7 +103,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 EditorGUI.LabelField(labelRect, GetTitleName(), EditorStyles.boldLabel);
             }
 
-            if (GUI.Button(removeButtonRect, removeIcon))
+            if (GUI.Button(removeButtonRect, Styling.RemoveIcon))
             {
                 sortingCriterionData.isAddedToEditorList = false;
             }

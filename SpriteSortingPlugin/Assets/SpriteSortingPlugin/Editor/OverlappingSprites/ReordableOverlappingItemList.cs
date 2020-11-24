@@ -12,10 +12,6 @@ namespace SpriteSortingPlugin.OverlappingSprites
     {
         private const float LineSpacing = 1.5f;
         private const int SelectButtonWidth = 55;
-        private static Texture spriteIcon;
-        private static Texture baseItemIcon;
-        private static Texture sortingGroupIcon;
-        private static bool isInitializedIcons;
 
         private ReorderableList reordableSpriteSortingList;
         private int lastFocussedIndex = -1;
@@ -27,14 +23,6 @@ namespace SpriteSortingPlugin.OverlappingSprites
         {
             this.overlappingItems = overlappingItems;
             this.preview = preview;
-
-            if (!isInitializedIcons)
-            {
-                spriteIcon = EditorGUIUtility.IconContent("Sprite Icon").image;
-                baseItemIcon = EditorGUIUtility.IconContent("PreMatCylinder@2x").image;
-                sortingGroupIcon = EditorGUIUtility.IconContent("BlendTree Icon").image;
-                isInitializedIcons = true;
-            }
 
             reordableSpriteSortingList = new ReorderableList(overlappingItems.Items,
                 typeof(OverlappingItem), true, true, false, false)
@@ -134,7 +122,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
             if (element.IsBaseItem)
             {
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 80, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("Base Item", baseItemIcon));
+                    new GUIContent("Base Item", Styling.BaseItemIcon));
                 startX += 80 + 5;
             }
 
@@ -143,7 +131,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 lastElementRectWidth = rect.width;
             }
 
-            var guiContent = new GUIContent("\"" + element.OriginSpriteRenderer.name + "\"", spriteIcon);
+            var guiContent = new GUIContent("\"" + element.OriginSpriteRenderer.name + "\"", Styling.SpriteIcon);
             EditorGUI.LabelField(
                 new Rect(startX, rect.y, lastElementRectWidth - SelectButtonWidth - 90,
                     EditorGUIUtility.singleLineHeight),
@@ -162,7 +150,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
 
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 160, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("in outmost Sorting Group", sortingGroupIcon));
+                    new GUIContent("in outmost Sorting Group", Styling.SortingGroupIcon));
 
                 EditorGUI.LabelField(
                     new Rect(rect.x + 160 + 2.5f, rect.y, 120, EditorGUIUtility.singleLineHeight),
