@@ -445,6 +445,7 @@ namespace SpriteSortingPlugin
                             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
                             {
                                 sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
+                                sortingCriteriaComponent.sortingCriterionData.isActive = true;
                             }
                         }
                     }
@@ -457,6 +458,7 @@ namespace SpriteSortingPlugin
                             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
                             {
                                 sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = false;
+                                sortingCriteriaComponent.sortingCriterionData.isActive = false;
                             }
                         }
                     }
@@ -921,7 +923,8 @@ namespace SpriteSortingPlugin
                 if (sortingCriteriaComponent.sortingCriterionData is ContainmentSortingCriterionData
                     containmentSortingCriterionData)
                 {
-                    autoSortingGenerator.SetContainmentCriteria(containmentSortingCriterionData, sortingCriteriaComponent.sortingCriterion);
+                    autoSortingGenerator.SetContainmentCriteria(containmentSortingCriterionData,
+                        sortingCriteriaComponent.sortingCriterion);
                     continue;
                 }
 
