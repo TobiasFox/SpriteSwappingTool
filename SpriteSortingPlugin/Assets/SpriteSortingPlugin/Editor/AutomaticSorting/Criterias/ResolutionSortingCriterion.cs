@@ -13,28 +13,24 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override int[] InternalSort(AutoSortingComponent autoSortingComponent,
+        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var results = new int[2];
-
             // var spriteResolution = CalculateCurrentSpriteResolution(autoSortingComponent.OriginSpriteRenderer);
             // var otherSpriteResolution = CalculateCurrentSpriteResolution(otherAutoSortingComponent.OriginSpriteRenderer);
             var spriteResolution = CalculatePixelResolution(autoSortingComponent.OriginSpriteRenderer);
             var otherSpriteResolution = CalculatePixelResolution(otherAutoSortingComponent.OriginSpriteRenderer);
-            
+
             var hasAutoSortingComponentHigherResolution = spriteResolution >= otherSpriteResolution;
 
             if (DefaultSortingCriterionData.isSortingInForeground)
             {
-                results[hasAutoSortingComponentHigherResolution ? 0 : 1]++;
+                sortingResults[hasAutoSortingComponentHigherResolution ? 0 : 1]++;
             }
             else
             {
-                results[!hasAutoSortingComponentHigherResolution ? 0 : 1]++;
+                sortingResults[!hasAutoSortingComponentHigherResolution ? 0 : 1]++;
             }
-
-            return results;
         }
 
         public override bool IsUsingSpriteData()

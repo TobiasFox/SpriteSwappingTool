@@ -12,14 +12,12 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override int[] InternalSort(AutoSortingComponent autoSortingComponent,
+        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var results = new int[2];
-
             if (autoSortingCalculationData.cameraProjectionType == CameraProjectionType.Orthographic)
             {
-                return results;
+                return;
             }
 
             var spriteRendererTransform = autoSortingComponent.OriginSpriteRenderer.transform;
@@ -33,14 +31,12 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             if (PositionSortingCriterionData.isFurtherAwaySpriteInForeground)
             {
-                results[isAutoSortingComponentCloser ? 1 : 0]++;
+                sortingResults[isAutoSortingComponentCloser ? 1 : 0]++;
             }
             else
             {
-                results[!isAutoSortingComponentCloser ? 1 : 0]++;
+                sortingResults[!isAutoSortingComponentCloser ? 1 : 0]++;
             }
-
-            return results;
         }
 
         public override bool IsUsingSpriteData()

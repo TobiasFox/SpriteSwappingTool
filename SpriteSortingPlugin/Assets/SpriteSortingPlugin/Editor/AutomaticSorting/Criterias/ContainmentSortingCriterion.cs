@@ -12,11 +12,9 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override int[] InternalSort(AutoSortingComponent autoSortingComponent,
+        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var results = new int[2];
-
             var alpha = 0f;
 
             if (ContainmentSortingCriterionData.isUsingSpriteRendererColor)
@@ -31,10 +29,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             if (alpha < ContainmentSortingCriterionData.alphaThreshold)
             {
-                results[1]++;
+                sortingResults[1]++;
             }
-
-            return results;
         }
 
         public override bool IsUsingSpriteData()

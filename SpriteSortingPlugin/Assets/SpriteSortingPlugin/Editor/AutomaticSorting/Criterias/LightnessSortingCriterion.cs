@@ -15,11 +15,9 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override int[] InternalSort(AutoSortingComponent autoSortingComponent,
+        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var results = new int[2];
-
             var blurriness = 0d;
             var otherBlurriness = 0d;
 
@@ -49,14 +47,12 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             if (LightnessSortingCriterionData.isLighterSpriteIsInForeground)
             {
-                results[isAutoSortingComponentIsLighter ? 0 : 1]++;
+                sortingResults[isAutoSortingComponentIsLighter ? 0 : 1]++;
             }
             else
             {
-                results[!isAutoSortingComponentIsLighter ? 0 : 1]++;
+                sortingResults[!isAutoSortingComponentIsLighter ? 0 : 1]++;
             }
-
-            return results;
         }
 
         public override bool IsUsingSpriteData()

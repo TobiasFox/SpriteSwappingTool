@@ -12,11 +12,9 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override int[] InternalSort(AutoSortingComponent autoSortingComponent,
+        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var results = new int[2];
-
             var blurriness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
                 .spriteAnalysisData.blurriness;
@@ -30,14 +28,12 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             if (DefaultSortingCriterionData.isSortingInForeground)
             {
-                results[isAutoSortingComponentIsMoreBlurry ? 0 : 1]++;
+                sortingResults[isAutoSortingComponentIsMoreBlurry ? 0 : 1]++;
             }
             else
             {
-                results[!isAutoSortingComponentIsMoreBlurry ? 0 : 1]++;
+                sortingResults[!isAutoSortingComponentIsMoreBlurry ? 0 : 1]++;
             }
-
-            return results;
         }
 
         public override bool IsUsingSpriteData()

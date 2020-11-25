@@ -13,11 +13,9 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override int[] InternalSort(AutoSortingComponent autoSortingComponent,
+        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var results = new int[2];
-
             Color primaryColor;
             Color otherPrimaryColor;
 
@@ -41,15 +39,13 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
                 if (isChannelInForeground)
                 {
-                    results[0]++;
+                    sortingResults[0]++;
                 }
                 else
                 {
-                    results[1]++;
+                    sortingResults[1]++;
                 }
             }
-
-            return results;
         }
 
         public override bool IsUsingSpriteData()

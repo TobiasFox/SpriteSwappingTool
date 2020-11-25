@@ -10,6 +10,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         protected SpriteDataItemValidator spriteDataItemValidator;
         protected SpriteDataItemValidator otherSpriteDataItemValidator;
         protected AutoSortingCalculationData autoSortingCalculationData;
+        protected int[] sortingResults;
 
         protected SortingCriterion(T sortingCriterionData)
         {
@@ -30,19 +31,21 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
                     spriteDataItemValidatorCache.GetOrCreateValidator(otherAutoSortingComponent.OriginSpriteRenderer);
             }
 
-            var results = InternalSort(autoSortingComponent, otherAutoSortingComponent);
+            sortingResults = new int[2];
 
-            for (int i = 0; i < results.Length; i++)
+            InternalSort(autoSortingComponent, otherAutoSortingComponent);
+
+            for (int i = 0; i < sortingResults.Length; i++)
             {
-                results[i] *= sortingCriterionData.priority;
+                sortingResults[i] *= sortingCriterionData.priority;
             }
 
-            Debug.Log(GetType().Name + " sorted: [" + results[0] + "," + results[1] + "]");
+            Debug.Log(GetType().Name + " sorted: [" + sortingResults[0] + "," + sortingResults[1] + "]");
 
-            return results;
+            return sortingResults;
         }
 
-        protected abstract int[] InternalSort(AutoSortingComponent autoSortingComponent,
+        protected abstract void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent);
 
         public abstract bool IsUsingSpriteData();
