@@ -13,7 +13,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         protected override void OnInspectorGuiInternal()
         {
             ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground = EditorGUILayout.ToggleLeft(
-                "Is enclosed Sprite in foreground",
+                "Is contained Sprite in foreground",
                 ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground);
 
             using (new EditorGUI.DisabledScope(ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground))
@@ -23,25 +23,6 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
                 using (new EditorGUI.DisabledScope(!ContainmentSortingCriterionData.isCheckingAlpha))
                 {
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        EditorGUI.BeginChangeCheck();
-                        GUILayout.Toggle(!ContainmentSortingCriterionData.isUsingSpriteRendererColor,
-                            "Use Color of Sprite Only", Styling.ButtonStyle);
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            ContainmentSortingCriterionData.isUsingSpriteRendererColor = false;
-                        }
-
-                        EditorGUI.BeginChangeCheck();
-                        GUILayout.Toggle(ContainmentSortingCriterionData.isUsingSpriteRendererColor,
-                            "Combine Colors of Sprite and SpriteRenderer", Styling.ButtonStyle);
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            ContainmentSortingCriterionData.isUsingSpriteRendererColor = true;
-                        }
-                    }
-
                     EditorGUI.BeginChangeCheck();
                     ContainmentSortingCriterionData.alphaThreshold =
                         EditorGUILayout.FloatField("Alpha threshold", ContainmentSortingCriterionData.alphaThreshold);

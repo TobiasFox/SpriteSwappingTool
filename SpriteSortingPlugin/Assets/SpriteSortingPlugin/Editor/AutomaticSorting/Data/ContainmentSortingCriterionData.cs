@@ -4,8 +4,7 @@
     {
         public bool isCheckingAlpha;
         public float alphaThreshold = 0.2f;
-        public bool isSortingEnclosedSpriteInForeground;
-        public bool isUsingSpriteRendererColor;
+        public bool isSortingEnclosedSpriteInForeground = true;
 
         public override SortingCriterionData Copy()
         {
@@ -13,7 +12,6 @@
             CopyDataTo(clone);
             clone.isSortingEnclosedSpriteInForeground = isSortingEnclosedSpriteInForeground;
             clone.isCheckingAlpha = isCheckingAlpha;
-            clone.isUsingSpriteRendererColor = isUsingSpriteRendererColor;
             clone.alphaThreshold = alphaThreshold;
             return clone;
         }

@@ -15,25 +15,6 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
         protected override void OnInspectorGuiInternal()
         {
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUI.BeginChangeCheck();
-                GUILayout.Toggle(!PrimaryColorSortingCriterionData.isUsingSpriteRendererColor,
-                    "Use Color of Sprite Only", Styling.ButtonStyle);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    PrimaryColorSortingCriterionData.isUsingSpriteRendererColor = false;
-                }
-
-                EditorGUI.BeginChangeCheck();
-                GUILayout.Toggle(PrimaryColorSortingCriterionData.isUsingSpriteRendererColor,
-                    "Combine Colors of Sprite and SpriteRenderer", Styling.ButtonStyle);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    PrimaryColorSortingCriterionData.isUsingSpriteRendererColor = true;
-                }
-            }
-
             EditorGUILayout.Space();
 
             using (new EditorGUILayout.HorizontalScope())
@@ -43,25 +24,25 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 if (GUILayout.Button("All",
                     GUILayout.Width(25f), GUILayout.ExpandWidth(false)))
                 {
-                    for (var i = 0; i < PrimaryColorSortingCriterionData.isChannelActive.Length; i++)
+                    for (var i = 0; i < PrimaryColorSortingCriterionData.activeChannels.Length; i++)
                     {
-                        PrimaryColorSortingCriterionData.isChannelActive[i] = true;
+                        PrimaryColorSortingCriterionData.activeChannels[i] = true;
                     }
                 }
 
                 if (GUILayout.Button("None", GUILayout.Width(40f), GUILayout.ExpandWidth(false)))
                 {
-                    for (var i = 0; i < PrimaryColorSortingCriterionData.isChannelActive.Length; i++)
+                    for (var i = 0; i < PrimaryColorSortingCriterionData.activeChannels.Length; i++)
                     {
-                        PrimaryColorSortingCriterionData.isChannelActive[i] = false;
+                        PrimaryColorSortingCriterionData.activeChannels[i] = false;
                     }
                 }
 
-                for (var i = 0; i < PrimaryColorSortingCriterionData.isChannelActive.Length; i++)
+                for (var i = 0; i < PrimaryColorSortingCriterionData.activeChannels.Length; i++)
                 {
                     EditorGUIUtility.labelWidth = ChannelLabelWidth[i];
-                    PrimaryColorSortingCriterionData.isChannelActive[i] = EditorGUILayout.Toggle(ChannelNames[i],
-                        PrimaryColorSortingCriterionData.isChannelActive[i]);
+                    PrimaryColorSortingCriterionData.activeChannels[i] = EditorGUILayout.Toggle(ChannelNames[i],
+                        PrimaryColorSortingCriterionData.activeChannels[i]);
                 }
 
                 EditorGUIUtility.labelWidth = 0;

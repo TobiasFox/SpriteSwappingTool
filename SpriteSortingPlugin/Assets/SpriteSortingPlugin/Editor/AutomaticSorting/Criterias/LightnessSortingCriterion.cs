@@ -5,12 +5,12 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
     public class LightnessSortingCriterion : SortingCriterion<SortingCriterionData>
     {
-        private LightnessSortingCriterionData LightnessSortingCriterionData =>
-            (LightnessSortingCriterionData) sortingCriterionData;
+        private DefaultSortingCriterionData DefaultSortingCriterionData =>
+            (DefaultSortingCriterionData) sortingCriterionData;
 
         private LightnessAnalyzer lightnessAnalyzer;
 
-        public LightnessSortingCriterion(LightnessSortingCriterionData sortingCriterionData) : base(
+        public LightnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
         }
@@ -26,22 +26,20 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
                 .spriteAnalysisData.perceivedLightness;
 
-            if (LightnessSortingCriterionData.isUsingSpriteRendererColor)
+            if (lightnessAnalyzer == null)
             {
-                if (lightnessAnalyzer == null)
-                {
-                    lightnessAnalyzer = new LightnessAnalyzer();
-                }
-
-                //TODO calc lightness with spriterenderer colour
-                perceivedLightness = lightnessAnalyzer.Analyze(autoSortingComponent.OriginSpriteRenderer);
-                otherPerceivedLightness = lightnessAnalyzer.Analyze(otherAutoSortingComponent.OriginSpriteRenderer);
+                lightnessAnalyzer = new LightnessAnalyzer();
             }
 
+            perceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(perceivedLightness,
+                autoSortingComponent.OriginSpriteRenderer.color);
+
+            otherPerceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(otherPerceivedLightness,
+                otherAutoSortingComponent.OriginSpriteRenderer.color);
 
             var isAutoSortingComponentIsLighter = perceivedLightness >= otherPerceivedLightness;
 
-            if (LightnessSortingCriterionData.isLighterSpriteIsInForeground)
+            if (DefaultSortingCriterionData.isSortingInForeground)
             {
                 sortingResults[isAutoSortingComponentIsLighter ? 0 : 1]++;
             }

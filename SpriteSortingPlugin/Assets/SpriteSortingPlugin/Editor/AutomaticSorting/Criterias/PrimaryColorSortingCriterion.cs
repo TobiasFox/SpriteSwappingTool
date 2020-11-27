@@ -22,14 +22,16 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var otherPrimaryColor = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
 
-            if (PrimaryColorSortingCriterionData.isUsingSpriteRendererColor)
-            {
-                primaryColor *= autoSortingComponent.OriginSpriteRenderer.color;
-                otherPrimaryColor *= otherAutoSortingComponent.OriginSpriteRenderer.color;
-            }
+            primaryColor *= autoSortingComponent.OriginSpriteRenderer.color;
+            otherPrimaryColor *= otherAutoSortingComponent.OriginSpriteRenderer.color;
 
-            for (var i = 0; i < 3; i++)
+            for (var i = 0; i < PrimaryColorSortingCriterionData.activeChannels.Length; i++)
             {
+                if (!PrimaryColorSortingCriterionData.activeChannels[i])
+                {
+                    continue;
+                }
+
                 var isChannelInForeground = IsInForeground(primaryColor, otherPrimaryColor, i);
 
                 if (isChannelInForeground)

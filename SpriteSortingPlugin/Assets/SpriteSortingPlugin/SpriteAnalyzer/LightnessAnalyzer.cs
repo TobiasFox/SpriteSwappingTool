@@ -8,6 +8,8 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
      */
     public class LightnessAnalyzer
     {
+        private const float UnitScaleFactor = 100f;
+
         public float Analyze(Sprite sprite)
         {
             if (sprite == null)
@@ -52,6 +54,21 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             return CalculatePerceivedLightness(spriteRenderer.color);
         }
 
+        public float ApplySpriteRendererColor(float lightness, Color spriteRendererColor)
+        {
+            if (spriteRendererColor.r.Equals(1) && spriteRendererColor.g.Equals(1) && spriteRendererColor.b.Equals(1))
+            {
+                return lightness;
+            }
+
+            var spriteRendererLightness = CalculatePerceivedLightness(spriteRendererColor);
+
+            var combinedLightness = lightness / UnitScaleFactor;
+            combinedLightness *= spriteRendererLightness / UnitScaleFactor;
+
+            return combinedLightness * UnitScaleFactor;
+        }
+
         public float Analyze2(SpriteRenderer spriteRenderer)
         {
             var color = spriteRenderer.color;
@@ -62,7 +79,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             return Mathf.Sqrt(redColor + blueColor + greenColor);
         }
 
-        private static float CalculatePerceivedLightness(Color color)
+        private float CalculatePerceivedLightness(Color color)
         {
             var luminance = CalculateLuminance(color);
             var convertedLuminance = LuminanceToCIELAB(luminance);

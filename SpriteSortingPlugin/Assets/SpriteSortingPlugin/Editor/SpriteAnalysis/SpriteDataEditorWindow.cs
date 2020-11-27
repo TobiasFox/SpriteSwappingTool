@@ -762,7 +762,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void AnalyzeSpriteAlphas()
         {
-            if (outlineAnalysisType == OutlineAnalysisType.Nothing)
+            if (outlineAnalysisType == OutlineAnalysisType.Nothing &&
+                spriteDataAnalysisType == SpriteDataAnalysisType.Nothing)
             {
                 return;
             }

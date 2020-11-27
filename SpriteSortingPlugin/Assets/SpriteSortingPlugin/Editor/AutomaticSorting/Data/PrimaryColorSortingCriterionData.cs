@@ -4,8 +4,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Data
 {
     public class PrimaryColorSortingCriterionData : SortingCriterionData
     {
-        public bool isUsingSpriteRendererColor;
-        public bool[] isChannelActive = new bool[] {true, true, true};
+        public bool[] activeChannels = new bool[] {true, true, true};
         public Color backgroundColor;
         public Color foregroundColor;
 
@@ -13,11 +12,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.Data
         {
             var clone = CreateInstance<PrimaryColorSortingCriterionData>();
             CopyDataTo(clone);
-            clone.isUsingSpriteRendererColor = isUsingSpriteRendererColor;
-            clone.isChannelActive = new bool[3];
-            for (int i = 0; i < isChannelActive.Length; i++)
+            clone.activeChannels = new bool[3];
+            for (var i = 0; i < activeChannels.Length; i++)
             {
-                clone.isChannelActive[i] = isChannelActive[i];
+                clone.activeChannels[i] = activeChannels[i];
             }
 
             clone.backgroundColor =

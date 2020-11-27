@@ -27,7 +27,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                     CreateSharpnessDataAndCriterion(ref sortingCriteriaComponent);
                     break;
                 case SortingCriterionType.Brightness:
-                    CreateBrightnessDataAndCriterion(ref sortingCriteriaComponent);
+                    CreateLightnessDataAndCriterion(ref sortingCriteriaComponent);
                     break;
                 case SortingCriterionType.PrimaryColor:
                     CreatePrimaryColorDataAndCriterion(ref sortingCriteriaComponent);
@@ -86,9 +86,11 @@ namespace SpriteSortingPlugin.AutomaticSorting
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
-        private static void CreateBrightnessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
+        private static void CreateLightnessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<LightnessSortingCriterionData>();
+            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
+            sortingCriterionData.criterionName = "Perceived Lightness";
+            sortingCriterionData.foregroundSortingName = "Is lighter sprite in foreground";
             sortingCriteriaComponent.sortingCriterion = new LightnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
