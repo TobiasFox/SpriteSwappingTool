@@ -13,7 +13,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         protected override void OnInspectorGuiInternal()
         {
             ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground = EditorGUILayout.ToggleLeft(
-                "Is enclosed Sprite in foreground", ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground);
+                "Is enclosed Sprite in foreground",
+                ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground);
 
             using (new EditorGUI.DisabledScope(ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground))
             {
@@ -25,23 +26,19 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         EditorGUI.BeginChangeCheck();
-                        ContainmentSortingCriterionData.isUsingSpriteColor =
-                            GUILayout.Toggle(ContainmentSortingCriterionData.isUsingSpriteColor, "Use Color of Sprite",
-                                Styling.ButtonStyle);
+                        GUILayout.Toggle(!ContainmentSortingCriterionData.isUsingSpriteRendererColor,
+                            "Use Color of Sprite Only", Styling.ButtonStyle);
                         if (EditorGUI.EndChangeCheck())
                         {
-                            ContainmentSortingCriterionData.isUsingSpriteRendererColor =
-                                !ContainmentSortingCriterionData.isUsingSpriteColor;
+                            ContainmentSortingCriterionData.isUsingSpriteRendererColor = false;
                         }
 
                         EditorGUI.BeginChangeCheck();
-                        ContainmentSortingCriterionData.isUsingSpriteRendererColor =
-                            GUILayout.Toggle(ContainmentSortingCriterionData.isUsingSpriteRendererColor,
-                                "Use Color of SpriteRenderer", Styling.ButtonStyle);
+                        GUILayout.Toggle(ContainmentSortingCriterionData.isUsingSpriteRendererColor,
+                            "Combine Colors of Sprite and SpriteRenderer", Styling.ButtonStyle);
                         if (EditorGUI.EndChangeCheck())
                         {
-                            ContainmentSortingCriterionData.isUsingSpriteColor =
-                                !ContainmentSortingCriterionData.isUsingSpriteRendererColor;
+                            ContainmentSortingCriterionData.isUsingSpriteRendererColor = true;
                         }
                     }
 
@@ -51,7 +48,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                     if (EditorGUI.EndChangeCheck())
                     {
                         ContainmentSortingCriterionData.alphaThreshold =
-                            Mathf.Clamp01(ContainmentSortingCriterionData.alphaThreshold);    
+                            Mathf.Clamp01(ContainmentSortingCriterionData.alphaThreshold);
                     }
                 }
             }

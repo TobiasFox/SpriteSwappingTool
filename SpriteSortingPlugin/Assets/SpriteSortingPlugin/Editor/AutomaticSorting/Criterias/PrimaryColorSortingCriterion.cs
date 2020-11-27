@@ -16,21 +16,16 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            Color primaryColor;
-            Color otherPrimaryColor;
+            var primaryColor = autoSortingCalculationData.spriteData
+                .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
 
-            if (PrimaryColorSortingCriterionData.isUsingSpriteColor)
-            {
-                primaryColor = autoSortingCalculationData.spriteData
-                    .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
+            var otherPrimaryColor = autoSortingCalculationData.spriteData
+                .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
 
-                otherPrimaryColor = autoSortingCalculationData.spriteData
-                    .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
-            }
-            else
+            if (PrimaryColorSortingCriterionData.isUsingSpriteRendererColor)
             {
-                primaryColor = autoSortingComponent.OriginSpriteRenderer.color;
-                otherPrimaryColor = otherAutoSortingComponent.OriginSpriteRenderer.color;
+                primaryColor *= autoSortingComponent.OriginSpriteRenderer.color;
+                otherPrimaryColor *= otherAutoSortingComponent.OriginSpriteRenderer.color;
             }
 
             for (var i = 0; i < 3; i++)
@@ -50,7 +45,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
         public override bool IsUsingSpriteData()
         {
-            return PrimaryColorSortingCriterionData.isUsingSpriteColor;
+            return true;
         }
 
         private bool IsInForeground(Color primaryColor, Color otherPrimaryColor, int channel)

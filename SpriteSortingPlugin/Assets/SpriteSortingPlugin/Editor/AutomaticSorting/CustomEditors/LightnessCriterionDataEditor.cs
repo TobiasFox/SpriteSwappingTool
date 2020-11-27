@@ -15,23 +15,19 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             using (new EditorGUILayout.HorizontalScope())
             {
                 EditorGUI.BeginChangeCheck();
-                LightnessSortingCriterionData.isUsingSpriteColor =
-                    GUILayout.Toggle(LightnessSortingCriterionData.isUsingSpriteColor, "Use Color of Sprite",
-                        Styling.ButtonStyle);
+                GUILayout.Toggle(!LightnessSortingCriterionData.isUsingSpriteRendererColor, "Use Color of Sprite Only",
+                    Styling.ButtonStyle);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    LightnessSortingCriterionData.isUsingSpriteRendererColor =
-                        !LightnessSortingCriterionData.isUsingSpriteColor;
+                    LightnessSortingCriterionData.isUsingSpriteRendererColor = false;
                 }
 
                 EditorGUI.BeginChangeCheck();
-                LightnessSortingCriterionData.isUsingSpriteRendererColor =
-                    GUILayout.Toggle(LightnessSortingCriterionData.isUsingSpriteRendererColor,
-                        "Use Color of SpriteRenderer", Styling.ButtonStyle);
+                GUILayout.Toggle(LightnessSortingCriterionData.isUsingSpriteRendererColor,
+                    "Combine Colors of Sprite and SpriteRenderer", Styling.ButtonStyle);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    LightnessSortingCriterionData.isUsingSpriteColor =
-                        !LightnessSortingCriterionData.isUsingSpriteRendererColor;
+                    LightnessSortingCriterionData.isUsingSpriteRendererColor = true;
                 }
             }
 

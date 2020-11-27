@@ -15,16 +15,18 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var alpha = 0f;
+            if (ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground ||
+                !ContainmentSortingCriterionData.isCheckingAlpha)
+            {
+                return;
+            }
+
+            var alpha = autoSortingCalculationData.spriteData.spriteDataDictionary[spriteDataItemValidator.AssetGuid]
+                .spriteAnalysisData.averageAlpha;
 
             if (ContainmentSortingCriterionData.isUsingSpriteRendererColor)
             {
-                alpha = autoSortingComponent.OriginSpriteRenderer.color.a;
-            }
-            else
-            {
-                alpha = autoSortingCalculationData.spriteData.spriteDataDictionary[spriteDataItemValidator.AssetGuid]
-                    .spriteAnalysisData.averageAlpha;
+                alpha *= autoSortingComponent.OriginSpriteRenderer.color.a;
             }
 
             if (alpha < ContainmentSortingCriterionData.alphaThreshold)
@@ -36,8 +38,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         public override bool IsUsingSpriteData()
         {
             return !ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground &&
-                   ContainmentSortingCriterionData.isCheckingAlpha &&
-                   ContainmentSortingCriterionData.isUsingSpriteColor;
+                   ContainmentSortingCriterionData.isCheckingAlpha;
         }
     }
 }
