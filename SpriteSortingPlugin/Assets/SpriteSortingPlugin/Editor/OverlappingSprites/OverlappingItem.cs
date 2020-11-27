@@ -31,8 +31,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
             Init();
         }
 
-        public OverlappingItem(SortingComponent sortingComponent, bool isBaseItem = false) : base(
-            sortingComponent.OriginSpriteRenderer, sortingComponent.OutmostSortingGroup)
+        public OverlappingItem(SortingComponent sortingComponent, bool isBaseItem = false) : base(sortingComponent)
         {
             Init();
             IsBaseItem = isBaseItem;

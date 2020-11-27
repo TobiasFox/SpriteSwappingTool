@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -7,8 +8,10 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class SortingComponent
     {
-        private SpriteRenderer originSpriteRenderer;
-        private SortingGroup outmostSortingGroup;
+        private readonly SpriteRenderer originSpriteRenderer;
+        private readonly SortingGroup outmostSortingGroup;
+
+        protected HashSet<int> overlappingSortingComponents;
 
         public SpriteRenderer OriginSpriteRenderer => originSpriteRenderer;
         public SortingGroup OutmostSortingGroup => outmostSortingGroup;
@@ -17,6 +20,21 @@ namespace SpriteSortingPlugin
         {
             this.originSpriteRenderer = originSpriteRenderer;
             this.outmostSortingGroup = outmostSortingGroup;
+        }
+
+        public SortingComponent(SortingComponent otherSortingComponent)
+        {
+            this.originSpriteRenderer = otherSortingComponent.originSpriteRenderer;
+            this.outmostSortingGroup = otherSortingComponent.outmostSortingGroup;
+
+            if (otherSortingComponent.overlappingSortingComponents != null)
+            {
+                overlappingSortingComponents = new HashSet<int>();
+                foreach (var hashCode in otherSortingComponent.overlappingSortingComponents)
+                {
+                    overlappingSortingComponents.Add(hashCode);
+                }
+            }
         }
 
         public int OriginSortingOrder
@@ -70,20 +88,42 @@ namespace SpriteSortingPlugin
 
         public override int GetHashCode()
         {
-            var hashcode = OriginSpriteRenderer.GetHashCode();
-            if (OutmostSortingGroup != null)
+            unchecked
             {
-                hashcode ^= OutmostSortingGroup.GetHashCode();
+                var hashcode = 397 * originSpriteRenderer.GetHashCode();
+                if (outmostSortingGroup != null)
+                {
+                    hashcode ^= outmostSortingGroup.GetHashCode();
+                }
+
+                return hashcode;
+            }
+        }
+
+        public void AddOverlappingSortingComponent(SortingComponent sortingComponent)
+        {
+            if (overlappingSortingComponents == null)
+            {
+                overlappingSortingComponents = new HashSet<int>();
             }
 
-            return hashcode;
+            overlappingSortingComponents.Add(sortingComponent.GetHashCode());
+        }
+
+        public bool IsOverlapping(SortingComponent sortingComponent)
+        {
+            if (overlappingSortingComponents == null)
+            {
+                return false;
+            }
+
+            return overlappingSortingComponents.Contains(sortingComponent.GetHashCode());
         }
 
         public override string ToString()
         {
             return "SortingComponent[" + OriginSpriteRenderer.name + ", " + OriginSortingLayer + ", " +
-                   OriginSortingOrder +
-                   ", SG:" + (OutmostSortingGroup != null) + "]";
+                   OriginSortingOrder + ", SG:" + (OutmostSortingGroup != null) + "]";
         }
     }
 }

@@ -333,14 +333,6 @@ namespace SpriteSortingPlugin.AutomaticSorting
             {
                 var autoSortingComponent = new AutoSortingComponent(overlappingItem);
 
-                var overlappingItems = overlappingSpriteDetector.DetectOverlappingSortingComponents(overlappingItem,
-                    overlappingSortingComponents, autoSortingCalculationData);
-
-                foreach (var overlappingSortingItem in overlappingItems)
-                {
-                    autoSortingComponent.AddOverlappingSortingComponent(overlappingSortingItem);
-                }
-
                 autoSortingComponents.Add(autoSortingComponent);
             }
 

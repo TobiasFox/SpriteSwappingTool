@@ -456,6 +456,9 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
                     continue;
                 }
 
+                sortingComponent.AddOverlappingSortingComponent(sortingComponentToCheck);
+                sortingComponentToCheck.AddOverlappingSortingComponent(sortingComponent);
+
                 overlappingComponents.Add(sortingComponent);
             }
 

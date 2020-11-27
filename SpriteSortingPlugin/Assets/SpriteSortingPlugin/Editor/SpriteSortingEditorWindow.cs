@@ -362,6 +362,7 @@ namespace SpriteSortingPlugin
                     SortingCriteriaComponentFactory.CreateSortingCriteriaComponent(sortingCriterionType);
                 sortingCriteriaComponents.Add(sortingCriteriaComponent);
 
+                //default value
                 if (sortingCriterionType == SortingCriterionType.Containment)
                 {
                     sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
