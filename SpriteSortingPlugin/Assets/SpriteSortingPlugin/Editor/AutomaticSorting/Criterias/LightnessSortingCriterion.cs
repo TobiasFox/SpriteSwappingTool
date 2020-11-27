@@ -15,8 +15,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent)
+        protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
             var perceivedLightness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
@@ -32,10 +31,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             }
 
             perceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(perceivedLightness,
-                autoSortingComponent.OriginSpriteRenderer.color);
+                sortingComponent.OriginSpriteRenderer.color);
 
             otherPerceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(otherPerceivedLightness,
-                otherAutoSortingComponent.OriginSpriteRenderer.color);
+                otherSortingComponent.OriginSpriteRenderer.color);
 
             var isAutoSortingComponentIsLighter = perceivedLightness >= otherPerceivedLightness;
 

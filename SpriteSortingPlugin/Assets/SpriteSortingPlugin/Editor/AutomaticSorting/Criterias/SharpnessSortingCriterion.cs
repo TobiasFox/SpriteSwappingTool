@@ -12,8 +12,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent)
+        protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
             var sharpness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid]

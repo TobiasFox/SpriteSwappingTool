@@ -12,16 +12,15 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent)
+        protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
             if (autoSortingCalculationData.cameraProjectionType == CameraProjectionType.Orthographic)
             {
                 return;
             }
 
-            var spriteRendererTransform = autoSortingComponent.OriginSpriteRenderer.transform;
-            var otherSpriteRendererTransform = otherAutoSortingComponent.OriginSpriteRenderer.transform;
+            var spriteRendererTransform = sortingComponent.OriginSpriteRenderer.transform;
+            var otherSpriteRendererTransform = otherSortingComponent.OriginSpriteRenderer.transform;
             var cameraTransform = autoSortingCalculationData.cameraTransform;
 
             var perspectiveDistance = CalculatePerspectiveDistance(spriteRendererTransform, cameraTransform);

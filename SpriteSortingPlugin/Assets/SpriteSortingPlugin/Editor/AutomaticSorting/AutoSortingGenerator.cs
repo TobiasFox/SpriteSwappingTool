@@ -176,9 +176,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
             {
                 //check against each of the items which are already in the resultList
                 lastIndex++;
-                var autoSortingComponent = resultList[i];
+                var sortedComponent = resultList[i];
 
-                var sortingResult = CompareWithSortingCriterias(currentItem, autoSortingComponent);
+                var sortingResult = CompareWithSortingCriterias(currentItem, sortedComponent);
                 if (!sortingResult.isOverlapping)
                 {
                     continue;
@@ -186,14 +186,14 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
                 if (sortingResult.order < 0)
                 {
-                    currentItem.sortingOrder = autoSortingComponent.sortingOrder;
+                    currentItem.sortingOrder = sortedComponent.sortingOrder;
                     InsertInResultListAndIncreaseSortingOrderAfterIndex(currentItem, i);
 
                     isInsertedInResultList = true;
                     break;
                 }
 
-                currentItem.sortingOrder = autoSortingComponent.sortingOrder + 1;
+                currentItem.sortingOrder = sortedComponent.sortingOrder + 1;
             }
 
             if (!isInsertedInResultList)

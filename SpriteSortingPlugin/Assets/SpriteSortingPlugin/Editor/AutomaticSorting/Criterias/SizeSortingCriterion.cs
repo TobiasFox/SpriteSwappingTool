@@ -20,11 +20,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent)
+        protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
-            spriteRenderer = autoSortingComponent.OriginSpriteRenderer;
-            otherSpriteRenderer = otherAutoSortingComponent.OriginSpriteRenderer;
+            spriteRenderer = sortingComponent.OriginSpriteRenderer;
+            otherSpriteRenderer = otherSortingComponent.OriginSpriteRenderer;
             spriteSortPoint = GetSpriteSortPoint(spriteRenderer);
             otherSpriteSortPoint = GetSpriteSortPoint(otherSpriteRenderer);
 

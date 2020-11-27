@@ -3,7 +3,7 @@
     public class AutoSortingComponent : SortingComponent
     {
         public int sortingOrder;
-        public AutoSortingComponent containedByAutoSortingComponent;
+        public SortingComponent containedByAutoSortingComponent;
 
         public AutoSortingComponent(SortingComponent sortingComponent) : base(sortingComponent)
         {

@@ -13,13 +13,12 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent)
+        protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
             // var spriteResolution = CalculateCurrentSpriteResolution(autoSortingComponent.OriginSpriteRenderer);
             // var otherSpriteResolution = CalculateCurrentSpriteResolution(otherAutoSortingComponent.OriginSpriteRenderer);
-            var spriteResolution = CalculatePixelResolution(autoSortingComponent.OriginSpriteRenderer);
-            var otherSpriteResolution = CalculatePixelResolution(otherAutoSortingComponent.OriginSpriteRenderer);
+            var spriteResolution = CalculatePixelResolution(sortingComponent.OriginSpriteRenderer);
+            var otherSpriteResolution = CalculatePixelResolution(otherSortingComponent.OriginSpriteRenderer);
 
             var hasAutoSortingComponentHigherResolution = spriteResolution >= otherSpriteResolution;
 

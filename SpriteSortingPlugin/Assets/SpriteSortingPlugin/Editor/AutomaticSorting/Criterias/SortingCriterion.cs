@@ -17,7 +17,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             this.sortingCriterionData = sortingCriterionData;
         }
 
-        public int[] Sort(AutoSortingComponent autoSortingComponent, AutoSortingComponent otherAutoSortingComponent,
+        public int[] Sort(SortingComponent sortingComponent, SortingComponent otherSortingComponent,
             AutoSortingCalculationData autoSortingCalculationData)
         {
             this.autoSortingCalculationData = autoSortingCalculationData;
@@ -26,16 +26,16 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             {
                 var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
                 spriteDataItemValidator =
-                    spriteDataItemValidatorCache.GetOrCreateValidator(autoSortingComponent.OriginSpriteRenderer);
+                    spriteDataItemValidatorCache.GetOrCreateValidator(sortingComponent.OriginSpriteRenderer);
                 otherSpriteDataItemValidator =
-                    spriteDataItemValidatorCache.GetOrCreateValidator(otherAutoSortingComponent.OriginSpriteRenderer);
+                    spriteDataItemValidatorCache.GetOrCreateValidator(otherSortingComponent.OriginSpriteRenderer);
             }
 
             sortingResults = new int[2];
 
-            InternalSort(autoSortingComponent, otherAutoSortingComponent);
+            InternalSort(sortingComponent, otherSortingComponent);
 
-            for (int i = 0; i < sortingResults.Length; i++)
+            for (var i = 0; i < sortingResults.Length; i++)
             {
                 sortingResults[i] *= sortingCriterionData.priority;
             }
@@ -45,8 +45,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             return sortingResults;
         }
 
-        protected abstract void InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent);
+        protected abstract void InternalSort(SortingComponent sortingComponent,
+            SortingComponent otherSortingComponent);
 
         public abstract bool IsUsingSpriteData();
     }

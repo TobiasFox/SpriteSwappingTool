@@ -12,8 +12,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent)
+        protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
             if (ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground ||
                 !ContainmentSortingCriterionData.isCheckingAlpha)
@@ -24,7 +23,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var alpha = autoSortingCalculationData.spriteData.spriteDataDictionary[spriteDataItemValidator.AssetGuid]
                 .spriteAnalysisData.averageAlpha;
 
-            alpha *= autoSortingComponent.OriginSpriteRenderer.color.a;
+            alpha *= sortingComponent.OriginSpriteRenderer.color.a;
 
             if (alpha < ContainmentSortingCriterionData.alphaThreshold)
             {

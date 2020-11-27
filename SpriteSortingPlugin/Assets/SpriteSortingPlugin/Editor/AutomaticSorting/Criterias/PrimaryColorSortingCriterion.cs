@@ -13,8 +13,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
         }
 
-        protected override void InternalSort(AutoSortingComponent autoSortingComponent,
-            AutoSortingComponent otherAutoSortingComponent)
+        protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
             var primaryColor = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
@@ -22,8 +21,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var otherPrimaryColor = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
 
-            primaryColor *= autoSortingComponent.OriginSpriteRenderer.color;
-            otherPrimaryColor *= otherAutoSortingComponent.OriginSpriteRenderer.color;
+            primaryColor *= sortingComponent.OriginSpriteRenderer.color;
+            otherPrimaryColor *= otherSortingComponent.OriginSpriteRenderer.color;
 
             for (var i = 0; i < PrimaryColorSortingCriterionData.activeChannels.Length; i++)
             {
