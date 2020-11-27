@@ -18,8 +18,13 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var blurriness = 0d;
-            var otherBlurriness = 0d;
+            var perceivedLightness = autoSortingCalculationData.spriteData
+                .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
+                .spriteAnalysisData.perceivedLightness;
+
+            var otherPerceivedLightness = autoSortingCalculationData.spriteData
+                .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
+                .spriteAnalysisData.perceivedLightness;
 
             if (LightnessSortingCriterionData.isUsingSpriteRendererColor)
             {
@@ -28,22 +33,13 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
                     lightnessAnalyzer = new LightnessAnalyzer();
                 }
 
-                blurriness = lightnessAnalyzer.Analyze(autoSortingComponent.OriginSpriteRenderer);
-                otherBlurriness = lightnessAnalyzer.Analyze(otherAutoSortingComponent.OriginSpriteRenderer);
-            }
-            else
-            {
-                blurriness = autoSortingCalculationData.spriteData
-                    .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
-                    .spriteAnalysisData.blurriness;
-
-                otherBlurriness = autoSortingCalculationData.spriteData
-                    .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
-                    .spriteAnalysisData.blurriness;
+                //TODO calc lightness with spriterenderer colour
+                perceivedLightness = lightnessAnalyzer.Analyze(autoSortingComponent.OriginSpriteRenderer);
+                otherPerceivedLightness = lightnessAnalyzer.Analyze(otherAutoSortingComponent.OriginSpriteRenderer);
             }
 
 
-            var isAutoSortingComponentIsLighter = blurriness >= otherBlurriness;
+            var isAutoSortingComponentIsLighter = perceivedLightness >= otherPerceivedLightness;
 
             if (LightnessSortingCriterionData.isLighterSpriteIsInForeground)
             {
@@ -57,7 +53,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
         public override bool IsUsingSpriteData()
         {
-            return LightnessSortingCriterionData.isUsingSpriteColor;
+            return true;
         }
     }
 }

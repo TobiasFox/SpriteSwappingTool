@@ -3,7 +3,7 @@
     public enum SpriteAnalyzerType
     {
         Outline,
-        Blurriness,
+        Sharpness,
         Lightness,
         PrimaryColor,
         AverageAlpha

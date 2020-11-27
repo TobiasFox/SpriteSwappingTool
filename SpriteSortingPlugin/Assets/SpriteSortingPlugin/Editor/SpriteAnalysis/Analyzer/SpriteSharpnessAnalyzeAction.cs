@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 {
-    public class SpriteBlurrinessAnalyzer : ISpriteDataAnalyzer
+    public class SpriteSharpnessAnalyzer : ISpriteDataAnalyzer
     {
-        private BlurrinessAnalyzer blurrinessAnalyzer;
+        private SharpnessAnalyzer sharpnessAnalyzer;
 
         public void Analyse(ref SpriteDataItem spriteDataItem, Sprite sprite,
             SpriteAnalyzeInputData spriteAnalyzeInputData)
         {
-            if (blurrinessAnalyzer == null)
+            if (sharpnessAnalyzer == null)
             {
-                blurrinessAnalyzer = new BlurrinessAnalyzer();
+                sharpnessAnalyzer = new SharpnessAnalyzer();
             }
 
-            spriteDataItem.spriteAnalysisData.blurriness = blurrinessAnalyzer.Analyze(sprite);
+            spriteDataItem.spriteAnalysisData.sharpness = sharpnessAnalyzer.Analyze(sprite);
         }
     }
 }

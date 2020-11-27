@@ -2,12 +2,12 @@
 
 namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
-    public class BlurrinessSortingCriterion : SortingCriterion<SortingCriterionData>
+    public class SharpnessSortingCriterion : SortingCriterion<SortingCriterionData>
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;
 
-        public BlurrinessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
+        public SharpnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
         }
@@ -15,24 +15,24 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         protected override void InternalSort(AutoSortingComponent autoSortingComponent,
             AutoSortingComponent otherAutoSortingComponent)
         {
-            var blurriness = autoSortingCalculationData.spriteData
+            var sharpness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
-                .spriteAnalysisData.blurriness;
+                .spriteAnalysisData.sharpness;
 
-            var otherBlurriness = autoSortingCalculationData.spriteData
+            var otherSharpness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[otherSpriteDataItemValidator.AssetGuid]
-                .spriteAnalysisData.blurriness;
+                .spriteAnalysisData.sharpness;
 
 
-            var isAutoSortingComponentIsMoreBlurry = blurriness >= otherBlurriness;
+            var isAutoSortingComponentIsSharper = sharpness >= otherSharpness;
 
             if (DefaultSortingCriterionData.isSortingInForeground)
             {
-                sortingResults[isAutoSortingComponentIsMoreBlurry ? 0 : 1]++;
+                sortingResults[isAutoSortingComponentIsSharper ? 0 : 1]++;
             }
             else
             {
-                sortingResults[!isAutoSortingComponentIsMoreBlurry ? 0 : 1]++;
+                sortingResults[!isAutoSortingComponentIsSharper ? 0 : 1]++;
             }
         }
 

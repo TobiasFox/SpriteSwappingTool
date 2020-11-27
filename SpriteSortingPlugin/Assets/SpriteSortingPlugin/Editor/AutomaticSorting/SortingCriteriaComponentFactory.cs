@@ -23,8 +23,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 case SortingCriterionType.Resolution:
                     CreateResolutionDataAndCriterion(ref sortingCriteriaComponent);
                     break;
-                case SortingCriterionType.Blurriness:
-                    CreateBlurrinessDataAndCriterion(ref sortingCriteriaComponent);
+                case SortingCriterionType.Sharpness:
+                    CreateSharpnessDataAndCriterion(ref sortingCriteriaComponent);
                     break;
                 case SortingCriterionType.Brightness:
                     CreateBrightnessDataAndCriterion(ref sortingCriteriaComponent);
@@ -70,12 +70,12 @@ namespace SpriteSortingPlugin.AutomaticSorting
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
-        private static void CreateBlurrinessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
+        private static void CreateSharpnessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.criterionName = "Sprite Sharpness";
             sortingCriterionData.foregroundSortingName = "Is sharper sprite in foreground";
-            sortingCriteriaComponent.sortingCriterion = new BlurrinessSortingCriterion(sortingCriterionData);
+            sortingCriteriaComponent.sortingCriterion = new SharpnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 

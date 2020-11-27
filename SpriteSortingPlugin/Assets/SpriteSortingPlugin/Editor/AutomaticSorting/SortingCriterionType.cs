@@ -6,7 +6,7 @@
         Size,
         Position,
         Resolution,
-        Blurriness,
+        Sharpness,
         Brightness,
         PrimaryColor,
     }

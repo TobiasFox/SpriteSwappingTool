@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalyzer
 {
-    public class BlurrinessAnalyzer
+    public class SharpnessAnalyzer
     {
         private const int OwnPixelFactor = -4;
 
@@ -43,7 +43,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                 for (var j = 0; j < spriteWidth; j++)
                 {
                     var index = i * spriteWidth + j;
-                    var blurriness = modifiedPixelArray[index] * OwnPixelFactor;
+                    var sharpness = modifiedPixelArray[index] * OwnPixelFactor;
 
                     foreach (var kernelItem in kernelItems)
                     {
@@ -67,10 +67,10 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                             continue;
                         }
 
-                        blurriness += modifiedPixelArray[neighbourPixelIndex] * kernelItem.factor;
+                        sharpness += modifiedPixelArray[neighbourPixelIndex] * kernelItem.factor;
                     }
 
-                    returnArray[index] = blurriness;
+                    returnArray[index] = sharpness;
                 }
             }
 

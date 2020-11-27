@@ -7,7 +7,7 @@ namespace SpriteSortingPlugin
     {
         Nothing = 0,
         Outline = 1 << 0,
-        Blurriness = 1 << 1,
+        Sharpness = 1 << 1,
         Lightness = 1 << 2,
         PrimaryColor = 1 << 3,
         AverageAlpha = 1 << 4,

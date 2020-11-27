@@ -6,7 +6,7 @@ namespace SpriteSortingPlugin
     [Serializable]
     public struct SpriteAnalysisData
     {
-        public double blurriness;
+        public double sharpness;
         public float perceivedLightness;
         public Color primaryColor;
         public float averageAlpha;

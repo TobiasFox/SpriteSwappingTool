@@ -328,22 +328,22 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUI.BeginChangeCheck();
-                    var blurriness = hasSelectedDataItem ? selectedSpriteDataItem.spriteAnalysisData.blurriness : 0;
-                    blurriness = EditorGUILayout.DoubleField("Blurriness", blurriness);
+                    var sharpness = hasSelectedDataItem ? selectedSpriteDataItem.spriteAnalysisData.sharpness : 0;
+                    sharpness = EditorGUILayout.DoubleField("Sharpness", sharpness);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        if (blurriness < 0)
+                        if (sharpness < 0)
                         {
-                            blurriness = 0d;
+                            sharpness = 0d;
                         }
 
-                        selectedSpriteDataItem.spriteAnalysisData.blurriness = blurriness;
+                        selectedSpriteDataItem.spriteAnalysisData.sharpness = sharpness;
                     }
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
                         spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
-                        AnalyzeSprite(SpriteAnalyzerType.Blurriness);
+                        AnalyzeSprite(SpriteAnalyzerType.Sharpness);
                     }
                 }
 
@@ -412,7 +412,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     if (GUILayout.Button("Analyze All", analyzeButtonWidth))
                     {
                         spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
-                        AnalyzeSprite(SpriteAnalyzerType.Lightness, SpriteAnalyzerType.Blurriness,
+                        AnalyzeSprite(SpriteAnalyzerType.Lightness, SpriteAnalyzerType.Sharpness,
                             SpriteAnalyzerType.PrimaryColor, SpriteAnalyzerType.AverageAlpha);
                     }
                 }
@@ -809,8 +809,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                 switch (spriteAnalyzerType)
                 {
-                    case SpriteDataAnalysisType.Blurriness:
-                        type = SpriteAnalyzerType.Blurriness;
+                    case SpriteDataAnalysisType.Sharpness:
+                        type = SpriteAnalyzerType.Sharpness;
                         break;
                     case SpriteDataAnalysisType.Lightness:
                         type = SpriteAnalyzerType.Lightness;
