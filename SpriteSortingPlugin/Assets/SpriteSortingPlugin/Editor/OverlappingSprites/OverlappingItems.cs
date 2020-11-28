@@ -98,17 +98,14 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 if (isAdjustingSortingOrderUpwards && itemWithNewIndex.sortingOrder <= lastItem.sortingOrder)
                 {
                     itemWithNewIndex.sortingOrder = lastItem.sortingOrder + 1;
-                    itemWithNewIndex.UpdatePreviewSortingOrderWithExistingOrder();
                 }
                 else if (!isAdjustingSortingOrderUpwards && itemWithNewIndex.sortingOrder >= lastItem.sortingOrder)
                 {
                     itemWithNewIndex.sortingOrder = lastItem.sortingOrder - 1;
-                    itemWithNewIndex.UpdatePreviewSortingOrderWithExistingOrder();
                 }
             }
 
-            UpdateSurroundingItemsUpwards(newIndex);
-            UpdateSurroundingItemsDownwards(newIndex);
+            UpdateSortingOrder(newIndex);
         }
 
         public void UpdateSortingOrder(int currentIndex)
