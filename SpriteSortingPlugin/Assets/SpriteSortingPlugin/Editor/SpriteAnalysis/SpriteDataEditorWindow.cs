@@ -14,6 +14,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private const int MinWidthRightContentBar = 200;
         private const float LineSpacing = 1.5f;
         private const float RightAreaOffset = 3f;
+        private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
 
         private SerializedObject serializedObject;
 
@@ -205,10 +206,21 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         {
                             EditorGUILayout.Space();
 
-                            outlinePrecision =
-                                (OutlinePrecision) EditorGUILayout.EnumPopup("Preview Outline", outlinePrecision);
+                            GUILayout.Label("Preview Outline");
+                            foreach (OutlinePrecision outlinePrecisionType in OutlinePrecisionTypes)
+                            {
+                                EditorGUI.BeginChangeCheck();
 
-                            outlineColor = EditorGUILayout.ColorField("Outline Color", outlineColor);
+                                GUILayout.Toggle(outlinePrecision == outlinePrecisionType,
+                                    outlinePrecisionType.ToString(), Styling.ButtonStyle);
+                                if (EditorGUI.EndChangeCheck())
+                                {
+                                    outlinePrecision = outlinePrecisionType;
+                                }
+                            }
+
+                            GUILayout.Label("Outline Color");
+                            outlineColor = EditorGUILayout.ColorField(outlineColor);
                         }
                     }
 
