@@ -76,6 +76,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.criterionName = "Sprite Sharpness";
             sortingCriterionData.foregroundSortingName = "Is sharper sprite in foreground";
+            sortingCriterionData.isSortingInForeground = true;
             sortingCriteriaComponent.sortingCriterion = new SharpnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -92,6 +93,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.criterionName = "Perceived Lightness";
             sortingCriterionData.foregroundSortingName = "Is lighter sprite in foreground";
+            sortingCriterionData.isSortingInForeground = true;
             sortingCriteriaComponent.sortingCriterion = new LightnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }

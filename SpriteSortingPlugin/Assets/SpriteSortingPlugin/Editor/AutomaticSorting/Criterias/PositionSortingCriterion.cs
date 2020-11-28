@@ -29,11 +29,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             if (PositionSortingCriterionData.isFurtherAwaySpriteInForeground)
             {
-                sortingResults[isAutoSortingComponentCloser ? 1 : 0]++;
+                sortingResults[isAutoSortingComponentCloser ? 0 : 1]++;
             }
             else
             {
-                sortingResults[!isAutoSortingComponentCloser ? 1 : 0]++;
+                sortingResults[!isAutoSortingComponentCloser ? 0 : 1]++;
             }
         }
 
