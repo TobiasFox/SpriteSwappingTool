@@ -22,7 +22,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
                 .spriteAnalysisData.perceivedLightness;
 
             var otherPerceivedLightness = autoSortingCalculationData.spriteData
-                .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
+                .spriteDataDictionary[otherSpriteDataItemValidator.AssetGuid]
                 .spriteAnalysisData.perceivedLightness;
 
             if (lightnessAnalyzer == null)

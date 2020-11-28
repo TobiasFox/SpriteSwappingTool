@@ -24,8 +24,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var cameraTransform = autoSortingCalculationData.cameraTransform;
 
             var perspectiveDistance = CalculatePerspectiveDistance(spriteRendererTransform, cameraTransform);
-            var otherPerspectiveDistance =
-                CalculatePerspectiveDistance(otherSpriteRendererTransform, cameraTransform);
+            var otherPerspectiveDistance = CalculatePerspectiveDistance(otherSpriteRendererTransform, cameraTransform);
             var isAutoSortingComponentCloser = perspectiveDistance <= otherPerspectiveDistance;
 
             if (PositionSortingCriterionData.isFurtherAwaySpriteInForeground)
