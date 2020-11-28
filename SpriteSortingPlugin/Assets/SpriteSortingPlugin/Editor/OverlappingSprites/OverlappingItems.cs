@@ -86,53 +86,29 @@ namespace SpriteSortingPlugin.OverlappingSprites
             ArrayList.Adapter(items).Sort(overlappingItemIdentityComparer);
         }
 
-        public void ReOrderItem(int oldIndex, int newIndex)
+        public void ReOrderItem(int newIndex)
         {
             var itemWithNewIndex = items[newIndex];
 
             var isAdjustingSortingOrderUpwards = newIndex < items.Count / 2;
             var lastItem = items[newIndex + (isAdjustingSortingOrderUpwards ? 1 : -1)];
 
-            if (isAdjustingSortingOrderUpwards)
+            if (itemWithNewIndex.sortingComponent.IsOverlapping(lastItem.sortingComponent))
             {
-                if (itemWithNewIndex.sortingOrder <= lastItem.sortingOrder)
+                if (isAdjustingSortingOrderUpwards && itemWithNewIndex.sortingOrder <= lastItem.sortingOrder)
                 {
                     itemWithNewIndex.sortingOrder = lastItem.sortingOrder + 1;
                     itemWithNewIndex.UpdatePreviewSortingOrderWithExistingOrder();
                 }
-
-                for (var i = newIndex - 1; i >= 0; i--)
+                else if (!isAdjustingSortingOrderUpwards && itemWithNewIndex.sortingOrder >= lastItem.sortingOrder)
                 {
-                    var previousItem = items[i + 1];
-                    var currentItem = items[i];
-
-                    if (previousItem.sortingOrder == currentItem.sortingOrder)
-                    {
-                        currentItem.sortingOrder++;
-                        currentItem.UpdatePreviewSortingOrderWithExistingOrder();
-                    }
-                }
-
-                return;
-            }
-
-            if (itemWithNewIndex.sortingOrder >= lastItem.sortingOrder)
-            {
-                itemWithNewIndex.sortingOrder = lastItem.sortingOrder - 1;
-                itemWithNewIndex.UpdatePreviewSortingOrderWithExistingOrder();
-            }
-
-            for (var i = newIndex + 1; i < items.Count; i++)
-            {
-                var previousItem = items[i - 1];
-                var currentItem = items[i];
-
-                if (previousItem.sortingOrder == currentItem.sortingOrder)
-                {
-                    currentItem.sortingOrder--;
-                    currentItem.UpdatePreviewSortingOrderWithExistingOrder();
+                    itemWithNewIndex.sortingOrder = lastItem.sortingOrder - 1;
+                    itemWithNewIndex.UpdatePreviewSortingOrderWithExistingOrder();
                 }
             }
+
+            UpdateSurroundingItemsUpwards(newIndex);
+            UpdateSurroundingItemsDownwards(newIndex);
         }
 
         public void UpdateSortingOrder(int currentIndex)
@@ -172,39 +148,63 @@ namespace SpriteSortingPlugin.OverlappingSprites
 
         private void UpdateSurroundingItems(int currentIndex)
         {
-            var layerName = items[currentIndex].sortingLayerName;
-            for (var i = currentIndex - 1; i >= 0; i--)
-            {
-                var previousItem = items[i + 1];
-                var currentItem = items[i];
+            UpdateSurroundingItemsUpwards(currentIndex);
+            UpdateSurroundingItemsDownwards(currentIndex);
+        }
 
-                if (currentItem.sortingLayerName.Equals(layerName) &&
-                    previousItem.sortingOrder >= currentItem.sortingOrder)
-                {
-                    currentItem.sortingOrder = previousItem.sortingOrder + 1;
-                    currentItem.UpdatePreviewSortingOrderWithExistingOrder();
-                }
-                else
-                {
-                    break;
-                }
-            }
+        private void UpdateSurroundingItemsDownwards(int currentIndex)
+        {
+            var currentItemToCompare = items[currentIndex];
+            var layerName = currentItemToCompare.sortingLayerName;
 
             for (var i = currentIndex + 1; i < items.Count; i++)
             {
-                var previousItem = items[i - 1];
                 var currentItem = items[i];
 
-                if (currentItem.sortingLayerName.Equals(layerName) &&
-                    previousItem.sortingOrder <= currentItem.sortingOrder)
+                if (!currentItem.sortingLayerName.Equals(layerName))
                 {
-                    currentItem.sortingOrder = previousItem.sortingOrder - 1;
-                    currentItem.UpdatePreviewSortingOrderWithExistingOrder();
+                    continue;
                 }
-                else
+
+                var isOverlapping =
+                    currentItem.sortingComponent.IsOverlapping(currentItemToCompare.sortingComponent);
+
+                if (!isOverlapping || currentItemToCompare.sortingOrder > currentItem.sortingOrder)
                 {
-                    break;
+                    continue;
                 }
+
+                currentItem.sortingOrder = currentItemToCompare.sortingOrder - 1;
+                currentItem.UpdatePreviewSortingOrderWithExistingOrder();
+                currentItemToCompare = currentItem;
+            }
+        }
+
+        private void UpdateSurroundingItemsUpwards(int currentIndex)
+        {
+            var currentItemToCompare = items[currentIndex];
+            var layerName = currentItemToCompare.sortingLayerName;
+
+            for (var i = currentIndex - 1; i >= 0; i--)
+            {
+                var currentItem = items[i];
+
+                if (!currentItem.sortingLayerName.Equals(layerName))
+                {
+                    continue;
+                }
+
+                var isOverlapping =
+                    currentItem.sortingComponent.IsOverlapping(currentItemToCompare.sortingComponent);
+
+                if (!isOverlapping || currentItemToCompare.sortingOrder < currentItem.sortingOrder)
+                {
+                    continue;
+                }
+
+                currentItem.sortingOrder = currentItemToCompare.sortingOrder + 1;
+                currentItem.UpdatePreviewSortingOrderWithExistingOrder();
+                currentItemToCompare = currentItem;
             }
         }
 

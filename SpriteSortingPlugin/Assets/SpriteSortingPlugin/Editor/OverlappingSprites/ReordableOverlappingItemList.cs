@@ -60,7 +60,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
 
         private void OnReorderCallbackWithDetails(ReorderableList list, int oldIndex, int newIndex)
         {
-            overlappingItems.ReOrderItem(oldIndex, newIndex);
+            overlappingItems.ReOrderItem(newIndex);
             preview.UpdatePreviewEditor();
         }
 
