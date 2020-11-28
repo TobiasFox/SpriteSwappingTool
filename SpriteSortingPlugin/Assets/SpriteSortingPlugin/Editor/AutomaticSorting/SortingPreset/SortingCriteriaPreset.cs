@@ -37,9 +37,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.SortingPreset
                 return;
             }
 
-            jsonStrings = new string[SortingCriterionData.Length];
-            types = new string[SortingCriterionData.Length];
-            for (var i = 0; i < SortingCriterionData.Length; i++)
+            var length = SortingCriterionData.Length;
+            jsonStrings = new string[length];
+            types = new string[length];
+            for (var i = 0; i < length; i++)
             {
                 var criterionData = SortingCriterionData[i];
                 jsonStrings[i] = JsonUtility.ToJson(criterionData);
