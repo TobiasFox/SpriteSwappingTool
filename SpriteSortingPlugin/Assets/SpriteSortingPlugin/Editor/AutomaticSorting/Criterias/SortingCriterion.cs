@@ -33,6 +33,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 
             sortingResults = new int[2];
 
+            //TODO validate key in map before calling method
             InternalSort(sortingComponent, otherSortingComponent);
 
             for (var i = 0; i < sortingResults.Length; i++)

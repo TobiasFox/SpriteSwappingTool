@@ -524,7 +524,7 @@ namespace SpriteSortingPlugin
 
         private static void DrawHorizontalLine(bool isBig = false)
         {
-            var rect = GUILayoutUtility.GetRect(1f, isBig ? 1.5f : 1f);
+            var rect = GUILayoutUtility.GetRect(1f, isBig ? 1.5f : 1.25f);
 
             // Splitter rect should be full-width
             // rect.xMin = 0f;
