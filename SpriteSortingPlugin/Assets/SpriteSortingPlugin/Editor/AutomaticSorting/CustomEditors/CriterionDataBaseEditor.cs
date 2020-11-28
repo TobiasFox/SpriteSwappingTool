@@ -9,9 +9,11 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         protected T sortingCriterionData;
 
         private Rect headerRect;
+        private bool isShowingInInspector;
 
-        public void Initialize(T sortingCriterionData)
+        public void Initialize(T sortingCriterionData, bool isShowingInInspector = false)
         {
+            this.isShowingInInspector = isShowingInInspector;
             this.sortingCriterionData = sortingCriterionData;
             InternalInitialize();
         }
@@ -66,16 +68,18 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             labelRect.xMin += 37f;
 
             var priorityRect = headerRect;
-            priorityRect.xMax = priorityRect.width - 60;
-            priorityRect.xMin = priorityRect.width - 220;
             priorityRect.yMax -= 2;
             priorityRect.yMin += 2;
-
-            var removeButtonRect = headerRect;
-            removeButtonRect.xMax = removeButtonRect.width + 7.5f;
-            removeButtonRect.xMin = removeButtonRect.width - 33f;
-            removeButtonRect.yMax -= 2;
-            removeButtonRect.yMin += 2;
+            if (!isShowingInInspector)
+            {
+                priorityRect.xMax = priorityRect.width - 60;
+                priorityRect.xMin = priorityRect.width - 220;
+            }
+            else
+            {
+                priorityRect.xMax = priorityRect.width + 15;
+                priorityRect.xMin = priorityRect.width - 160;
+            }
 
             var foldoutRect = new Rect(headerRect.x, headerRect.y + 2, 13, 13);
             var toggleRect = new Rect(headerRect.x + 16, headerRect.y + 2, 13, 13);
@@ -103,9 +107,18 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 EditorGUI.LabelField(labelRect, GetTitleName(), EditorStyles.boldLabel);
             }
 
-            if (GUI.Button(removeButtonRect, Styling.RemoveIcon))
+            if (!isShowingInInspector)
             {
-                sortingCriterionData.isAddedToEditorList = false;
+                var removeButtonRect = headerRect;
+                removeButtonRect.xMax = removeButtonRect.width + 7.5f;
+                removeButtonRect.xMin = removeButtonRect.width - 33f;
+                removeButtonRect.yMax -= 2;
+                removeButtonRect.yMin += 2;
+
+                if (GUI.Button(removeButtonRect, Styling.RemoveIcon))
+                {
+                    sortingCriterionData.isAddedToEditorList = false;
+                }
             }
 
             sortingCriterionData.isExpanded = GUI.Toggle(foldoutRect, sortingCriterionData.isExpanded, GUIContent.none,

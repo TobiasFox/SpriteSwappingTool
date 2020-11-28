@@ -1000,12 +1000,12 @@ namespace SpriteSortingPlugin
         public SortingCriteriaPreset GenerateSortingCriteriaPreset()
         {
             var preset = CreateInstance<SortingCriteriaPreset>();
-            preset.sortingCriterionData = new SortingCriterionData[sortingCriteriaComponents.Count];
+            preset.SortingCriterionData = new SortingCriterionData[sortingCriteriaComponents.Count];
 
             for (var i = 0; i < sortingCriteriaComponents.Count; i++)
             {
                 var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                preset.sortingCriterionData[i] = sortingCriteriaComponent.sortingCriterionData.Copy();
+                preset.SortingCriterionData[i] = sortingCriteriaComponent.sortingCriterionData.Copy();
             }
 
             return preset;
@@ -1013,10 +1013,10 @@ namespace SpriteSortingPlugin
 
         public void UpdateSortingCriteriaFromPreset(SortingCriteriaPreset preset)
         {
-            for (var i = 0; i < preset.sortingCriterionData.Length; i++)
+            for (var i = 0; i < preset.SortingCriterionData.Length; i++)
             {
                 var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                sortingCriteriaComponent.sortingCriterionData = preset.sortingCriterionData[i];
+                sortingCriteriaComponent.sortingCriterionData = preset.SortingCriterionData[i];
                 sortingCriteriaComponent.criterionDataBaseEditor.UpdateSortingCriterionData(sortingCriteriaComponent
                     .sortingCriterionData);
                 sortingCriteriaComponents[i] = sortingCriteriaComponent;
