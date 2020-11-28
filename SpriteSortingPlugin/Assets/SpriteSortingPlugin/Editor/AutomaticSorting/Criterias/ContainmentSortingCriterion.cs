@@ -23,7 +23,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var alpha = autoSortingCalculationData.spriteData.spriteDataDictionary[spriteDataItemValidator.AssetGuid]
                 .spriteAnalysisData.averageAlpha;
 
-            alpha *= sortingComponent.OriginSpriteRenderer.color.a;
+            alpha *= sortingComponent.spriteRenderer.color.a;
 
             if (alpha < ContainmentSortingCriterionData.alphaThreshold)
             {

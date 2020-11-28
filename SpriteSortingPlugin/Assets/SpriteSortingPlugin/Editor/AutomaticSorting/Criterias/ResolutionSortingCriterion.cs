@@ -17,8 +17,8 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
         {
             // var spriteResolution = CalculateCurrentSpriteResolution(autoSortingComponent.OriginSpriteRenderer);
             // var otherSpriteResolution = CalculateCurrentSpriteResolution(otherAutoSortingComponent.OriginSpriteRenderer);
-            var spriteResolution = CalculatePixelResolution(sortingComponent.OriginSpriteRenderer);
-            var otherSpriteResolution = CalculatePixelResolution(otherSortingComponent.OriginSpriteRenderer);
+            var spriteResolution = CalculatePixelResolution(sortingComponent.spriteRenderer);
+            var otherSpriteResolution = CalculatePixelResolution(otherSortingComponent.spriteRenderer);
 
             var hasAutoSortingComponentHigherResolution = spriteResolution >= otherSpriteResolution;
 

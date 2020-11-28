@@ -1,13 +1,16 @@
 ﻿namespace SpriteSortingPlugin.AutomaticSorting
 {
-    public class AutoSortingComponent : SortingComponent
+    public class AutoSortingComponent
     {
+        public readonly SortingComponent sortingComponent;
+
         public int sortingOrder;
         public SortingComponent containedByAutoSortingComponent;
 
-        public AutoSortingComponent(SortingComponent sortingComponent) : base(sortingComponent)
+        public AutoSortingComponent(SortingComponent sortingComponent)
         {
-            sortingOrder = OriginSortingOrder;
+            this.sortingComponent = sortingComponent;
+            sortingOrder = sortingComponent.OriginSortingOrder;
         }
     }
 }

@@ -150,7 +150,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
 
             foreach (var overlappingItem in overlappingItems)
             {
-                excludingSpriteRendererList.Add(overlappingItem.OriginSpriteRenderer);
+                excludingSpriteRendererList.Add(overlappingItem.sortingComponent.spriteRenderer);
 
                 var newSortingOrder = overlappingItem.GetNewSortingOrder();
                 if (overlappingItem.originSortingOrder == newSortingOrder)
@@ -159,8 +159,8 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
                 }
 
                 //TODO cache sortingComponents for better performance
-                var sortingComponent = new SortingComponent(overlappingItem.OriginSpriteRenderer,
-                    overlappingItem.OutmostSortingGroup);
+                var sortingComponent = new SortingComponent(overlappingItem.sortingComponent.spriteRenderer,
+                    overlappingItem.sortingComponent.sortingGroup);
                 baseSortingComponents.Add(sortingComponent);
                 sortingOptions.Add(sortingComponent.GetInstanceId(), newSortingOrder);
             }
@@ -232,7 +232,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
                     sortingOptions.Add(baseSortingComponentInstanceId, currentBaseSortingOrder);
                 }
 
-                Debug.Log("check overlapping sprites against " + baseSortingComponent.OriginSpriteRenderer.name);
+                Debug.Log("check overlapping sprites against " + baseSortingComponent.spriteRenderer.name);
 
                 var hasOverlappingSortingComponents = tempOverlappingSpriteDetector.DetectOverlappingSortingComponents(
                     baseSortingComponent, out List<SortingComponent> overlappingSprites, out var baseItem);
@@ -256,7 +256,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
                     // baseSortingComponent.spriteRenderer.name, overlappingSprite.spriteRenderer.name);
                     counter++;
 
-                    newExcludingList.Add(overlappingSprite.OriginSpriteRenderer);
+                    newExcludingList.Add(overlappingSprite.spriteRenderer);
 
                     var currentSortingComponentInstanceId = overlappingSprite.GetInstanceId();
                     var currentSortingOrder = overlappingSprite.OriginSortingOrder;
@@ -412,7 +412,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
             overlappingComponents = new List<SortingComponent>();
             baseItem = null;
             Debug.Log("start search in " + filteredSortingComponents.Count + " sprite renderers for an overlap with " +
-                      sortingComponentToCheck.OriginSpriteRenderer.name);
+                      sortingComponentToCheck.spriteRenderer.name);
             if (polygonColliderToCheck == null)
             {
                 polygonColliderCacher = PolygonColliderCacher.GetInstance();
@@ -420,7 +420,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
 
             ResetOverlappingDetectionVariables();
 
-            SetSpriteOutline(sortingComponentToCheck.OriginSpriteRenderer);
+            SetSpriteOutline(sortingComponentToCheck.spriteRenderer);
 
             foreach (var sortingComponent in filteredSortingComponents)
             {
@@ -429,9 +429,9 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
                     continue;
                 }
 
-                if (sortingComponentToCheck.OutmostSortingGroup != null &&
-                    sortingComponent.OutmostSortingGroup != null &&
-                    sortingComponentToCheck.OutmostSortingGroup == sortingComponent.OutmostSortingGroup)
+                if (sortingComponentToCheck.sortingGroup != null &&
+                    sortingComponent.sortingGroup != null &&
+                    sortingComponentToCheck.sortingGroup == sortingComponent.sortingGroup)
                 {
                     continue;
                 }
@@ -444,13 +444,13 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
                 }
 
                 if (spriteDetectionData.cameraProjectionType == CameraProjectionType.Orthographic && Math.Abs(
-                    sortingComponent.OriginSpriteRenderer.transform.position.z - boundsToCheck.center.z) > Tolerance)
+                    sortingComponent.spriteRenderer.transform.position.z - boundsToCheck.center.z) > Tolerance)
                 {
                     //TODO: is z the distance to the camera? if not maybe create something to choose for the user
                     continue;
                 }
 
-                var isOverlapping = IsOverlapping(sortingComponent.OriginSpriteRenderer);
+                var isOverlapping = IsOverlapping(sortingComponent.spriteRenderer);
                 if (!isOverlapping)
                 {
                     continue;

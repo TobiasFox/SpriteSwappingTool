@@ -294,7 +294,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 }
                 else
                 {
-                    overlappingItem.sortingOrder = overlappingItem.AutoSortingOrder;
+                    overlappingItem.sortingOrder = overlappingItem.OriginAutoSortingOrder;
                 }
 
                 overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();

@@ -862,7 +862,12 @@ namespace SpriteSortingPlugin
 
                 if (isReplacingOverlappingItemsWithAutoSortedResult)
                 {
-                    var sortingComponentList = new List<SortingComponent>(resultList);
+                    var sortingComponentList = new List<SortingComponent>();
+                    foreach (var autoSortingComponent in resultList)
+                    {
+                        sortingComponents.Add(autoSortingComponent.sortingComponent);
+                    }
+
                     overlappingSpriteDetectionResult.overlappingSortingComponents = sortingComponentList;
 
                     overlappingSpriteDetectionResult.ConvertToOverlappingItems(out overlappingItemList,
@@ -871,7 +876,7 @@ namespace SpriteSortingPlugin
                     for (var i = 0; i < overlappingItemList.Count; i++)
                     {
                         var overlappingItem = overlappingItemList[i];
-                        overlappingItem.AutoSortingOrder = resultList[i].sortingOrder;
+                        overlappingItem.OriginAutoSortingOrder = resultList[i].sortingOrder;
                     }
                 }
                 else

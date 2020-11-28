@@ -61,7 +61,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
         {
             baseItemAssetGuid =
                 AssetDatabase.AssetPathToGUID(
-                    AssetDatabase.GetAssetPath(baseItem.OriginSpriteRenderer.sprite.GetInstanceID()));
+                    AssetDatabase.GetAssetPath(baseItem.spriteRenderer.sprite.GetInstanceID()));
 
             hasBaseItemSpriteDataItem = spriteDetectionData.spriteData != null &&
                                         spriteDetectionData.spriteData.spriteDataDictionary.TryGetValue(
@@ -81,7 +81,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                     }
 
                     baseOOBB = baseItemSpriteDataItem.objectOrientedBoundingBox;
-                    baseOOBB.UpdateBox(baseItem.OriginSpriteRenderer.transform);
+                    baseOOBB.UpdateBox(baseItem.spriteRenderer.transform);
                     break;
                 case OutlinePrecision.PixelPerfect:
                     if (!baseItemSpriteDataItem.IsValidOutline())
@@ -90,15 +90,15 @@ namespace SpriteSortingPlugin.AutomaticSorting
                     }
 
                     basePolygonCollider = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
-                        baseItemAssetGuid, baseItemSpriteDataItem, baseItem.OriginSpriteRenderer.transform);
+                        baseItemAssetGuid, baseItemSpriteDataItem, baseItem.spriteRenderer.transform);
                     break;
             }
         }
 
         private bool ContainsBaseItem(SortingComponent sortingComponent, out float surfaceArea)
         {
-            var baseItemBounds = baseItem.OriginSpriteRenderer.bounds;
-            var sortingComponentsBounds = sortingComponent.OriginSpriteRenderer.bounds;
+            var baseItemBounds = baseItem.spriteRenderer.bounds;
+            var sortingComponentsBounds = sortingComponent.spriteRenderer.bounds;
 
             surfaceArea = sortingComponentsBounds.size.x * sortingComponentsBounds.size.y;
             if (!sortingComponentsBounds.Intersects(baseItemBounds))
@@ -113,7 +113,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
             var sortingComponentAssetGuid =
                 AssetDatabase.AssetPathToGUID(
-                    AssetDatabase.GetAssetPath(sortingComponent.OriginSpriteRenderer.sprite.GetInstanceID()));
+                    AssetDatabase.GetAssetPath(sortingComponent.spriteRenderer.sprite.GetInstanceID()));
 
             var hasSortingComponentSpriteDataItem =
                 spriteDetectionData.spriteData.spriteDataDictionary.TryGetValue(sortingComponentAssetGuid,
@@ -139,7 +139,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                         otherOOBB = (ObjectOrientedBoundingBox) otherOOBB.Clone();
                     }
 
-                    otherOOBB.UpdateBox(sortingComponent.OriginSpriteRenderer.transform);
+                    otherOOBB.UpdateBox(sortingComponent.spriteRenderer.transform);
 
                     var isContained = otherOOBB.Contains(baseOOBB);
                     if (isContained)
@@ -157,7 +157,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
                     var otherPolygonCollider = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
                         sortingComponentAssetGuid, sortingComponentSpriteDataItem,
-                        sortingComponent.OriginSpriteRenderer.transform);
+                        sortingComponent.spriteRenderer.transform);
 
                     var distance = otherPolygonCollider.Distance(basePolygonCollider);
 
@@ -181,7 +181,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                     if (isContained)
                     {
                         surfaceArea =
-                            sortingComponentSpriteDataItem.CalculatePolygonArea(sortingComponent.OriginSpriteRenderer
+                            sortingComponentSpriteDataItem.CalculatePolygonArea(sortingComponent.spriteRenderer
                                 .transform);
                     }
 

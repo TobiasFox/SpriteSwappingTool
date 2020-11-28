@@ -8,24 +8,21 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class SortingComponent
     {
-        private readonly SpriteRenderer originSpriteRenderer;
-        private readonly SortingGroup outmostSortingGroup;
+        public readonly SpriteRenderer spriteRenderer;
+        public readonly SortingGroup sortingGroup;
 
-        protected HashSet<int> overlappingSortingComponents;
+        private HashSet<int> overlappingSortingComponents;
 
-        public SpriteRenderer OriginSpriteRenderer => originSpriteRenderer;
-        public SortingGroup OutmostSortingGroup => outmostSortingGroup;
-
-        public SortingComponent(SpriteRenderer originSpriteRenderer, SortingGroup outmostSortingGroup = null)
+        public SortingComponent(SpriteRenderer spriteRenderer, SortingGroup sortingGroup = null)
         {
-            this.originSpriteRenderer = originSpriteRenderer;
-            this.outmostSortingGroup = outmostSortingGroup;
+            this.spriteRenderer = spriteRenderer;
+            this.sortingGroup = sortingGroup;
         }
 
         public SortingComponent(SortingComponent otherSortingComponent)
         {
-            this.originSpriteRenderer = otherSortingComponent.originSpriteRenderer;
-            this.outmostSortingGroup = otherSortingComponent.outmostSortingGroup;
+            this.spriteRenderer = otherSortingComponent.spriteRenderer;
+            this.sortingGroup = otherSortingComponent.sortingGroup;
 
             if (otherSortingComponent.overlappingSortingComponents != null)
             {
@@ -41,12 +38,12 @@ namespace SpriteSortingPlugin
         {
             get
             {
-                if (OutmostSortingGroup != null)
+                if (sortingGroup != null)
                 {
-                    return OutmostSortingGroup.sortingOrder;
+                    return sortingGroup.sortingOrder;
                 }
 
-                return OriginSpriteRenderer != null ? OriginSpriteRenderer.sortingOrder : 0;
+                return spriteRenderer != null ? spriteRenderer.sortingOrder : 0;
             }
         }
 
@@ -54,20 +51,20 @@ namespace SpriteSortingPlugin
         {
             get
             {
-                if (OutmostSortingGroup != null)
+                if (sortingGroup != null)
                 {
-                    return OutmostSortingGroup.sortingLayerID;
+                    return sortingGroup.sortingLayerID;
                 }
 
-                return OriginSpriteRenderer != null ? OriginSpriteRenderer.sortingLayerID : 0;
+                return spriteRenderer != null ? spriteRenderer.sortingLayerID : 0;
             }
         }
 
         public int GetInstanceId()
         {
-            return OutmostSortingGroup != null
-                ? OutmostSortingGroup.GetInstanceID()
-                : OriginSpriteRenderer.GetInstanceID();
+            return sortingGroup != null
+                ? sortingGroup.GetInstanceID()
+                : spriteRenderer.GetInstanceID();
         }
 
         public override bool Equals(object obj)
@@ -82,18 +79,18 @@ namespace SpriteSortingPlugin
 
         public bool Equals(SortingComponent other)
         {
-            return OriginSpriteRenderer == other.OriginSpriteRenderer &&
-                   OutmostSortingGroup == other.OutmostSortingGroup;
+            return spriteRenderer == other.spriteRenderer &&
+                   sortingGroup == other.sortingGroup;
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashcode = 397 * originSpriteRenderer.GetHashCode();
-                if (outmostSortingGroup != null)
+                var hashcode = 397 * spriteRenderer.GetHashCode();
+                if (sortingGroup != null)
                 {
-                    hashcode ^= outmostSortingGroup.GetHashCode();
+                    hashcode ^= sortingGroup.GetHashCode();
                 }
 
                 return hashcode;
@@ -122,8 +119,8 @@ namespace SpriteSortingPlugin
 
         public override string ToString()
         {
-            return "SortingComponent[" + OriginSpriteRenderer.name + ", " + OriginSortingLayer + ", " +
-                   OriginSortingOrder + ", SG:" + (OutmostSortingGroup != null) + "]";
+            return "SortingComponent[" + spriteRenderer.name + ", " + OriginSortingLayer + ", " +
+                   OriginSortingOrder + ", SG:" + (sortingGroup != null) + "]";
         }
     }
 }
