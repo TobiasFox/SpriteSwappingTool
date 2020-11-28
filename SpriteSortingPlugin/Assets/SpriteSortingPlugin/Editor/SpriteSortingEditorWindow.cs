@@ -850,7 +850,8 @@ namespace SpriteSortingPlugin
             List<OverlappingItem> overlappingItemList;
             OverlappingItem overlappingBaseItem;
 
-            if (isApplyingAutoSorting)
+            var isApplyingAutoSortingForAnalysis = isApplyingAutoSorting && HasActiveAutoSortingCriteria();
+            if (isApplyingAutoSortingForAnalysis)
             {
                 var sortingComponents =
                     new List<SortingComponent>(overlappingSpriteDetectionResult.overlappingSortingComponents);
@@ -899,6 +900,26 @@ namespace SpriteSortingPlugin
             preview.UpdateOverlappingItems(overlappingItems);
             preview.UpdateSpriteData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
+        }
+
+        private bool HasActiveAutoSortingCriteria()
+        {
+            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+            {
+                if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
+                {
+                    continue;
+                }
+
+                if (!sortingCriteriaComponent.sortingCriterionData.isActive)
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         private void DrawAdditionalListOfAutoSortingResult(List<AutoSortingComponent> resultList)
