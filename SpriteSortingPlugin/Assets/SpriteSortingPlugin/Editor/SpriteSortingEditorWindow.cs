@@ -404,6 +404,7 @@ namespace SpriteSortingPlugin
                 }
 
                 DrawHorizontalLine(true);
+                var isMinOneSortingCriterionEditorDrawn = false;
 
                 for (var i = 0; i < sortingCriteriaComponents.Count; i++)
                 {
@@ -414,13 +415,18 @@ namespace SpriteSortingPlugin
                     }
 
                     sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
+                    isMinOneSortingCriterionEditorDrawn = true;
                     if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
                     {
                         DrawHorizontalLine();
                     }
                 }
 
-                DrawHorizontalLine(true);
+                if (isMinOneSortingCriterionEditorDrawn)
+                {
+                    DrawHorizontalLine(true);
+                }
+
                 var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
                 using (new EditorGUILayout.HorizontalScope())
                 {
