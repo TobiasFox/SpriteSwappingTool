@@ -865,7 +865,7 @@ namespace SpriteSortingPlugin
                     var sortingComponentList = new List<SortingComponent>();
                     foreach (var autoSortingComponent in resultList)
                     {
-                        sortingComponents.Add(autoSortingComponent.sortingComponent);
+                        sortingComponentList.Add(autoSortingComponent.sortingComponent);
                     }
 
                     overlappingSpriteDetectionResult.overlappingSortingComponents = sortingComponentList;

@@ -64,8 +64,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
         private static void CreateResolutionDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
+            sortingCriterionData.isSortingInForeground = true;
             sortingCriterionData.criterionName = "Sprite Resolution";
-            sortingCriterionData.foregroundSortingName = "Is sprite with higher pixel density in foreground";
+            sortingCriterionData.foregroundSortingName = "Is sprite with higher resolution in foreground";
             sortingCriteriaComponent.sortingCriterion = new ResolutionSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
