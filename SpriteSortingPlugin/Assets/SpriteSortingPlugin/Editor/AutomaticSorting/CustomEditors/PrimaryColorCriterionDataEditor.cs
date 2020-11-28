@@ -40,13 +40,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
                 for (var i = 0; i < PrimaryColorSortingCriterionData.activeChannels.Length; i++)
                 {
-                    EditorGUIUtility.labelWidth = ChannelLabelWidth[i];
-                    PrimaryColorSortingCriterionData.activeChannels[i] = EditorGUILayout.Toggle(ChannelNames[i],
-                        PrimaryColorSortingCriterionData.activeChannels[i]);
+                    PrimaryColorSortingCriterionData.activeChannels[i] = GUILayout.Toggle(
+                        PrimaryColorSortingCriterionData.activeChannels[i], ChannelNames[i], Styling.ButtonStyle,
+                        GUILayout.ExpandWidth(true));
                 }
-
-                EditorGUIUtility.labelWidth = 0;
-                GUILayout.FlexibleSpace();
             }
 
             PrimaryColorSortingCriterionData.backgroundColor = EditorGUILayout.ColorField("Background Color",
