@@ -344,12 +344,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     sharpness = EditorGUILayout.DoubleField("Sharpness", sharpness);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        if (sharpness < 0)
-                        {
-                            sharpness = 0d;
-                        }
-
-                        selectedSpriteDataItem.spriteAnalysisData.sharpness = sharpness;
+                        selectedSpriteDataItem.spriteAnalysisData.sharpness = Math.Max(0, sharpness);
                     }
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))

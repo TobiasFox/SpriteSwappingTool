@@ -7,16 +7,16 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class ObjectOrientedBoundingBox : ISerializationCallbackReceiver, ICloneable
     {
-        [SerializeField] private bool isInitialized;
+        [SerializeField, HideInInspector] private bool isInitialized;
         [SerializeField, HideInInspector] private Vector2[] localWorldPoints = new Vector2[4];
-        [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
+        [SerializeField, HideInInspector] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
         [SerializeField] public float zRotation;
         private Quaternion rotation;
         private Bounds ownBounds;
         [SerializeField] private Vector2 boundsCenter;
         [SerializeField] private Vector2 boundsSize;
-        [SerializeField] private Vector2 boundsCenterOffset;
+        [SerializeField, HideInInspector] private Vector2 boundsCenterOffset;
 
         private Vector2 lastGlobalScale;
         private Vector2[] axes;
