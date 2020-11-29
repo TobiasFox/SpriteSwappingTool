@@ -1,6 +1,5 @@
 ﻿using SpriteSortingPlugin.AutomaticSorting.Data;
 using UnityEditor;
-using UnityEngine;
 
 namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 {
@@ -10,15 +9,16 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         private LightnessSortingCriterionData LightnessSortingCriterionData =>
             (LightnessSortingCriterionData) sortingCriterionData;
 
+        protected override void InternalInitialize()
+        {
+            title = "Perceived Sprite Lightness";
+            tooltip = "";
+        }
+
         protected override void OnInspectorGuiInternal()
         {
             LightnessSortingCriterionData.isLighterSpriteIsInForeground = EditorGUILayout.ToggleLeft(
                 "Is lighter sprite in foreground", LightnessSortingCriterionData.isLighterSpriteIsInForeground);
-        }
-
-        public override string GetTitleName()
-        {
-            return "Perceived Sprite Lightness";
         }
     }
 }

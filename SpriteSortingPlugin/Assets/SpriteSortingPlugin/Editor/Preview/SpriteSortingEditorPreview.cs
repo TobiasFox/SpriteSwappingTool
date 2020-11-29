@@ -67,7 +67,10 @@ namespace SpriteSortingPlugin.Preview
 
                 EditorGUI.BeginChangeCheck();
                 isVisualizingBoundsInScene =
-                    EditorGUILayout.ToggleLeft("Visualize Bounds in Scene", isVisualizingBoundsInScene,
+                    EditorGUILayout.ToggleLeft(
+                        new GUIContent("Visualize Bounds in Scene",
+                            "When enabled, SpriteRenderer outlines will be drawn in the scene."),
+                        isVisualizingBoundsInScene,
                         GUILayout.Width(180));
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -76,7 +79,10 @@ namespace SpriteSortingPlugin.Preview
 
                 EditorGUI.BeginChangeCheck();
                 isVisualizingSortingOrder =
-                    EditorGUILayout.ToggleLeft("Display Sorting Order", isVisualizingSortingOrder,
+                    EditorGUILayout.ToggleLeft(
+                        new GUIContent("Display Sorting Order",
+                            "When enabled, the current sorting order and the modified sorting order will be displayed in the scene as text."),
+                        isVisualizingSortingOrder,
                         GUILayout.Width(160));
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -85,7 +91,10 @@ namespace SpriteSortingPlugin.Preview
 
                 EditorGUI.BeginChangeCheck();
                 isVisualizingSortingLayer =
-                    EditorGUILayout.ToggleLeft("Display Sorting Layer", isVisualizingSortingLayer,
+                    EditorGUILayout.ToggleLeft(
+                        new GUIContent("Display Sorting Layer",
+                            "When enabled, the current sorting layer and the modified sorting layer will be displayed in the scene as text."),
+                        isVisualizingSortingLayer,
                         GUILayout.Width(170));
                 if (EditorGUI.EndChangeCheck())
                 {

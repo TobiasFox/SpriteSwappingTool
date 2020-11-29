@@ -8,10 +8,16 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
     public class PrimaryColorCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
     {
         private static readonly string[] ChannelNames = new string[] {"Red", "Green", "Blue"};
-        private static readonly int[] ChannelLabelWidth = new[] {42, 50, 42};
 
         private PrimaryColorSortingCriterionData PrimaryColorSortingCriterionData =>
             (PrimaryColorSortingCriterionData) sortingCriterionData;
+
+        protected override void InternalInitialize()
+        {
+            title = "Primary Color";
+            tooltip =
+                "Compares the primary color of given SpriteRenderers and sorts SpriteRenderer in the foreground which are close to the foreground color.";
+        }
 
         protected override void OnInspectorGuiInternal()
         {
@@ -19,7 +25,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.PrefixLabel("Channels");
+                EditorGUILayout.PrefixLabel(new GUIContent("Channels", "Specify which color channels should be used."));
 
                 if (GUILayout.Button("All",
                     GUILayout.Width(25f), GUILayout.ExpandWidth(false)))
@@ -46,8 +52,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 }
             }
 
-            PrimaryColorSortingCriterionData.backgroundColor = EditorGUILayout.ColorField("Background Color",
-                PrimaryColorSortingCriterionData.backgroundColor);
+            PrimaryColorSortingCriterionData.foregroundColor = EditorGUILayout.ColorField(
+                new GUIContent("Foreground Color",
+                    "Specify the color of SpriteRenderers, which will be sorted in the foreground."),
+                PrimaryColorSortingCriterionData.foregroundColor);
 
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -61,13 +69,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 GUILayout.FlexibleSpace();
             }
 
-            PrimaryColorSortingCriterionData.foregroundColor = EditorGUILayout.ColorField("Foreground Color",
-                PrimaryColorSortingCriterionData.foregroundColor);
-        }
-
-        public override string GetTitleName()
-        {
-            return "Primary Color";
+            PrimaryColorSortingCriterionData.backgroundColor = EditorGUILayout.ColorField(
+                new GUIContent("Background Color",
+                    "Specify the color of SpriteRenderers, which will be sorted in the background."),
+                PrimaryColorSortingCriterionData.backgroundColor);
         }
     }
 }

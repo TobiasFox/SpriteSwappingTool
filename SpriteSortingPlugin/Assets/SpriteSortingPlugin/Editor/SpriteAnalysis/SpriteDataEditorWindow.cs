@@ -212,7 +212,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                                 EditorGUI.BeginChangeCheck();
 
                                 GUILayout.Toggle(outlinePrecision == outlinePrecisionType,
-                                    outlinePrecisionType.ToString(), Styling.ButtonStyle);
+                                    ObjectNames.NicifyVariableName(outlinePrecisionType.ToString()),
+                                    Styling.ButtonStyle);
                                 if (EditorGUI.EndChangeCheck())
                                 {
                                     outlinePrecision = outlinePrecisionType;

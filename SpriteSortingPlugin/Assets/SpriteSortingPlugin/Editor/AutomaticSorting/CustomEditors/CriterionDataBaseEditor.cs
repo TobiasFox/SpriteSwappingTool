@@ -7,9 +7,14 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
     public abstract class CriterionDataBaseEditor<T> : Editor where T : SortingCriterionData
     {
         protected T sortingCriterionData;
+        protected string title = "Criteria";
+        protected string tooltip = "";
 
         private Rect headerRect;
         private bool isShowingInInspector;
+
+        public string Title => title;
+        public string Tooltip => tooltip;
 
         public void Initialize(T sortingCriterionData, bool isShowingInInspector = false)
         {
@@ -45,11 +50,6 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         }
 
         protected abstract void OnInspectorGuiInternal();
-
-        public virtual string GetTitleName()
-        {
-            return "Criteria";
-        }
 
         private new void DrawHeader()
         {
@@ -104,7 +104,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                     EditorGUIUtility.labelWidth = 0;
                 }
 
-                EditorGUI.LabelField(labelRect, GetTitleName(), EditorStyles.boldLabel);
+                EditorGUI.LabelField(labelRect, new GUIContent(title, tooltip), EditorStyles.boldLabel);
             }
 
             if (!isShowingInInspector)
