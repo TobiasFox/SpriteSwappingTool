@@ -13,16 +13,15 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
         protected override void InternalInitialize()
         {
-            title = "Position difference";
-            tooltip =
-                "Compares the distance to the camera. Will be ignored when using orthographic Transparency Sort mode or Default Transparency Sort mode and orthographic camera project.";
+            title = "Camera distance difference";
+            tooltip = UITooltipConstants.CameraDistanceTooltip;
         }
 
         protected override void OnInspectorGuiInternal()
         {
             PositionSortingCriterionData.isFurtherAwaySpriteInForeground = EditorGUILayout.ToggleLeft(
                 new GUIContent("Is further away Sprite in foreground",
-                    "When enabled, SpriteRenderer with a higher distance to the camera will be sorted in the foreground."),
+                    UITooltipConstants.CameraDistanceForegroundSpriteTooltip),
                 PositionSortingCriterionData.isFurtherAwaySpriteInForeground);
         }
     }

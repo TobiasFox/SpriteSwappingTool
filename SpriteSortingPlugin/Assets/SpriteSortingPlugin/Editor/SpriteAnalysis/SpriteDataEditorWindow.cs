@@ -180,9 +180,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     leftBarScrollPosition = scrollScope.scrollPosition;
                     using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                     {
-                        GUILayout.Label(
-                            new GUIContent("Edit Sprite Data",
-                                "Choose either to see and modify the sprite outline or the sprite details."),
+                        GUILayout.Label(new GUIContent("Edit Sprite Data", UITooltipConstants.SpriteDataEditModeTooltip),
                             Styling.CenteredStyle, GUILayout.ExpandWidth(true));
 
                         using (new EditorGUILayout.HorizontalScope(Styling.HelpBoxStyle))
@@ -207,7 +205,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                             EditorGUILayout.Space();
 
                             GUILayout.Label(new GUIContent("Preview Outline",
-                                "Specify the type of the sprite outline to be drawn when a sprite is selected."));
+                                UITooltipConstants.SpriteDataPreviewOutlineTooltip));
                             foreach (OutlinePrecision outlinePrecisionType in OutlinePrecisionTypes)
                             {
                                 EditorGUI.BeginChangeCheck();
@@ -221,8 +219,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                                 }
                             }
 
-                            GUILayout.Label(new GUIContent("Outline Color",
-                                "Specify the color of the sprite outline."));
+                            GUILayout.Label(new GUIContent("Outline Color", UITooltipConstants.SpriteDataOutlineColorTooltip));
                             outlineColor = EditorGUILayout.ColorField(outlineColor);
                         }
                     }
@@ -231,8 +228,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     EditorGUILayout.Space();
 
                     GUILayout.Label(
-                        new GUIContent("Sprites",
-                            "A list of all Sprites which were analyzed in current " + nameof(SpriteData) + " asset."),
+                        new GUIContent("Sprites", UITooltipConstants.SpriteDataSpriteListTooltip),
                         Styling.CenteredStyle, GUILayout.ExpandWidth(true));
                     EditorGUI.BeginChangeCheck();
                     searchString = searchField.OnGUI(searchString);
@@ -267,7 +263,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     if (GUILayout.Button("Load"))
                     {
-                        Debug.Log("loaded sprite Alpha Data");
                         LoadSpriteDataList();
                     }
                 }
@@ -281,7 +276,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         EditorGUIUtility.labelWidth = 80;
                         EditorGUI.BeginChangeCheck();
                         spriteDataAnalysisType = (SpriteDataAnalysisType) EditorGUILayout.EnumFlagsField(
-                            new GUIContent("Analysis Type", "Specify the types of data to be analyzed."),
+                            new GUIContent("Analysis Type", UITooltipConstants.SpriteDataAnalysisTypeTooltip),
                             spriteDataAnalysisType, GUILayout.MinWidth(200));
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -292,15 +287,14 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         }
 
                         outlineAnalysisType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField(
-                            new GUIContent("Outline Type", "Specify the outline types to analyze."),
+                            new GUIContent("Outline Type", UITooltipConstants.SpriteDataOutlineAnalysisTypeTooltip),
                             outlineAnalysisType, GUILayout.MinWidth(200));
 
                         EditorGUIUtility.labelWidth = 0;
                     }
 
                     if (GUILayout.Button(new GUIContent("Analyze all sprites + create new SpriteData",
-                        "This action will select all visible sprites in opened scenes, analyze these sprites according to the selected Analysis Types and create a new " +
-                        nameof(SpriteData) + " asset.")))
+                        UITooltipConstants.SpriteDataAnalyzeAllTooltip)))
                     {
                         AnalyzeSpriteAlphas();
                     }
@@ -325,7 +319,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 {
                     var resolutionLabel = EditorGUILayout.GetControlRect();
                     var resolutionContentLabel = EditorGUI.PrefixLabel(resolutionLabel,
-                        new GUIContent("Resolution", "The sprites resolution in pixel."));
+                        new GUIContent("Resolution", UITooltipConstants.SpriteDataResolutionTooltip));
                     var spriteSize = hasSelectedDataItem
                         ? new int[] {selectedSprite.texture.width, selectedSprite.texture.height}
                         : new int[] {0, 0};
@@ -344,9 +338,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 {
                     EditorGUI.BeginChangeCheck();
                     var sharpness = hasSelectedDataItem ? selectedSpriteDataItem.spriteAnalysisData.sharpness : 0;
-                    sharpness = EditorGUILayout.DoubleField(new GUIContent("Sharpness",
-                        "This value indicates how sharp a sprite is. The higher the value, the sharper the sprite.\n" +
-                        "Minimum: 0.0 "), sharpness);
+                    sharpness = EditorGUILayout.DoubleField(new GUIContent("Sharpness", UITooltipConstants.SpriteDataSharpnessTooltip),
+                        sharpness);
                     if (EditorGUI.EndChangeCheck())
                     {
                         selectedSpriteDataItem.spriteAnalysisData.sharpness = Math.Max(0, sharpness);
@@ -365,9 +358,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     var perceivedLightness = hasSelectedDataItem
                         ? selectedSpriteDataItem.spriteAnalysisData.perceivedLightness
                         : 0;
-                    perceivedLightness = EditorGUILayout.Slider(new GUIContent("Perceived Lightness",
-                        "This value represents the average perceived lightness of a sprite, where 0 means dark and 100.0 means bright.\n" +
-                        "Range: 0.0 - 100.0"), perceivedLightness, 0, 100);
+                    perceivedLightness = EditorGUILayout.Slider(
+                        new GUIContent("Perceived Lightness", UITooltipConstants.SpriteDataPerceivedLightnessTooltip),
+                        perceivedLightness, 0, 100);
                     if (EditorGUI.EndChangeCheck())
                     {
                         selectedSpriteDataItem.spriteAnalysisData.perceivedLightness = perceivedLightness;
@@ -387,8 +380,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         ? selectedSpriteDataItem.spriteAnalysisData.averageAlpha
                         : 0;
                     averageAlpha = EditorGUILayout.Slider(
-                        new GUIContent("Average alpha",
-                            "This value represents the average alpha of a sprite ignoring completely transparent pixels."),
+                        new GUIContent("Average alpha", UITooltipConstants.SpriteDataAverageAlphaTooltip),
                         averageAlpha, 0, 1);
                     if (EditorGUI.EndChangeCheck())
                     {
@@ -409,9 +401,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         ? selectedSpriteDataItem.spriteAnalysisData.primaryColor
                         : Color.black;
                     primaryColor = EditorGUILayout.ColorField(
-                        new GUIContent("Primary Color",
-                            "This is the primary or average Color of a sprite ignoring completely transparent pixels."),
-                        primaryColor);
+                        new GUIContent("Primary Color", UITooltipConstants.SpriteDataPrimaryColorTooltip), primaryColor);
                     if (EditorGUI.EndChangeCheck())
                     {
                         selectedSpriteDataItem.spriteAnalysisData.primaryColor = primaryColor;

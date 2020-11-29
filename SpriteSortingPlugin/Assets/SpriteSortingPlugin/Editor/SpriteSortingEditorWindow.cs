@@ -326,8 +326,7 @@ namespace SpriteSortingPlugin
                     {
                         EditorGUI.BeginChangeCheck();
                         spriteData = EditorGUILayout.ObjectField(
-                            new GUIContent("Sprite Data Asset",
-                                "This asset contains analyzed data of sprites such as a more accurate outline or other data which is used to generate a sorting suggestion."),
+                            new GUIContent("Sprite Data Asset", UITooltipConstants.SortingEditorSpriteDataAssetTooltip),
                             spriteData, typeof(SpriteData), false) as SpriteData;
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -387,8 +386,7 @@ namespace SpriteSortingPlugin
             {
                 isApplyingAutoSorting =
                     EditorGUILayout.Toggle(
-                        new GUIContent("use automatic sorting?",
-                            "Enable to generate an automatic sorting order suggestion of overlapping and unsorted SpriteRenderer based on given sorting criteria."),
+                        new GUIContent("use automatic sorting?", UITooltipConstants.SortingEditorUsingAutoSortingTooltip),
                         isApplyingAutoSorting);
 
                 if (!isApplyingAutoSorting)
@@ -565,8 +563,7 @@ namespace SpriteSortingPlugin
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     GUILayout.Label(
-                        new GUIContent("Sorting Type",
-                            "Specify, if either a completely Sorting Layer or a single sprite is used to identify overlapping SpriteRenderers."),
+                        new GUIContent("Sorting Type", UITooltipConstants.SortingEditorSortingTypeTooltip),
                         GUILayout.ExpandWidth(false));
 
                     GUILayout.FlexibleSpace();
@@ -592,7 +589,7 @@ namespace SpriteSortingPlugin
                         using (var gameObjectParentScope =
                             new EditorGUILayout.ToggleGroupScope(
                                 new GUIContent("use specific GameObject parents?",
-                                    "Search for overlapping SpriteRenderer in the given GameObjects only."),
+                                    UITooltipConstants.SortingEditorUsingGameObjectParentsTooltip),
                                 isUsingGameObjectParents))
                         {
                             isUsingGameObjectParents = gameObjectParentScope.enabled;
@@ -616,7 +613,7 @@ namespace SpriteSortingPlugin
                         var serializedSpriteRenderer = serializedObject.FindProperty(nameof(spriteRenderer));
                         EditorGUILayout.PropertyField(serializedSpriteRenderer,
                             new GUIContent(serializedSpriteRenderer.displayName,
-                                "Select a SpriteRenderer to search for overlapping SpriteRenderers."), true);
+                                UITooltipConstants.SortingEditorSingleSpriteRendererTooltip), true);
 
                         // //TODO: will not work for prefab scene
                         if (serializedSpriteRenderer.objectReferenceValue == null ||
@@ -647,7 +644,7 @@ namespace SpriteSortingPlugin
                     EditorGUIUtility.labelWidth = 350;
                     EditorGUILayout.LabelField(
                         new GUIContent("Transparency Sort Mode (Change via Project Settings):",
-                            "Determines how SpriteRenderers are being prioritized during sorting. Change this mode in the project setting."),
+                            UITooltipConstants.SortingEditorTransparencySortModeTooltip),
                         new GUIContent(projectTransparencySortMode.ToString()));
                     EditorGUIUtility.labelWidth = 0;
                 }
@@ -659,14 +656,13 @@ namespace SpriteSortingPlugin
                         var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
 
                         EditorGUILayout.PropertyField(cameraSerializedProp,
-                            new GUIContent("Camera",
-                                "The camera which is used to render SpriteRenderers (especially overlapping ones)."));
+                            new GUIContent("Camera", UITooltipConstants.SortingEditorCameraTooltip));
 
                         if (cameraSerializedProp.objectReferenceValue == null)
                         {
                             EditorGUI.indentLevel++;
                             EditorGUILayout.LabelField(new GUIContent("Please choose a camera.", Styling.WarnIcon,
-                                "The camera is necessary to determine the current Transparency Sort Mode and to check distances between SpriteRenderers and the camera."));
+                                UITooltipConstants.SortingEditorMissingCameraTooltip));
                             isAnalyzedButtonDisabled = true;
                             EditorGUI.indentLevel--;
                         }
@@ -690,7 +686,7 @@ namespace SpriteSortingPlugin
                 }
 
                 EditorGUILayout.LabelField(new GUIContent("Outline Precision",
-                    "Choose the outline precision of sprites. The more accurate the precision is, the more time is needed to identify overlapping SpriteRenderers."));
+                    UITooltipConstants.SortingEditorOutlinePrecisionTooltip));
                 foreach (OutlinePrecision outlinePrecisionType in OutlinePrecisionTypes)
                 {
                     using (new EditorGUILayout.HorizontalScope())
@@ -702,21 +698,19 @@ namespace SpriteSortingPlugin
                             case OutlinePrecision.AxisAlignedBoundingBox:
                                 EditorGUILayout.LabelField(
                                     new GUIContent("\u2191      fast      \u2193",
-                                        "Even this is fastest check, its accuracy is not high. Therefore it could identify some sprites which are not visually overlapping because their alpha regions are overlapping."),
+                                        UITooltipConstants.SortingEditorOutlinePrecisionAABBTooltip),
                                     GUILayout.Width(110));
                                 break;
                             case OutlinePrecision.ObjectOrientedBoundingBox:
                                 EditorGUILayout.LabelField(
                                     new GUIContent("\u2191                   \u2193",
-                                        "This outline is more accurate, but the identification of overlapping SpriteRenderers will take slightly more time.\n" +
-                                        "It considers the rotation of SpriteRenderers and requires a " +
-                                        nameof(SpriteData) + " asset."), GUILayout.Width(110));
+                                        UITooltipConstants.SortingEditorOutlinePrecisionOOBBTooltip), GUILayout.Width(110));
                                 break;
                             case OutlinePrecision.PixelPerfect:
                                 EditorGUILayout.LabelField(
                                     new GUIContent("\u2191 accurate \u2193",
-                                        "This outline type has the highest precision, but it will take significantly more time.\n" +
-                                        "Requires a " + nameof(SpriteData) + " asset."), GUILayout.Width(110));
+                                        UITooltipConstants.SortingEditorOutlinePrecisionPixelPerfectTooltip),
+                                    GUILayout.Width(110));
                                 break;
                         }
 
@@ -843,8 +837,7 @@ namespace SpriteSortingPlugin
 
             EditorGUI.BeginChangeCheck();
             selectedSortingLayers = EditorGUILayout.MaskField(
-                new GUIContent("Sorting Layers",
-                    "Choose Sorting Layers to search for overlapping SpriteRenderers."),
+                new GUIContent("Sorting Layers", UITooltipConstants.SortingEditorSortingLayerTooltip),
                 selectedSortingLayers, SortingLayerUtility.SortingLayerNames);
             if (EditorGUI.EndChangeCheck())
             {

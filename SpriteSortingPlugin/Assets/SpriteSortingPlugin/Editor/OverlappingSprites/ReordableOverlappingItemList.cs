@@ -124,8 +124,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
             if (element.IsBaseItem)
             {
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 80, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("Base Item", Styling.BaseItemIcon,
-                        "Every identified SpriteRenderer overlaps with this base item SpriteRenderer and they all had the same sorting options."));
+                    new GUIContent("Base Item", Styling.BaseItemIcon, UITooltipConstants.OverlappingItemListBaseItemTooltip));
                 startX += 80 + 5;
             }
 
@@ -138,8 +137,8 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 Styling.SpriteIcon)
             {
                 tooltip = element.IsBaseItem
-                    ? "The SpriteRenderer of the base item."
-                    : "This SpriteRenderer overlaps with the base item and they had the same sorting options."
+                    ? UITooltipConstants.OverlappingItemListBaseItemSpriteRendererTooltip
+                    : UITooltipConstants.OverlappingItemListSpriteRendererTooltip
             };
 
             EditorGUI.LabelField(new Rect(startX, rect.y, lastElementRectWidth - SelectButtonWidth - 90,
@@ -157,9 +156,15 @@ namespace SpriteSortingPlugin.OverlappingSprites
             {
                 rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
 
+                var sortingGroupLabel = new GUIContent("in outmost Sorting Group", Styling.SortingGroupIcon)
+                {
+                    tooltip = element.IsBaseItem
+                        ? UITooltipConstants.OverlappingItemListBaseItemSortingGroupTooltip
+                        : UITooltipConstants.OverlappingItemListSortingGroupTooltip
+                };
+
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 160, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("in outmost Sorting Group", Styling.SortingGroupIcon,
-                        "This is the outmost SortingGroup of the SpriteRenderer, which had the same sorting options as the base item."));
+                    sortingGroupLabel);
 
                 EditorGUI.LabelField(
                     new Rect(rect.x + 160 + 2.5f, rect.y, 120, EditorGUIUtility.singleLineHeight),
@@ -181,7 +186,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
 
             element.sortingLayerDropDownIndex =
                 EditorGUI.Popup(new Rect(rect.x, rect.y, 135, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("Layer", "Change the sorting layer of this SpriteRenderer."),
+                    new GUIContent("Layer", UITooltipConstants.OverlappingItemListSortingLayerTooltip),
                     element.sortingLayerDropDownIndex, SortingLayerUtility.SortingLayerGuiContents);
 
             if (EditorGUI.EndChangeCheck())
@@ -201,9 +206,9 @@ namespace SpriteSortingPlugin.OverlappingSprites
             var sortingOrderGUIContent = new GUIContent
             {
                 text = "Order " + (isUsingRelativeSortingOrder ? element.originSortingOrder + " +" : ""),
-                tooltip = "Change the sorting order of this SpriteRenderer.\n" + (isUsingRelativeSortingOrder
-                    ? "The sorting order is displayed relative to the sorting order when they were unsorted."
-                    : "This is the total sorting order of the SpriteRenderer.")
+                tooltip = isUsingRelativeSortingOrder
+                    ? UITooltipConstants.OverlappingItemListRelativeSortingOrderTooltip
+                    : UITooltipConstants.OverlappingItemListTotalSortingOrderTooltip
             };
             element.sortingOrder =
                 EditorGUI.DelayedIntField(new Rect(rect.x + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
@@ -245,12 +250,12 @@ namespace SpriteSortingPlugin.OverlappingSprites
         {
             var labelRect = rect;
             labelRect.xMax -= 135 + 45;
-            EditorGUI.LabelField(labelRect, new GUIContent("Overlapping Items",
-                "All listed SpriteRenderers are overlapping and had the same sorting option (identical sorting layer and sorting order)."));
+            EditorGUI.LabelField(labelRect,
+                new GUIContent("Overlapping Items", UITooltipConstants.OverlappingItemListTooltip));
 
             if (GUI.Button(new Rect(rect.width - 172.5f, rect.y, 135, EditorGUIUtility.singleLineHeight),
                 new GUIContent((isUsingRelativeSortingOrder ? "Total" : "Relative") + " Sorting Order",
-                    "Change displaying the sorting order of SpriteRenderers between their total value or their relative value, when they were unsorted."))
+                    UITooltipConstants.OverlappingItemListUsingRelativeSortingOrderTooltip))
             )
             {
                 isUsingRelativeSortingOrder = !isUsingRelativeSortingOrder;

@@ -50,11 +50,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.criterionName = "Size";
             sortingCriterionData.foregroundSortingName = "Is large sprite in foreground";
-            sortingCriterionData.foregroundSortingTooltip =
-                "When enabled, larger sprites will be sorted in the foreground.";
-            sortingCriterionData.criterionTooltip =
-                "Compares the size, their relation as well as the intersection area of SpriteRenderers.\n" +
-                "Requires a " + nameof(SpriteData) + " asset.";
+            sortingCriterionData.foregroundSortingTooltip = UITooltipConstants.SizeForegroundSpriteTooltip;
+            sortingCriterionData.criterionTooltip = UITooltipConstants.SizeTooltip;
             sortingCriteriaComponent.sortingCriterion = new SizeSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -71,10 +68,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.isSortingInForeground = true;
             sortingCriterionData.criterionName = "Sprite Resolution";
-            sortingCriterionData.criterionTooltip = "Compares the sprites resolution in pixel.";
+            sortingCriterionData.criterionTooltip = UITooltipConstants.ResolutionTooltip;
             sortingCriterionData.foregroundSortingName = "Is sprite with higher resolution in foreground";
-            sortingCriterionData.foregroundSortingTooltip =
-                "When enabled, sprites with higher resolutions will be sorted in the foreground.";
+            sortingCriterionData.foregroundSortingTooltip = UITooltipConstants.ResolutionForegroundSpriteTooltip;
             sortingCriteriaComponent.sortingCriterion = new ResolutionSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -84,12 +80,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.criterionName = "Sprite Sharpness";
             sortingCriterionData.foregroundSortingName = "Is sharper sprite in foreground";
-            sortingCriterionData.criterionTooltip =
-                "Compares the sharpness of sprites by analyze their amount of edges in a sprite.\n" +
-                "Requires a " + nameof(SpriteData) + " asset.";
+            sortingCriterionData.criterionTooltip = UITooltipConstants.SharpnessTooltip;
             sortingCriterionData.isSortingInForeground = true;
-            sortingCriterionData.foregroundSortingTooltip =
-                "When enabled, sharper sprites will be sorted in the foreground.";
+            sortingCriterionData.foregroundSortingTooltip = UITooltipConstants.SharpnessForegroundSpriteTooltip;
             sortingCriteriaComponent.sortingCriterion = new SharpnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -105,11 +98,9 @@ namespace SpriteSortingPlugin.AutomaticSorting
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
             sortingCriterionData.criterionName = "Perceived Lightness";
-            sortingCriterionData.criterionTooltip = "Compares only the perceived lightness of Sprites.\n" +
-                                                    "Requires a " + nameof(SpriteData) + " asset.";
+            sortingCriterionData.criterionTooltip = UITooltipConstants.PerceivedLightnessTooltip;
             sortingCriterionData.foregroundSortingName = "Is lighter sprite in foreground";
-            sortingCriterionData.foregroundSortingTooltip =
-                "When enabled, lighter sprites will be sorted in the foreground.";
+            sortingCriterionData.foregroundSortingTooltip = UITooltipConstants.PerceivedLightnessForegroundSpriteTooltip;
             sortingCriterionData.isSortingInForeground = true;
             sortingCriteriaComponent.sortingCriterion = new LightnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;

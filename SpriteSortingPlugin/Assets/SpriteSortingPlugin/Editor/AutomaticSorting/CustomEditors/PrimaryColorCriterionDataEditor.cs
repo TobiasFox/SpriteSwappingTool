@@ -15,8 +15,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
         protected override void InternalInitialize()
         {
             title = "Primary Color";
-            tooltip =
-                "Compares the primary color of given SpriteRenderers and sorts SpriteRenderer in the foreground which are close to the foreground color.";
+            tooltip = UITooltipConstants.PrimaryColorTooltip;
         }
 
         protected override void OnInspectorGuiInternal()
@@ -25,7 +24,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.PrefixLabel(new GUIContent("Channels", "Specify which color channels should be used."));
+                EditorGUILayout.PrefixLabel(new GUIContent("Channels", UITooltipConstants.PrimaryColorChannelsTooltip));
 
                 if (GUILayout.Button("All",
                     GUILayout.Width(25f), GUILayout.ExpandWidth(false)))
@@ -53,8 +52,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             }
 
             PrimaryColorSortingCriterionData.foregroundColor = EditorGUILayout.ColorField(
-                new GUIContent("Foreground Color",
-                    "Specify the color of SpriteRenderers, which will be sorted in the foreground."),
+                new GUIContent("Foreground Color", UITooltipConstants.PrimaryColorForegroundColorTooltip),
                 PrimaryColorSortingCriterionData.foregroundColor);
 
             using (new EditorGUILayout.HorizontalScope())
@@ -70,8 +68,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
             }
 
             PrimaryColorSortingCriterionData.backgroundColor = EditorGUILayout.ColorField(
-                new GUIContent("Background Color",
-                    "Specify the color of SpriteRenderers, which will be sorted in the background."),
+                new GUIContent("Background Color", UITooltipConstants.PrimaryColorBackgroundColorTooltip),
                 PrimaryColorSortingCriterionData.backgroundColor);
         }
     }
