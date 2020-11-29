@@ -386,7 +386,8 @@ namespace SpriteSortingPlugin
             {
                 isApplyingAutoSorting =
                     EditorGUILayout.Toggle(
-                        new GUIContent("use automatic sorting?", UITooltipConstants.SortingEditorUsingAutoSortingTooltip),
+                        new GUIContent("use automatic sorting?",
+                            UITooltipConstants.SortingEditorUsingAutoSortingTooltip),
                         isApplyingAutoSorting);
 
                 if (!isApplyingAutoSorting)
@@ -649,12 +650,12 @@ namespace SpriteSortingPlugin
                     EditorGUIUtility.labelWidth = 0;
                 }
 
+                EditorGUI.indentLevel++;
                 switch (projectTransparencySortMode)
                 {
                     case TransparencySortMode.Default:
-                        EditorGUI.indentLevel++;
-                        var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
 
+                        var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
                         EditorGUILayout.PropertyField(cameraSerializedProp,
                             new GUIContent("Camera", UITooltipConstants.SortingEditorCameraTooltip));
 
@@ -704,7 +705,8 @@ namespace SpriteSortingPlugin
                             case OutlinePrecision.ObjectOrientedBoundingBox:
                                 EditorGUILayout.LabelField(
                                     new GUIContent("\u2191                   \u2193",
-                                        UITooltipConstants.SortingEditorOutlinePrecisionOOBBTooltip), GUILayout.Width(110));
+                                        UITooltipConstants.SortingEditorOutlinePrecisionOOBBTooltip),
+                                    GUILayout.Width(110));
                                 break;
                             case OutlinePrecision.PixelPerfect:
                                 EditorGUILayout.LabelField(
