@@ -40,8 +40,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private SpriteDataItem selectedSpriteDataItem;
 
-        private bool isDisplayingSpriteOutline = true;
-        private bool isDisplayingSpriteDetails;
+        private bool isDisplayingSpriteOutline;
 
         private SpriteDataAnalyzerContext spriteDataAnalyzerContext;
         private SpriteAnalyzeInputData spriteAnalyzeInputData;
@@ -163,7 +162,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     originOutlines.Add(selectedSpriteDataItem.AssetGuid, selectedSpriteDataItem.outlinePoints);
                 }
             }
-            else if (isDisplayingSpriteDetails)
+            else
             {
                 DrawSpriteDetails(rightAreaRect);
             }
@@ -181,24 +180,25 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     leftBarScrollPosition = scrollScope.scrollPosition;
                     using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                     {
-                        GUILayout.Label("Edit Sprite Data", Styling.CenteredStyle, GUILayout.ExpandWidth(true));
+                        GUILayout.Label(
+                            new GUIContent("Edit Sprite Data",
+                                "Choose either to see and modify the sprite outline or the sprite details."),
+                            Styling.CenteredStyle, GUILayout.ExpandWidth(true));
 
                         using (new EditorGUILayout.HorizontalScope(Styling.HelpBoxStyle))
                         {
                             EditorGUI.BeginChangeCheck();
-                            isDisplayingSpriteOutline =
-                                GUILayout.Toggle(isDisplayingSpriteOutline, "Sprite outline", "Button");
+                            GUILayout.Toggle(isDisplayingSpriteOutline, "Sprite outline", Styling.ButtonStyle);
                             if (EditorGUI.EndChangeCheck())
                             {
-                                isDisplayingSpriteDetails = !isDisplayingSpriteOutline;
+                                isDisplayingSpriteOutline = true;
                             }
 
                             EditorGUI.BeginChangeCheck();
-                            isDisplayingSpriteDetails =
-                                GUILayout.Toggle(isDisplayingSpriteDetails, "Sprite Details", "Button");
+                            GUILayout.Toggle(!isDisplayingSpriteOutline, "Sprite Details", Styling.ButtonStyle);
                             if (EditorGUI.EndChangeCheck())
                             {
-                                isDisplayingSpriteOutline = !isDisplayingSpriteDetails;
+                                isDisplayingSpriteOutline = false;
                             }
                         }
 
@@ -206,7 +206,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         {
                             EditorGUILayout.Space();
 
-                            GUILayout.Label("Preview Outline");
+                            GUILayout.Label(new GUIContent("Preview Outline",
+                                "Specify the type of the sprite outline to be drawn when a sprite is selected."));
                             foreach (OutlinePrecision outlinePrecisionType in OutlinePrecisionTypes)
                             {
                                 EditorGUI.BeginChangeCheck();
@@ -220,7 +221,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                                 }
                             }
 
-                            GUILayout.Label("Outline Color");
+                            GUILayout.Label(new GUIContent("Outline Color",
+                                "Specify the color of the sprite outline."));
                             outlineColor = EditorGUILayout.ColorField(outlineColor);
                         }
                     }
@@ -228,7 +230,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
 
-                    GUILayout.Label("Sprites", Styling.CenteredStyle, GUILayout.ExpandWidth(true));
+                    GUILayout.Label(
+                        new GUIContent("Sprites",
+                            "A list of all Sprites which were analyzed in current " + nameof(SpriteData) + " asset."),
+                        Styling.CenteredStyle, GUILayout.ExpandWidth(true));
                     EditorGUI.BeginChangeCheck();
                     searchString = searchField.OnGUI(searchString);
                     if (EditorGUI.EndChangeCheck())
@@ -276,7 +281,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         EditorGUIUtility.labelWidth = 80;
                         EditorGUI.BeginChangeCheck();
                         spriteDataAnalysisType = (SpriteDataAnalysisType) EditorGUILayout.EnumFlagsField(
-                            "Analysis Type", spriteDataAnalysisType, GUILayout.MinWidth(200));
+                            new GUIContent("Analysis Type", "Specify the types of data to be analyzed."),
+                            spriteDataAnalysisType, GUILayout.MinWidth(200));
                         if (EditorGUI.EndChangeCheck())
                         {
                             if (!spriteDataAnalysisType.HasFlag(SpriteDataAnalysisType.Outline))
@@ -285,16 +291,17 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                             }
                         }
 
-                        outlineAnalysisType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField("Outline Type",
+                        outlineAnalysisType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField(
+                            new GUIContent("Outline Type", "Specify the outline types to analyze."),
                             outlineAnalysisType, GUILayout.MinWidth(200));
 
                         EditorGUIUtility.labelWidth = 0;
                     }
 
-                    if (GUILayout.Button("Analyze sprite outlines"))
+                    if (GUILayout.Button(new GUIContent("Analyze all sprites + create new SpriteData",
+                        "This action will select all visible sprites in opened scenes, analyze these sprites according to the selected Analysis Types and create a new " +
+                        nameof(SpriteData) + " asset.")))
                     {
-                        Debug.Log("analyze alpha");
-
                         AnalyzeSpriteAlphas();
                     }
                 }
@@ -314,25 +321,20 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                using (new EditorGUI.DisabledGroupScope(!hasSelectedDataItem))
-                {
-                    GUILayout.Label("Resolution");
-                }
-
                 using (new EditorGUI.DisabledGroupScope(true))
                 {
-                    if (!hasSelectedDataItem)
-                    {
-                        EditorGUILayout.IntField("Width", 0);
-                        EditorGUILayout.IntField("Height", 0);
-                    }
-                    else
-                    {
-                        EditorGUILayout.IntField("Width", selectedSprite.texture.width);
-                        EditorGUILayout.IntField("Height", selectedSprite.texture.height);
-                    }
+                    var resolutionLabel = EditorGUILayout.GetControlRect();
+                    var resolutionContentLabel = EditorGUI.PrefixLabel(resolutionLabel,
+                        new GUIContent("Resolution", "The sprites resolution in pixel."));
+                    var spriteSize = hasSelectedDataItem
+                        ? new int[] {selectedSprite.texture.width, selectedSprite.texture.height}
+                        : new int[] {0, 0};
+                    EditorGUI.MultiIntField(resolutionContentLabel,
+                        new GUIContent[] {new GUIContent("Width"), new GUIContent("height")}, spriteSize);
                 }
             }
+
+            GUILayout.Space(1.5f);
 
             var analyzeButtonWidth = GUILayout.Width(rightAreaRect.width / 8);
 
@@ -342,7 +344,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 {
                     EditorGUI.BeginChangeCheck();
                     var sharpness = hasSelectedDataItem ? selectedSpriteDataItem.spriteAnalysisData.sharpness : 0;
-                    sharpness = EditorGUILayout.DoubleField("Sharpness", sharpness);
+                    sharpness = EditorGUILayout.DoubleField(new GUIContent("Sharpness",
+                        "This value indicates how sharp a sprite is. The higher the value, the sharper the sprite.\n" +
+                        "Minimum: 0.0 "), sharpness);
                     if (EditorGUI.EndChangeCheck())
                     {
                         selectedSpriteDataItem.spriteAnalysisData.sharpness = Math.Max(0, sharpness);
@@ -361,10 +365,11 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     var perceivedLightness = hasSelectedDataItem
                         ? selectedSpriteDataItem.spriteAnalysisData.perceivedLightness
                         : 0;
-                    perceivedLightness = EditorGUILayout.FloatField("Perceived Lightness", perceivedLightness);
+                    perceivedLightness = EditorGUILayout.Slider(new GUIContent("Perceived Lightness",
+                        "This value represents the average perceived lightness of a sprite, where 0 means dark and 100.0 means bright.\n" +
+                        "Range: 0.0 - 100.0"), perceivedLightness, 0, 100);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        perceivedLightness = Mathf.Clamp(perceivedLightness, 0f, 100f);
                         selectedSpriteDataItem.spriteAnalysisData.perceivedLightness = perceivedLightness;
                     }
 
@@ -378,10 +383,35 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUI.BeginChangeCheck();
+                    var averageAlpha = hasSelectedDataItem
+                        ? selectedSpriteDataItem.spriteAnalysisData.averageAlpha
+                        : 0;
+                    averageAlpha = EditorGUILayout.Slider(
+                        new GUIContent("Average alpha",
+                            "This value represents the average alpha of a sprite ignoring completely transparent pixels."),
+                        averageAlpha, 0, 1);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        selectedSpriteDataItem.spriteAnalysisData.averageAlpha = averageAlpha;
+                    }
+
+                    if (GUILayout.Button("Analyze", analyzeButtonWidth))
+                    {
+                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        AnalyzeSprite(SpriteAnalyzerType.AverageAlpha);
+                    }
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUI.BeginChangeCheck();
                     var primaryColor = hasSelectedDataItem
                         ? selectedSpriteDataItem.spriteAnalysisData.primaryColor
                         : Color.black;
-                    primaryColor = EditorGUILayout.ColorField("Primary Color", primaryColor);
+                    primaryColor = EditorGUILayout.ColorField(
+                        new GUIContent("Primary Color",
+                            "This is the primary or average Color of a sprite ignoring completely transparent pixels."),
+                        primaryColor);
                     if (EditorGUI.EndChangeCheck())
                     {
                         selectedSpriteDataItem.spriteAnalysisData.primaryColor = primaryColor;
@@ -391,26 +421,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     {
                         spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
                         AnalyzeSprite(SpriteAnalyzerType.PrimaryColor);
-                    }
-                }
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    EditorGUI.BeginChangeCheck();
-                    var averageAlpha = hasSelectedDataItem
-                        ? selectedSpriteDataItem.spriteAnalysisData.averageAlpha
-                        : 0;
-                    averageAlpha = EditorGUILayout.FloatField("Average alpha", averageAlpha);
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        averageAlpha = Mathf.Clamp01(averageAlpha);
-                        selectedSpriteDataItem.spriteAnalysisData.averageAlpha = averageAlpha;
-                    }
-
-                    if (GUILayout.Button("Analyze", analyzeButtonWidth))
-                    {
-                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
-                        AnalyzeSprite(SpriteAnalyzerType.AverageAlpha);
                     }
                 }
 
