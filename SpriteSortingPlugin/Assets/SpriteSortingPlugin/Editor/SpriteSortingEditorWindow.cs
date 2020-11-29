@@ -283,6 +283,12 @@ namespace SpriteSortingPlugin
                 return isUsingSpriteData;
             }
 
+            if (sortingCriteriaComponents == null)
+            {
+                return isUsingSpriteData;
+            }
+
+
             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
             {
                 if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList ||

@@ -29,7 +29,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                 ContainmentSortingCriterionData.isCheckingAlpha = EditorGUILayout.ToggleLeft(
                     new GUIContent("Is checking transparency of larger sprite",
                         "Completely enclosed SpriteRenderer will be sorted in the background. Consider comparing their transparency by enable this option.\n" +
-                        "When enabled, the average transparency of the larger sprite will be compared with to the alpha threshold."),
+                        "When enabled, the average transparency of the larger sprite will be compared to the alpha threshold."),
                     ContainmentSortingCriterionData.isCheckingAlpha);
 
                 using (new EditorGUI.DisabledScope(!ContainmentSortingCriterionData.isCheckingAlpha))
@@ -38,7 +38,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
                     ContainmentSortingCriterionData.alphaThreshold =
                         EditorGUILayout.FloatField(
                             new GUIContent("Alpha threshold",
-                                "Specifies the alpha threshold, until when larger sprite should be displayed in the foreground, even they enclose completely the smaller SpriteRenderer.\n" +
+                                "Specifies the alpha threshold up to which a SpriteRenderer should be rendered in the foreground even though it is completely enclosed by another SpriteRenderer\n" +
                                 "Range: 0.0 - 1.0"),
                             ContainmentSortingCriterionData.alphaThreshold);
                     if (EditorGUI.EndChangeCheck())

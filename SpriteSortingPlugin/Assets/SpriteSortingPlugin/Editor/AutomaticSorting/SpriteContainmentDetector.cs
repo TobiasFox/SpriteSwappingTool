@@ -97,8 +97,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
         private bool ContainsBaseItem(SortingComponent sortingComponent, out float surfaceArea)
         {
-            var baseItemBounds = baseItem.spriteRenderer.bounds;
-            var sortingComponentsBounds = sortingComponent.spriteRenderer.bounds;
+            var baseItemBounds = CreatePlaneBounds(baseItem.spriteRenderer.bounds);
+            var sortingComponentsBounds = CreatePlaneBounds(sortingComponent.spriteRenderer.bounds);
 
             surfaceArea = sortingComponentsBounds.size.x * sortingComponentsBounds.size.y;
             if (!sortingComponentsBounds.Intersects(baseItemBounds))
@@ -192,6 +192,11 @@ namespace SpriteSortingPlugin.AutomaticSorting
             }
 
             return Contains(sortingComponentsBounds, baseItemBounds);
+        }
+
+        private Bounds CreatePlaneBounds(Bounds originBounds)
+        {
+            return new Bounds(originBounds.center, new Vector3(originBounds.size.x, originBounds.size.y, 0));
         }
 
         private static bool Contains(Bounds bounds, Bounds otherBounds)
