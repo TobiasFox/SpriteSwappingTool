@@ -4,12 +4,11 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 {
-    //TODO rename to camera distance
-    [CustomEditor(typeof(PositionSortingCriterionData))]
-    public class PositionCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
+    [CustomEditor(typeof(CameraDistanceSortingCriterionData))]
+    public class CameraDistanceCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
     {
-        private PositionSortingCriterionData PositionSortingCriterionData =>
-            (PositionSortingCriterionData) sortingCriterionData;
+        private CameraDistanceSortingCriterionData CameraDistanceSortingCriterionData =>
+            (CameraDistanceSortingCriterionData) sortingCriterionData;
 
         protected override void InternalInitialize()
         {
@@ -19,10 +18,10 @@ namespace SpriteSortingPlugin.AutomaticSorting.CustomEditors
 
         protected override void OnInspectorGuiInternal()
         {
-            PositionSortingCriterionData.isFurtherAwaySpriteInForeground = EditorGUILayout.ToggleLeft(
+            CameraDistanceSortingCriterionData.isFurtherAwaySpriteInForeground = EditorGUILayout.ToggleLeft(
                 new GUIContent("Is further away Sprite in foreground",
                     UITooltipConstants.CameraDistanceForegroundSpriteTooltip),
-                PositionSortingCriterionData.isFurtherAwaySpriteInForeground);
+                CameraDistanceSortingCriterionData.isFurtherAwaySpriteInForeground);
         }
     }
 }

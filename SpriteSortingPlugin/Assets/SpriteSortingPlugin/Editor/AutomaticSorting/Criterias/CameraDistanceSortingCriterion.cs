@@ -3,12 +3,13 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.AutomaticSorting.Criterias
 {
-    public class PositionSortingCriterion : SortingCriterion<SortingCriterionData>
+    public class CameraDistanceSortingCriterion : SortingCriterion<SortingCriterionData>
     {
-        private PositionSortingCriterionData PositionSortingCriterionData =>
-            (PositionSortingCriterionData) sortingCriterionData;
+        private CameraDistanceSortingCriterionData CameraDistanceSortingCriterionData =>
+            (CameraDistanceSortingCriterionData) sortingCriterionData;
 
-        public PositionSortingCriterion(PositionSortingCriterionData sortingCriterionData) : base(sortingCriterionData)
+        public CameraDistanceSortingCriterion(CameraDistanceSortingCriterionData sortingCriterionData) : base(
+            sortingCriterionData)
         {
         }
 
@@ -27,7 +28,7 @@ namespace SpriteSortingPlugin.AutomaticSorting.Criterias
             var otherPerspectiveDistance = CalculatePerspectiveDistance(otherSpriteRendererTransform, cameraTransform);
             var isAutoSortingComponentCloser = perspectiveDistance <= otherPerspectiveDistance;
 
-            if (PositionSortingCriterionData.isFurtherAwaySpriteInForeground)
+            if (CameraDistanceSortingCriterionData.isFurtherAwaySpriteInForeground)
             {
                 sortingResults[isAutoSortingComponentCloser ? 0 : 1]++;
             }

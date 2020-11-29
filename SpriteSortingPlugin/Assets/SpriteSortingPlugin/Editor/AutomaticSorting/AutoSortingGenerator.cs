@@ -243,7 +243,6 @@ namespace SpriteSortingPlugin.AutomaticSorting
         private AutoSortingResult CompareWithSortingCriterias(AutoSortingComponent unsortedItem,
             AutoSortingComponent sortedItem)
         {
-            //check each sorting criteria
             var result = new AutoSortingResult
                 {isOverlapping = unsortedItem.sortingComponent.IsOverlapping(sortedItem.sortingComponent)};
 
@@ -258,7 +257,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
                 var tempResults = sortingCriteria.Sort(unsortedItem.sortingComponent, sortedItem.sortingComponent,
                     autoSortingCalculationData);
 
-                for (int i = 0; i < resultCounter.Length; i++)
+                for (var i = 0; i < resultCounter.Length; i++)
                 {
                     resultCounter[i] += tempResults[i];
                 }

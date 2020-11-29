@@ -58,8 +58,8 @@ namespace SpriteSortingPlugin.AutomaticSorting
 
         private static void CreatePositionDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<PositionSortingCriterionData>();
-            sortingCriteriaComponent.sortingCriterion = new PositionSortingCriterion(sortingCriterionData);
+            var sortingCriterionData = ScriptableObject.CreateInstance<CameraDistanceSortingCriterionData>();
+            sortingCriteriaComponent.sortingCriterion = new CameraDistanceSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
