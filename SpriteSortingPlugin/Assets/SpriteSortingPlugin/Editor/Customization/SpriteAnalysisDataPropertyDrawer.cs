@@ -11,7 +11,14 @@ namespace SpriteSortingPlugin.Customization
         {
             EditorGUI.BeginProperty(position, label, property);
             property.serializedObject.Update();
-            EditorGUI.LabelField(position, label);
+            property.isExpanded = EditorGUI.Foldout(position, property.isExpanded, label, true);
+
+            if (!property.isExpanded)
+            {
+                property.serializedObject.ApplyModifiedProperties();
+                EditorGUI.EndProperty();
+                return;
+            }
 
             EditorGUI.indentLevel++;
 
