@@ -313,7 +313,7 @@ namespace SpriteSortingPlugin.AutomaticSorting
         {
             for (var i = 0; i < autoSortingComponents.Count; i++)
             {
-                if (!autoSortingComponents[i].Equals(sortingComponent))
+                if (!autoSortingComponents[i].sortingComponent.Equals(sortingComponent))
                 {
                     continue;
                 }
