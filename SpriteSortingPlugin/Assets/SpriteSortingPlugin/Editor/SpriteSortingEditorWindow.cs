@@ -653,28 +653,6 @@ namespace SpriteSortingPlugin
                 EditorGUI.indentLevel++;
                 switch (projectTransparencySortMode)
                 {
-                    case TransparencySortMode.Default:
-
-                        var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
-                        EditorGUILayout.PropertyField(cameraSerializedProp,
-                            new GUIContent("Camera", UITooltipConstants.SortingEditorCameraTooltip));
-
-                        if (cameraSerializedProp.objectReferenceValue == null)
-                        {
-                            EditorGUI.indentLevel++;
-                            EditorGUILayout.LabelField(new GUIContent("Please choose a camera.", Styling.WarnIcon,
-                                UITooltipConstants.SortingEditorMissingCameraTooltip));
-                            isAnalyzedButtonDisabled = true;
-                            EditorGUI.indentLevel--;
-                        }
-                        else
-                        {
-                            cameraProjectionType = ((Camera) cameraSerializedProp.objectReferenceValue).orthographic
-                                ? CameraProjectionType.Orthographic
-                                : CameraProjectionType.Perspective;
-                        }
-
-                        break;
                     case TransparencySortMode.Perspective:
                         cameraProjectionType = CameraProjectionType.Perspective;
                         break;
@@ -684,6 +662,30 @@ namespace SpriteSortingPlugin
                     case TransparencySortMode.CustomAxis:
                         // TODO add functionality for custom axis
                         break;
+                }
+
+                var isCameraNeeded = IsCameraRequired(out var errorMessage);
+                if (isCameraNeeded)
+                {
+                    var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
+                    EditorGUILayout.PropertyField(cameraSerializedProp,
+                        new GUIContent("Camera", UITooltipConstants.SortingEditorCameraTooltip));
+
+                    if (cameraSerializedProp.objectReferenceValue == null)
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.LabelField(new GUIContent(
+                            "Please choose a Camera. It is used to " + errorMessage + ".", Styling.WarnIcon,
+                            UITooltipConstants.SortingEditorMissingCameraTooltip));
+                        isAnalyzedButtonDisabled = true;
+                        EditorGUI.indentLevel--;
+                    }
+                    else
+                    {
+                        cameraProjectionType = ((Camera) cameraSerializedProp.objectReferenceValue).orthographic
+                            ? CameraProjectionType.Orthographic
+                            : CameraProjectionType.Perspective;
+                    }
                 }
 
                 EditorGUILayout.LabelField(new GUIContent("Outline Precision",
@@ -733,6 +735,48 @@ namespace SpriteSortingPlugin
 
                 EditorGUI.indentLevel--;
             }
+        }
+
+        private bool IsCameraRequired(out string usedBy)
+        {
+            usedBy = "";
+            var isCameraRequired = false;
+
+            if (GraphicsSettings.transparencySortMode == TransparencySortMode.Default)
+            {
+                usedBy = "identify unsorted SpriteRenderers";
+                isCameraRequired = true;
+            }
+
+            if (isApplyingAutoSorting && sortingCriteriaComponents != null)
+            {
+                foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                {
+                    if (sortingCriteriaComponent.sortingCriterionData is CameraDistanceSortingCriterionData
+                        cameraDistanceSortingCriterionData)
+                    {
+                        var isRequiredForCameraDistanceCriterion =
+                            cameraDistanceSortingCriterionData.isAddedToEditorList &&
+                            cameraDistanceSortingCriterionData.isActive;
+
+                        if (isRequiredForCameraDistanceCriterion)
+                        {
+                            if (usedBy.Length > 0)
+                            {
+                                usedBy += " and ";
+                            }
+
+                            usedBy += "generate sorting order suggestions (camera distance difference)";
+                        }
+
+                        isCameraRequired |= isRequiredForCameraDistanceCriterion;
+
+                        break;
+                    }
+                }
+            }
+
+            return isCameraRequired;
         }
 
         private void ApplySortingOptions()
