@@ -40,7 +40,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private SpriteDataItem selectedSpriteDataItem;
 
-        private bool isDisplayingSpriteOutline;
+        private bool isDisplayingSpriteOutline = true;
 
         private SpriteDataAnalyzerContext spriteDataAnalyzerContext;
         private SpriteAnalyzeInputData spriteAnalyzeInputData;
@@ -180,7 +180,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     leftBarScrollPosition = scrollScope.scrollPosition;
                     using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                     {
-                        GUILayout.Label(new GUIContent("Edit Sprite Data", UITooltipConstants.SpriteDataEditModeTooltip),
+                        GUILayout.Label(
+                            new GUIContent("Edit Sprite Data", UITooltipConstants.SpriteDataEditModeTooltip),
                             Styling.CenteredStyle, GUILayout.ExpandWidth(true));
 
                         using (new EditorGUILayout.HorizontalScope(Styling.HelpBoxStyle))
@@ -219,7 +220,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                                 }
                             }
 
-                            GUILayout.Label(new GUIContent("Outline Color", UITooltipConstants.SpriteDataOutlineColorTooltip));
+                            GUILayout.Label(new GUIContent("Outline Color",
+                                UITooltipConstants.SpriteDataOutlineColorTooltip));
                             outlineColor = EditorGUILayout.ColorField(outlineColor);
                         }
                     }
@@ -339,7 +341,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 {
                     EditorGUI.BeginChangeCheck();
                     var sharpness = hasSelectedDataItem ? selectedSpriteDataItem.spriteAnalysisData.sharpness : 0;
-                    sharpness = EditorGUILayout.DoubleField(new GUIContent("Sharpness", UITooltipConstants.SpriteDataSharpnessTooltip),
+                    sharpness = EditorGUILayout.DoubleField(
+                        new GUIContent("Sharpness", UITooltipConstants.SpriteDataSharpnessTooltip),
                         sharpness);
                     if (EditorGUI.EndChangeCheck())
                     {
@@ -402,7 +405,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         ? selectedSpriteDataItem.spriteAnalysisData.primaryColor
                         : Color.black;
                     primaryColor = EditorGUILayout.ColorField(
-                        new GUIContent("Primary Color", UITooltipConstants.SpriteDataPrimaryColorTooltip), primaryColor);
+                        new GUIContent("Primary Color", UITooltipConstants.SpriteDataPrimaryColorTooltip),
+                        primaryColor);
                     if (EditorGUI.EndChangeCheck())
                     {
                         selectedSpriteDataItem.spriteAnalysisData.primaryColor = primaryColor;
