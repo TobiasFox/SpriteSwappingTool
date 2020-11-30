@@ -76,11 +76,6 @@ namespace SpriteSortingPlugin
             Debug.DrawLine(start, perp + start, Color.magenta);
         }
 
-        public void Test3()
-        {
-            Debug.Log(AreLinesIntersecting(point1, point2, point3, point4));
-        }
-
         public void ContainingPointTest()
         {
             var spriteRenderer = spriteRenderers[0];
@@ -90,34 +85,6 @@ namespace SpriteSortingPlugin
             var oobb = spriteData.spriteDataDictionary[assetGuid1].objectOrientedBoundingBox;
             oobb.UpdateBox(spriteRenderer.transform);
             Debug.Log(oobb.Contains(point1));
-        }
-
-        private bool AreLinesIntersecting(Vector2 line1Point1, Vector2 line1Point2, Vector2 line2Point1,
-            Vector2 line2Point2)
-        {
-            var isIntersecting = false;
-
-            var denominator = (line2Point2.y - line2Point1.y) * (line1Point2.x - line1Point1.x) -
-                              (line2Point2.x - line2Point1.x) * (line1Point2.y - line1Point1.y);
-
-            //check for parallelism
-            if (denominator == 0f)
-            {
-                return false;
-            }
-
-            var u = ((line2Point2.x - line2Point1.x) * (line1Point1.y - line2Point1.y) -
-                     (line2Point2.y - line2Point1.y) * (line1Point1.x - line2Point1.x)) / denominator;
-            var v = ((line1Point2.x - line1Point1.x) * (line1Point1.y - line2Point1.y) -
-                     (line1Point2.y - line1Point1.y) * (line1Point1.x - line2Point1.x)) / denominator;
-
-            // check if line intersection lies on line segment (including start and end)
-            if (u >= 0 && u <= 1 && v >= 0 && v <= 1)
-            {
-                isIntersecting = true;
-            }
-
-            return isIntersecting;
         }
 
         public void AnalyzeSharpness()
@@ -174,18 +141,10 @@ namespace SpriteSortingPlugin
 
         public void LineTest()
         {
-            var slope = GetSlope(point1.x, point1.y, point2.x, point2.y);
-            var constant = GetConstant(point2.x, point2.y, slope);
-            // IsInLine(point3.x, point3.y, slope, constant);
-
-            // Debug.Log(IsInLine(point3.x, point3.y, slope, constant));
-
-            // Debug.Log(inLine(point1, point2, point3));
-            // Debug.Log(isPointOnLine(point3, point1, point2));
-            Debug.Log(VectorCheck());
+            Debug.Log(IsOnLine());
         }
 
-        private bool VectorCheck()
+        private bool IsOnLine()
         {
             var origin = point1;
             var dir = point2 - point1;
@@ -206,76 +165,6 @@ namespace SpriteSortingPlugin
             var isInLine = Math.Abs(t1 - t2) < Tolerance;
 
             return isInLine;
-        }
-
-        private bool IsInLine(float x3, float y3, float m, float c)
-        {
-            var temp = m * x3 + c;
-            var isInLine = Math.Abs(temp - y3) < Tolerance;
-            Debug.LogFormat("{0}={1}*{2}+{3} = {0}={4} => {5}", y3, m, x3, c, temp, isInLine);
-
-            return isInLine;
-
-            // return temp.CompareTo(y3) == 0;
-        }
-
-        bool isPointOnLine(Vector2 r, Vector2 p, Vector2 v)
-        {
-            if (v.x == 0)
-            {
-                return Math.Abs(r.x - p.x) < Tolerance;
-            }
-
-            if (v.y == 0)
-            {
-                return Math.Abs(r.y - p.y) < Tolerance;
-            }
-
-            var pX = (p.x - r.x) / v.x;
-            var pY = (p.y - r.y) / v.y;
-            return Math.Abs(pX - pY) < Tolerance;
-
-            // ((px-rx)*vy-(py-ry)*vx)/sqrt(vx*vx+vy*vy) <= tol
-        }
-
-        public bool inLine(Vector2 a, Vector2 b, Vector2 c)
-        {
-            // if AC is vertical
-            var dif1 = Math.Abs(a.x - c.x);
-            if (dif1 < Tolerance)
-            {
-                return Math.Abs(b.x - c.x) < Tolerance;
-            }
-
-            // if AC is horizontal
-            var dif2 = Math.Abs(a.y - c.y);
-            if (dif2 < Tolerance)
-            {
-                return Math.Abs(b.y - c.y) < Tolerance;
-            }
-            // match the gradients
-
-            var dif3 = (b.x - c.x);
-            var dif4 = (b.y - c.y);
-            var sum1 = dif1 * dif2;
-            var sum2 = dif3 * dif4;
-            return Math.Abs(sum1 - sum2) < Tolerance;
-        }
-
-        private float GetConstant(float x1, float y1, float m)
-        {
-            return y1 - m * x1;
-        }
-
-        private float GetSlope(float x1, float y1, float x2, float y2)
-        {
-            var denominator = x2 - x1;
-            if (denominator == 0)
-            {
-                return 0;
-            }
-
-            return (y2 - y1) / denominator;
         }
 
         private void OnDrawGizmos()
@@ -305,11 +194,6 @@ namespace SpriteSortingPlugin
             if (GUILayout.Button("Test2"))
             {
                 satTester.Test2();
-            }
-
-            if (GUILayout.Button("Test3"))
-            {
-                satTester.Test3();
             }
 
             if (GUILayout.Button(nameof(SATTester.ContainingPointTest)))
