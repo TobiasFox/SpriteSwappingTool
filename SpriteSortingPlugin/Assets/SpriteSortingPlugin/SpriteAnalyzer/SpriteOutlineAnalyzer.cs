@@ -64,10 +64,9 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             var outlineList = AnalyzeSpriteOutlines(sprite);
 
             var mainOutline = outlineList[0];
-            FlattenPointList(ref mainOutline);
-            ValidateClosedPointList(ref mainOutline);
+            FlattenOutlineList(ref mainOutline);
+            ValidateClosedOutlineList(ref mainOutline);
 
-            pixels = null;
             return mainOutline.ToArray();
         }
 
@@ -78,21 +77,20 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             for (var i = 0; i < smallerAreaLists.Count; i++)
             {
                 var outline = smallerAreaLists[i];
-                FlattenPointList(ref outline);
-                ValidateClosedPointList(ref outline);
+                FlattenOutlineList(ref outline);
+                ValidateClosedOutlineList(ref outline);
             }
 
             var mainOutline = smallerAreaLists[0];
             smallerAreaLists.RemoveAt(0);
 
-            pixels = null;
             return mainOutline.ToArray();
         }
 
         private List<List<Vector2>> AnalyzeSpriteOutlines(Sprite sprite, bool isCollectingSmallerAreaLists = false)
         {
-            var returnList = new List<List<Vector2>>();
-            var pointList = new List<Vector2>();
+            var returnOutlineList = new List<List<Vector2>>();
+            var largestOutlineList = new List<Vector2>();
             if (analyzedPoints == null)
             {
                 analyzedPoints = new HashSet<int>();
@@ -142,29 +140,32 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                         continue;
                     }
 
-                    if (analyzedOutline.Count > pointList.Count)
+                    if (analyzedOutline.Count > largestOutlineList.Count)
                     {
-                        pointList = analyzedOutline;
+                        largestOutlineList = analyzedOutline;
                     }
 
                     if (isCollectingSmallerAreaLists)
                     {
-                        returnList.Add(analyzedOutline);
+                        returnOutlineList.Add(analyzedOutline);
                     }
                 }
             }
 
             if (isCollectingSmallerAreaLists)
             {
-                returnList.Remove(pointList);
-                returnList.Insert(0, pointList);
+                returnOutlineList.Remove(largestOutlineList);
+                returnOutlineList.Insert(0, largestOutlineList);
             }
             else
             {
-                returnList.Add(pointList);
+                returnOutlineList.Add(largestOutlineList);
             }
 
-            return returnList;
+            pixels = null;
+            analyzedPoints.Clear();
+
+            return returnOutlineList;
         }
 
         private List<Vector2> AnalyseSpriteOutline(int startPixelIndex)
@@ -290,7 +291,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             return -1;
         }
 
-        private void FlattenPointList(ref List<Vector2> pointList)
+        private void FlattenOutlineList(ref List<Vector2> pointList)
         {
             if (pointList.Count < 3)
             {
@@ -335,7 +336,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             return Mathf.Abs(t1 - t2) < Tolerance;
         }
 
-        private void ValidateClosedPointList(ref List<Vector2> pointList)
+        private void ValidateClosedOutlineList(ref List<Vector2> pointList)
         {
             if (pointList.Count <= 1)
             {
