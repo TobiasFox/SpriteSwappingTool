@@ -269,6 +269,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                 GUILayout.FlexibleSpace();
 
+                //TODO add allowReimport function, add to current spriteData and analyze a given sprite only 
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
                     using (new EditorGUILayout.HorizontalScope())
