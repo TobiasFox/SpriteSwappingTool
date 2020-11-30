@@ -11,6 +11,7 @@ namespace SpriteSortingPlugin
         private const float Tolerance = 0.001f;
 
         [SerializeField] private bool liveUpdateBounds;
+        [SerializeField] private bool isSimplifyGeneratedOutline;
         [SerializeField] private float outlineVariance;
 
         private SpriteRenderer ownRenderer;
@@ -71,16 +72,40 @@ namespace SpriteSortingPlugin
             }
 
             var colliderPoints = spriteOutlineAnalyzer.Analyze(ownRenderer.sprite);
-            var isSimplified = spriteOutlineAnalyzer.Simplify(colliderPoints, outlineVariance,
-                out var simplifiedPoints);
-
-            if (isSimplified)
+            if (isSimplifyGeneratedOutline)
             {
-                colliderPoints = simplifiedPoints;
+                var isSimplified = spriteOutlineAnalyzer.Simplify(colliderPoints, outlineVariance,
+                    out var simplifiedPoints);
+                if (isSimplified)
+                {
+                    colliderPoints = simplifiedPoints;
+                }
             }
 
             CreatePolygonCollider(colliderPoints);
             Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
+        }
+
+        public void GenerateMultipleColliders()
+        {
+            if (spriteOutlineAnalyzer == null)
+            {
+                spriteOutlineAnalyzer = new SpriteOutlineAnalyzer();
+            }
+
+            var colliderPoints = spriteOutlineAnalyzer.Analyze(ownRenderer.sprite, out var outlines);
+            CreatePolygonCollider(colliderPoints);
+
+            var parentGameObjectTransform = new GameObject(ownRenderer.name + " multiCollider").transform;
+
+            for (var i = 0; i < outlines.Count; i++)
+            {
+                var colliderPointList = outlines[i];
+                var colliderGameObject = new GameObject(" Collider " + i);
+                colliderGameObject.transform.SetParent(parentGameObjectTransform);
+                var polyCollider = colliderGameObject.AddComponent<PolygonCollider2D>();
+                polyCollider.points = colliderPointList.ToArray();
+            }
         }
 
         private SpriteOutlineAnalyzer spriteOutlineAnalyzer;
@@ -93,80 +118,6 @@ namespace SpriteSortingPlugin
         private float spritePixelsPerUnit;
         private Vector2 pixelOffset;
 
-        private List<Vector2> AnalyzeOutlineMooreNeighbourAlgortihm()
-        {
-            var colliderPointList = new List<Vector2>();
-            spritePixelsPerUnit = ownRenderer.sprite.pixelsPerUnit;
-            var spriteTexture = ownRenderer.sprite.texture;
-
-            pixels = spriteTexture.GetPixels();
-            spriteHeight = spriteTexture.height;
-            spriteWidth = spriteTexture.width;
-            PixelDirectionUtility.spriteWidth = spriteWidth;
-
-            startPixelIndex = GetFirstSpritePixelIndex(out startPixelEntryDirection);
-            if (startPixelIndex < 0)
-            {
-                Debug.Log("sprite is completely transparent");
-                return colliderPointList;
-            }
-
-            var rectCenter = ownRenderer.sprite.rect.center;
-            var halfPixelOffset = 1f / spritePixelsPerUnit / 2f;
-            pixelOffset = new Vector2(rectCenter.x / spritePixelsPerUnit - halfPixelOffset,
-                rectCenter.y / spritePixelsPerUnit - halfPixelOffset);
-
-
-            var point = ConvertToColliderPoint(startPixelIndex);
-            colliderPointList.Add(point);
-
-            var boundaryPoint = startPixelIndex;
-            var pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(startPixelEntryDirection);
-            var firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
-            var neighbourOfBoundaryPointIndex =
-                PixelDirectionUtility.GetIndexOfPixelDirection(startPixelIndex, pixelDirectionToCheck);
-            var counter = 0;
-
-            while (neighbourOfBoundaryPointIndex != startPixelIndex)
-            {
-                if (neighbourOfBoundaryPointIndex == startPixelIndex &&
-                    firstEntryDirection == startPixelEntryDirection)
-                {
-                    break;
-                }
-
-                if (pixels[neighbourOfBoundaryPointIndex].a > 0)
-                {
-                    //found pixel
-                    var nextPoint = ConvertToColliderPoint(neighbourOfBoundaryPointIndex);
-                    colliderPointList.Add(nextPoint);
-
-                    boundaryPoint = neighbourOfBoundaryPointIndex;
-
-                    var backtracedDirection =
-                        PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(pixelDirectionToCheck,
-                            firstEntryDirection);
-
-                    pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(backtracedDirection);
-                    firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
-
-                    neighbourOfBoundaryPointIndex =
-                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
-                }
-                else
-                {
-                    //TODO check against picture boundaries 
-                    //move to next clockwise pixel 
-                    pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
-                    neighbourOfBoundaryPointIndex =
-                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
-                }
-
-                counter++;
-            }
-
-            return colliderPointList;
-        }
 
         private Vector2 ConvertToColliderPoint(int pixelIndex)
         {
@@ -885,6 +836,11 @@ namespace SpriteSortingPlugin
             if (GUILayout.Button("Regenerate Collider"))
             {
                 analyzeSpritesAlpha.Generate();
+            }
+
+            if (GUILayout.Button("Generate multiple Colliders "))
+            {
+                analyzeSpritesAlpha.GenerateMultipleColliders();
             }
 
             if (GUILayout.Button("Optimize"))
