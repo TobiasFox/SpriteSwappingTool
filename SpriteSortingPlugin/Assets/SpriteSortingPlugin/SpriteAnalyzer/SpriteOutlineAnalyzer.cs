@@ -181,7 +181,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             var firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
 
             var boundaryPoint = startPixelIndex;
-            var neighbourCounter = 1;
+            var neighbourCounter = 0;
 
             var neighbourOfBoundaryPointIndex = GetNextValidPixelIndexWithinSprite3(startPixelIndex,
                 ref neighbourCounter, ref pixelDirectionToCheck);
@@ -213,7 +213,12 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
                     pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(backtracedDirection);
                     firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
-                    neighbourCounter = 1;
+                    neighbourCounter = 0;
+                }
+                else
+                {
+                    pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
+                    neighbourCounter++;
                 }
 
                 neighbourOfBoundaryPointIndex = GetNextValidPixelIndexWithinSprite3(boundaryPoint,
@@ -234,7 +239,6 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             while (neighbourCounter < PixelDirectionUtility.PixelDirections)
             {
                 neighbourCounter++;
-                pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
 
                 var isOutsideOfLeftImageBorder = currentBoundaryIndex % spriteWidth == 0 &&
                                                  (pixelDirectionToCheck == PixelDirection.Northwest ||
@@ -264,6 +268,8 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                 {
                     return currentNeighbourIndex;
                 }
+
+                pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
             }
 
             return -1;
