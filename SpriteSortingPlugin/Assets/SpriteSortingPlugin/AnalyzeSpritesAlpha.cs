@@ -86,6 +86,28 @@ namespace SpriteSortingPlugin
             Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
         }
 
+        public void GenerateMultipleColliders()
+        {
+            if (spriteOutlineAnalyzer == null)
+            {
+                spriteOutlineAnalyzer = new SpriteOutlineAnalyzer();
+            }
+
+            var colliderPoints = spriteOutlineAnalyzer.Analyze(ownRenderer.sprite, out var outlines);
+            CreatePolygonCollider(colliderPoints);
+
+            var parentGameObjectTransform = new GameObject(ownRenderer.name + " multiCollider").transform;
+
+            for (var i = 0; i < outlines.Count; i++)
+            {
+                var colliderPointList = outlines[i];
+                var colliderGameObject = new GameObject(" Collider " + i);
+                colliderGameObject.transform.SetParent(parentGameObjectTransform);
+                var polyCollider = colliderGameObject.AddComponent<PolygonCollider2D>();
+                polyCollider.points = colliderPointList.ToArray();
+            }
+        }
+
         private SpriteOutlineAnalyzer spriteOutlineAnalyzer;
 
         private int startPixelIndex;
@@ -814,6 +836,11 @@ namespace SpriteSortingPlugin
             if (GUILayout.Button("Regenerate Collider"))
             {
                 analyzeSpritesAlpha.Generate();
+            }
+
+            if (GUILayout.Button("Generate multiple Colliders "))
+            {
+                analyzeSpritesAlpha.GenerateMultipleColliders();
             }
 
             if (GUILayout.Button("Optimize"))
