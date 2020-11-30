@@ -16,7 +16,6 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
         private Vector2 origin;
         private Vector2 direction;
-        private Vector2 spriteRectCenter;
 
         private HashSet<int> analyzedPoints;
 
@@ -110,7 +109,11 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             spriteHeight = spriteTexture.height;
             spriteWidth = spriteTexture.width;
             PixelDirectionUtility.spriteWidth = spriteWidth;
-            spriteRectCenter = sprite.rect.center;
+
+            var spriteRectCenter = sprite.rect.center;
+            var halfPixelOffset = 1f / spritePixelsPerUnit / 2f;
+            pixelOffset = new Vector2(spriteRectCenter.x / spritePixelsPerUnit - halfPixelOffset,
+                spriteRectCenter.y / spritePixelsPerUnit - halfPixelOffset);
 
             var isInsideAlreadyAnalyzedOutline = false;
 
@@ -168,13 +171,8 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
         {
             var pointList = new List<Vector2>();
 
-            var halfPixelOffset = 1f / spritePixelsPerUnit / 2f;
-            pixelOffset = new Vector2(spriteRectCenter.x / spritePixelsPerUnit - halfPixelOffset,
-                spriteRectCenter.y / spritePixelsPerUnit - halfPixelOffset);
-
-
-            var point = ConvertToColliderPoint(startPixelIndex);
-            pointList.Add(point);
+            var startPoint = ConvertToColliderPoint(startPixelIndex);
+            pointList.Add(startPoint);
             analyzedPoints.Add(startPixelIndex);
 
             var startPixelEntryDirection = PixelDirection.East;
