@@ -31,12 +31,15 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: jsonStrings.Array.data[0]
-    value: '{"isActive":true,"priority":1,"isExpanded":false,"isAddedToEditorList":false,"isCheckingAlpha":false,"alphaThreshold":0.20000000298023225,"isSortingEnclosedSpriteInForeground":true}'
+    value: '{"isActive":true,"priority":1,"isExpanded":true,"isAddedToEditorList":false,"isCheckingAlpha":true,"alphaThreshold":0.20000000298023225,"isSortingEnclosedSpriteInForeground":false}'
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: jsonStrings.Array.data[1]
     value: '{"isActive":false,"priority":1,"isExpanded":false,"isAddedToEditorList":false,"isSortingInForeground":false,"foregroundSortingName":"Is
-      large sprite in foreground","criterionName":"Size"}'
+      large sprite in foreground","foregroundSortingTooltip":"When enabled, larger
+      sprites will be sorted in the foreground.","criterionName":"Size","criterionTooltip":"Compares
+      the size, their relation as well as the intersection area of SpriteRenderers.\nRequires
+      a SpriteData asset."}'
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: jsonStrings.Array.data[2]
@@ -45,21 +48,28 @@ Preset:
   - target: {fileID: 0}
     propertyPath: jsonStrings.Array.data[3]
     value: '{"isActive":false,"priority":1,"isExpanded":false,"isAddedToEditorList":false,"isSortingInForeground":true,"foregroundSortingName":"Is
-      sprite with higher resolution in foreground","criterionName":"Sprite Resolution"}'
+      sprite with higher resolution in foreground","foregroundSortingTooltip":"When
+      enabled, sprites with higher resolutions will be sorted in the foreground.","criterionName":"Sprite
+      Resolution","criterionTooltip":"Compares the sprites resolution in pixel."}'
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: jsonStrings.Array.data[4]
     value: '{"isActive":false,"priority":1,"isExpanded":false,"isAddedToEditorList":false,"isSortingInForeground":true,"foregroundSortingName":"Is
-      sharper sprite in foreground","criterionName":"Sprite Sharpness"}'
+      sharper sprite in foreground","foregroundSortingTooltip":"When enabled, sharper
+      sprites will be sorted in the foreground.","criterionName":"Sprite Sharpness","criterionTooltip":"Compares
+      the sharpness of sprites by analyze their amount of edges in a sprite.\nRequires
+      a SpriteData asset."}'
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: jsonStrings.Array.data[5]
     value: '{"isActive":false,"priority":1,"isExpanded":false,"isAddedToEditorList":false,"isSortingInForeground":true,"foregroundSortingName":"Is
-      lighter sprite in foreground","criterionName":"Perceived Lightness"}'
+      lighter sprite in foreground","foregroundSortingTooltip":"When enabled, lighter
+      sprites will be sorted in the foreground.","criterionName":"Perceived Lightness","criterionTooltip":"Compares
+      only the perceived lightness of Sprites.\nRequires a SpriteData asset."}'
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: jsonStrings.Array.data[6]
-    value: '{"isActive":true,"priority":1,"isExpanded":true,"isAddedToEditorList":true,"activeChannels":[true,true,true],"backgroundColor":{"r":0.6462709307670593,"g":0.9716981053352356,"b":0.9201127290725708,"a":0.0},"foregroundColor":{"r":0.48065754771232607,"g":1.0,"b":0.21226418018341065,"a":0.0}}'
+    value: '{"isActive":true,"priority":1,"isExpanded":true,"isAddedToEditorList":true,"activeChannels":[true,true,true],"backgroundColor":{"r":0.38679248094558718,"g":0.1988697201013565,"b":0.1988697201013565,"a":0.0},"foregroundColor":{"r":0.018689922988414766,"g":0.7924528121948242,"b":0.7649720311164856,"a":0.0}}'
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: types.Array.size
@@ -75,7 +85,7 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: types.Array.data[2]
-    value: SpriteSortingPlugin.AutomaticSorting.Data.PositionSortingCriterionData
+    value: SpriteSortingPlugin.AutomaticSorting.Data.CameraDistanceSortingCriterionData
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: types.Array.data[3]
