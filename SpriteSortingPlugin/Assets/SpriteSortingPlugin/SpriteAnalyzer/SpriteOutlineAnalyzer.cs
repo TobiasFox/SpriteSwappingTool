@@ -177,13 +177,14 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             analyzedPoints.Add(startPixelIndex);
 
             var startPixelEntryDirection = PixelDirection.East;
-            var boundaryPoint = startPixelIndex;
             var pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(startPixelEntryDirection);
             var firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
-            var neighbourOfBoundaryPointIndex =
-                PixelDirectionUtility.GetIndexOfPixelDirection(startPixelIndex, pixelDirectionToCheck);
-            // var counter = 0;
-            var neighbourCounter = 0;
+
+            var boundaryPoint = startPixelIndex;
+            var neighbourCounter = 1;
+
+            var neighbourOfBoundaryPointIndex = GetNextValidPixelIndexWithinSprite3(startPixelIndex,
+                ref neighbourCounter, ref pixelDirectionToCheck);
 
             while (neighbourOfBoundaryPointIndex != startPixelIndex)
             {
@@ -193,7 +194,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                     break;
                 }
 
-                if (neighbourCounter > PixelDirectionUtility.PixelDirections)
+                if (neighbourCounter > PixelDirectionUtility.PixelDirections || neighbourOfBoundaryPointIndex < 0)
                 {
                     break;
                 }
@@ -207,53 +208,65 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
                     boundaryPoint = neighbourOfBoundaryPointIndex;
 
-                    var backtracedDirection =
-                        PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(pixelDirectionToCheck,
-                            firstEntryDirection);
+                    var backtracedDirection = PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(
+                        pixelDirectionToCheck, firstEntryDirection);
 
                     pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(backtracedDirection);
                     firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
-
-                    neighbourOfBoundaryPointIndex =
-                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
                     neighbourCounter = 1;
                 }
-                else
-                {
-                    //TODO check against picture boundaries 
-                    //move to next clockwise pixel 
-                    pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
-                    neighbourOfBoundaryPointIndex =
-                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
-                    neighbourCounter++;
 
-                    // var boundaryWidth=boundaryPoint & spriteWidth;
-                    //
-                    // for (; neighbourCounter < PixelDirectionUtility.PixelDirections; neighbourCounter++)
-                    // {
-                    //    
-                    //
-                    //     if (neighbourOfBoundaryPointIndex < 0 || neighbourOfBoundaryPointIndex >= pixels.Length)
-                    //     {
-                    //         continue;
-                    //     }
-                    //     
-                    //     var currentWidth = neighbourOfBoundaryPointIndex & spriteWidth;
-                    //     var currentHeight = neighbourOfBoundaryPointIndex / spriteWidth;
-                    //
-                    //     if (boundaryWidth)
-                    //     {
-                    //         continue;
-                    //     }
-                    //
-                    //     break;
-                    // }
-                }
-
-                // counter++;
+                neighbourOfBoundaryPointIndex = GetNextValidPixelIndexWithinSprite3(boundaryPoint,
+                    ref neighbourCounter, ref pixelDirectionToCheck);
             }
 
             return pointList;
+        }
+
+        private int GetNextValidPixelIndexWithinSprite3(int currentBoundaryIndex, ref int neighbourCounter,
+            ref PixelDirection pixelDirectionToCheck)
+        {
+            if (neighbourCounter < 0)
+            {
+                return -1;
+            }
+
+            while (neighbourCounter < PixelDirectionUtility.PixelDirections)
+            {
+                neighbourCounter++;
+                pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
+
+                var isOutsideOfLeftImageBorder = currentBoundaryIndex % spriteWidth == 0 &&
+                                                 (pixelDirectionToCheck == PixelDirection.Northwest ||
+                                                  pixelDirectionToCheck == PixelDirection.West ||
+                                                  pixelDirectionToCheck == PixelDirection.Southwest);
+                if (isOutsideOfLeftImageBorder)
+                {
+                    continue;
+                }
+
+                var isOutsideOfRightImageBorder = currentBoundaryIndex % spriteWidth == spriteWidth - 1 &&
+                                                  (pixelDirectionToCheck == PixelDirection.Northeast ||
+                                                   pixelDirectionToCheck == PixelDirection.East ||
+                                                   pixelDirectionToCheck == PixelDirection.Southeast);
+                if (isOutsideOfRightImageBorder)
+                {
+                    continue;
+                }
+
+                var currentNeighbourIndex =
+                    PixelDirectionUtility.GetIndexOfPixelDirection(currentBoundaryIndex, pixelDirectionToCheck);
+
+                var isInsideOfBottomImageBorder = currentNeighbourIndex >= 0;
+                var isInsideOfTopImageBorder = currentNeighbourIndex < pixels.Length;
+
+                if (isInsideOfBottomImageBorder && isInsideOfTopImageBorder)
+                {
+                    return currentNeighbourIndex;
+                }
+            }
+
+            return -1;
         }
 
         private Vector2 ConvertToColliderPoint(int pixelIndex)
@@ -266,29 +279,6 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             // point *= 1 + (1f / spritePixelsPerUnit);
 
             return point;
-        }
-
-        private int GetFirstSpritePixelIndex(out PixelDirection entryDirection)
-        {
-            var counter = 0;
-            entryDirection = PixelDirection.East;
-
-            for (var y = spriteHeight - 1; y >= 0; y--)
-            {
-                for (var x = 0; x < spriteWidth; x++)
-                {
-                    var alphaValue = pixels[counter].a;
-
-                    if (alphaValue > 0)
-                    {
-                        return counter;
-                    }
-
-                    counter++;
-                }
-            }
-
-            return -1;
         }
 
         private void FlattenOutlineList(ref List<Vector2> pointList)
