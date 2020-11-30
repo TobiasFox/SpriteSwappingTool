@@ -6,6 +6,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
     public class SpriteOutlineAnalyzer
     {
         private const float Tolerance = 0.0001f;
+        private const int MinPointsOfOutline = 16;
 
         private Color[] pixels;
         private int spriteHeight;
@@ -133,7 +134,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
                     var analyzedOutline = AnalyseSpriteOutline(i);
 
-                    if (analyzedOutline.Count <= 16)
+                    if (analyzedOutline.Count <= MinPointsOfOutline)
                     {
                         continue;
                     }
