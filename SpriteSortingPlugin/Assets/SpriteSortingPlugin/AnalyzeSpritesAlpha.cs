@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpriteSortingPlugin.SpriteAnalyzer;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace SpriteSortingPlugin
         private const float Tolerance = 0.001f;
 
         [SerializeField] private bool liveUpdateBounds;
+        [SerializeField] private float outlineVariance;
 
         private SpriteRenderer ownRenderer;
         private int[] borders;
@@ -36,7 +38,7 @@ namespace SpriteSortingPlugin
 
             polygonGameobject = new GameObject("colliderGameobject");
             var polyCol = polygonGameobject.AddComponent<PolygonCollider2D>();
-            polyCol.points = spriteDataItem.outlinePoints.ToArray();
+            polyCol.points = spriteDataItem.outlinePoints;
         }
 
         public void SetColliderToOtherTransform()
@@ -68,9 +70,16 @@ namespace SpriteSortingPlugin
                 spriteOutlineAnalyzer = new SpriteOutlineAnalyzer();
             }
 
-            var pointList = spriteOutlineAnalyzer.Analyze(ownRenderer.sprite);
+            var colliderPoints = spriteOutlineAnalyzer.Analyze(ownRenderer.sprite);
+            var isSimplified = spriteOutlineAnalyzer.Simplify(colliderPoints, outlineVariance,
+                out var simplifiedPoints);
 
-            CreatePolygonCollider(pointList);
+            if (isSimplified)
+            {
+                colliderPoints = simplifiedPoints;
+            }
+
+            CreatePolygonCollider(colliderPoints);
             Debug.Log("analyzed within " + (EditorApplication.timeSinceStartup - startTime));
         }
 
@@ -533,7 +542,7 @@ namespace SpriteSortingPlugin
             return colliderPointList;
         }
 
-        private void CreatePolygonCollider(List<Vector2> pixelList)
+        private void CreatePolygonCollider(Vector2[] points)
         {
             var hasPolygonCollider = TryGetComponent<PolygonCollider2D>(out var polyCollider);
             if (hasPolygonCollider)
@@ -545,7 +554,7 @@ namespace SpriteSortingPlugin
                 polyCollider = gameObject.AddComponent<PolygonCollider2D>();
             }
 
-            polyCollider.points = pixelList.ToArray();
+            polyCollider.points = points;
         }
 
         private Vector2[] GetFirstPolygonEdge(List<Vector2> pointList)

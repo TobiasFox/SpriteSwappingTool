@@ -9,7 +9,7 @@ public class TestWindow : EditorWindow
     {
         EditorGUI.BeginChangeCheck();
 
-        var counterPosition = new Rect(0, 0, 300, EditorGUIUtility.singleLineHeight);
+        var counterPosition = new Rect(0, 0, 300, 20);
         counter = EditorGUI.IntField(counterPosition, "Counter", counter);
 
         if (EditorGUI.EndChangeCheck())

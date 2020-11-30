@@ -12,10 +12,6 @@ namespace SpriteSortingPlugin.OverlappingSprites
     {
         private const float LineSpacing = 1.5f;
         private const int SelectButtonWidth = 55;
-        private static Texture spriteIcon;
-        private static Texture baseItemIcon;
-        private static Texture sortingGroupIcon;
-        private static bool isInitializedIcons;
 
         private ReorderableList reordableSpriteSortingList;
         private int lastFocussedIndex = -1;
@@ -27,14 +23,6 @@ namespace SpriteSortingPlugin.OverlappingSprites
         {
             this.overlappingItems = overlappingItems;
             this.preview = preview;
-
-            if (!isInitializedIcons)
-            {
-                spriteIcon = EditorGUIUtility.IconContent("Sprite Icon").image;
-                baseItemIcon = EditorGUIUtility.IconContent("PreMatCylinder@2x").image;
-                sortingGroupIcon = EditorGUIUtility.IconContent("BlendTree Icon").image;
-                isInitializedIcons = true;
-            }
 
             reordableSpriteSortingList = new ReorderableList(overlappingItems.Items,
                 typeof(OverlappingItem), true, true, false, false)
@@ -72,7 +60,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
 
         private void OnReorderCallbackWithDetails(ReorderableList list, int oldIndex, int newIndex)
         {
-            overlappingItems.ReOrderItem(oldIndex, newIndex);
+            overlappingItems.ReOrderItem(newIndex);
             preview.UpdatePreviewEditor();
         }
 
@@ -82,17 +70,17 @@ namespace SpriteSortingPlugin.OverlappingSprites
             Color color;
             if (isActive)
             {
-                color = ReordableBackgroundColors.ActiveColor;
+                color = Styling.ListElementActiveColor;
             }
             else if (isFocused)
             {
-                color = ReordableBackgroundColors.FocussingColor;
+                color = Styling.ListElementFocussingColor;
             }
             else
             {
                 color = index % 2 == 0
-                    ? ReordableBackgroundColors.BackgroundColor1
-                    : ReordableBackgroundColors.BackgroundColor2;
+                    ? Styling.ListElementBackground1
+                    : Styling.ListElementBackground2;
             }
 
             EditorGUI.DrawRect(rect, color);
@@ -113,7 +101,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
         private float ElementHeightCallback(int index)
         {
             var element = (OverlappingItem) reordableSpriteSortingList.list[index];
-            if (element.originSortingGroup == null)
+            if (element.sortingComponent.sortingGroup == null)
             {
                 return EditorGUIUtility.singleLineHeight * 2 + LineSpacing + LineSpacing * 3;
             }
@@ -126,6 +114,8 @@ namespace SpriteSortingPlugin.OverlappingSprites
         private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
             var element = (OverlappingItem) reordableSpriteSortingList.list[index];
+            var sortingComponentSpriteRenderer = element.sortingComponent.spriteRenderer;
+            var sortingComponentOutmostSortingGroup = element.sortingComponent.sortingGroup;
             var isPreviewUpdating = false;
             var startX = rect.x;
 
@@ -134,7 +124,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
             if (element.IsBaseItem)
             {
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 80, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("Base Item", baseItemIcon));
+                    new GUIContent("Base Item", Styling.BaseItemIcon, UITooltipConstants.OverlappingItemListBaseItemTooltip));
                 startX += 80 + 5;
             }
 
@@ -143,37 +133,49 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 lastElementRectWidth = rect.width;
             }
 
-            EditorGUI.LabelField(
-                new Rect(startX, rect.y, lastElementRectWidth - SelectButtonWidth - 90,
-                    EditorGUIUtility.singleLineHeight),
-                new GUIContent("\"" + element.originSpriteRenderer.name + "\"", spriteIcon));
+            var guiContent = new GUIContent("\"" + sortingComponentSpriteRenderer.name + "\"",
+                Styling.SpriteIcon)
+            {
+                tooltip = element.IsBaseItem
+                    ? UITooltipConstants.OverlappingItemListBaseItemSpriteRendererTooltip
+                    : UITooltipConstants.OverlappingItemListSpriteRendererTooltip
+            };
+
+            EditorGUI.LabelField(new Rect(startX, rect.y, lastElementRectWidth - SelectButtonWidth - 90,
+                EditorGUIUtility.singleLineHeight), guiContent);
 
             if (GUI.Button(new Rect(rect.width - 28, rect.y, SelectButtonWidth, EditorGUIUtility.singleLineHeight),
                 "Select"))
             {
-                Selection.objects = new Object[] {element.originSpriteRenderer.gameObject};
-                SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
-                EditorGUIUtility.PingObject(element.originSpriteRenderer);
+                Selection.objects = new Object[] {sortingComponentSpriteRenderer.gameObject};
+                SceneView.lastActiveSceneView.Frame(sortingComponentSpriteRenderer.bounds);
+                EditorGUIUtility.PingObject(sortingComponentSpriteRenderer);
             }
 
-            if (element.originSortingGroup != null)
+            if (sortingComponentOutmostSortingGroup != null)
             {
                 rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
 
+                var sortingGroupLabel = new GUIContent("in outmost Sorting Group", Styling.SortingGroupIcon)
+                {
+                    tooltip = element.IsBaseItem
+                        ? UITooltipConstants.OverlappingItemListBaseItemSortingGroupTooltip
+                        : UITooltipConstants.OverlappingItemListSortingGroupTooltip
+                };
+
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 160, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("in outmost Sorting Group", sortingGroupIcon));
+                    sortingGroupLabel);
 
                 EditorGUI.LabelField(
                     new Rect(rect.x + 160 + 2.5f, rect.y, 120, EditorGUIUtility.singleLineHeight),
-                    "\"" + element.originSortingGroup.name + "\"");
+                    "\"" + sortingComponentOutmostSortingGroup.name + "\"");
 
-                if (GUI.Button(
-                    new Rect(rect.width - 56, rect.y, 83,
-                        EditorGUIUtility.singleLineHeight), "Select Group"))
+                if (GUI.Button(new Rect(rect.width - 56, rect.y, 83,
+                    EditorGUIUtility.singleLineHeight), "Select Group"))
                 {
-                    Selection.objects = new Object[] {element.originSortingGroup.gameObject};
-                    SceneView.lastActiveSceneView.Frame(element.originSpriteRenderer.bounds);
-                    EditorGUIUtility.PingObject(element.originSortingGroup);
+                    Selection.objects = new Object[] {sortingComponentOutmostSortingGroup.gameObject};
+                    SceneView.lastActiveSceneView.Frame(element.sortingComponent.spriteRenderer.bounds);
+                    EditorGUIUtility.PingObject(sortingComponentOutmostSortingGroup);
                 }
             }
 
@@ -181,9 +183,11 @@ namespace SpriteSortingPlugin.OverlappingSprites
 
             EditorGUIUtility.labelWidth = 35;
             EditorGUI.BeginChangeCheck();
+
             element.sortingLayerDropDownIndex =
-                EditorGUI.Popup(new Rect(rect.x, rect.y, 135, EditorGUIUtility.singleLineHeight), "Layer",
-                    element.sortingLayerDropDownIndex, SortingLayerUtility.SortingLayerNames);
+                EditorGUI.Popup(new Rect(rect.x, rect.y, 135, EditorGUIUtility.singleLineHeight),
+                    new GUIContent("Layer", UITooltipConstants.OverlappingItemListSortingLayerTooltip),
+                    element.sortingLayerDropDownIndex, SortingLayerUtility.SortingLayerGuiContents);
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -199,10 +203,16 @@ namespace SpriteSortingPlugin.OverlappingSprites
             EditorGUIUtility.labelWidth = 70;
 
             EditorGUI.BeginChangeCheck();
-            var sortingOrderLabel = "Order " + (isUsingRelativeSortingOrder ? element.originSortingOrder + " +" : "");
+            var sortingOrderGUIContent = new GUIContent
+            {
+                text = "Order " + (isUsingRelativeSortingOrder ? element.originSortingOrder + " +" : ""),
+                tooltip = isUsingRelativeSortingOrder
+                    ? UITooltipConstants.OverlappingItemListRelativeSortingOrderTooltip
+                    : UITooltipConstants.OverlappingItemListTotalSortingOrderTooltip
+            };
             element.sortingOrder =
                 EditorGUI.DelayedIntField(new Rect(rect.x + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
-                    sortingOrderLabel, element.sortingOrder);
+                    sortingOrderGUIContent, element.sortingOrder);
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -238,10 +248,15 @@ namespace SpriteSortingPlugin.OverlappingSprites
 
         private void DrawHeaderCallback(Rect rect)
         {
-            EditorGUI.LabelField(rect, "Overlapping Items");
+            var labelRect = rect;
+            labelRect.xMax -= 135 + 45;
+            EditorGUI.LabelField(labelRect,
+                new GUIContent("Overlapping Items", UITooltipConstants.OverlappingItemListTooltip));
 
             if (GUI.Button(new Rect(rect.width - 172.5f, rect.y, 135, EditorGUIUtility.singleLineHeight),
-                (isUsingRelativeSortingOrder ? "Total" : "Relative") + " Sorting Order"))
+                new GUIContent((isUsingRelativeSortingOrder ? "Total" : "Relative") + " Sorting Order",
+                    UITooltipConstants.OverlappingItemListUsingRelativeSortingOrderTooltip))
+            )
             {
                 isUsingRelativeSortingOrder = !isUsingRelativeSortingOrder;
                 overlappingItems.ConvertSortingOrder(isUsingRelativeSortingOrder);
@@ -254,6 +269,7 @@ namespace SpriteSortingPlugin.OverlappingSprites
                 preview.UpdatePreviewEditor();
 
                 lastFocussedIndex = -1;
+                reordableSpriteSortingList.index = lastFocussedIndex;
             }
         }
 

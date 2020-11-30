@@ -5,6 +5,7 @@ namespace SpriteSortingPlugin
     public static class SortingLayerUtility
     {
         private static string[] sortingLayerNames;
+        private static GUIContent[] sortingLayerGuiContents;
 
         public static string[] SortingLayerNames
         {
@@ -16,6 +17,23 @@ namespace SpriteSortingPlugin
                 // }
 
                 return sortingLayerNames;
+            }
+        }
+
+        public static GUIContent[] SortingLayerGuiContents
+        {
+            get
+            {
+                if (sortingLayerGuiContents == null)
+                {
+                    sortingLayerGuiContents = new GUIContent[sortingLayerNames.Length];
+                    for (var i = 0; i < sortingLayerNames.Length; i++)
+                    {
+                        sortingLayerGuiContents[i] = new GUIContent(sortingLayerNames[i]);
+                    }
+                }
+
+                return sortingLayerGuiContents;
             }
         }
 
