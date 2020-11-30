@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SpriteSortingPlugin
@@ -7,11 +6,12 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class SpriteDataItem
     {
-        [SerializeField] private string assetGuid;
+        [SerializeField, HideInInspector] private string assetGuid;
         [SerializeField] private string assetName;
 
         public ObjectOrientedBoundingBox objectOrientedBoundingBox;
-        public List<Vector2> outlinePoints;
+        public Vector2[] outlinePoints;
+        public SpriteAnalysisData spriteAnalysisData;
 
         public string AssetGuid => assetGuid;
         public string AssetName => assetName;
@@ -29,7 +29,30 @@ namespace SpriteSortingPlugin
 
         public bool IsValidOutline()
         {
-            return outlinePoints != null && outlinePoints.Count >= 2;
+            return outlinePoints != null && outlinePoints.Length >= 2;
+        }
+
+        //https://answers.unity.com/questions/684909/how-to-calculate-the-surface-area-of-a-irregular-p.html
+        public float CalculatePolygonArea(Transform polygonTransform)
+        {
+            float surfaceArea = 0;
+            if (!IsValidOutline())
+            {
+                return surfaceArea;
+            }
+
+            for (var i = 0; i < outlinePoints.Length; i++)
+            {
+                var point1 = polygonTransform.TransformPoint(outlinePoints[i]);
+                var point2 = polygonTransform.TransformPoint(outlinePoints[(i + 1) % outlinePoints.Length]);
+
+                var mulA = point1.x * point2.y;
+                var mulB = point2.x * point1.y;
+                surfaceArea += (mulA - mulB);
+            }
+
+            surfaceArea *= 0.5f;
+            return Mathf.Abs(surfaceArea);
         }
     }
 }

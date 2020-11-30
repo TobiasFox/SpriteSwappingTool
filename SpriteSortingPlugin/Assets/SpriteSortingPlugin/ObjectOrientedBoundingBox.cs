@@ -7,17 +7,18 @@ namespace SpriteSortingPlugin
     [Serializable]
     public class ObjectOrientedBoundingBox : ISerializationCallbackReceiver, ICloneable
     {
-        [SerializeField] private bool isInitialized;
+        [SerializeField, HideInInspector] private bool isInitialized;
         [SerializeField, HideInInspector] private Vector2[] localWorldPoints = new Vector2[4];
-        [SerializeField] private Vector2[] originLocalWorldPoints = new Vector2[4];
+        [SerializeField, HideInInspector] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
         [SerializeField] public float zRotation;
         private Quaternion rotation;
         private Bounds ownBounds;
         [SerializeField] private Vector2 boundsCenter;
         [SerializeField] private Vector2 boundsSize;
-        [SerializeField] private Vector2 boundsCenterOffset;
+        [SerializeField, HideInInspector] private Vector2 boundsCenterOffset;
 
+        private Vector2 lastGlobalScale;
         private Vector2[] axes;
         private Vector2[] points;
         [SerializeField] private AlphaRectangleBorder alphaRectangleBorder;
@@ -125,10 +126,11 @@ namespace SpriteSortingPlugin
             UpdateLocalWorldPoints(false);
 
             // Apply scaling
-            var globalScale = transform.lossyScale;
+            lastGlobalScale = transform.lossyScale;
             for (var i = 0; i < localWorldPoints.Length; i++)
             {
-                points[i] = new Vector2(localWorldPoints[i].x * globalScale.x, localWorldPoints[i].y * globalScale.y);
+                points[i] = new Vector2(localWorldPoints[i].x * lastGlobalScale.x,
+                    localWorldPoints[i].y * lastGlobalScale.y);
             }
 
             // Transform points from local to world space
@@ -174,6 +176,67 @@ namespace SpriteSortingPlugin
             alphaRectangleBorder = (AlphaRectangleBorder) originAlphaRectangleBorder.Clone();
             ownBounds.center = (Vector2) ownBounds.center - boundsCenter;
             boundsCenterOffset = Vector2.zero;
+        }
+
+        public bool Contains(ObjectOrientedBoundingBox otherOOBB)
+        {
+            foreach (var otherPoint1 in otherOOBB.points)
+            {
+                var isContaining = Contains(otherPoint1);
+
+                if (!isContaining)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool Contains(Vector2 point)
+        {
+            for (int i = 0; i < points.Length; i++)
+            {
+                var ownPoint1 = points[i];
+                var ownPoint2 = points[(i + 1) % points.Length];
+                var isIntersecting = AreLinesIntersecting(ownPoint1, ownPoint2, point, ownBounds.center);
+
+                if (isIntersecting)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        //http://thirdpartyninjas.com/blog/2008/10/07/line-segment-intersection/
+        private bool AreLinesIntersecting(Vector2 line1Point1, Vector2 line1Point2, Vector2 line2Point1,
+            Vector2 line2Point2)
+        {
+            var isIntersecting = false;
+
+            var denominator = (line2Point2.y - line2Point1.y) * (line1Point2.x - line1Point1.x) -
+                              (line2Point2.x - line2Point1.x) * (line1Point2.y - line1Point1.y);
+
+            //check for parallelism
+            if (denominator == 0f)
+            {
+                return false;
+            }
+
+            var u = ((line2Point2.x - line2Point1.x) * (line1Point1.y - line2Point1.y) -
+                     (line2Point2.y - line2Point1.y) * (line1Point1.x - line2Point1.x)) / denominator;
+            var v = ((line1Point2.x - line1Point1.x) * (line1Point1.y - line2Point1.y) -
+                     (line1Point2.y - line1Point1.y) * (line1Point1.x - line2Point1.x)) / denominator;
+
+            // check if line intersection lies on line segment (including start and end)
+            if (u >= 0 && u <= 1 && v >= 0 && v <= 1)
+            {
+                isIntersecting = true;
+            }
+
+            return isIntersecting;
         }
 
         private void Initialize()
@@ -229,6 +292,11 @@ namespace SpriteSortingPlugin
             axes = new Vector2[2];
             axes[0] = Vector2.Perpendicular(points[3] - points[0]);
             axes[1] = Vector2.Perpendicular(points[0] - points[1]);
+        }
+
+        public float GetSurfaceArea()
+        {
+            return boundsSize.x * lastGlobalScale.x * boundsSize.y * lastGlobalScale.y;
         }
 
         public void OnBeforeSerialize()

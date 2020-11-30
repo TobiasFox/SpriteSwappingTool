@@ -59,51 +59,64 @@ namespace SpriteSortingPlugin.Preview
 
             GeneratePreview();
 
-            var horizontalRect = EditorGUILayout.BeginHorizontal();
-            EditorGUI.indentLevel++;
-
-            EditorGUI.BeginChangeCheck();
-            isVisualizingBoundsInScene =
-                EditorGUILayout.ToggleLeft("Visualize Bounds in Scene", isVisualizingBoundsInScene,
-                    GUILayout.Width(180));
-            if (EditorGUI.EndChangeCheck())
+            float previewHeight;
+            using (var horizontalScope = new EditorGUILayout.HorizontalScope())
             {
-                EnableSceneVisualization(isVisualizingBoundsInScene);
-            }
+                previewHeight = horizontalScope.rect.height;
+                EditorGUI.indentLevel++;
 
-            EditorGUI.BeginChangeCheck();
-            isVisualizingSortingOrder =
-                EditorGUILayout.ToggleLeft("Display Sorting Order", isVisualizingSortingOrder, GUILayout.Width(160));
-            if (EditorGUI.EndChangeCheck())
-            {
-                EnableSceneVisualization(isVisualizingSortingOrder);
-            }
+                EditorGUI.BeginChangeCheck();
+                isVisualizingBoundsInScene =
+                    EditorGUILayout.ToggleLeft(
+                        new GUIContent("Visualize Bounds in Scene",
+                            "When enabled, SpriteRenderer outlines will be drawn in the scene."),
+                        isVisualizingBoundsInScene,
+                        GUILayout.Width(180));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EnableSceneVisualization(isVisualizingBoundsInScene);
+                }
 
-            EditorGUI.BeginChangeCheck();
-            isVisualizingSortingLayer =
-                EditorGUILayout.ToggleLeft("Display Sorting Layer", isVisualizingSortingLayer, GUILayout.Width(170));
-            if (EditorGUI.EndChangeCheck())
-            {
-                EnableSceneVisualization(isVisualizingSortingLayer);
-            }
+                EditorGUI.BeginChangeCheck();
+                isVisualizingSortingOrder =
+                    EditorGUILayout.ToggleLeft(
+                        new GUIContent("Display Sorting Order",
+                            "When enabled, the current sorting order and the modified sorting order will be displayed in the scene as text."),
+                        isVisualizingSortingOrder,
+                        GUILayout.Width(160));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EnableSceneVisualization(isVisualizingSortingOrder);
+                }
 
-            if (!isSceneVisualizingDelegateIsAdded &&
-                (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
-            {
-                EnableSceneVisualization(true);
-            }
+                EditorGUI.BeginChangeCheck();
+                isVisualizingSortingLayer =
+                    EditorGUILayout.ToggleLeft(
+                        new GUIContent("Display Sorting Layer",
+                            "When enabled, the current sorting layer and the modified sorting layer will be displayed in the scene as text."),
+                        isVisualizingSortingLayer,
+                        GUILayout.Width(170));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EnableSceneVisualization(isVisualizingSortingLayer);
+                }
 
-            if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
-            {
-                previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
-                Object.DestroyImmediate(previewEditor);
-                previewEditor = Editor.CreateEditor(previewGameObject);
-            }
+                if (!isSceneVisualizingDelegateIsAdded &&
+                    (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
+                {
+                    EnableSceneVisualization(true);
+                }
 
-            EditorGUILayout.EndHorizontal();
+                if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
+                {
+                    previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
+                    Object.DestroyImmediate(previewEditor);
+                    previewEditor = Editor.CreateEditor(previewGameObject);
+                }
+            }
 
             var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
-            var previewRect = EditorGUILayout.GetControlRect(false, 256 + horizontalRect.height);
+            var previewRect = EditorGUILayout.GetControlRect(false, 256 + previewHeight);
 
             //hack for not seeing the previewGameObject in the scene view 
             previewGameObject.SetActive(true);
@@ -133,34 +146,37 @@ namespace SpriteSortingPlugin.Preview
 
             foreach (var overlappingItem in overlappingItems.Items)
             {
-                if (overlappingItem.originSortingGroup == null)
+                var sortingComponentOutmostSortingGroup = overlappingItem.sortingComponent.sortingGroup;
+                var sortingComponentSpriteRenderer = overlappingItem.sortingComponent.spriteRenderer;
+
+                if (sortingComponentOutmostSortingGroup == null)
                 {
-                    var previewSpriteRenderer = previewRoot.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
+                    var previewSpriteRenderer = previewRoot.AddSpriteRenderer(sortingComponentSpriteRenderer);
                     overlappingItem.previewSpriteRenderer = previewSpriteRenderer;
                     overlappingItem.UpdatePreviewSortingLayer();
                     overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
                     continue;
                 }
 
-                var spritePreviewItem = GetAppropriatePreviewItem(overlappingItem.originSpriteRenderer, previewRoot);
-                spritePreviewItem.AddSpriteRenderer(overlappingItem.originSpriteRenderer);
+                var spritePreviewItem = GetAppropriatePreviewItem(sortingComponentSpriteRenderer, previewRoot);
+                spritePreviewItem.AddSpriteRenderer(sortingComponentSpriteRenderer);
 
-                previewRoot.TryGetSortingGroup(overlappingItem.originSortingGroup,
+                previewRoot.TryGetSortingGroup(sortingComponentOutmostSortingGroup,
                     out overlappingItem.previewSortingGroup);
                 overlappingItem.UpdatePreviewSortingLayer();
                 overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
 
-                var childSpriteRenderer = overlappingItem.originSortingGroup
+                var childSpriteRenderer = sortingComponentOutmostSortingGroup
                     .GetComponentsInChildren<SpriteRenderer>();
 
                 foreach (var spriteRenderer in childSpriteRenderer)
                 {
-                    if (spriteRenderer == overlappingItem.originSpriteRenderer)
+                    if (spriteRenderer == sortingComponentSpriteRenderer)
                     {
                         continue;
                     }
 
-                    if (!overlappingItem.originSpriteRenderer.bounds.Intersects(spriteRenderer.bounds))
+                    if (!sortingComponentSpriteRenderer.bounds.Intersects(spriteRenderer.bounds))
                     {
                         continue;
                     }
@@ -177,7 +193,8 @@ namespace SpriteSortingPlugin.Preview
             PreviewItem lastPreviewGroup)
         {
             var activeSortingGroups =
-                SortingGroupUtility.GetAllEnabledSortingGroups(currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
+                SortingGroupUtility.GetAllEnabledSortingGroups(
+                    currentSpriteRenderer.GetComponentsInParent<SortingGroup>());
 
             for (int i = activeSortingGroups.Count - 1; i >= 0; i--)
             {
@@ -297,7 +314,7 @@ namespace SpriteSortingPlugin.Preview
                 }
             }
 
-            Handles.Label(item.originSpriteRenderer.transform.position, text, sortingOrderStyle);
+            Handles.Label(item.sortingComponent.spriteRenderer.transform.position, text, sortingOrderStyle);
 
             Handles.EndGUI();
         }
@@ -320,7 +337,7 @@ namespace SpriteSortingPlugin.Preview
 
                 if (hasSpriteDataItem && CanDrawOutlineType(spriteDataItem))
                 {
-                    DrawOutline(spriteDataItem, item.originSpriteRenderer.transform);
+                    DrawOutline(spriteDataItem, item.sortingComponent.spriteRenderer.transform);
                 }
                 else
                 {
@@ -334,7 +351,7 @@ namespace SpriteSortingPlugin.Preview
 
             if (isDrawingSpriteRendererBounds)
             {
-                var bounds = item.originSpriteRenderer.bounds;
+                var bounds = item.sortingComponent.spriteRenderer.bounds;
                 Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
             }
         }
@@ -354,7 +371,7 @@ namespace SpriteSortingPlugin.Preview
                     break;
                 case OutlinePrecision.PixelPerfect:
                     var lastPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[0]);
-                    for (var i = 1; i < spriteDataItem.outlinePoints.Count; i++)
+                    for (var i = 1; i < spriteDataItem.outlinePoints.Length; i++)
                     {
                         var nextPoint = itemTransform.TransformPoint(spriteDataItem.outlinePoints[i]);
                         Handles.DrawLine(lastPoint, nextPoint);

@@ -13,8 +13,8 @@ namespace SpriteSortingPlugin
             if (ReferenceEquals(null, y)) return 1;
             if (ReferenceEquals(null, x)) return -1;
 
-            var sortingOrderDifX = Math.Abs(baseSortingOrder - x.CurrentSortingOrder);
-            var sortingOrderDifY = Math.Abs(baseSortingOrder - y.CurrentSortingOrder);
+            var sortingOrderDifX = Math.Abs(baseSortingOrder - x.OriginSortingOrder);
+            var sortingOrderDifY = Math.Abs(baseSortingOrder - y.OriginSortingOrder);
 
             return sortingOrderDifX.CompareTo(sortingOrderDifY);
         }

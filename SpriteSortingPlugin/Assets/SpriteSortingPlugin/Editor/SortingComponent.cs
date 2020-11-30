@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -8,34 +9,51 @@ namespace SpriteSortingPlugin
     public class SortingComponent
     {
         public readonly SpriteRenderer spriteRenderer;
-        public readonly SortingGroup outmostSortingGroup;
+        public readonly SortingGroup sortingGroup;
 
-        public SortingComponent(SpriteRenderer spriteRenderer, SortingGroup outmostSortingGroup = null)
+        private HashSet<int> overlappingSortingComponents;
+
+        public SortingComponent(SpriteRenderer spriteRenderer, SortingGroup sortingGroup = null)
         {
             this.spriteRenderer = spriteRenderer;
-            this.outmostSortingGroup = outmostSortingGroup;
+            this.sortingGroup = sortingGroup;
         }
 
-        public int CurrentSortingOrder
+        public SortingComponent(SortingComponent otherSortingComponent)
+        {
+            this.spriteRenderer = otherSortingComponent.spriteRenderer;
+            this.sortingGroup = otherSortingComponent.sortingGroup;
+
+            if (otherSortingComponent.overlappingSortingComponents != null)
+            {
+                overlappingSortingComponents = new HashSet<int>();
+                foreach (var hashCode in otherSortingComponent.overlappingSortingComponents)
+                {
+                    overlappingSortingComponents.Add(hashCode);
+                }
+            }
+        }
+
+        public int OriginSortingOrder
         {
             get
             {
-                if (outmostSortingGroup != null)
+                if (sortingGroup != null)
                 {
-                    return outmostSortingGroup.sortingOrder;
+                    return sortingGroup.sortingOrder;
                 }
 
                 return spriteRenderer != null ? spriteRenderer.sortingOrder : 0;
             }
         }
 
-        public int CurrentSortingLayer
+        public int OriginSortingLayer
         {
             get
             {
-                if (outmostSortingGroup != null)
+                if (sortingGroup != null)
                 {
-                    return outmostSortingGroup.sortingLayerID;
+                    return sortingGroup.sortingLayerID;
                 }
 
                 return spriteRenderer != null ? spriteRenderer.sortingLayerID : 0;
@@ -44,8 +62,8 @@ namespace SpriteSortingPlugin
 
         public int GetInstanceId()
         {
-            return outmostSortingGroup != null
-                ? outmostSortingGroup.GetInstanceID()
+            return sortingGroup != null
+                ? sortingGroup.GetInstanceID()
                 : spriteRenderer.GetInstanceID();
         }
 
@@ -61,24 +79,48 @@ namespace SpriteSortingPlugin
 
         public bool Equals(SortingComponent other)
         {
-            return spriteRenderer == other.spriteRenderer && outmostSortingGroup == other.outmostSortingGroup;
+            return spriteRenderer == other.spriteRenderer &&
+                   sortingGroup == other.sortingGroup;
         }
 
         public override int GetHashCode()
         {
-            var hashcode = spriteRenderer.GetHashCode();
-            if (outmostSortingGroup != null)
+            unchecked
             {
-                hashcode ^= outmostSortingGroup.GetHashCode();
+                var hashcode = 397 * spriteRenderer.GetHashCode();
+                if (sortingGroup != null)
+                {
+                    hashcode ^= sortingGroup.GetHashCode();
+                }
+
+                return hashcode;
+            }
+        }
+
+        public void AddOverlappingSortingComponent(SortingComponent sortingComponent)
+        {
+            if (overlappingSortingComponents == null)
+            {
+                overlappingSortingComponents = new HashSet<int>();
             }
 
-            return hashcode;
+            overlappingSortingComponents.Add(sortingComponent.GetHashCode());
+        }
+
+        public bool IsOverlapping(SortingComponent sortingComponent)
+        {
+            if (overlappingSortingComponents == null)
+            {
+                return false;
+            }
+
+            return overlappingSortingComponents.Contains(sortingComponent.GetHashCode());
         }
 
         public override string ToString()
         {
-            return "SortingComponent[" + spriteRenderer.name + ", " + CurrentSortingLayer + ", " + CurrentSortingOrder +
-                   ", SG:" + (outmostSortingGroup != null) + "]";
+            return "SortingComponent[" + spriteRenderer.name + ", " + OriginSortingLayer + ", " +
+                   OriginSortingOrder + ", SG:" + (sortingGroup != null) + "]";
         }
     }
 }

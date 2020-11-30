@@ -1,6 +1,6 @@
 ﻿namespace SpriteSortingPlugin.OverlappingSpriteDetection
 {
-    public struct SpriteDetectionData
+    public class SpriteDetectionData
     {
         public CameraProjectionType cameraProjectionType;
         public SpriteData spriteData;
