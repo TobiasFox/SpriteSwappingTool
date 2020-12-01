@@ -9,7 +9,6 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
         private const int MinPointsOfOutline = 16;
 
         private Color[] pixels;
-        private int spriteHeight;
         private int spriteWidth;
         private float spritePixelsPerUnit;
         private Vector2 pixelOffset;
@@ -21,18 +20,13 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
         public bool Simplify(Vector2[] points, float outlineTolerance, out Vector2[] simplifiedPoints)
         {
-            var convertedV3Points = new Vector3[points.Length];
-            for (var i = 0; i < points.Length; i++)
-            {
-                convertedV3Points[i] = (Vector3) points[i];
-            }
+            var convertedV3Points = ConvertToVector3Array(points);
 
             var lineRendererGameObject = new GameObject("LineRendererHelper")
             {
                 hideFlags = HideFlags.HideAndDontSave
             };
             var lineRenderer = lineRendererGameObject.AddComponent<LineRenderer>();
-
             lineRenderer.positionCount = convertedV3Points.Length;
             lineRenderer.SetPositions(convertedV3Points);
 
@@ -47,14 +41,9 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
             var positions = new Vector3[lineRenderer.positionCount];
             lineRenderer.GetPositions(positions);
+            simplifiedPoints = ConvertToVector2Array(positions);
 
             Object.DestroyImmediate(lineRendererGameObject);
-
-            simplifiedPoints = new Vector2[positions.Length];
-            for (var i = 0; i < positions.Length; i++)
-            {
-                simplifiedPoints[i] = (Vector2) positions[i];
-            }
 
             return true;
         }
@@ -64,35 +53,31 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             var outlineList = AnalyzeSpriteOutlines(sprite);
 
             var mainOutline = outlineList[0];
-            FlattenPointList(ref mainOutline);
-            ValidateClosedPointList(ref mainOutline);
+            FlattenOutlineList(ref mainOutline);
+            ValidateClosedOutlineList(ref mainOutline);
 
-            pixels = null;
             return mainOutline.ToArray();
         }
 
-        public Vector2[] Analyze(Sprite sprite, out List<List<Vector2>> smallerAreaLists)
+        public Vector2[] Analyze(Sprite sprite, out List<List<Vector2>> additionalOutlinesList)
         {
-            smallerAreaLists = AnalyzeSpriteOutlines(sprite, true);
+            additionalOutlinesList = AnalyzeSpriteOutlines(sprite, true);
 
-            for (var i = 0; i < smallerAreaLists.Count; i++)
+            for (var i = 0; i < additionalOutlinesList.Count; i++)
             {
-                var outline = smallerAreaLists[i];
-                FlattenPointList(ref outline);
-                ValidateClosedPointList(ref outline);
+                var outline = additionalOutlinesList[i];
+                FlattenOutlineList(ref outline);
+                ValidateClosedOutlineList(ref outline);
             }
 
-            var mainOutline = smallerAreaLists[0];
-            smallerAreaLists.RemoveAt(0);
+            var mainOutline = additionalOutlinesList[0];
+            additionalOutlinesList.RemoveAt(0);
 
-            pixels = null;
             return mainOutline.ToArray();
         }
 
-        private List<List<Vector2>> AnalyzeSpriteOutlines(Sprite sprite, bool isCollectingSmallerAreaLists = false)
+        private List<List<Vector2>> AnalyzeSpriteOutlines(Sprite sprite, bool isCollectingAdditionalOutlines = false)
         {
-            var returnList = new List<List<Vector2>>();
-            var pointList = new List<Vector2>();
             if (analyzedPoints == null)
             {
                 analyzedPoints = new HashSet<int>();
@@ -106,7 +91,6 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             var spriteTexture = sprite.texture;
 
             pixels = spriteTexture.GetPixels();
-            spriteHeight = spriteTexture.height;
             spriteWidth = spriteTexture.width;
             PixelDirectionUtility.spriteWidth = spriteWidth;
 
@@ -115,6 +99,29 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             pixelOffset = new Vector2(spriteRectCenter.x / spritePixelsPerUnit - halfPixelOffset,
                 spriteRectCenter.y / spritePixelsPerUnit - halfPixelOffset);
 
+            var largestOutlineList = AnalyseAllOutlines(out var additionalOutlineList, isCollectingAdditionalOutlines);
+
+            if (isCollectingAdditionalOutlines)
+            {
+                additionalOutlineList.Remove(largestOutlineList);
+                additionalOutlineList.Insert(0, largestOutlineList);
+            }
+            else
+            {
+                additionalOutlineList.Add(largestOutlineList);
+            }
+
+            pixels = null;
+            analyzedPoints.Clear();
+
+            return additionalOutlineList;
+        }
+
+        private List<Vector2> AnalyseAllOutlines(out List<List<Vector2>> additionalOutlineList,
+            bool isCollectingSmallerAreaLists = false)
+        {
+            additionalOutlineList = new List<List<Vector2>>();
+            var largestOutlineList = new List<Vector2>();
             var isInsideAlreadyAnalyzedOutline = false;
 
             for (var i = 0; i < pixels.Length; i++)
@@ -142,29 +149,19 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                         continue;
                     }
 
-                    if (analyzedOutline.Count > pointList.Count)
+                    if (analyzedOutline.Count > largestOutlineList.Count)
                     {
-                        pointList = analyzedOutline;
+                        largestOutlineList = analyzedOutline;
                     }
 
                     if (isCollectingSmallerAreaLists)
                     {
-                        returnList.Add(analyzedOutline);
+                        additionalOutlineList.Add(analyzedOutline);
                     }
                 }
             }
 
-            if (isCollectingSmallerAreaLists)
-            {
-                returnList.Remove(pointList);
-                returnList.Insert(0, pointList);
-            }
-            else
-            {
-                returnList.Add(pointList);
-            }
-
-            return returnList;
+            return largestOutlineList;
         }
 
         private List<Vector2> AnalyseSpriteOutline(int startPixelIndex)
@@ -176,13 +173,14 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             analyzedPoints.Add(startPixelIndex);
 
             var startPixelEntryDirection = PixelDirection.East;
-            var boundaryPoint = startPixelIndex;
             var pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(startPixelEntryDirection);
-            var firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
-            var neighbourOfBoundaryPointIndex =
-                PixelDirectionUtility.GetIndexOfPixelDirection(startPixelIndex, pixelDirectionToCheck);
-            // var counter = 0;
+            var firstEntryDirection = pixelDirectionToCheck;
+
+            var boundaryPixelIndex = startPixelIndex;
             var neighbourCounter = 0;
+
+            var neighbourOfBoundaryPointIndex = GetNextValidPixelNeighbourIndexWithinSprite(startPixelIndex,
+                ref neighbourCounter, ref pixelDirectionToCheck);
 
             while (neighbourOfBoundaryPointIndex != startPixelIndex)
             {
@@ -192,67 +190,84 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                     break;
                 }
 
-                if (neighbourCounter > PixelDirectionUtility.PixelDirections)
+                if (neighbourCounter > PixelDirectionUtility.PixelDirections || neighbourOfBoundaryPointIndex < 0)
                 {
                     break;
                 }
 
                 if (pixels[neighbourOfBoundaryPointIndex].a > 0)
                 {
-                    //found pixel
+                    //found boundary pixel
                     var nextPoint = ConvertToColliderPoint(neighbourOfBoundaryPointIndex);
                     pointList.Add(nextPoint);
                     analyzedPoints.Add(neighbourOfBoundaryPointIndex);
 
-                    boundaryPoint = neighbourOfBoundaryPointIndex;
+                    boundaryPixelIndex = neighbourOfBoundaryPointIndex;
 
-                    var backtracedDirection =
-                        PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(pixelDirectionToCheck,
-                            firstEntryDirection);
+                    var backtracedDirection = PixelDirectionUtility.GetBacktracedPixelDirectionClockWise(
+                        pixelDirectionToCheck, firstEntryDirection);
 
                     pixelDirectionToCheck = PixelDirectionUtility.GetOppositePixelDirection(backtracedDirection);
-                    firstEntryDirection = (PixelDirection) ((int) pixelDirectionToCheck);
-
-                    neighbourOfBoundaryPointIndex =
-                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
-                    neighbourCounter = 1;
+                    firstEntryDirection = pixelDirectionToCheck;
+                    neighbourCounter = 0;
                 }
                 else
                 {
-                    //TODO check against picture boundaries 
-                    //move to next clockwise pixel 
                     pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
-                    neighbourOfBoundaryPointIndex =
-                        PixelDirectionUtility.GetIndexOfPixelDirection(boundaryPoint, pixelDirectionToCheck);
-                    neighbourCounter++;
-
-                    // var boundaryWidth=boundaryPoint & spriteWidth;
-                    //
-                    // for (; neighbourCounter < PixelDirectionUtility.PixelDirections; neighbourCounter++)
-                    // {
-                    //    
-                    //
-                    //     if (neighbourOfBoundaryPointIndex < 0 || neighbourOfBoundaryPointIndex >= pixels.Length)
-                    //     {
-                    //         continue;
-                    //     }
-                    //     
-                    //     var currentWidth = neighbourOfBoundaryPointIndex & spriteWidth;
-                    //     var currentHeight = neighbourOfBoundaryPointIndex / spriteWidth;
-                    //
-                    //     if (boundaryWidth)
-                    //     {
-                    //         continue;
-                    //     }
-                    //
-                    //     break;
-                    // }
                 }
 
-                // counter++;
+                neighbourOfBoundaryPointIndex = GetNextValidPixelNeighbourIndexWithinSprite(boundaryPixelIndex,
+                    ref neighbourCounter, ref pixelDirectionToCheck);
             }
 
             return pointList;
+        }
+
+        private int GetNextValidPixelNeighbourIndexWithinSprite(int currentBoundaryIndex, ref int neighbourCounter,
+            ref PixelDirection pixelDirectionToCheck)
+        {
+            if (neighbourCounter < 0)
+            {
+                return -1;
+            }
+
+            while (neighbourCounter < PixelDirectionUtility.PixelDirections)
+            {
+                neighbourCounter++;
+
+                var isOutsideOfLeftImageBorder = currentBoundaryIndex % spriteWidth == 0 &&
+                                                 (pixelDirectionToCheck == PixelDirection.Northwest ||
+                                                  pixelDirectionToCheck == PixelDirection.West ||
+                                                  pixelDirectionToCheck == PixelDirection.Southwest);
+                if (isOutsideOfLeftImageBorder)
+                {
+                    continue;
+                }
+
+                var isOutsideOfRightImageBorder = currentBoundaryIndex % spriteWidth == spriteWidth - 1 &&
+                                                  (pixelDirectionToCheck == PixelDirection.Northeast ||
+                                                   pixelDirectionToCheck == PixelDirection.East ||
+                                                   pixelDirectionToCheck == PixelDirection.Southeast);
+                if (isOutsideOfRightImageBorder)
+                {
+                    continue;
+                }
+
+                var currentNeighbourIndex =
+                    PixelDirectionUtility.GetIndexOfPixelDirection(currentBoundaryIndex, pixelDirectionToCheck);
+
+                var isInsideOfBottomImageBorder = currentNeighbourIndex >= 0;
+                var isInsideOfTopImageBorder = currentNeighbourIndex < pixels.Length;
+
+                if (isInsideOfBottomImageBorder && isInsideOfTopImageBorder)
+                {
+                    return currentNeighbourIndex;
+                }
+
+                pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
+            }
+
+            return -1;
         }
 
         private Vector2 ConvertToColliderPoint(int pixelIndex)
@@ -262,35 +277,11 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
             var point = new Vector2((pixelWidth / spritePixelsPerUnit),
                 (pixelHeight / spritePixelsPerUnit)) - pixelOffset;
-            // point *= 1 + (1f / spritePixelsPerUnit);
 
             return point;
         }
 
-        private int GetFirstSpritePixelIndex(out PixelDirection entryDirection)
-        {
-            var counter = 0;
-            entryDirection = PixelDirection.East;
-
-            for (var y = spriteHeight - 1; y >= 0; y--)
-            {
-                for (var x = 0; x < spriteWidth; x++)
-                {
-                    var alphaValue = pixels[counter].a;
-
-                    if (alphaValue > 0)
-                    {
-                        return counter;
-                    }
-
-                    counter++;
-                }
-            }
-
-            return -1;
-        }
-
-        private void FlattenPointList(ref List<Vector2> pointList)
+        private void FlattenOutlineList(ref List<Vector2> pointList)
         {
             if (pointList.Count < 3)
             {
@@ -335,7 +326,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             return Mathf.Abs(t1 - t2) < Tolerance;
         }
 
-        private void ValidateClosedPointList(ref List<Vector2> pointList)
+        private void ValidateClosedOutlineList(ref List<Vector2> pointList)
         {
             if (pointList.Count <= 1)
             {
@@ -347,6 +338,28 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             {
                 pointList.Add(first);
             }
+        }
+
+        private Vector2[] ConvertToVector2Array(Vector3[] positions)
+        {
+            var v2Array = new Vector2[positions.Length];
+            for (var i = 0; i < positions.Length; i++)
+            {
+                v2Array[i] = (Vector2) positions[i];
+            }
+
+            return v2Array;
+        }
+
+        private Vector3[] ConvertToVector3Array(Vector2[] points)
+        {
+            var v3Array = new Vector3[points.Length];
+            for (var i = 0; i < points.Length; i++)
+            {
+                v3Array[i] = (Vector3) points[i];
+            }
+
+            return v3Array;
         }
     }
 }

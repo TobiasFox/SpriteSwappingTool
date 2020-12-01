@@ -688,54 +688,62 @@ namespace SpriteSortingPlugin
                     }
                 }
 
-                EditorGUILayout.LabelField(new GUIContent("Outline Precision",
-                    UITooltipConstants.SortingEditorOutlinePrecisionTooltip));
-                foreach (OutlinePrecision outlinePrecisionType in OutlinePrecisionTypes)
+                var sliderContentRect = GUILayoutUtility.GetRect(position.width, EditorGUIUtility.singleLineHeight);
+                sliderContentRect = EditorGUI.IndentedRect(sliderContentRect);
+
+                var labelRect = sliderContentRect;
+                labelRect.width = EditorGUIUtility.labelWidth - sliderContentRect.x / 2;
+
+                var fromLabel = sliderContentRect;
+                fromLabel.xMin = labelRect.xMax;
+                fromLabel.width = 27.5f;
+
+                var toLabel = sliderContentRect;
+                toLabel.xMin = toLabel.xMax - 70;
+
+                var sliderRect = sliderContentRect;
+                sliderRect.xMin = fromLabel.xMax + 10;
+                sliderRect.xMax = toLabel.xMin - 10;
+
+                GUI.Label(labelRect,
+                    new GUIContent("Outline Precision", UITooltipConstants.SortingEditorOutlinePrecisionTooltip));
+                GUI.Label(fromLabel,
+                    new GUIContent("Fast", UITooltipConstants.SortingEditorOutlinePrecisionFast));
+                EditorGUI.BeginChangeCheck();
+                outlinePrecisionSliderValue = GUI.HorizontalSlider(sliderRect, outlinePrecisionSliderValue, 0,
+                    OutlinePrecisionTypes.Length - 1);
+                if (EditorGUI.EndChangeCheck())
                 {
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        EditorGUI.indentLevel++;
-
-                        switch (outlinePrecisionType)
-                        {
-                            case OutlinePrecision.AxisAlignedBoundingBox:
-                                EditorGUILayout.LabelField(
-                                    new GUIContent("\u2191      fast      \u2193",
-                                        UITooltipConstants.SortingEditorOutlinePrecisionAABBTooltip),
-                                    GUILayout.Width(110));
-                                break;
-                            case OutlinePrecision.ObjectOrientedBoundingBox:
-                                EditorGUILayout.LabelField(
-                                    new GUIContent("\u2191                   \u2193",
-                                        UITooltipConstants.SortingEditorOutlinePrecisionOOBBTooltip),
-                                    GUILayout.Width(110));
-                                break;
-                            case OutlinePrecision.PixelPerfect:
-                                EditorGUILayout.LabelField(
-                                    new GUIContent("\u2191 accurate \u2193",
-                                        UITooltipConstants.SortingEditorOutlinePrecisionPixelPerfectTooltip),
-                                    GUILayout.Width(110));
-                                break;
-                        }
-
-                        EditorGUI.indentLevel--;
-                        GUILayout.FlexibleSpace();
-
-                        EditorGUI.BeginChangeCheck();
-                        GUILayout.Toggle(outlinePrecision == outlinePrecisionType,
-                            ObjectNames.NicifyVariableName(outlinePrecisionType.ToString()), Styling.ButtonStyle,
-                            GUILayout.Width(position.width - 100 - 66));
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            outlinePrecision = outlinePrecisionType;
-                            preview.UpdateOutlineType(outlinePrecision);
-                        }
-                    }
+                    outlinePrecisionSliderValue = (int) Math.Round(outlinePrecisionSliderValue);
+                    outlinePrecision = (OutlinePrecision) outlinePrecisionSliderValue;
                 }
+
+                GUI.Label(toLabel,
+                    new GUIContent("Accurate", UITooltipConstants.SortingEditorOutlinePrecisionAccurate));
+
+                var selectedLabel =
+                    new GUIContent("Selected: " + ObjectNames.NicifyVariableName(outlinePrecision.ToString()));
+
+                switch (outlinePrecision)
+                {
+                    case OutlinePrecision.AxisAlignedBoundingBox:
+                        selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionAABBTooltip;
+                        break;
+                    case OutlinePrecision.ObjectOrientedBoundingBox:
+                        selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionOOBBTooltip;
+                        break;
+                    case OutlinePrecision.PixelPerfect:
+                        selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionPixelPerfectTooltip;
+                        break;
+                }
+
+                EditorGUILayout.LabelField(new GUIContent(" "), selectedLabel);
 
                 EditorGUI.indentLevel--;
             }
         }
+
+        private float outlinePrecisionSliderValue;
 
         private bool IsCameraRequired(out string usedBy)
         {
