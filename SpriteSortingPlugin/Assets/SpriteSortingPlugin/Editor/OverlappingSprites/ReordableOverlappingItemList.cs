@@ -124,7 +124,8 @@ namespace SpriteSortingPlugin.OverlappingSprites
             if (element.IsBaseItem)
             {
                 EditorGUI.LabelField(new Rect(rect.x, rect.y, 80, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("Base Item", Styling.BaseItemIcon, UITooltipConstants.OverlappingItemListBaseItemTooltip));
+                    new GUIContent("Base Item", Styling.BaseItemIcon,
+                        UITooltipConstants.OverlappingItemListBaseItemTooltip));
                 startX += 80 + 5;
             }
 

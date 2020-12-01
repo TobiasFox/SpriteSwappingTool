@@ -24,7 +24,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private string searchString = "";
         private bool hasLoadedSpriteDataAsset = true;
-        private Color outlineColor = Color.green;
+        private Color outlineColor = Color.blue;
 
         private List<SpriteDataItem> spriteDataList;
         private ReorderableList reorderableSpriteList;
@@ -144,7 +144,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             var rightAreaRect = new Rect(leftBarWidth + RightAreaOffset, lastHeight + RightAreaOffset,
                 position.width - leftBarWidth - RightAreaOffset, position.height - lastHeight - RightAreaOffset);
 
-            GUILayout.BeginArea(rightAreaRect, new GUIStyle {normal = {background = Texture2D.whiteTexture}});
+            GUILayout.BeginArea(rightAreaRect,
+                new GUIStyle {normal = {background = Styling.SpriteDataEditorOutlinePreviewBackgroundTexture}});
 
             if (isDisplayingSpriteOutline)
             {

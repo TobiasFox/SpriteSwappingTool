@@ -67,11 +67,9 @@ namespace SpriteSortingPlugin.Preview
 
                 EditorGUI.BeginChangeCheck();
                 isVisualizingBoundsInScene =
-                    EditorGUILayout.ToggleLeft(
-                        new GUIContent("Visualize Bounds in Scene",
-                            "When enabled, SpriteRenderer outlines will be drawn in the scene."),
-                        isVisualizingBoundsInScene,
-                        GUILayout.Width(180));
+                    EditorGUILayout.ToggleLeft(new GUIContent("Visualize Bounds in Scene",
+                            UITooltipConstants.SortingEditorScenePreviewSpriteOutlineTooltip),
+                        isVisualizingBoundsInScene, GUILayout.Width(180));
                 if (EditorGUI.EndChangeCheck())
                 {
                     EnableSceneVisualization(isVisualizingBoundsInScene);
@@ -79,11 +77,9 @@ namespace SpriteSortingPlugin.Preview
 
                 EditorGUI.BeginChangeCheck();
                 isVisualizingSortingOrder =
-                    EditorGUILayout.ToggleLeft(
-                        new GUIContent("Display Sorting Order",
-                            "When enabled, the current sorting order and the modified sorting order will be displayed in the scene as text."),
-                        isVisualizingSortingOrder,
-                        GUILayout.Width(160));
+                    EditorGUILayout.ToggleLeft(new GUIContent("Display Sorting Order",
+                            UITooltipConstants.SortingEditorScenePreviewDisplaySortingOrderTooltip),
+                        isVisualizingSortingOrder, GUILayout.Width(160));
                 if (EditorGUI.EndChangeCheck())
                 {
                     EnableSceneVisualization(isVisualizingSortingOrder);
@@ -93,9 +89,8 @@ namespace SpriteSortingPlugin.Preview
                 isVisualizingSortingLayer =
                     EditorGUILayout.ToggleLeft(
                         new GUIContent("Display Sorting Layer",
-                            "When enabled, the current sorting layer and the modified sorting layer will be displayed in the scene as text."),
-                        isVisualizingSortingLayer,
-                        GUILayout.Width(170));
+                            UITooltipConstants.SortingEditorScenePreviewDisplaySortingLayerTooltip),
+                        isVisualizingSortingLayer, GUILayout.Width(170));
                 if (EditorGUI.EndChangeCheck())
                 {
                     EnableSceneVisualization(isVisualizingSortingLayer);
@@ -115,7 +110,7 @@ namespace SpriteSortingPlugin.Preview
                 }
             }
 
-            var bgColor = new GUIStyle {normal = {background = EditorGUIUtility.whiteTexture}};
+            var bgColor = new GUIStyle {normal = {background = Styling.SpriteSortingPreviewBackgroundTexture}};
             var previewRect = EditorGUILayout.GetControlRect(false, 256 + previewHeight);
 
             //hack for not seeing the previewGameObject in the scene view 

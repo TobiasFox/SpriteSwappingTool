@@ -190,5 +190,14 @@
 
         public const string SortingEditorSortingLayerTooltip =
             "Choose Sorting Layers to search for overlapping SpriteRenderers.";
+
+        public const string SortingEditorScenePreviewDisplaySortingOrderTooltip =
+            "When enabled, the current sorting order and the modified sorting order will be displayed in the scene as text.";
+
+        public const string SortingEditorScenePreviewDisplaySortingLayerTooltip =
+            "When enabled, the current sorting layer and the modified sorting layer will be displayed in the scene as text.";
+
+        public const string SortingEditorScenePreviewSpriteOutlineTooltip =
+            "When enabled, SpriteRenderer outlines will be drawn in the scene.";
     }
 }

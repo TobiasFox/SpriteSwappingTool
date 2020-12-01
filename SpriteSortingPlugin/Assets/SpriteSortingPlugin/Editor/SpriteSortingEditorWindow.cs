@@ -404,7 +404,8 @@ namespace SpriteSortingPlugin
 
                 using (var headerScope = new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUI.DrawRect(headerScope.rect, Styling.SortingCriteriaHeaderBackgroundLightColor);
+                    EditorGUI.DrawRect(headerScope.rect, Styling.SortingCriteriaHeaderBackgroundColor);
+
                     GUILayout.Label("Sorting Criteria");
 
                     GUILayout.FlexibleSpace();

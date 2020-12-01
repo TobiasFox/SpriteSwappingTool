@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9eb8c2846e9ff464cbd83851b830f40d, type: 3}
-  m_Name: All
+  m_Name: DefaultSpriteData
   m_EditorClassIdentifier: 
   spriteDataList:
   - assetGuid: 47c62591626bbc94dba9a5c281496f48
