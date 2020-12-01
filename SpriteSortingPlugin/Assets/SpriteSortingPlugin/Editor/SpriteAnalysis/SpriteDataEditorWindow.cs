@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using SpriteSortingPlugin.SpriteAnalysis.Analyzer;
 using SpriteSortingPlugin.SpriteAnalyzer;
 using UnityEditor;
@@ -19,11 +20,12 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private SerializedObject serializedObject;
 
         [SerializeField] private SpriteData spriteData;
+        [SerializeField] private SpriteRenderer spriteRenderer;
         private Sprite selectedSprite;
         private float selectedSpriteAspectRatio;
 
         private string searchString = "";
-        private bool hasLoadedSpriteDataAsset = true;
+        private bool hasLoadedSpriteDataAsset;
         private Color outlineColor = Color.blue;
 
         private List<SpriteDataItem> spriteDataList;
@@ -37,6 +39,11 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private SpriteDataAnalysisType spriteDataAnalysisType = SpriteDataAnalysisType.Outline;
         private OutlinePrecision outlinePrecision;
         private SpriteDataAnalysisType[] spriteAnalyzerTypes;
+        private bool isAnalyzingAllSprites = true;
+        private bool isExpandingAnalyzeOptions;
+        private SpriteAnalyzedDataAddingChoice spriteAnalyzedDataAddingChoice;
+        private float expandedAnalyzeOptionsHeight = -1;
+        private float collapsedAnalyzeOptionsHeight = -1;
 
         private SpriteDataItem selectedSpriteDataItem;
 
@@ -98,10 +105,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void OnEnable()
         {
-            // if (serializedObject == null)
-            // {
-            //     serializedObject = new SerializedObject(this);
-            // }
+            if (serializedObject == null)
+            {
+                serializedObject = new SerializedObject(this);
+            }
 
             if (searchField == null)
             {
@@ -119,14 +126,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void OnGUI()
         {
-            // serializedObject.Update();
+            serializedObject.Update();
             DrawToolbar();
-            // serializedObject.ApplyModifiedProperties();
-
-            if (!hasLoadedSpriteDataAsset)
-            {
-                return;
-            }
+            serializedObject.ApplyModifiedProperties();
 
             var leftBarWidth = position.width / 4;
             if (leftBarWidth < MinWidthRightContentBar)
@@ -290,7 +292,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                 GUILayout.FlexibleSpace();
 
-                //TODO add allowReimport function, add to current spriteData and analyze a given sprite only 
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
                     using (new EditorGUILayout.HorizontalScope())
@@ -315,13 +316,116 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         EditorGUIUtility.labelWidth = 0;
                     }
 
-                    if (GUILayout.Button(new GUIContent("Analyze all sprites + create new SpriteData",
+                    EditorGUI.BeginChangeCheck();
+                    isExpandingAnalyzeOptions =
+                        EditorGUILayout.Foldout(isExpandingAnalyzeOptions, "More Analyzing options", true);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        //hack for not getting delayed ui updating of collapsed/expanded foldout
+                        if (isExpandingAnalyzeOptions && expandedAnalyzeOptionsHeight > -1)
+                        {
+                            lastHeight = expandedAnalyzeOptionsHeight;
+                        }
+                        else if (!isExpandingAnalyzeOptions && collapsedAnalyzeOptionsHeight > -1)
+                        {
+                            lastHeight = collapsedAnalyzeOptionsHeight;
+                        }
+                        else
+                        {
+                            //happens only the first time the foldout is collapsed/expanded
+                            EditorApplication.delayCall += RepaintDelayed;
+                        }
+                    }
+
+                    if (isExpandingAnalyzeOptions)
+                    {
+                        EditorGUI.indentLevel++;
+
+                        using (new EditorGUI.DisabledScope(!hasLoadedSpriteDataAsset))
+                        {
+                            if (!hasLoadedSpriteDataAsset)
+                            {
+                                spriteAnalyzedDataAddingChoice = SpriteAnalyzedDataAddingChoice.NewSpriteData;
+                            }
+
+                            EditorGUIUtility.labelWidth = 175;
+                            spriteAnalyzedDataAddingChoice = (SpriteAnalyzedDataAddingChoice) EditorGUILayout.EnumPopup(
+                                "Adding analyzed data to", spriteAnalyzedDataAddingChoice);
+                            EditorGUIUtility.labelWidth = 0;
+                        }
+
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUIUtility.labelWidth = 65;
+                            isAnalyzingAllSprites =
+                                EditorGUILayout.ToggleLeft("Is analyzing all sprites", isAnalyzingAllSprites);
+
+                            EditorGUIUtility.labelWidth = 0;
+                            using (new EditorGUI.DisabledScope(isAnalyzingAllSprites))
+                            {
+                                var serializedSpriteRenderer = serializedObject.FindProperty(nameof(spriteRenderer));
+                                EditorGUILayout.PropertyField(serializedSpriteRenderer,
+                                    GUIContent.none, true);
+                            }
+                        }
+
+                        EditorGUI.indentLevel--;
+                    }
+
+                    var buttonTextBuilder = new StringBuilder("Analyze ");
+                    buttonTextBuilder.Append(isAnalyzingAllSprites ? "all sprites " : " sprite ");
+                    buttonTextBuilder.Append("+ add to ");
+
+                    switch (spriteAnalyzedDataAddingChoice)
+                    {
+                        case SpriteAnalyzedDataAddingChoice.NewSpriteData:
+                            buttonTextBuilder.Append("new ");
+                            break;
+                        case SpriteAnalyzedDataAddingChoice.CurrentlyLoaded:
+                            buttonTextBuilder.Append("existing ");
+                            break;
+                    }
+
+                    buttonTextBuilder.Append(nameof(SpriteData));
+
+                    if (GUILayout.Button(new GUIContent(buttonTextBuilder.ToString(),
                         UITooltipConstants.SpriteDataAnalyzeAllTooltip)))
                     {
                         AnalyzeSpriteAlphas();
                     }
                 }
             }
+
+            GetDynamicHeightsOfAnalyzeOptionFoldout();
+        }
+
+        //hack for getting dynamic height of analyze options foldout. Otherwise a visual delay from updating the GUI is visible
+        private void GetDynamicHeightsOfAnalyzeOptionFoldout()
+        {
+            if (expandedAnalyzeOptionsHeight >= 0 && collapsedAnalyzeOptionsHeight >= 0)
+            {
+                return;
+            }
+
+            if (Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
+            var currentFoldoutHeight = GUILayoutUtility.GetLastRect().height;
+            if (isExpandingAnalyzeOptions)
+            {
+                expandedAnalyzeOptionsHeight = currentFoldoutHeight;
+            }
+            else
+            {
+                collapsedAnalyzeOptionsHeight = currentFoldoutHeight;
+            }
+        }
+
+        private void RepaintDelayed()
+        {
+            Repaint();
         }
 
         private void DrawSpriteDetails(Rect rightAreaRect)
@@ -954,5 +1058,11 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         Nothing,
         ReplacedByOOBB,
         NotValid
+    }
+
+    internal enum SpriteAnalyzedDataAddingChoice
+    {
+        NewSpriteData,
+        CurrentlyLoaded
     }
 }
