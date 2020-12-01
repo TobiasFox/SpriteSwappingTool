@@ -156,6 +156,13 @@
         public const string SortingEditorOutlinePrecisionTooltip =
             "Choose the outline precision of sprites. The more accurate the precision is, the more time is needed to identify overlapping SpriteRenderers.";
 
+        public const string SortingEditorOutlinePrecisionFast =
+            "Overlapping SpriteRenderers can be identified very fast. The downside is that the sprite's outline is not very accurate.";
+        // "The test to identify overlapping SpriteRenderer can be calculated fast, but the precision of the sprite outline is not very high.";
+
+        public const string SortingEditorOutlinePrecisionAccurate =
+            "The sprite outline is very accurate, but it slows down the time to identify overlapping SpriteRenderers.";
+
         public const string SortingEditorOutlinePrecisionAABBTooltip =
             "Even this is fastest check, its accuracy is not high. Therefore it could identify some sprites which are not visually overlapping because their alpha regions are overlapping.";
 
