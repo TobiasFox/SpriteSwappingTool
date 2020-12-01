@@ -20,18 +20,13 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
         public bool Simplify(Vector2[] points, float outlineTolerance, out Vector2[] simplifiedPoints)
         {
-            var convertedV3Points = new Vector3[points.Length];
-            for (var i = 0; i < points.Length; i++)
-            {
-                convertedV3Points[i] = (Vector3) points[i];
-            }
+            var convertedV3Points = ConvertToVector3Array(points);
 
             var lineRendererGameObject = new GameObject("LineRendererHelper")
             {
                 hideFlags = HideFlags.HideAndDontSave
             };
             var lineRenderer = lineRendererGameObject.AddComponent<LineRenderer>();
-
             lineRenderer.positionCount = convertedV3Points.Length;
             lineRenderer.SetPositions(convertedV3Points);
 
@@ -46,14 +41,9 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
 
             var positions = new Vector3[lineRenderer.positionCount];
             lineRenderer.GetPositions(positions);
+            simplifiedPoints = ConvertToVector2Array(positions);
 
             Object.DestroyImmediate(lineRendererGameObject);
-
-            simplifiedPoints = new Vector2[positions.Length];
-            for (var i = 0; i < positions.Length; i++)
-            {
-                simplifiedPoints[i] = (Vector2) positions[i];
-            }
 
             return true;
         }
@@ -348,6 +338,28 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
             {
                 pointList.Add(first);
             }
+        }
+
+        private Vector2[] ConvertToVector2Array(Vector3[] positions)
+        {
+            var v2Array = new Vector2[positions.Length];
+            for (var i = 0; i < positions.Length; i++)
+            {
+                v2Array[i] = (Vector2) positions[i];
+            }
+
+            return v2Array;
+        }
+
+        private Vector3[] ConvertToVector3Array(Vector2[] points)
+        {
+            var v3Array = new Vector3[points.Length];
+            for (var i = 0; i < points.Length; i++)
+            {
+                v3Array[i] = (Vector3) points[i];
+            }
+
+            return v3Array;
         }
     }
 }
