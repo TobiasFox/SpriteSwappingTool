@@ -82,8 +82,8 @@
             "This action will select all visible sprites in opened scenes, analyze these sprites according to the selected Analysis Types and create a new " +
             nameof(SpriteData) + " asset.";
 
-        public const string SpriteDataOutlineAnalysisTypeTooltip = "Specify the outline types to analyze.";
-        public const string SpriteDataAnalysisTypeTooltip = "Specify the types of data to be analyzed.";
+        public const string SpriteDataOutlineAnalysisTypeTooltip = "Specify the outline types to analyze. The Pixel Perfect outline is the most accurate but needs slightly more time to analyze.";
+        public const string SpriteDataAnalysisTypeTooltip = "Specify the types of data to be analyzed. ";
 
         public const string SpriteDataSpriteListTooltip =
             "A list of all Sprites which were analyzed in the current " + nameof(SpriteData) + " asset.";
@@ -199,5 +199,13 @@
 
         public const string SortingEditorScenePreviewSpriteOutlineTooltip =
             "When enabled, SpriteRenderer outlines will be drawn in the scene.";
+
+        public const string SortingEditorSpriteAnalyzedDataAddingChoiceTooltip =
+            "Specifies whether a new " + nameof(SpriteData) +
+            " asset should be created or the analyzed data should be added to a loaded " + nameof(SpriteData) +
+            " asset.";
+
+        public const string SortingEditorAnalyzingAllSpritesTooltip =
+            "When enabled, sprites from all active and enabled SpriteRenderers of opened scenes are analyzed. Otherwise the selected Sprite will be analyzed only.";
     }
 }

@@ -105,10 +105,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void OnEnable()
         {
-            if (serializedObject == null)
-            {
-                serializedObject = new SerializedObject(this);
-            }
+            // if (serializedObject == null)
+            // {
+            //     serializedObject = new SerializedObject(this);
+            // }
 
             if (searchField == null)
             {
@@ -126,9 +126,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void OnGUI()
         {
-            serializedObject.Update();
+            // serializedObject.Update();
             DrawToolbar();
-            serializedObject.ApplyModifiedProperties();
+            // serializedObject.ApplyModifiedProperties();
 
             var leftBarWidth = position.width / 4;
             if (leftBarWidth < MinWidthRightContentBar)
@@ -350,7 +350,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                             EditorGUIUtility.labelWidth = 175;
                             spriteAnalyzedDataAddingChoice = (SpriteAnalyzedDataAddingChoice) EditorGUILayout.EnumPopup(
-                                "Adding analyzed data to", spriteAnalyzedDataAddingChoice);
+                                new GUIContent("Adding analyzed data to",
+                                    UITooltipConstants.SortingEditorSpriteAnalyzedDataAddingChoiceTooltip),
+                                spriteAnalyzedDataAddingChoice);
                             EditorGUIUtility.labelWidth = 0;
                         }
 
@@ -358,14 +360,15 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         {
                             EditorGUIUtility.labelWidth = 65;
                             isAnalyzingAllSprites =
-                                EditorGUILayout.ToggleLeft("Is analyzing all sprites", isAnalyzingAllSprites);
+                                EditorGUILayout.ToggleLeft(new GUIContent("Is analyzing all sprites",
+                                        UITooltipConstants.SortingEditorAnalyzingAllSpritesTooltip),
+                                    isAnalyzingAllSprites);
 
                             EditorGUIUtility.labelWidth = 0;
                             using (new EditorGUI.DisabledScope(isAnalyzingAllSprites))
                             {
-                                var serializedSpriteRenderer = serializedObject.FindProperty(nameof(spriteRenderer));
-                                EditorGUILayout.PropertyField(serializedSpriteRenderer,
-                                    GUIContent.none, true);
+                                spriteToAnalyze =
+                                    (Sprite) EditorGUILayout.ObjectField(spriteToAnalyze, typeof(Sprite), false);
                             }
                         }
 
@@ -398,6 +401,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
             GetDynamicHeightsOfAnalyzeOptionFoldout();
         }
+
+        private Sprite spriteToAnalyze;
 
         //hack for getting dynamic height of analyze options foldout. Otherwise a visual delay from updating the GUI is visible
         private void GetDynamicHeightsOfAnalyzeOptionFoldout()
