@@ -93,9 +93,23 @@
         public const string SpriteDataPreviewOutlineTooltip =
             "Specify the type of the sprite outline to be drawn when a sprite is selected.";
 
+        public const string SpriteDataOutlinePrecisionAABBTooltip =
+            "This shows the already given bounds of a sprite.";
+
+        public const string SpriteDataOutlinePrecisionOOBBTooltip =
+            "This shows the generated OOBB based on the far most outside non-alpha pixel on each image side.";
+
+        public const string SpriteDataOutlinePrecisionPixelPerfectTooltip =
+            "This shows the generated pixel perfect outline based on an analysis of the sprite's alpha.";
+
         public const string SpriteDataEditModeTooltip =
             "Choose either to see and modify the sprite outline or the sprite details.";
 
+        public const string SpriteDataOOBBBorderTooltip =
+            "Adjust the border of each side of the OOBB within the range of the sprite's size.";
+
+        public const string SpriteDataPixelPerfectSimplifyOutlineTooltip =
+            "This value is used to evaluate which points should be removed from the outline. A higher value results in a simpler outline (less points). A positive value close to zero results in an outline with little to no reduction. A value of zero has no effect.";
 
         //-- overlapping item list
         public const string OverlappingItemListBaseItemTooltip =
@@ -158,7 +172,6 @@
 
         public const string SortingEditorOutlinePrecisionFast =
             "Overlapping SpriteRenderers can be identified very fast. The downside is that the sprite's outline is not very accurate.";
-        // "The test to identify overlapping SpriteRenderer can be calculated fast, but the precision of the sprite outline is not very high.";
 
         public const string SortingEditorOutlinePrecisionAccurate =
             "The sprite outline is very accurate, but it slows down the time to identify overlapping SpriteRenderers.";

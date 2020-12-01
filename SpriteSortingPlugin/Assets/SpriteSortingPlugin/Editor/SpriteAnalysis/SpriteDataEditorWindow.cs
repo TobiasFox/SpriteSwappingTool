@@ -72,7 +72,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         {
             try
             {
-                var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
+                var guids = AssetDatabase.FindAssets("DefaultSpriteData");
                 spriteData =
                     AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
             }
@@ -211,8 +211,26 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                             {
                                 EditorGUI.BeginChangeCheck();
 
-                                GUILayout.Toggle(outlinePrecision == outlinePrecisionType,
-                                    ObjectNames.NicifyVariableName(outlinePrecisionType.ToString()),
+                                var outlinePrecisionTypeLabel =
+                                    new GUIContent(ObjectNames.NicifyVariableName(outlinePrecisionType.ToString()));
+
+                                switch (outlinePrecisionType)
+                                {
+                                    case OutlinePrecision.AxisAlignedBoundingBox:
+                                        outlinePrecisionTypeLabel.tooltip =
+                                            UITooltipConstants.SpriteDataOutlinePrecisionAABBTooltip;
+                                        break;
+                                    case OutlinePrecision.ObjectOrientedBoundingBox:
+                                        outlinePrecisionTypeLabel.tooltip =
+                                            UITooltipConstants.SpriteDataOutlinePrecisionOOBBTooltip;
+                                        break;
+                                    case OutlinePrecision.PixelPerfect:
+                                        outlinePrecisionTypeLabel.tooltip = UITooltipConstants
+                                            .SpriteDataOutlinePrecisionPixelPerfectTooltip;
+                                        break;
+                                }
+
+                                GUILayout.Toggle(outlinePrecision == outlinePrecisionType, outlinePrecisionTypeLabel,
                                     Styling.ButtonStyle);
                                 if (EditorGUI.EndChangeCheck())
                                 {
@@ -543,7 +561,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             using (new EditorGUILayout.HorizontalScope())
             {
                 EditorGUI.BeginChangeCheck();
-                outlineTolerance = EditorGUILayout.FloatField("Outline Tolerance", outlineTolerance);
+                outlineTolerance = EditorGUILayout.FloatField(new GUIContent("Outline Tolerance",
+                    UITooltipConstants.SpriteDataPixelPerfectSimplifyOutlineTooltip), outlineTolerance);
                 if (EditorGUI.EndChangeCheck())
                 {
                     if (outlineTolerance < 0)
@@ -723,10 +742,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     new Rect(rect.x, rect.y, intFieldLength, EditorGUIUtility.singleLineHeight),
                     alphaBorder.leftBorder, 0, halfSpriteWidth);
 
+                var oobbIconContent = new GUIContent(Styling.MoveIcon, UITooltipConstants.SpriteDataOOBBBorderTooltip);
                 EditorGUI.LabelField(new Rect(rect.width / 2 - Styling.MoveIcon.width,
                     rect.y - (Styling.MoveIcon.height / 2f) + EditorGUIUtility.singleLineHeight / 2f,
-                    Styling.MoveIcon.width,
-                    EditorGUIUtility.singleLineHeight * 2), new GUIContent(Styling.MoveIcon));
+                    Styling.MoveIcon.width, EditorGUIUtility.singleLineHeight * 2), oobbIconContent);
 
                 alphaBorder.rightBorder = EditorGUI.IntSlider(
                     new Rect(rect.x + 2 * intFieldLength, rect.y, intFieldLength,
