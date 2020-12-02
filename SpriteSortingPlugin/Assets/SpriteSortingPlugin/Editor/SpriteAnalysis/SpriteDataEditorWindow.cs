@@ -60,7 +60,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private Dictionary<string, Vector2[]> originOutlines;
         private SimplifiedOutlineToleranceErrorAppearance simplifiedOutlineToleranceErrorAppearance;
 
-        [MenuItem("Window/Sprite Alpha Analysis %e")]
+        [MenuItem("Window/Sprite Data Analysis %e")]
         public static void ShowWindow()
         {
             var window = GetWindow<SpriteDataEditorWindow>();
@@ -69,7 +69,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void Awake()
         {
-            titleContent = new GUIContent("Sprite Alpha Analysis");
+            titleContent = new GUIContent("Sprite Data Analysis");
             minSize = new Vector2(720, minSize.y);
             ResetSpriteList();
 
@@ -150,31 +150,28 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             var rightAreaRect = new Rect(leftBarWidth + RightAreaOffset, lastHeight + RightAreaOffset,
                 position.width - leftBarWidth - RightAreaOffset, position.height - lastHeight - RightAreaOffset);
 
-            GUILayout.BeginArea(rightAreaRect,
-                new GUIStyle {normal = {background = Styling.SpriteDataEditorOutlinePreviewBackgroundTexture}});
-
-            if (isDisplayingSpriteOutline)
+            using (new GUILayout.AreaScope(rightAreaRect, GUIContent.none,
+                new GUIStyle {normal = {background = Styling.SpriteDataEditorOutlinePreviewBackgroundTexture}}))
             {
-                if (selectedSpriteDataItem == null)
+                if (selectedSpriteDataItem != null)
                 {
-                    GUILayout.EndArea();
-                    return;
-                }
+                    if (isDisplayingSpriteOutline)
+                    {
+                        DrawOutlineContent(rightAreaRect);
 
-                DrawOutlineContent(rightAreaRect);
-
-                if (outlinePrecision == OutlinePrecision.PixelPerfect &&
-                    !originOutlines.ContainsKey(selectedSpriteDataItem.AssetGuid))
-                {
-                    originOutlines.Add(selectedSpriteDataItem.AssetGuid, selectedSpriteDataItem.outlinePoints);
+                        if (outlinePrecision == OutlinePrecision.PixelPerfect &&
+                            !originOutlines.ContainsKey(selectedSpriteDataItem.AssetGuid))
+                        {
+                            originOutlines.Add(selectedSpriteDataItem.AssetGuid,
+                                selectedSpriteDataItem.outlinePoints);
+                        }
+                    }
+                    else
+                    {
+                        DrawSpriteDetails(rightAreaRect);
+                    }
                 }
             }
-            else
-            {
-                DrawSpriteDetails(rightAreaRect);
-            }
-
-            GUILayout.EndArea();
         }
 
         private void DrawLeftContentBar(float leftBarWidth)
@@ -947,6 +944,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             FillSpriteAnalyzeInputDataForAdding();
             var currentSpriteAnalyzerTypes = CreateSpriteAnalyzerTypeArray();
             AnalyzeSprite(currentSpriteAnalyzerTypes);
+
             SaveOrReSaveSpriteData();
 
             LoadSpriteDataList();
