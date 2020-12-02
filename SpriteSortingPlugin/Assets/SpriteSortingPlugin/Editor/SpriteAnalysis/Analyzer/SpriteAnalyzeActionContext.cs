@@ -64,7 +64,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
             InitSpriteData();
 
             var assetGuidList = new List<string>();
-
             if (spriteAnalyzeInputData.assetGuid != null)
             {
                 assetGuidList.Add(spriteAnalyzeInputData.assetGuid);
@@ -80,9 +79,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
                 var assetPath = AssetDatabase.GUIDToAssetPath(tempAssetGuid);
                 var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
-                var spriteIsReadable = sprite.texture.isReadable;
+                var isSpriteTextureReadable = sprite.texture.isReadable;
 
-                if (!spriteIsReadable)
+                if (!isSpriteTextureReadable)
                 {
                     try
                     {
@@ -103,7 +102,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
                 spriteAnalyzeInputData.spriteData.spriteDataDictionary[tempAssetGuid] = spriteDataItem;
 
-                if (!spriteIsReadable)
+                if (!isSpriteTextureReadable)
                 {
                     Object.DestroyImmediate(sprite);
                 }
