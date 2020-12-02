@@ -11,6 +11,7 @@ namespace SpriteSortingPlugin
         public static readonly Texture SpriteIcon;
         public static readonly Texture BaseItemIcon;
         public static readonly Texture SortingGroupIcon;
+        public static readonly Texture InfoIcon;
 
         public static readonly GUIStyle HelpBoxStyle;
         public static readonly GUIStyle CenteredStyle;
@@ -145,6 +146,7 @@ namespace SpriteSortingPlugin
             SpriteIcon = EditorGUIUtility.IconContent("Sprite Icon").image;
             BaseItemIcon = EditorGUIUtility.IconContent("PreMatCylinder@2x").image;
             SortingGroupIcon = EditorGUIUtility.IconContent("BlendTree Icon").image;
+            InfoIcon = EditorGUIUtility.IconContent("console.infoicon.sml").image;
 
             HelpBoxStyle = new GUIStyle("HelpBox");
             ButtonStyle = new GUIStyle("Button");

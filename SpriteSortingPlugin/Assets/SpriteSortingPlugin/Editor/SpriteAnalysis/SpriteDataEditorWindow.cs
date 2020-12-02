@@ -332,12 +332,18 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         EditorGUIUtility.labelWidth = 0;
                     }
 
-                    EditorGUI.BeginChangeCheck();
-                    isExpandingAnalyzeOptions =
-                        EditorGUILayout.Foldout(isExpandingAnalyzeOptions, "More Analyzing options", true);
-                    if (EditorGUI.EndChangeCheck())
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        SetAnalyzeOptionsHeightDependingOnFoldoutExpand();
+                        EditorGUI.BeginChangeCheck();
+                        isExpandingAnalyzeOptions =
+                            EditorGUILayout.Foldout(isExpandingAnalyzeOptions, "More Analyzing options", true);
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            SetAnalyzeOptionsHeightDependingOnFoldoutExpand();
+                        }
+
+                        GUILayout.Label(new GUIContent("Sprite analyzing can take some time", Styling.InfoIcon,
+                            UITooltipConstants.SpriteDataAnalyzingActionDurationTooltip), GUILayout.ExpandWidth(false));
                     }
 
                     if (isExpandingAnalyzeOptions)

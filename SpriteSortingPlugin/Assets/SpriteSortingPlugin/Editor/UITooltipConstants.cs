@@ -82,7 +82,9 @@
             "This action will select all visible sprites in opened scenes, analyze these sprites according to the selected Analysis Types and create a new " +
             nameof(SpriteData) + " asset.";
 
-        public const string SpriteDataOutlineAnalysisTypeTooltip = "Specify the outline types to analyze. The Pixel Perfect outline is the most accurate but needs slightly more time to analyze.";
+        public const string SpriteDataOutlineAnalysisTypeTooltip =
+            "Specify the outline types to analyze. The Pixel Perfect outline is the most accurate but needs slightly more time to analyze.";
+
         public const string SpriteDataAnalysisTypeTooltip = "Specify the types of data to be analyzed. ";
 
         public const string SpriteDataSpriteListTooltip =
@@ -110,6 +112,9 @@
 
         public const string SpriteDataPixelPerfectSimplifyOutlineTooltip =
             "This value is used to evaluate which points should be removed from the outline. A higher value results in a simpler outline (less points). A positive value close to zero results in an outline with little to no reduction. A value of zero has no effect.";
+
+        public const string SpriteDataAnalyzingActionDurationTooltip =
+            "Depending on the amount of sprites to be analyzed this action may take some time.";
 
         //-- overlapping item list
         public const string OverlappingItemListBaseItemTooltip =
