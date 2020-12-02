@@ -319,6 +319,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         EditorGUIUtility.labelWidth = 0;
                     }
 
+                    //TODO add tooltip
                     isAllowingSpriteReImport = EditorGUILayout.ToggleLeft(new GUIContent("Is allowing sprite reimport"),
                         isAllowingSpriteReImport);
 
@@ -384,10 +385,15 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     buttonTextBuilder.Append(nameof(SpriteData));
 
-                    if (GUILayout.Button(new GUIContent(buttonTextBuilder.ToString(),
-                        UITooltipConstants.SpriteDataAnalyzeAllTooltip)))
+                    var isAnalyzeSpriteButtonValid =
+                        isAnalyzingAllSprites || (!isAnalyzingAllSprites && spriteToAnalyze != null);
+                    using (new EditorGUI.DisabledScope(!isAnalyzeSpriteButtonValid))
                     {
-                        AnalyzeSpriteAlphas();
+                        if (GUILayout.Button(new GUIContent(buttonTextBuilder.ToString(),
+                            UITooltipConstants.SpriteDataAnalyzeAllTooltip)))
+                        {
+                            AnalyzeSprites();
+                        }
                     }
                 }
             }
@@ -490,7 +496,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
-                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
                         AnalyzeSprite(SpriteAnalyzerType.Sharpness);
                     }
                 }
@@ -511,7 +517,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
-                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
                         AnalyzeSprite(SpriteAnalyzerType.Lightness);
                     }
                 }
@@ -532,7 +538,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
-                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
                         AnalyzeSprite(SpriteAnalyzerType.AverageAlpha);
                     }
                 }
@@ -553,7 +559,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
-                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
                         AnalyzeSprite(SpriteAnalyzerType.PrimaryColor);
                     }
                 }
@@ -563,7 +569,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     EditorGUILayout.LabelField("", "");
                     if (GUILayout.Button("Analyze All", analyzeButtonWidth))
                     {
-                        spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                        FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
                         AnalyzeSprite(SpriteAnalyzerType.Lightness, SpriteAnalyzerType.Sharpness,
                             SpriteAnalyzerType.PrimaryColor, SpriteAnalyzerType.AverageAlpha);
                     }
@@ -584,7 +590,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 spriteDataAnalyzerContext.AddSpriteDataAnalyzer(spriteAnalyzerType);
             }
 
-            spriteDataAnalyzerContext.Analyze(ref spriteData, spriteAnalyzeInputData);
+            spriteData = spriteDataAnalyzerContext.Analyze(spriteAnalyzeInputData);
         }
 
         private void DrawOutlineContent(Rect rightAreaRect)
@@ -659,7 +665,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 if (GUILayout.Button("Re-Analyze", GUILayout.Width(90)))
                 {
                     Undo.RegisterCompleteObjectUndo(spriteData, "reanalyzed outline");
-                    spriteAnalyzeInputData.assetGuid = selectedSpriteDataItem.AssetGuid;
+                    FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
                     spriteAnalyzeInputData.outlineAnalysisType = OutlineAnalysisType.PixelPerfect;
                     AnalyzeSprite(SpriteAnalyzerType.Outline);
 
@@ -913,33 +919,105 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             originOutlines.Clear();
         }
 
-        private void AnalyzeSpriteAlphas()
+        private void AnalyzeSprites()
         {
             if (outlineAnalysisType == OutlineAnalysisType.Nothing &&
-                spriteDataAnalysisType == SpriteDataAnalysisType.Nothing)
+                spriteDataAnalysisType == SpriteDataAnalysisType.Nothing ||
+                (!isAnalyzingAllSprites && spriteToAnalyze == null))
             {
                 return;
             }
 
+            var lastSelectedSpriteDataItemGuid = selectedSpriteDataItem?.AssetGuid;
             reorderableSpriteList.index = -1;
             selectedSpriteDataItem = null;
-            spriteDataList.Clear();
-            spriteData = CreateInstance<SpriteData>();
-            spriteAnalyzeInputData.assetGuid = null;
-            spriteAnalyzeInputData.outlineAnalysisType = outlineAnalysisType;
-            GenerateSpriteDataItems();
+            selectedSprite = null;
+            selectedSpriteAspectRatio = 0;
+
+            FillSpriteAnalyzeInputDataForAdding();
             var currentSpriteAnalyzerTypes = CreateSpriteAnalyzerTypeArray();
             AnalyzeSprite(currentSpriteAnalyzerTypes);
+            SaveOrReSaveSpriteData();
+
             LoadSpriteDataList();
-
-            var assetPathAndName =
-                AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteData) + ".asset");
-
-            AssetDatabase.CreateAsset(spriteData, assetPathAndName);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            RestoreSpriteDataItemSelection(lastSelectedSpriteDataItemGuid);
 
             simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
+        }
+
+        private void RestoreSpriteDataItemSelection(string lastSelectedSpriteDataItemGuid)
+        {
+            if (lastSelectedSpriteDataItemGuid == null || lastSelectedSpriteDataItemGuid.Length <= 0)
+            {
+                return;
+            }
+
+            for (var i = 0; i < spriteDataList.Count; i++)
+            {
+                var spriteDataItem = spriteDataList[i];
+                if (!spriteDataItem.AssetGuid.Equals(lastSelectedSpriteDataItemGuid))
+                {
+                    continue;
+                }
+
+                reorderableSpriteList.index = i;
+                OnSpriteSelected(reorderableSpriteList);
+                return;
+            }
+        }
+
+        private void SaveOrReSaveSpriteData()
+        {
+            var assetPathAndName = "";
+            var forceReserializeAssetsOptions = ForceReserializeAssetsOptions.ReserializeAssets;
+
+            switch (spriteAnalyzedDataAddingChoice)
+            {
+                case SpriteAnalyzedDataAddingChoice.NewSpriteData:
+                    assetPathAndName =
+                        AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteData) + ".asset");
+                    forceReserializeAssetsOptions = ForceReserializeAssetsOptions.ReserializeAssetsAndMetadata;
+                    break;
+                case SpriteAnalyzedDataAddingChoice.CurrentlyLoaded:
+                    assetPathAndName = AssetDatabase.GetAssetPath(spriteAnalyzeInputData.spriteData.GetInstanceID());
+                    break;
+                default:
+                    assetPathAndName =
+                        AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteData) + ".asset");
+                    break;
+            }
+
+            if (spriteAnalyzedDataAddingChoice == SpriteAnalyzedDataAddingChoice.NewSpriteData)
+            {
+                AssetDatabase.CreateAsset(spriteData, assetPathAndName);
+            }
+
+            AssetDatabase.ForceReserializeAssets(new string[] {assetPathAndName}, forceReserializeAssetsOptions);
+            AssetDatabase.Refresh();
+        }
+
+        private void FillSpriteAnalyzeInputDataForAdding()
+        {
+            switch (spriteAnalyzedDataAddingChoice)
+            {
+                case SpriteAnalyzedDataAddingChoice.CurrentlyLoaded:
+                    spriteAnalyzeInputData.spriteData = spriteData;
+                    break;
+                default:
+                    spriteAnalyzeInputData.spriteData = null;
+                    break;
+            }
+
+            spriteAnalyzeInputData.assetGuid = null;
+            spriteAnalyzeInputData.sprite = isAnalyzingAllSprites ? null : spriteToAnalyze;
+            spriteAnalyzeInputData.outlineAnalysisType = outlineAnalysisType;
+            spriteAnalyzeInputData.isAllowingSpriteReimport = isAllowingSpriteReImport;
+        }
+
+        private void FillSpriteAnalyzeDataForUpdating(string assetGuid)
+        {
+            spriteAnalyzeInputData.assetGuid = assetGuid;
+            spriteAnalyzeInputData.sprite = null;
         }
 
         private SpriteAnalyzerType[] CreateSpriteAnalyzerTypeArray()
@@ -981,30 +1059,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             }
 
             return typeList.ToArray();
-        }
-
-        private void GenerateSpriteDataItems()
-        {
-            var spriteRenderers = FindObjectsOfType<SpriteRenderer>();
-            foreach (var spriteRenderer in spriteRenderers)
-            {
-                if (!spriteRenderer.enabled || !spriteRenderer.gameObject.activeInHierarchy ||
-                    spriteRenderer.sprite == null)
-                {
-                    continue;
-                }
-
-                var path = AssetDatabase.GetAssetPath(spriteRenderer.sprite.GetInstanceID());
-                var guid = AssetDatabase.AssetPathToGUID(path);
-
-                if (spriteData.spriteDataDictionary.ContainsKey(guid))
-                {
-                    continue;
-                }
-
-                var spriteDataItem = new SpriteDataItem(guid, spriteRenderer.sprite.name);
-                spriteData.spriteDataDictionary.Add(guid, spriteDataItem);
-            }
         }
 
         private void InitReordableSpriteList()

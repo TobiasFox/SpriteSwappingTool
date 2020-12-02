@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 {
     public class SpriteDataAnalyzerContext
     {
+        private static readonly SpriteAnalyzeInputData EmptyInputData = new SpriteAnalyzeInputData();
+
         protected int totalProgress;
         protected int currentProgress;
 
@@ -16,6 +19,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
         private readonly Dictionary<SpriteAnalyzerType, ISpriteDataAnalyzer> spriteDataAnalyzers =
             new Dictionary<SpriteAnalyzerType, ISpriteDataAnalyzer>();
+
+        private SpriteAnalyzeInputData spriteAnalyzeInputData;
 
         public void AddSpriteDataAnalyzer(SpriteAnalyzerType spriteAnalyzerType)
         {
@@ -52,22 +57,25 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
             spriteDataAnalyzerSet.Clear();
         }
 
-        public void Analyze(ref SpriteData spriteData, SpriteAnalyzeInputData inputData)
+        public SpriteData Analyze(SpriteAnalyzeInputData inputData)
         {
+            spriteAnalyzeInputData = inputData;
+            InitSpriteData();
+
             var assetGuidList = new List<string>();
 
-            if (inputData.assetGuid != null)
+            if (spriteAnalyzeInputData.assetGuid != null)
             {
-                assetGuidList.Add(inputData.assetGuid);
+                assetGuidList.Add(spriteAnalyzeInputData.assetGuid);
             }
             else
             {
-                assetGuidList.AddRange(spriteData.spriteDataDictionary.Keys);
+                assetGuidList.AddRange(spriteAnalyzeInputData.spriteData.spriteDataDictionary.Keys);
             }
 
             foreach (var tempAssetGuid in assetGuidList)
             {
-                var spriteDataItem = spriteData.spriteDataDictionary[tempAssetGuid];
+                var spriteDataItem = spriteAnalyzeInputData.spriteData.spriteDataDictionary[tempAssetGuid];
 
                 var assetPath = AssetDatabase.GUIDToAssetPath(tempAssetGuid);
                 var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
@@ -85,10 +93,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
                 foreach (var spriteDataAnalyzer in spriteDataAnalyzerSet)
                 {
-                    spriteDataAnalyzer.Analyse(ref spriteDataItem, sprite, inputData);
+                    spriteDataAnalyzer.Analyse(ref spriteDataItem, sprite, spriteAnalyzeInputData);
                 }
 
-                spriteData.spriteDataDictionary[tempAssetGuid] = spriteDataItem;
+                spriteAnalyzeInputData.spriteData.spriteDataDictionary[tempAssetGuid] = spriteDataItem;
 
                 if (!spriteIsReadable)
                 {
@@ -97,6 +105,54 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
                 // currentProgress++;
             }
+
+            var returnSpriteData = spriteAnalyzeInputData.spriteData;
+            spriteAnalyzeInputData = EmptyInputData;
+
+            return returnSpriteData;
+        }
+
+        private void InitSpriteData()
+        {
+            if (spriteAnalyzeInputData.spriteData == null)
+            {
+                spriteAnalyzeInputData.spriteData = ScriptableObject.CreateInstance<SpriteData>();
+            }
+
+            if (spriteAnalyzeInputData.sprite != null)
+            {
+                AddSpriteDataItemToDictionary(spriteAnalyzeInputData.sprite);
+
+                spriteAnalyzeInputData.assetGuid = AssetDatabase.AssetPathToGUID(
+                    AssetDatabase.GetAssetPath(spriteAnalyzeInputData.sprite.GetInstanceID()));
+                return;
+            }
+
+            var spriteRenderers = Object.FindObjectsOfType<SpriteRenderer>();
+            foreach (var currentSpriteRenderer in spriteRenderers)
+            {
+                if (!currentSpriteRenderer.enabled || !currentSpriteRenderer.gameObject.activeInHierarchy ||
+                    currentSpriteRenderer.sprite == null)
+                {
+                    continue;
+                }
+
+                AddSpriteDataItemToDictionary(currentSpriteRenderer.sprite);
+            }
+        }
+
+        private void AddSpriteDataItemToDictionary(Sprite currentSprite)
+        {
+            var path = AssetDatabase.GetAssetPath(currentSprite.GetInstanceID());
+            var guid = AssetDatabase.AssetPathToGUID(path);
+
+            if (spriteAnalyzeInputData.spriteData.spriteDataDictionary.ContainsKey(guid))
+            {
+                return;
+            }
+
+            var spriteDataItem = new SpriteDataItem(guid, currentSprite.name);
+            spriteAnalyzeInputData.spriteData.spriteDataDictionary.Add(guid, spriteDataItem);
         }
 
         private bool SetSpriteReadable(Texture2D spriteTexture, bool isReadable)
