@@ -59,6 +59,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
         public SpriteData Analyze(SpriteAnalyzeInputData inputData)
         {
+            var startTime = EditorApplication.timeSinceStartup;
             spriteAnalyzeInputData = inputData;
             InitSpriteData();
 
@@ -83,10 +84,14 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
                 if (!spriteIsReadable)
                 {
-                    var isResetReadableFlagSuccessful = SetSpriteReadable(sprite.texture, true);
-                    if (!isResetReadableFlagSuccessful)
+                    try
                     {
-                        // currentProgress+=2; or +1 error
+                        var readableSpriteTexture = CreateReadableSpriteTexture2D(sprite.texture);
+                        sprite = Sprite.Create(readableSpriteTexture, sprite.textureRect, sprite.pivot,
+                            sprite.pixelsPerUnit);
+                    }
+                    catch (Exception e)
+                    {
                         continue;
                     }
                 }
@@ -100,7 +105,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
                 if (!spriteIsReadable)
                 {
-                    SetSpriteReadable(sprite.texture, false);
+                    Object.DestroyImmediate(sprite);
                 }
 
                 // currentProgress++;
@@ -108,8 +113,38 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
             var returnSpriteData = spriteAnalyzeInputData.spriteData;
             spriteAnalyzeInputData = EmptyInputData;
-
+            var timeDif = EditorApplication.timeSinceStartup - startTime;
+            Debug.LogFormat("analyzed {0} sprites in {1} seconds", assetGuidList.Count, Math.Round(timeDif, 2));
             return returnSpriteData;
+        }
+
+        private Texture2D CreateReadableSpriteTexture2D(Texture2D spriteTexture)
+        {
+            var tmp = RenderTexture.GetTemporary(spriteTexture.width, spriteTexture.height);
+
+            // Blit the pixels on texture to the RenderTexture
+            Graphics.Blit(spriteTexture, tmp);
+
+            // Backup the currently set RenderTexture
+            var previous = RenderTexture.active;
+
+            // Set the current RenderTexture to the temporary one
+            RenderTexture.active = tmp;
+
+            // Create a new readable Texture2D to copy the pixels to it
+            var myTexture2D = new Texture2D(spriteTexture.width, spriteTexture.height);
+
+            // Copy the pixels from the RenderTexture to the new Texture
+            myTexture2D.ReadPixels(new Rect(0, 0, tmp.width, tmp.height), 0, 0);
+            myTexture2D.Apply();
+
+            // Reset the active RenderTexture
+            RenderTexture.active = previous;
+
+            // Release the temporary RenderTexture
+            RenderTexture.ReleaseTemporary(tmp);
+
+            return myTexture2D;
         }
 
         private void InitSpriteData()
@@ -153,39 +188,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis.Analyzer
 
             var spriteDataItem = new SpriteDataItem(guid, currentSprite.name);
             spriteAnalyzeInputData.spriteData.spriteDataDictionary.Add(guid, spriteDataItem);
-        }
-
-        private bool SetSpriteReadable(Texture2D spriteTexture, bool isReadable)
-        {
-            var path = AssetDatabase.GetAssetPath(spriteTexture.GetInstanceID());
-            var textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
-
-            if (textureImporter == null)
-            {
-                return false;
-            }
-
-            var isSuccessfullyChangeReadableFlag = false;
-
-            try
-            {
-                AssetDatabase.StartAssetEditing();
-
-                textureImporter.isReadable = isReadable;
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-                isSuccessfullyChangeReadableFlag = true;
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarningFormat("could not set readable flag to {0} of sprite {1}", isReadable, path);
-                Debug.LogWarning(e);
-            }
-            finally
-            {
-                AssetDatabase.StopAssetEditing();
-            }
-
-            return isSuccessfullyChangeReadableFlag;
         }
     }
 }
