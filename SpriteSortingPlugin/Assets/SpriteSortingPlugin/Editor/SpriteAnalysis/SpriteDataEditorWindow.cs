@@ -40,6 +40,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private OutlinePrecision outlinePrecision;
         private SpriteDataAnalysisType[] spriteAnalyzerTypes;
         private bool isAnalyzingAllSprites = true;
+        private bool isAllowingSpriteReImport = true;
         private bool isExpandingAnalyzeOptions;
         private SpriteAnalyzedDataAddingChoice spriteAnalyzedDataAddingChoice;
         private float expandedAnalyzeOptionsHeight = -1;
@@ -277,20 +278,22 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         {
             using (new EditorGUILayout.HorizontalScope())
             {
-                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                using (new EditorGUILayout.VerticalScope())
                 {
-                    EditorGUIUtility.labelWidth = 110;
-                    spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"), spriteData,
-                        typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
-                    EditorGUIUtility.labelWidth = 0;
-
-                    if (GUILayout.Button("Load"))
+                    EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
+                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                     {
-                        LoadSpriteDataList();
+                        EditorGUIUtility.labelWidth = 110;
+                        spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"), spriteData,
+                            typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
+                        EditorGUIUtility.labelWidth = 0;
+
+                        if (GUILayout.Button("Load"))
+                        {
+                            LoadSpriteDataList();
+                        }
                     }
                 }
-
-                GUILayout.FlexibleSpace();
 
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
@@ -316,25 +319,15 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         EditorGUIUtility.labelWidth = 0;
                     }
 
+                    isAllowingSpriteReImport = EditorGUILayout.ToggleLeft(new GUIContent("Is allowing sprite reimport"),
+                        isAllowingSpriteReImport);
+
                     EditorGUI.BeginChangeCheck();
                     isExpandingAnalyzeOptions =
                         EditorGUILayout.Foldout(isExpandingAnalyzeOptions, "More Analyzing options", true);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        //hack for not getting delayed ui updating of collapsed/expanded foldout
-                        if (isExpandingAnalyzeOptions && expandedAnalyzeOptionsHeight > -1)
-                        {
-                            lastHeight = expandedAnalyzeOptionsHeight;
-                        }
-                        else if (!isExpandingAnalyzeOptions && collapsedAnalyzeOptionsHeight > -1)
-                        {
-                            lastHeight = collapsedAnalyzeOptionsHeight;
-                        }
-                        else
-                        {
-                            //happens only the first time the foldout is collapsed/expanded
-                            EditorApplication.delayCall += RepaintDelayed;
-                        }
+                        SetAnalyzeOptionsHeightDependingOnFoldoutExpand();
                     }
 
                     if (isExpandingAnalyzeOptions)
@@ -400,6 +393,24 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             }
 
             GetDynamicHeightsOfAnalyzeOptionFoldout();
+        }
+
+        //hack for not getting delayed ui updating of collapsed/expanded foldout
+        private void SetAnalyzeOptionsHeightDependingOnFoldoutExpand()
+        {
+            if (isExpandingAnalyzeOptions && expandedAnalyzeOptionsHeight > -1)
+            {
+                lastHeight = expandedAnalyzeOptionsHeight;
+            }
+            else if (!isExpandingAnalyzeOptions && collapsedAnalyzeOptionsHeight > -1)
+            {
+                lastHeight = collapsedAnalyzeOptionsHeight;
+            }
+            else
+            {
+                //happens only the first time the foldout is collapsed/expanded
+                EditorApplication.delayCall += RepaintDelayed;
+            }
         }
 
         private Sprite spriteToAnalyze;
