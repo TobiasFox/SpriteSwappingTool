@@ -15,12 +15,14 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private const int MinWidthRightContentBar = 200;
         private const float LineSpacing = 1.5f;
         private const float RightAreaOffset = 3f;
+        private const float LoadingSpriteDataAssetPercentageWidth = 0.39f;
         private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
 
         private SerializedObject serializedObject;
 
         [SerializeField] private SpriteData spriteData;
         [SerializeField] private Sprite spriteToAnalyze;
+        private float lastToolbarWidth;
         private Sprite selectedSprite;
         private float selectedSpriteAspectRatio;
 
@@ -68,6 +70,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
         private void Awake()
         {
             titleContent = new GUIContent("Sprite Alpha Analysis");
+            minSize = new Vector2(720, minSize.y);
             ResetSpriteList();
 
             //TODO: remove
@@ -276,26 +279,36 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void DrawToolbar()
         {
-            using (new EditorGUILayout.HorizontalScope())
+            using (var toolbarScope = new EditorGUILayout.HorizontalScope())
             {
-                using (new EditorGUILayout.VerticalScope())
+                if (Event.current.type == EventType.Repaint)
                 {
-                    EditorGUILayout.Space(EditorGUIUtility.singleLineHeight);
-                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
-                    {
-                        EditorGUIUtility.labelWidth = 110;
-                        spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset"), spriteData,
-                            typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
-                        EditorGUIUtility.labelWidth = 0;
+                    lastToolbarWidth = toolbarScope.rect.width;
+                }
 
-                        if (GUILayout.Button("Load"))
-                        {
-                            LoadSpriteDataList();
-                        }
+                var currentLoadingSpriteDataPercentageWidth = lastToolbarWidth * LoadingSpriteDataAssetPercentageWidth;
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle,
+                    GUILayout.Width(currentLoadingSpriteDataPercentageWidth)))
+                {
+                    GUILayout.Space(1.5f);
+
+                    var normalCenteredStyling = new GUIStyle(Styling.CenteredStyle) {fontStyle = FontStyle.Normal};
+                    GUILayout.Label("Sprite Data Asset", normalCenteredStyling);
+
+                    GUILayout.Space(1.5f);
+
+                    EditorGUIUtility.labelWidth = 110;
+                    spriteData = EditorGUILayout.ObjectField(new GUIContent(GUIContent.none), spriteData,
+                        typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
+                    EditorGUIUtility.labelWidth = 0;
+
+                    if (GUILayout.Button("Load"))
+                    {
+                        LoadSpriteDataList();
                     }
                 }
 
-                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle, GUILayout.ExpandWidth(true)))
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
@@ -312,7 +325,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                             }
                         }
 
-                        EditorGUIUtility.labelWidth = 100;
                         outlineAnalysisType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField(
                             new GUIContent("Outline Type", UITooltipConstants.SpriteDataOutlineAnalysisTypeTooltip),
                             outlineAnalysisType, GUILayout.MinWidth(200));
@@ -320,42 +332,51 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                         EditorGUIUtility.labelWidth = 0;
                     }
 
-                    using (new EditorGUILayout.HorizontalScope())
+                    EditorGUI.BeginChangeCheck();
+                    isExpandingAnalyzeOptions =
+                        EditorGUILayout.Foldout(isExpandingAnalyzeOptions, "More Analyzing options", true);
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        //TODO add tooltip
-                        isAllowingSpriteReImport = EditorGUILayout.ToggleLeft(
-                            new GUIContent("Is allowing sprite reimport"), isAllowingSpriteReImport);
+                        SetAnalyzeOptionsHeightDependingOnFoldoutExpand();
+                    }
 
-                        if (!hasLoadedSpriteDataAsset)
-                        {
-                            spriteAnalyzedDataAddingChoice = SpriteAnalyzedDataAddingChoice.NewSpriteData;
-                        }
+                    if (isExpandingAnalyzeOptions)
+                    {
+                        EditorGUI.indentLevel++;
 
                         using (new EditorGUI.DisabledScope(!hasLoadedSpriteDataAsset))
                         {
-                            EditorGUIUtility.labelWidth = 100;
-                            spriteAnalyzedDataAddingChoice = (SpriteAnalyzedDataAddingChoice) EditorGUILayout.EnumPopup(
-                                new GUIContent("Adding data to",
-                                    UITooltipConstants.SortingEditorSpriteAnalyzedDataAddingChoiceTooltip),
-                                spriteAnalyzedDataAddingChoice, GUILayout.Width(205), GUILayout.ExpandWidth(true));
+                            if (!hasLoadedSpriteDataAsset)
+                            {
+                                spriteAnalyzedDataAddingChoice = SpriteAnalyzedDataAddingChoice.NewSpriteData;
+                            }
+
+                            EditorGUIUtility.labelWidth = 175;
+                            spriteAnalyzedDataAddingChoice =
+                                (SpriteAnalyzedDataAddingChoice) EditorGUILayout.EnumPopup(
+                                    new GUIContent("Adding analyzed data to",
+                                        UITooltipConstants.SortingEditorSpriteAnalyzedDataAddingChoiceTooltip),
+                                    spriteAnalyzedDataAddingChoice);
                             EditorGUIUtility.labelWidth = 0;
                         }
-                    }
 
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        EditorGUIUtility.labelWidth = 100;
-                        isAnalyzingAllSprites = EditorGUILayout.ToggleLeft(new GUIContent("Is analyzing all sprites",
-                                UITooltipConstants.SortingEditorAnalyzingAllSpritesTooltip), isAnalyzingAllSprites,
-                            GUILayout.ExpandWidth(false));
-
-                        EditorGUIUtility.labelWidth = 0;
-                        using (new EditorGUI.DisabledScope(isAnalyzingAllSprites))
+                        using (new EditorGUILayout.HorizontalScope())
                         {
-                            spriteToAnalyze =
-                                (Sprite) EditorGUILayout.ObjectField(spriteToAnalyze, typeof(Sprite), false,
-                                    GUILayout.MinWidth(250), GUILayout.ExpandWidth(true));
+                            EditorGUIUtility.labelWidth = 65;
+                            isAnalyzingAllSprites =
+                                EditorGUILayout.ToggleLeft(new GUIContent("Is analyzing all sprites",
+                                        UITooltipConstants.SortingEditorAnalyzingAllSpritesTooltip),
+                                    isAnalyzingAllSprites);
+
+                            EditorGUIUtility.labelWidth = 0;
+                            using (new EditorGUI.DisabledScope(isAnalyzingAllSprites))
+                            {
+                                spriteToAnalyze =
+                                    (Sprite) EditorGUILayout.ObjectField(spriteToAnalyze, typeof(Sprite), false);
+                            }
                         }
+
+                        EditorGUI.indentLevel--;
                     }
 
                     var buttonTextBuilder = new StringBuilder("Analyze ");
@@ -374,18 +395,63 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     buttonTextBuilder.Append(nameof(SpriteData));
 
-                    var isAnalyzeSpriteButtonValid =
-                        isAnalyzingAllSprites || (!isAnalyzingAllSprites && spriteToAnalyze != null);
-                    using (new EditorGUI.DisabledScope(!isAnalyzeSpriteButtonValid))
+                    if (GUILayout.Button(new GUIContent(buttonTextBuilder.ToString(),
+                        UITooltipConstants.SpriteDataAnalyzeAllTooltip)))
                     {
-                        if (GUILayout.Button(new GUIContent(buttonTextBuilder.ToString(),
-                            UITooltipConstants.SpriteDataAnalyzeAllTooltip)))
-                        {
-                            AnalyzeSprites();
-                        }
+                        AnalyzeSprites();
                     }
                 }
             }
+
+            GetDynamicHeightsOfAnalyzeOptionFoldout();
+        }
+
+        //hack for not getting delayed ui updating of collapsed/expanded foldout
+        private void SetAnalyzeOptionsHeightDependingOnFoldoutExpand()
+        {
+            if (isExpandingAnalyzeOptions && expandedAnalyzeOptionsHeight > -1)
+            {
+                lastHeight = expandedAnalyzeOptionsHeight;
+            }
+            else if (!isExpandingAnalyzeOptions && collapsedAnalyzeOptionsHeight > -1)
+            {
+                lastHeight = collapsedAnalyzeOptionsHeight;
+            }
+            else
+            {
+                //happens only the first time the foldout is collapsed/expanded
+                EditorApplication.delayCall += RepaintDelayed;
+            }
+        }
+
+        //hack for getting dynamic height of analyze options foldout. Otherwise a visual delay from updating the GUI is visible
+        private void GetDynamicHeightsOfAnalyzeOptionFoldout()
+        {
+            if (expandedAnalyzeOptionsHeight >= 0 && collapsedAnalyzeOptionsHeight >= 0)
+            {
+                return;
+            }
+
+            if (Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
+            var currentFoldoutHeight = GUILayoutUtility.GetLastRect().height;
+            if (isExpandingAnalyzeOptions)
+            {
+                expandedAnalyzeOptionsHeight = currentFoldoutHeight;
+            }
+
+            else
+            {
+                collapsedAnalyzeOptionsHeight = currentFoldoutHeight;
+            }
+        }
+
+        private void RepaintDelayed()
+        {
+            Repaint();
         }
 
         private void DrawSpriteDetails(Rect rightAreaRect)
