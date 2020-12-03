@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SpriteSortingPlugin.AutomaticSorting;
 using SpriteSortingPlugin.AutomaticSorting.Data;
 using SpriteSortingPlugin.AutomaticSorting.SortingPreset;
+using SpriteSortingPlugin.Customization;
 using SpriteSortingPlugin.OverlappingSpriteDetection;
 using SpriteSortingPlugin.OverlappingSprites;
 using SpriteSortingPlugin.Preview;

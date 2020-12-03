@@ -1,4 +1,5 @@
 ﻿using System;
+using SpriteSortingPlugin.Customization;
 using SpriteSortingPlugin.Preview;
 using UnityEditor;
 using UnityEditorInternal;

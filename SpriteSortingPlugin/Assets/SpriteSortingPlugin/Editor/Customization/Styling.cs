@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Customization
 {
     public static class Styling
     {
@@ -75,8 +75,10 @@ namespace SpriteSortingPlugin
         private static readonly Color ListElementActiveColorDark = new Color(0.1275f, 0.2654f, 0.383f, 0.5804f);
         private static readonly Color ListElementFocussingColorDark = new Color(0.1657f, 0.3355f, 0.4811f, 0.5804f);
         private static readonly Color TransparentBackgroundColorDark = new Color(0.217f, 0.217f, 0.217f, 0.7f);
-        public static Color SortingCriteriaHeaderBackgroundColorDark = new Color(0.22f, 0.22f, 0.22f, 0.3f);
-        public static Color SortingCriteriaHeaderInspectorBackgroundColorDark = new Color(0.283f, 0.283f, 0.283f, 0.3f);
+        private static readonly Color SortingCriteriaHeaderBackgroundColorDark = new Color(0.22f, 0.22f, 0.22f, 0.3f);
+
+        private static readonly Color SortingCriteriaHeaderInspectorBackgroundColorDark =
+            new Color(0.283f, 0.283f, 0.283f, 0.3f);
 
         private static readonly Color HorizontalLineColorDark = new Color(0.36f, 0.36f, 0.36f, 0.6f);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using SpriteSortingPlugin.Customization;
 using SpriteSortingPlugin.OverlappingSprites;
 using UnityEditor;
 using UnityEngine;
