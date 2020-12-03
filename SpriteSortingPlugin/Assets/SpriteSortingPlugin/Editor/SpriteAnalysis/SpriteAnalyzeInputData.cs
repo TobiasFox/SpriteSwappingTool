@@ -6,7 +6,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis
     {
         public OutlineAnalysisType outlineAnalysisType;
         public string assetGuid;
-        public bool isAllowingSpriteReimport;
         public SpriteData spriteData;
         public Sprite sprite;
     }

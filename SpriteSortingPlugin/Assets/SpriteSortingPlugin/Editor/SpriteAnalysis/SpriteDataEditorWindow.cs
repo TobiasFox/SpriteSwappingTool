@@ -339,7 +339,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                             SetAnalyzeOptionsHeightDependingOnFoldoutExpand();
                         }
 
-                        GUILayout.Label(new GUIContent("Sprite analyzing can take some time", Styling.InfoIcon,
+                        GUILayout.Label(new GUIContent("Sprite analyzing might take some time", Styling.InfoIcon,
                             UITooltipConstants.SpriteDataAnalyzingActionDurationTooltip), GUILayout.ExpandWidth(false));
                     }
 
@@ -365,11 +365,11 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                         using (new EditorGUILayout.HorizontalScope())
                         {
-                            EditorGUIUtility.labelWidth = 65;
+                            EditorGUIUtility.labelWidth = 105;
                             isAnalyzingAllSprites =
                                 EditorGUILayout.ToggleLeft(new GUIContent("Is analyzing all sprites",
                                         UITooltipConstants.SortingEditorAnalyzingAllSpritesTooltip),
-                                    isAnalyzingAllSprites);
+                                    isAnalyzingAllSprites, GUILayout.ExpandWidth(false));
 
                             EditorGUIUtility.labelWidth = 0;
                             using (new EditorGUI.DisabledScope(isAnalyzingAllSprites))
@@ -622,9 +622,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private void DrawAABB(Rect rectWithAlphaBorders)
         {
+            var lineDifferenceFactors = new Vector2(1, 1);
             Handles.DrawWireCube(rectWithAlphaBorders.center, rectWithAlphaBorders.size);
-            Handles.DrawWireCube(rectWithAlphaBorders.center,
-                new Vector3(rectWithAlphaBorders.size.x - 1, rectWithAlphaBorders.size.y - 1));
+            Handles.DrawWireCube(rectWithAlphaBorders.center, rectWithAlphaBorders.size + lineDifferenceFactors);
+            Handles.DrawWireCube(rectWithAlphaBorders.center, rectWithAlphaBorders.size - lineDifferenceFactors);
         }
 
         private void DrawOutline(Rect rectWithAlphaBorders, Rect rightAreaRect)
@@ -638,16 +639,22 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             var scaleYFactor = rectWithAlphaBorders.height / selectedSprite.bounds.size.y;
             var scale = new Vector2(scaleYFactor, -scaleXFactor);
 
+            var lineDifferenceFactors = new Vector2(0.5f, 0.5f);
             var lastPoint = selectedSpriteDataItem.outlinePoints[0] * scale + rectWithAlphaBorders.center;
             for (var i = 1; i < selectedSpriteDataItem.outlinePoints.Length; i++)
             {
                 var nextPoint = selectedSpriteDataItem.outlinePoints[i] * scale + rectWithAlphaBorders.center;
+
                 Handles.DrawLine(lastPoint, nextPoint);
-                Handles.DrawLine(new Vector2(lastPoint.x + 1, lastPoint.y), new Vector2(nextPoint.x + 1, nextPoint.y));
+                Handles.DrawLine(lastPoint + lineDifferenceFactors, nextPoint + lineDifferenceFactors);
+                Handles.DrawLine(lastPoint - lineDifferenceFactors, nextPoint - lineDifferenceFactors);
+
                 lastPoint = nextPoint;
             }
 
-            using (new GUILayout.AreaScope(new Rect(0, position.height - 122, rightAreaRect.width, 75)))
+            var outlineRect = new Rect(0, position.height - lastHeight, rightAreaRect.width, 75);
+            outlineRect.y -= outlineRect.height;
+            using (new GUILayout.AreaScope(outlineRect))
             {
                 var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 75);
                 EditorGUI.DrawRect(alphaRectangleBorderRect, Styling.TransparentBackgroundColor);
@@ -798,20 +805,20 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             var rectCenter = rectWithAlphaBorders.center - new Vector2(
                 selectedSpriteDataItem.objectOrientedBoundingBox.BoundsCenterOffset.x * scaleXFactor,
                 selectedSpriteDataItem.objectOrientedBoundingBox.BoundsCenterOffset.y * scaleYFactor);
-
+            var lineDifferenceFactors = new Vector2(1, 1);
             Handles.DrawWireCube(rectCenter, scaledSize);
-            Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x + 1, scaledSize.y + 1));
-            Handles.DrawWireCube(rectCenter, new Vector3(scaledSize.x - 1, scaledSize.y - 1));
+            Handles.DrawWireCube(rectCenter, scaledSize + lineDifferenceFactors);
+            Handles.DrawWireCube(rectCenter, scaledSize - lineDifferenceFactors);
 
-            using (new GUILayout.AreaScope(new Rect(0, position.height - 147, rightAreaRect.width, 100)))
+            var outlineRect = new Rect(0, position.height - lastHeight, rightAreaRect.width, 100);
+            outlineRect.y -= outlineRect.height;
+            using (new GUILayout.AreaScope(outlineRect))
             {
                 var alphaRectangleBorderRect = new Rect(0, 0, rightAreaRect.width, 125);
                 EditorGUI.DrawRect(alphaRectangleBorderRect, Styling.TransparentBackgroundColor);
 
                 EditorGUI.BeginChangeCheck();
-
                 DrawAlphaRectangleBorderSettings(alphaRectangleBorderRect);
-
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RegisterCompleteObjectUndo(spriteData, "changed OOBB size");
@@ -1019,13 +1026,13 @@ namespace SpriteSortingPlugin.SpriteAnalysis
             spriteAnalyzeInputData.assetGuid = null;
             spriteAnalyzeInputData.sprite = isAnalyzingAllSprites ? null : spriteToAnalyze;
             spriteAnalyzeInputData.outlineAnalysisType = outlineAnalysisType;
-            spriteAnalyzeInputData.isAllowingSpriteReimport = isAllowingSpriteReImport;
         }
 
         private void FillSpriteAnalyzeDataForUpdating(string assetGuid)
         {
             spriteAnalyzeInputData.assetGuid = assetGuid;
             spriteAnalyzeInputData.sprite = null;
+            spriteAnalyzeInputData.spriteData = spriteData;
         }
 
         private SpriteAnalyzerType[] CreateSpriteAnalyzerTypeArray()
