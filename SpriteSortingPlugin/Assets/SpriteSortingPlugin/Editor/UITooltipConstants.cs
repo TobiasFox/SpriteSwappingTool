@@ -79,8 +79,15 @@
         public const string SpriteDataResolutionTooltip = "The sprites resolution in pixel.";
 
         public const string SpriteDataAnalyzeAllTooltip =
-            "This action will select all visible sprites in opened scenes, analyze these sprites according to the selected Analysis Types and create a new " +
-            nameof(SpriteData) + " asset.";
+            SpriteDataAnalyzeTooltipPrefix + "all visible sprites in opened scenes " + SpriteDataAnalyzeTooltipSuffix;
+
+        public const string SpriteDataAnalyzeSingleSpriteTooltip =
+            SpriteDataAnalyzeTooltipPrefix + "the selected sprite " + SpriteDataAnalyzeTooltipSuffix;
+
+        private const string SpriteDataAnalyzeTooltipPrefix = "This action will analyze ";
+
+        private const string SpriteDataAnalyzeTooltipSuffix =
+            "according to the selected Analysis Types and create a new " + nameof(SpriteData) + " asset.";
 
         public const string SpriteDataOutlineAnalysisTypeTooltip =
             "Specify the outline types to analyze. The Pixel Perfect outline is the most accurate but needs slightly more time to analyze.";

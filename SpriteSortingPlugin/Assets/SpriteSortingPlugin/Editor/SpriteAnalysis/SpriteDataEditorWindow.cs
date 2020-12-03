@@ -250,8 +250,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
 
-                    GUILayout.Label(
-                        new GUIContent("Sprites", UITooltipConstants.SpriteDataSpriteListTooltip),
+                    GUILayout.Label(new GUIContent("Sprites", UITooltipConstants.SpriteDataSpriteListTooltip),
                         Styling.CenteredStyleBold, GUILayout.ExpandWidth(true));
                     EditorGUI.BeginChangeCheck();
                     searchString = searchField.OnGUI(searchString);
@@ -396,7 +395,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     buttonTextBuilder.Append(nameof(SpriteData));
 
                     if (GUILayout.Button(new GUIContent(buttonTextBuilder.ToString(),
-                        UITooltipConstants.SpriteDataAnalyzeAllTooltip)))
+                        isAnalyzingAllSprites
+                            ? UITooltipConstants.SpriteDataAnalyzeAllTooltip
+                            : UITooltipConstants.SpriteDataAnalyzeSingleSpriteTooltip)))
                     {
                         AnalyzeSprites();
                     }
