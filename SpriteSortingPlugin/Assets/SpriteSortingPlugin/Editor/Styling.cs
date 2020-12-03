@@ -14,6 +14,7 @@ namespace SpriteSortingPlugin
         public static readonly Texture InfoIcon;
 
         public static readonly GUIStyle HelpBoxStyle;
+        public static readonly GUIStyle CenteredStyleBold;
         public static readonly GUIStyle CenteredStyle;
         public static readonly GUIStyle ButtonStyle;
 
@@ -150,7 +151,9 @@ namespace SpriteSortingPlugin
 
             HelpBoxStyle = new GUIStyle("HelpBox");
             ButtonStyle = new GUIStyle("Button");
-            CenteredStyle = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
+            CenteredStyleBold = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
+            CenteredStyle = new GUIStyle(EditorStyles.boldLabel)
+                {alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Normal};
         }
     }
 }

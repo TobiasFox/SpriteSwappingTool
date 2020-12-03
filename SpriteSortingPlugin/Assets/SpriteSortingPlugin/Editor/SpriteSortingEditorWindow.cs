@@ -175,7 +175,7 @@ namespace SpriteSortingPlugin
             serializedObject.Update();
 
             isAnalyzedButtonDisabled = false;
-            GUILayout.Label("Sprite Sorting", Styling.CenteredStyle, GUILayout.ExpandWidth(true));
+            GUILayout.Label("Sprite Sorting", Styling.CenteredStyleBold, GUILayout.ExpandWidth(true));
 
             DrawCameraOptions();
 

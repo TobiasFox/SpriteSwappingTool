@@ -38,11 +38,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
         private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
         private OutlineAnalysisType outlineAnalysisType = OutlineAnalysisType.All;
-        private SpriteDataAnalysisType spriteDataAnalysisType = SpriteDataAnalysisType.Outline;
+        private SpriteDataAnalysisType spriteDataAnalysisType = SpriteDataAnalysisType.All;
         private OutlinePrecision outlinePrecision;
         private SpriteDataAnalysisType[] spriteAnalyzerTypes;
         private bool isAnalyzingAllSprites = true;
-        private bool isAllowingSpriteReImport = true;
         private bool isExpandingAnalyzeOptions;
         private SpriteAnalyzedDataAddingChoice spriteAnalyzedDataAddingChoice;
         private float expandedAnalyzeOptionsHeight = -1;
@@ -186,7 +185,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                     {
                         GUILayout.Label(
                             new GUIContent("Edit Sprite Data", UITooltipConstants.SpriteDataEditModeTooltip),
-                            Styling.CenteredStyle, GUILayout.ExpandWidth(true));
+                            Styling.CenteredStyleBold, GUILayout.ExpandWidth(true));
 
                         using (new EditorGUILayout.HorizontalScope(Styling.HelpBoxStyle))
                         {
@@ -253,7 +252,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                     GUILayout.Label(
                         new GUIContent("Sprites", UITooltipConstants.SpriteDataSpriteListTooltip),
-                        Styling.CenteredStyle, GUILayout.ExpandWidth(true));
+                        Styling.CenteredStyleBold, GUILayout.ExpandWidth(true));
                     EditorGUI.BeginChangeCheck();
                     searchString = searchField.OnGUI(searchString);
                     if (EditorGUI.EndChangeCheck())
@@ -287,12 +286,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle,
                     GUILayout.Width(currentLoadingSpriteDataPercentageWidth)))
                 {
-                    GUILayout.Space(1.5f);
-
-                    var normalCenteredStyling = new GUIStyle(Styling.CenteredStyle) {fontStyle = FontStyle.Normal};
-                    GUILayout.Label("Sprite Data Asset", normalCenteredStyling);
-
-                    GUILayout.Space(1.5f);
+                    GUILayout.Label("Sprite Data Asset", Styling.CenteredStyle);
 
                     EditorGUIUtility.labelWidth = 110;
                     spriteData = EditorGUILayout.ObjectField(new GUIContent(GUIContent.none), spriteData,
@@ -307,45 +301,48 @@ namespace SpriteSortingPlugin.SpriteAnalysis
 
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle, GUILayout.ExpandWidth(true)))
                 {
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        EditorGUIUtility.labelWidth = 80;
-                        EditorGUI.BeginChangeCheck();
-                        spriteDataAnalysisType = (SpriteDataAnalysisType) EditorGUILayout.EnumFlagsField(
-                            new GUIContent("Analysis Type", UITooltipConstants.SpriteDataAnalysisTypeTooltip),
-                            spriteDataAnalysisType, GUILayout.MinWidth(200));
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            if (!spriteDataAnalysisType.HasFlag(SpriteDataAnalysisType.Outline))
-                            {
-                                spriteDataAnalysisType |= SpriteDataAnalysisType.Outline;
-                            }
-                        }
-
-                        outlineAnalysisType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField(
-                            new GUIContent("Outline Type", UITooltipConstants.SpriteDataOutlineAnalysisTypeTooltip),
-                            outlineAnalysisType, GUILayout.MinWidth(200));
-
-                        EditorGUIUtility.labelWidth = 0;
-                    }
+                    GUILayout.Label("Sprite Data Analysis", Styling.CenteredStyle);
 
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         EditorGUI.BeginChangeCheck();
                         isExpandingAnalyzeOptions =
-                            EditorGUILayout.Foldout(isExpandingAnalyzeOptions, "More Analyzing options", true);
+                            EditorGUILayout.Foldout(isExpandingAnalyzeOptions, "Analyzing options", true);
                         if (EditorGUI.EndChangeCheck())
                         {
                             SetAnalyzeOptionsHeightDependingOnFoldoutExpand();
                         }
 
-                        GUILayout.Label(new GUIContent("Sprite analyzing might take some time", Styling.InfoIcon,
+                        GUILayout.Label(new GUIContent("Analysis might take some time", Styling.InfoIcon,
                             UITooltipConstants.SpriteDataAnalyzingActionDurationTooltip), GUILayout.ExpandWidth(false));
                     }
 
                     if (isExpandingAnalyzeOptions)
                     {
                         EditorGUI.indentLevel++;
+
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUIUtility.labelWidth = 100;
+                            EditorGUI.BeginChangeCheck();
+                            spriteDataAnalysisType = (SpriteDataAnalysisType) EditorGUILayout.EnumFlagsField(
+                                new GUIContent("Analysis Type", UITooltipConstants.SpriteDataAnalysisTypeTooltip),
+                                spriteDataAnalysisType, GUILayout.ExpandWidth(true));
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                if (!spriteDataAnalysisType.HasFlag(SpriteDataAnalysisType.Outline))
+                                {
+                                    spriteDataAnalysisType |= SpriteDataAnalysisType.Outline;
+                                }
+                            }
+
+                            EditorGUIUtility.labelWidth = 95;
+                            outlineAnalysisType = (OutlineAnalysisType) EditorGUILayout.EnumFlagsField(
+                                new GUIContent("Outline Type", UITooltipConstants.SpriteDataOutlineAnalysisTypeTooltip),
+                                outlineAnalysisType, GUILayout.MinWidth(200));
+
+                            EditorGUIUtility.labelWidth = 0;
+                        }
 
                         using (new EditorGUI.DisabledScope(!hasLoadedSpriteDataAsset))
                         {
