@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using SpriteSortingPlugin.SpriteAnalysis.UI;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
@@ -23,6 +22,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private static readonly Array SortingTypes = Enum.GetValues(typeof(SortingType));
 
         private Vector2 scrollPosition = Vector2.zero;
+        private Vector2 gameObjectsParentScrollPosition = Vector2.zero;
 
         [SerializeField] private SpriteData spriteData;
         [SerializeField] private OutlinePrecision outlinePrecision;
@@ -160,10 +160,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 serializedObject = new SerializedObject(this);
 
+                serializedObject.Update();
                 var gameObjectParentsSerializedProp =
                     serializedObject.FindProperty(nameof(gameObjectParents));
                 gameObjectParentsSerializedProp.isExpanded = true;
-                gameObjectParentsSerializedProp.arraySize = 1;
+                gameObjectParentsSerializedProp.arraySize = 2;
+                serializedObject.ApplyModifiedProperties();
             }
 
             SortingLayerUtility.UpdateSortingLayerNames();
@@ -714,7 +716,21 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                             var gameObjectParentsSerializedProp =
                                 serializedObject.FindProperty(nameof(gameObjectParents));
 
-                            EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                            if (gameObjectParentsSerializedProp.isExpanded)
+                            {
+                                using (var scrollScope = new EditorGUILayout.ScrollViewScope(
+                                    gameObjectsParentScrollPosition, false, true,
+                                    GUILayout.MaxHeight(80)))
+                                {
+                                    gameObjectsParentScrollPosition = scrollScope.scrollPosition;
+                                    EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                                }
+                            }
+                            else
+                            {
+                                EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                            }
+
                             EditorGUI.indentLevel--;
                         }
 
