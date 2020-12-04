@@ -11,6 +11,9 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
     [Serializable]
     public class SpriteSortingEditorPreview
     {
+        private const float PreviewHeight = 256;
+        private static readonly Quaternion DefaultPreviewRotation = Quaternion.Euler(0, 120f, 0);
+
         private bool isPreviewVisible = true;
         private bool isPreviewNeedsAnUpdate;
         private GameObject previewGameObject;
@@ -22,6 +25,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
         private OverlappingItems overlappingItems;
         private SpriteData spriteData;
         private OutlinePrecision outlinePrecision;
+        private float lastPreviewControlElementsHeight;
 
         private GUIStyle sortingOrderStyle;
 
@@ -60,41 +64,66 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 
             GeneratePreview();
 
-            float previewHeight;
             using (var horizontalScope = new EditorGUILayout.HorizontalScope())
             {
-                previewHeight = horizontalScope.rect.height;
-                EditorGUI.indentLevel++;
-
-                EditorGUI.BeginChangeCheck();
-                isVisualizingBoundsInScene =
-                    EditorGUILayout.ToggleLeft(new GUIContent("Visualize Bounds in Scene",
-                            UITooltipConstants.SortingEditorScenePreviewSpriteOutlineTooltip),
-                        isVisualizingBoundsInScene, GUILayout.Width(180));
-                if (EditorGUI.EndChangeCheck())
+                using (new GUILayout.HorizontalScope())
                 {
-                    EnableSceneVisualization(isVisualizingBoundsInScene);
+                    EditorGUILayout.Space();
+                    EditorGUILayout.Space();
+                    EditorGUILayout.Space();
+                    DrawSpriteDataSceneVisualizationToggles();
                 }
 
-                EditorGUI.BeginChangeCheck();
-                isVisualizingSortingOrder =
-                    EditorGUILayout.ToggleLeft(new GUIContent("Display Sorting Order",
-                            UITooltipConstants.SortingEditorScenePreviewDisplaySortingOrderTooltip),
-                        isVisualizingSortingOrder, GUILayout.Width(160));
-                if (EditorGUI.EndChangeCheck())
+                if (Event.current.type == EventType.Repaint)
                 {
-                    EnableSceneVisualization(isVisualizingSortingOrder);
+                    lastPreviewControlElementsHeight = horizontalScope.rect.height;
                 }
+            }
 
-                EditorGUI.BeginChangeCheck();
-                isVisualizingSortingLayer =
-                    EditorGUILayout.ToggleLeft(
-                        new GUIContent("Display Sorting Layer",
-                            UITooltipConstants.SortingEditorScenePreviewDisplaySortingLayerTooltip),
-                        isVisualizingSortingLayer, GUILayout.Width(170));
-                if (EditorGUI.EndChangeCheck())
+            EditorGUILayout.Space();
+
+            var bgColor = new GUIStyle {normal = {background = Styling.SpriteSortingPreviewBackgroundTexture}};
+            var previewRect = GUILayoutUtility.GetRect(1f, PreviewHeight + lastPreviewControlElementsHeight);
+
+            //hack for not seeing the previewGameObject in the scene view 
+            previewGameObject.SetActive(true);
+            previewEditor.OnInteractivePreviewGUI(previewRect, bgColor);
+            previewGameObject.SetActive(false);
+        }
+
+        private void DrawSpriteDataSceneVisualizationToggles()
+        {
+            using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                GUILayout.Label("Visualization in the scene", Styling.CenteredStyle, GUILayout.ExpandWidth(true));
+                using (new GUILayout.HorizontalScope())
                 {
-                    EnableSceneVisualization(isVisualizingSortingLayer);
+                    EditorGUI.BeginChangeCheck();
+                    isVisualizingBoundsInScene = GUILayout.Toggle(isVisualizingBoundsInScene,
+                        new GUIContent("Bounds", UITooltipConstants.SortingEditorScenePreviewSpriteOutlineTooltip),
+                        Styling.ButtonStyle, GUILayout.ExpandWidth(true));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        EnableSceneVisualization(isVisualizingBoundsInScene);
+                    }
+
+                    EditorGUI.BeginChangeCheck();
+                    isVisualizingSortingOrder = GUILayout.Toggle(isVisualizingSortingOrder, new GUIContent(
+                            "Sorting Order", UITooltipConstants.SortingEditorScenePreviewDisplaySortingOrderTooltip),
+                        Styling.ButtonStyle, GUILayout.ExpandWidth(true));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        EnableSceneVisualization(isVisualizingSortingOrder);
+                    }
+
+                    EditorGUI.BeginChangeCheck();
+                    isVisualizingSortingLayer = GUILayout.Toggle(isVisualizingSortingLayer, new GUIContent(
+                            "Sorting Layer", UITooltipConstants.SortingEditorScenePreviewDisplaySortingLayerTooltip),
+                        Styling.ButtonStyle, GUILayout.ExpandWidth(true));
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        EnableSceneVisualization(isVisualizingSortingLayer);
+                    }
                 }
 
                 if (!isSceneVisualizingDelegateIsAdded &&
@@ -102,22 +131,22 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
                 {
                     EnableSceneVisualization(true);
                 }
-
-                if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
-                {
-                    previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
-                    Object.DestroyImmediate(previewEditor);
-                    previewEditor = Editor.CreateEditor(previewGameObject);
-                }
             }
 
-            var bgColor = new GUIStyle {normal = {background = Styling.SpriteSortingPreviewBackgroundTexture}};
-            var previewRect = EditorGUILayout.GetControlRect(false, 256 + previewHeight);
-
-            //hack for not seeing the previewGameObject in the scene view 
-            previewGameObject.SetActive(true);
-            previewEditor.OnInteractivePreviewGUI(previewRect, bgColor);
-            previewGameObject.SetActive(false);
+            using (new EditorGUILayout.VerticalScope())
+            {
+                GUILayout.Space(22.5f);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
+                    {
+                        previewGameObject.transform.rotation = DefaultPreviewRotation;
+                        Object.DestroyImmediate(previewEditor);
+                        previewEditor = Editor.CreateEditor(previewGameObject);
+                    }
+                }
+            }
         }
 
         private void GeneratePreview()
@@ -136,7 +165,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
         private void GeneratePreviewGameObject()
         {
             previewGameObject = PreviewUtility.CreateGameObject(null, "Preview", true);
-            previewGameObject.transform.rotation = Quaternion.Euler(0, 120f, 0);
+            previewGameObject.transform.rotation = DefaultPreviewRotation;
 
             var previewRoot = new PreviewItem(previewGameObject.transform);
 
@@ -239,6 +268,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 
                     isSceneVisualizingDelegateIsAdded = true;
                     SceneView.duringSceneGui += OnSceneGUI;
+                    SceneView.RepaintAll();
                 }
 
                 return;
@@ -248,6 +278,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
             {
                 isSceneVisualizingDelegateIsAdded = false;
                 SceneView.duringSceneGui -= OnSceneGUI;
+                SceneView.RepaintAll();
             }
         }
 

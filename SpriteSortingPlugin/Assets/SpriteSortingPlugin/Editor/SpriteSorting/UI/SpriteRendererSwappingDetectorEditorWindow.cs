@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using SpriteSortingPlugin.SpriteAnalysis.UI;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
@@ -190,9 +191,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             GUILayout.Label(descriptionLabelContent, descriptionLabelStyle, GUILayout.ExpandWidth(true));
 
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
-
             using (new EditorGUILayout.VerticalScope())
             {
                 using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
@@ -286,22 +284,21 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             var isConfirmButtonClicked = false;
 
-            using (new EditorGUILayout.HorizontalScope())
+            var confirmButtonLabels = sortingType == SortingType.Layer
+                ? new[] {"Confirm", "Confirm and continue searching"}
+                : new[] {"Confirm"};
+
+            var selectedConfirmButtonIndex =
+                GUILayout.SelectionGrid(-1, confirmButtonLabels, confirmButtonLabels.Length);
+            if (selectedConfirmButtonIndex >= 0)
             {
-                if (GUILayout.Button("Confirm"))
-                {
-                    ApplySortingOptions();
-                    isConfirmButtonClicked = true;
-                }
+                ApplySortingOptions();
+                isConfirmButtonClicked = true;
 
-                if (sortingType == SortingType.Layer && GUILayout.Button("Confirm and continue searching"))
+                if (selectedConfirmButtonIndex == 1)
                 {
-                    ApplySortingOptions();
-
                     //TODO: check isAnalyzingWithChangedLayerFirst
                     Analyze();
-
-                    isConfirmButtonClicked = true;
                 }
             }
 
@@ -1245,7 +1242,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             autoSortingCalculationData.outlinePrecision = outlinePrecision;
             autoSortingCalculationData.spriteData = spriteData;
             autoSortingCalculationData.cameraProjectionType = cameraProjectionType;
-            autoSortingCalculationData.cameraTransform = camera.transform;
+            autoSortingCalculationData.cameraTransform = camera?.transform;
         }
 
         private void OnDisable()

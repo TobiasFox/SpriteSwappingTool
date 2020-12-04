@@ -19,7 +19,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         private OverlappingItems overlappingItems;
         private SpriteSortingEditorPreview preview;
         private bool isUsingRelativeSortingOrder = true;
-
+        private float lastElementRectWidth;
+        
         public void InitReordableList(OverlappingItems overlappingItems, SpriteSortingEditorPreview preview)
         {
             this.overlappingItems = overlappingItems;
@@ -109,8 +110,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
 
             return EditorGUIUtility.singleLineHeight * 3 + 2 * LineSpacing + LineSpacing * 3;
         }
-
-        private float lastElementRectWidth;
 
         private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
         {

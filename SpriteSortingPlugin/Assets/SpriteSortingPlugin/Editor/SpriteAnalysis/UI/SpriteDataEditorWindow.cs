@@ -990,7 +990,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             {
                 case SpriteAnalyzedDataAddingChoice.NewSpriteData:
                     assetPathAndName =
-                        AssetDatabase.GenerateUniqueAssetPath(DefaultSaveFolderPath + "/" + nameof(SpriteData) + ".asset");
+                        AssetDatabase.GenerateUniqueAssetPath(DefaultSaveFolderPath + "/" + nameof(SpriteData) +
+                                                              ".asset");
                     forceReserializeAssetsOptions = ForceReserializeAssetsOptions.ReserializeAssetsAndMetadata;
                     break;
                 case SpriteAnalyzedDataAddingChoice.CurrentlyLoaded:
@@ -998,7 +999,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     break;
                 default:
                     assetPathAndName =
-                        AssetDatabase.GenerateUniqueAssetPath(DefaultSaveFolderPath + "/" + nameof(SpriteData) + ".asset");
+                        AssetDatabase.GenerateUniqueAssetPath(DefaultSaveFolderPath + "/" + nameof(SpriteData) +
+                                                              ".asset");
                     break;
             }
 
@@ -1108,7 +1110,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             EditorGUI.DrawRect(rect, color);
         }
 
-        private void DrawElementCallBack(Rect rect, int index, bool isactive, bool isfocused)
+        private void DrawElementCallBack(Rect rect, int index, bool isActive, bool isFocused)
         {
             var oobb = spriteDataList[index];
             EditorGUI.LabelField(rect, oobb.AssetName);
