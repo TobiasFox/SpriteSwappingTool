@@ -4,11 +4,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
     public class SortingCriteriaPresetSelector : PresetSelectorReceiver
     {
-        private SpriteSortingEditorWindow currentWindow;
+        private SpriteRendererSwappingDetectorEditorWindow currentWindow;
         private Preset initialValues;
         private SortingCriteriaPreset currentPreset;
 
-        public void Init(SpriteSortingEditorWindow window)
+        public void Init(SpriteRendererSwappingDetectorEditorWindow window)
         {
             currentWindow = window;
         }

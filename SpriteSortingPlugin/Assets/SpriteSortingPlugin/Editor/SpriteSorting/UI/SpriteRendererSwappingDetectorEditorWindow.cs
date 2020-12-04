@@ -15,9 +15,8 @@ using UnityEngine.Rendering;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI
 {
-    public class SpriteSortingEditorWindow : EditorWindow
+    public class SpriteRendererSwappingDetectorEditorWindow : EditorWindow
     {
-        private const string SortingLayerNameDefault = "Default";
         private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
         private static readonly Array SortingTypes = Enum.GetValues(typeof(SortingType));
 
@@ -57,16 +56,16 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private bool isReplacingOverlappingItemsWithAutoSortedResult = true;
         private SortingCriteriaPresetSelector sortingCriteriaPresetSelector;
 
-        [MenuItem("Window/Sprite Sorting %q")]
+        [MenuItem("Window/Sprite Swapping Detector %q")]
         public static void ShowWindow()
         {
-            var window = GetWindow<SpriteSortingEditorWindow>();
+            var window = GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
             window.Show();
         }
 
         private void Awake()
         {
-            titleContent = new GUIContent("Sprite Sorting");
+            titleContent = new GUIContent("Sprite Swapping Detector");
             preview = new SpriteSortingEditorPreview();
             reordableOverlappingItemList = new ReordableOverlappingItemList();
             SortingLayerUtility.UpdateSortingLayerNames();
@@ -180,7 +179,18 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             serializedObject.Update();
 
             isAnalyzedButtonDisabled = false;
-            GUILayout.Label("Sprite Sorting", Styling.CenteredStyleBold, GUILayout.ExpandWidth(true));
+            GUILayout.Label("Sprite Swapping Detector", Styling.CenteredStyleBold, GUILayout.ExpandWidth(true));
+            var descriptionLabel = new GUIStyle(EditorStyles.largeLabel)
+            {
+                alignment = TextAnchor.MiddleCenter, wordWrap = true
+            };
+            GUILayout.Label(new GUIContent(
+                    "This tool identifies and helps to sort overlapping and unsorted SpriteRenderers, since such renderers often lead to an unwanted swap.",
+                    UITooltipConstants.SortingEditorSpriteSwapDescriptionTooltip), descriptionLabel,
+                GUILayout.ExpandWidth(true));
+
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
 
             using (new EditorGUILayout.VerticalScope())
             {
@@ -387,7 +397,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     {
                         EditorGUI.indentLevel++;
                         EditorGUILayout.LabelField(
-                            new GUIContent("Sprite Data Asset is not used by Sprite Sorting tool."));
+                            new GUIContent("Sprite Data Asset is not used by tool."));
                         EditorGUI.indentLevel--;
                     }
                     else if (spriteData == null)
@@ -1020,7 +1030,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             var defaultIndex = 0;
             for (var i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
             {
-                if (!SortingLayerUtility.SortingLayerNames[i].Equals(SortingLayerNameDefault))
+                if (!SortingLayerUtility.SortingLayerNames[i].Equals(SortingLayerUtility.SortingLayerNameDefault))
                 {
                     continue;
                 }
@@ -1030,7 +1040,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             selectedSortingLayers = 1 << defaultIndex;
-            selectedLayers = new List<string> {SortingLayerNameDefault};
+            selectedLayers = new List<string> {SortingLayerUtility.SortingLayerNameDefault};
         }
 
         private void Analyze()

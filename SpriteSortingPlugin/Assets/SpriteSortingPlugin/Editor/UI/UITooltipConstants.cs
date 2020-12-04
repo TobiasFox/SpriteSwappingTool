@@ -219,5 +219,9 @@
 
         public const string SortingEditorAnalyzingAllSpritesTooltip =
             "When enabled, sprites from all active and enabled SpriteRenderers of opened scenes are analyzed. Otherwise the selected Sprite will be analyzed only.";
+
+        public const string SortingEditorSpriteSwapDescriptionTooltip =
+            "The order of renderering overlapping and unsorted SpriteRenderer might differ per frame depending on several criteria. " +
+            "The resulting effect is an abrupt swap of the SpriteRenderer in the forground from such a group of renderers.";
     }
 }

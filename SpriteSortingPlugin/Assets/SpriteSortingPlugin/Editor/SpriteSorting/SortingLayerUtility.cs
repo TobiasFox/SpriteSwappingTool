@@ -4,6 +4,7 @@ namespace SpriteSortingPlugin.SpriteSorting
 {
     public static class SortingLayerUtility
     {
+        public const string SortingLayerNameDefault = "Default";
         private static string[] sortingLayerNames;
         private static GUIContent[] sortingLayerGuiContents;
 
