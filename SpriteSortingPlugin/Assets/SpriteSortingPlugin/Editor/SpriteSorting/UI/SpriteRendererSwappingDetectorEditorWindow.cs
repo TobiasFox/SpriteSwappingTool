@@ -180,14 +180,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             isAnalyzedButtonDisabled = false;
             GUILayout.Label("Sprite Swapping Detector", Styling.CenteredStyleBold, GUILayout.ExpandWidth(true));
-            var descriptionLabel = new GUIStyle(EditorStyles.largeLabel)
+            var descriptionLabelStyle = new GUIStyle(EditorStyles.largeLabel)
             {
                 alignment = TextAnchor.MiddleCenter, wordWrap = true
             };
-            GUILayout.Label(new GUIContent(
-                    "This tool identifies and helps to sort overlapping and unsorted SpriteRenderers, since such renderers often lead to an unwanted swap.",
-                    UITooltipConstants.SortingEditorSpriteSwapDescriptionTooltip), descriptionLabel,
-                GUILayout.ExpandWidth(true));
+            var descriptionLabelContent = new GUIContent(
+                "This tool identifies and helps to sort overlapping and unsorted SpriteRenderers, since such renderers often lead to an unwanted swap.",
+                UITooltipConstants.SortingEditorSpriteSwapDescriptionTooltip);
+
+            GUILayout.Label(descriptionLabelContent, descriptionLabelStyle, GUILayout.ExpandWidth(true));
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();

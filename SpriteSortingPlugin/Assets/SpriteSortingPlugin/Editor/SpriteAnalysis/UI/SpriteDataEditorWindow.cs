@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions;
 using SpriteSortingPlugin.SpriteAnalyzer;
@@ -17,6 +18,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
         private const float LineSpacing = 1.5f;
         private const float RightAreaOffset = 3f;
         private const float LoadingSpriteDataAssetPercentageWidth = 0.39f;
+        private const string DefaultSaveFolderPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
         private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
 
         private SerializedObject serializedObject;
@@ -37,7 +39,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
         private Vector2 leftBarScrollPosition;
         private float lastHeight;
 
-        private string assetPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
         private OutlineAnalysisType outlineAnalysisType = OutlineAnalysisType.All;
         private SpriteDataAnalysisType spriteDataAnalysisType = SpriteDataAnalysisType.All;
         private OutlinePrecision outlinePrecision;
@@ -989,7 +990,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             {
                 case SpriteAnalyzedDataAddingChoice.NewSpriteData:
                     assetPathAndName =
-                        AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteData) + ".asset");
+                        AssetDatabase.GenerateUniqueAssetPath(DefaultSaveFolderPath + "/" + nameof(SpriteData) + ".asset");
                     forceReserializeAssetsOptions = ForceReserializeAssetsOptions.ReserializeAssetsAndMetadata;
                     break;
                 case SpriteAnalyzedDataAddingChoice.CurrentlyLoaded:
@@ -997,12 +998,13 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     break;
                 default:
                     assetPathAndName =
-                        AssetDatabase.GenerateUniqueAssetPath(assetPath + "/" + nameof(SpriteData) + ".asset");
+                        AssetDatabase.GenerateUniqueAssetPath(DefaultSaveFolderPath + "/" + nameof(SpriteData) + ".asset");
                     break;
             }
 
             if (spriteAnalyzedDataAddingChoice == SpriteAnalyzedDataAddingChoice.NewSpriteData)
             {
+                Directory.CreateDirectory(DefaultSaveFolderPath);
                 AssetDatabase.CreateAsset(spriteData, assetPathAndName);
             }
 
