@@ -183,9 +183,6 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     continue;
                 }
 
-                //TODO cache sortingComponents for better performance
-                // var sortingComponent = new SortingComponent(overlappingItem.sortingComponent.spriteRenderer,
-                // overlappingItem.sortingComponent.sortingGroup);
                 var sortingComponent = overlappingItem.sortingComponent;
                 baseSortingComponents.Add(sortingComponent);
                 sortingOptions.Add(sortingComponent.GetInstanceId(), newSortingOrder);

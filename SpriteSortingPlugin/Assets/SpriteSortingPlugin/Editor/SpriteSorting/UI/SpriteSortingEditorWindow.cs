@@ -35,7 +35,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private int selectedSortingLayers;
         private List<string> selectedLayers;
-        private bool isGameObjectParentsExpanded;
         private bool isUsingGameObjectParents;
 
         private OverlappingItems overlappingItems;
@@ -158,6 +157,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             if (serializedObject == null)
             {
                 serializedObject = new SerializedObject(this);
+
+                var gameObjectParentsSerializedProp =
+                    serializedObject.FindProperty(nameof(gameObjectParents));
+                gameObjectParentsSerializedProp.isExpanded = true;
+                gameObjectParentsSerializedProp.arraySize = 1;
             }
 
             SortingLayerUtility.UpdateSortingLayerNames();
@@ -334,7 +338,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                             preview.UpdateSpriteData(spriteData);
                         }
 
-                        if (GUILayout.Button("Open Sprite Data editor window to create the data"))
+                        if (GUILayout.Button("Open Sprite Analysis window", GUILayout.ExpandWidth(false)))
                         {
                             var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
                             spriteAlphaEditorWindow.Show();
@@ -380,16 +384,39 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
         }
 
+        private bool DrawFoldoutBoolContent(bool isActive, GUIContent content)
+        {
+            var foldoutBoolContentRect = GUILayoutUtility.GetRect(1, EditorGUIUtility.singleLineHeight);
+
+            var labelRect = foldoutBoolContentRect;
+            labelRect.xMin += 15f;
+            labelRect.width = 136;
+
+            var foldoutRect = foldoutBoolContentRect;
+            foldoutRect.xMax = 13;
+
+            var toggleRect = foldoutBoolContentRect;
+            toggleRect.xMin = labelRect.xMax + 2;
+
+            isActive = GUI.Toggle(foldoutRect, isActive, GUIContent.none,
+                EditorStyles.foldout);
+
+            EditorGUI.LabelField(labelRect, content);
+
+            isActive =
+                GUI.Toggle(toggleRect, isActive, GUIContent.none);
+
+            return isActive;
+        }
+
         private void DrawAutoSortingOptions()
         {
             GUILayout.Label("Automatic Sorting");
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                isApplyingAutoSorting =
-                    EditorGUILayout.Toggle(
-                        new GUIContent("use automatic sorting?",
-                            UITooltipConstants.SortingEditorUsingAutoSortingTooltip),
-                        isApplyingAutoSorting);
+                var labelContent = new GUIContent("Apply auto sorting?",
+                    UITooltipConstants.SortingEditorUsingAutoSortingTooltip);
+                isApplyingAutoSorting = DrawFoldoutBoolContent(isApplyingAutoSorting, labelContent);
 
                 if (!isApplyingAutoSorting)
                 {
@@ -569,14 +596,14 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         new GUIContent("Sorting Type", UITooltipConstants.SortingEditorSortingTypeTooltip),
                         GUILayout.ExpandWidth(false));
 
-                    GUILayout.FlexibleSpace();
+                    GUILayout.Space(72.5f);
 
                     foreach (SortingType currentSortingType in SortingTypes)
                     {
                         EditorGUI.BeginChangeCheck();
                         GUILayout.Toggle(currentSortingType == sortingType,
                             ObjectNames.NicifyVariableName(currentSortingType.ToString()), Styling.ButtonStyle,
-                            GUILayout.Width((position.width - 169) / 2));
+                            GUILayout.ExpandWidth(true));
                         if (EditorGUI.EndChangeCheck())
                         {
                             sortingType = currentSortingType;
@@ -589,26 +616,19 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     case SortingType.Layer:
                         ShowSortingLayers();
 
-                        using (var gameObjectParentScope =
-                            new EditorGUILayout.ToggleGroupScope(
-                                new GUIContent("use specific GameObject parents?",
-                                    UITooltipConstants.SortingEditorUsingGameObjectParentsTooltip),
-                                isUsingGameObjectParents))
+                        var gameObjectsParentContent = new GUIContent("Use specific parents?",
+                            UITooltipConstants.SortingEditorUsingGameObjectParentsTooltip);
+                        isUsingGameObjectParents =
+                            DrawFoldoutBoolContent(isUsingGameObjectParents, gameObjectsParentContent);
+
+                        if (isUsingGameObjectParents)
                         {
-                            isUsingGameObjectParents = gameObjectParentScope.enabled;
+                            EditorGUI.indentLevel++;
+                            var gameObjectParentsSerializedProp =
+                                serializedObject.FindProperty(nameof(gameObjectParents));
 
-                            if (isUsingGameObjectParents)
-                            {
-                                var gameObjectParentsSerializedProp =
-                                    serializedObject.FindProperty(nameof(gameObjectParents));
-                                if (isGameObjectParentsExpanded)
-                                {
-                                    gameObjectParentsSerializedProp.isExpanded = true;
-                                    isGameObjectParentsExpanded = false;
-                                }
-
-                                EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
-                            }
+                            EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                            EditorGUI.indentLevel--;
                         }
 
                         break;
@@ -618,7 +638,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                             new GUIContent(serializedSpriteRenderer.displayName,
                                 UITooltipConstants.SortingEditorSingleSpriteRendererTooltip), true);
 
-                        // //TODO: will not work for prefab scene
+                        //TODO: will not work for prefab scene
                         if (serializedSpriteRenderer.objectReferenceValue == null ||
                             !((SpriteRenderer) serializedSpriteRenderer.objectReferenceValue).gameObject.scene.isLoaded)
                         {
@@ -638,7 +658,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private void DrawCameraOptions()
         {
             GUILayout.Label("General Options");
-            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            using (var verticalScope = new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 var projectTransparencySortMode = GraphicsSettings.transparencySortMode;
 
@@ -690,59 +710,64 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     }
                 }
 
-                var sliderContentRect = GUILayoutUtility.GetRect(position.width, EditorGUIUtility.singleLineHeight);
-                sliderContentRect = EditorGUI.IndentedRect(sliderContentRect);
-
-                var labelRect = sliderContentRect;
-                labelRect.width = EditorGUIUtility.labelWidth - sliderContentRect.x / 2;
-
-                var fromLabel = sliderContentRect;
-                fromLabel.xMin = labelRect.xMax;
-                fromLabel.width = 27.5f;
-
-                var toLabel = sliderContentRect;
-                toLabel.xMin = toLabel.xMax - 70;
-
-                var sliderRect = sliderContentRect;
-                sliderRect.xMin = fromLabel.xMax + 10;
-                sliderRect.xMax = toLabel.xMin - 10;
-
-                GUI.Label(labelRect,
-                    new GUIContent("Outline Precision", UITooltipConstants.SortingEditorOutlinePrecisionTooltip));
-                GUI.Label(fromLabel,
-                    new GUIContent("Fast", UITooltipConstants.SortingEditorOutlinePrecisionFast));
-                EditorGUI.BeginChangeCheck();
-                outlinePrecisionSliderValue = GUI.HorizontalSlider(sliderRect, outlinePrecisionSliderValue, 0,
-                    OutlinePrecisionTypes.Length - 1);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    outlinePrecisionSliderValue = (int) Math.Round(outlinePrecisionSliderValue);
-                    outlinePrecision = (OutlinePrecision) outlinePrecisionSliderValue;
-                }
-
-                GUI.Label(toLabel,
-                    new GUIContent("Accurate", UITooltipConstants.SortingEditorOutlinePrecisionAccurate));
-
-                var selectedLabel =
-                    new GUIContent("Selected: " + ObjectNames.NicifyVariableName(outlinePrecision.ToString()));
-
-                switch (outlinePrecision)
-                {
-                    case OutlinePrecision.AxisAlignedBoundingBox:
-                        selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionAABBTooltip;
-                        break;
-                    case OutlinePrecision.ObjectOrientedBoundingBox:
-                        selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionOOBBTooltip;
-                        break;
-                    case OutlinePrecision.PixelPerfect:
-                        selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionPixelPerfectTooltip;
-                        break;
-                }
-
-                EditorGUILayout.LabelField(new GUIContent(" "), selectedLabel);
+                DrawOutlinePrecisionSlider(verticalScope.rect.width);
 
                 EditorGUI.indentLevel--;
             }
+        }
+
+        private void DrawOutlinePrecisionSlider(float width)
+        {
+            var sliderContentRect = GUILayoutUtility.GetRect(width, EditorGUIUtility.singleLineHeight);
+            sliderContentRect = EditorGUI.IndentedRect(sliderContentRect);
+
+            var labelRect = sliderContentRect;
+            labelRect.width = EditorGUIUtility.labelWidth - sliderContentRect.x / 2;
+
+            var fromLabel = sliderContentRect;
+            fromLabel.xMin = labelRect.xMax;
+            fromLabel.width = 27.5f;
+
+            var toLabel = sliderContentRect;
+            toLabel.xMin = toLabel.xMax - 70;
+
+            var sliderRect = sliderContentRect;
+            sliderRect.xMin = fromLabel.xMax + 10;
+            sliderRect.xMax = toLabel.xMin - 10;
+
+            GUI.Label(labelRect,
+                new GUIContent("Outline Precision", UITooltipConstants.SortingEditorOutlinePrecisionTooltip));
+            GUI.Label(fromLabel,
+                new GUIContent("Fast", UITooltipConstants.SortingEditorOutlinePrecisionFast));
+            EditorGUI.BeginChangeCheck();
+            outlinePrecisionSliderValue = GUI.HorizontalSlider(sliderRect, outlinePrecisionSliderValue, 0,
+                OutlinePrecisionTypes.Length - 1);
+            if (EditorGUI.EndChangeCheck())
+            {
+                outlinePrecisionSliderValue = (int) Math.Round(outlinePrecisionSliderValue);
+                outlinePrecision = (OutlinePrecision) outlinePrecisionSliderValue;
+            }
+
+            GUI.Label(toLabel,
+                new GUIContent("Accurate", UITooltipConstants.SortingEditorOutlinePrecisionAccurate));
+
+            var selectedLabel =
+                new GUIContent("Selected: " + ObjectNames.NicifyVariableName(outlinePrecision.ToString()));
+
+            switch (outlinePrecision)
+            {
+                case OutlinePrecision.AxisAlignedBoundingBox:
+                    selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionAABBTooltip;
+                    break;
+                case OutlinePrecision.ObjectOrientedBoundingBox:
+                    selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionOOBBTooltip;
+                    break;
+                case OutlinePrecision.PixelPerfect:
+                    selectedLabel.tooltip = UITooltipConstants.SortingEditorOutlinePrecisionPixelPerfectTooltip;
+                    break;
+            }
+
+            EditorGUILayout.LabelField(new GUIContent(" "), selectedLabel);
         }
 
         private float outlinePrecisionSliderValue;
