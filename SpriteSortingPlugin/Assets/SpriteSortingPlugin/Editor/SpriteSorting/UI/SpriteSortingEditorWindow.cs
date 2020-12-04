@@ -182,26 +182,56 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             isAnalyzedButtonDisabled = false;
             GUILayout.Label("Sprite Sorting", Styling.CenteredStyleBold, GUILayout.ExpandWidth(true));
 
-            DrawCameraOptions();
+            using (new EditorGUILayout.VerticalScope())
+            {
+                using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
+                {
+                    GUILayout.Label("General Options");
+                    DrawCameraOptions();
 
-            EditorGUILayout.Space();
-            DrawSpriteDataAssetOptions();
+                    EditorGUILayout.Space();
+                    DrawSpriteDataAssetOptions();
 
-            EditorGUILayout.Space();
-            DrawSortingOptions();
+                    EditorGUILayout.Space();
+                    DrawSortingOptions();
 
-            EditorGUILayout.Space();
-            DrawAutoSortingOptions();
+                    EditorGUILayout.Space();
+                }
+
+                DrawAutoSortingOptions();
+            }
 
             serializedObject.ApplyModifiedProperties();
             var isAnalyzedButtonClickedThisFrame = false;
 
-            using (new EditorGUI.DisabledScope(isAnalyzedButtonDisabled))
+            EditorGUILayout.Space();
+            using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Analyze"))
+                using (new EditorGUI.DisabledScope(isAnalyzedButtonDisabled))
                 {
-                    Analyze();
-                    isAnalyzedButtonClickedThisFrame = true;
+                    var analyzeLabel = new GUIContent("Find overlapping and unsorted SpriteRenderers");
+                    var analyzeButtonStyle = new GUIStyle("Button") {fontStyle = FontStyle.Bold};
+                    var buttonMinHeight = EditorGUIUtility.singleLineHeight * 1.5f;
+
+                    if (GUILayout.Button(analyzeLabel, analyzeButtonStyle, GUILayout.MinHeight(buttonMinHeight)))
+                    {
+                        Analyze();
+                        isAnalyzedButtonClickedThisFrame = true;
+                    }
+
+                    using (new EditorGUI.DisabledScope(!analyzeButtonWasClicked))
+                    {
+                        if (GUILayout.Button("Clear Findings", analyzeButtonStyle, GUILayout.MinHeight(buttonMinHeight),
+                            GUILayout.ExpandWidth(false)))
+                        {
+                            analyzeButtonWasClicked = false;
+                            CleanUpReordableList();
+                            preview.DisableSceneVisualizations();
+
+                            EndScrollRect();
+                            return;
+                        }
+                    }
                 }
             }
 
@@ -212,12 +242,20 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             EditorGUILayout.Space();
+            EditorGUILayout.Space();
 
             if (!HasOverlappingItems())
             {
+                var centeredStyleBold = new GUIStyle(Styling.CenteredStyleBold)
+                {
+                    normal = {background = Styling.SpriteSortingNoSortingOrderIssuesBackgroundTexture}
+                };
+
                 GUILayout.Label(
-                    "No sorting order issues with overlapping sprites were found in the currently loaded scenes.",
-                    EditorStyles.boldLabel);
+                    new GUIContent("No sorting order issues with overlapping sprites were found in all opened scenes.",
+                        Styling.NoSortingOrderIssuesIcon),
+                    centeredStyleBold, GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.5f));
+
                 CleanUpReordableList();
                 preview.DisableSceneVisualizations();
 
@@ -411,102 +449,139 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void DrawAutoSortingOptions()
         {
-            GUILayout.Label("Automatic Sorting");
+            using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
+            {
+                GUILayout.Label("Automatic Sorting");
+            }
+
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                var labelContent = new GUIContent("Apply auto sorting?",
-                    UITooltipConstants.SortingEditorUsingAutoSortingTooltip);
-                isApplyingAutoSorting = DrawFoldoutBoolContent(isApplyingAutoSorting, labelContent);
-
-                if (!isApplyingAutoSorting)
+                using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
                 {
-                    return;
-                }
+                    var labelContent = new GUIContent("Apply auto sorting?",
+                        UITooltipConstants.SortingEditorUsingAutoSortingTooltip);
+                    isApplyingAutoSorting = DrawFoldoutBoolContent(isApplyingAutoSorting, labelContent);
 
-                EditorGUILayout.Space();
+                    if (!isApplyingAutoSorting)
+                    {
+                        return;
+                    }
 
-                if (sortingCriteriaComponents == null)
-                {
-                    InitializeSortingCriteriaDataAndEditors();
+                    EditorGUILayout.Space();
+
+                    if (sortingCriteriaComponents == null)
+                    {
+                        InitializeSortingCriteriaDataAndEditors();
+                    }
                 }
 
                 using (var headerScope = new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUI.DrawRect(headerScope.rect, Styling.SortingCriteriaHeaderBackgroundColor);
-
-                    GUILayout.Label("Sorting Criteria");
-
-                    GUILayout.FlexibleSpace();
-
-                    if (GUILayout.Button("Save or Load Preset", GUILayout.Width(135)))
+                    using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
                     {
-                        sortingCriteriaPresetSelector.ShowPresetSelector();
-                    }
-                }
+                        EditorGUI.DrawRect(headerScope.rect, Styling.SortingCriteriaHeaderBackgroundColor);
 
-                DrawHorizontalLine(true);
-                var isMinOneSortingCriterionEditorDrawn = false;
+                        GUILayout.Label("Sorting Criteria");
 
-                for (var i = 0; i < sortingCriteriaComponents.Count; i++)
-                {
-                    var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                    if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
-                    {
-                        continue;
+                        GUILayout.FlexibleSpace();
                     }
 
-                    sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
-                    isMinOneSortingCriterionEditorDrawn = true;
-                    if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
+                    if (GUILayout.Button(
+                        analyzeButtonWasClicked ? "Save Criteria Preset" : "Save / Load Criteria Preset",
+                        GUILayout.Width(analyzeButtonWasClicked ? 135 : 170)))
                     {
-                        DrawHorizontalLine();
-                    }
-                }
-
-                if (isMinOneSortingCriterionEditorDrawn)
-                {
-                    DrawHorizontalLine(true);
-                }
-
-                var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-
-                    using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
-                    {
-                        if (GUILayout.Button("Add Criterion", GUILayout.Width(103)))
+                        if (!analyzeButtonWasClicked)
                         {
-                            DrawSortingCriteriaMenu();
+                            sortingCriteriaPresetSelector.ShowPresetSelector();
+                        }
+                        else
+                        {
+                            var pathWithinProject = EditorUtility.SaveFilePanelInProject(
+                                "Save " + nameof(SortingCriteriaPreset),
+                                nameof(SortingCriteriaPreset),
+                                "preset",
+                                "Please enter a file name to save the " +
+                                ObjectNames.NicifyVariableName(nameof(SortingCriteriaPreset)));
+
+                            if (pathWithinProject.Length != 0)
+                            {
+                                var preset = GenerateSortingCriteriaPreset();
+
+                                AssetDatabase.CreateAsset(preset, pathWithinProject);
+                                AssetDatabase.ForceReserializeAssets(new string[] {pathWithinProject});
+                                AssetDatabase.Refresh();
+                                Debug.Log("Preset saved to " + pathWithinProject);
+                            }
                         }
                     }
                 }
 
-                using (new EditorGUILayout.HorizontalScope())
+                using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
                 {
-                    GUILayout.FlexibleSpace();
+                    DrawHorizontalLine(true);
+                    var isMinOneSortingCriterionEditorDrawn = false;
 
-                    using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
+                    for (var i = 0; i < sortingCriteriaComponents.Count; i++)
                     {
-                        if (GUILayout.Button("All", GUILayout.Width(50)))
+                        var sortingCriteriaComponent = sortingCriteriaComponents[i];
+                        if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
                         {
-                            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                            continue;
+                        }
+
+                        sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
+                        isMinOneSortingCriterionEditorDrawn = true;
+                        if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
+                        {
+                            DrawHorizontalLine();
+                        }
+                    }
+
+                    if (isMinOneSortingCriterionEditorDrawn)
+                    {
+                        DrawHorizontalLine(true);
+                    }
+
+                    var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        GUILayout.FlexibleSpace();
+
+                        using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
+                        {
+                            if (GUILayout.Button("Add Criterion", GUILayout.Width(103)))
                             {
-                                sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
-                                sortingCriteriaComponent.sortingCriterionData.isActive = true;
+                                DrawSortingCriteriaMenu();
                             }
                         }
                     }
 
-                    var isMinOneSortingCriteriaIsUsed = IsMinOneSortingCriteriaIsUsed();
-                    using (new EditorGUI.DisabledScope(!isMinOneSortingCriteriaIsUsed))
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        if (GUILayout.Button("None", GUILayout.Width(50)))
+                        GUILayout.FlexibleSpace();
+
+                        using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
                         {
-                            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                            if (GUILayout.Button("All", GUILayout.Width(50)))
                             {
-                                sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = false;
-                                sortingCriteriaComponent.sortingCriterionData.isActive = false;
+                                foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                                {
+                                    sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
+                                    sortingCriteriaComponent.sortingCriterionData.isActive = true;
+                                }
+                            }
+                        }
+
+                        var isMinOneSortingCriteriaIsUsed = IsMinOneSortingCriteriaIsUsed();
+                        using (new EditorGUI.DisabledScope(!isMinOneSortingCriteriaIsUsed))
+                        {
+                            if (GUILayout.Button("None", GUILayout.Width(50)))
+                            {
+                                foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                                {
+                                    sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = false;
+                                    sortingCriteriaComponent.sortingCriterionData.isActive = false;
+                                }
                             }
                         }
                     }
@@ -657,7 +732,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void DrawCameraOptions()
         {
-            GUILayout.Label("General Options");
             using (var verticalScope = new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 var projectTransparencySortMode = GraphicsSettings.transparencySortMode;

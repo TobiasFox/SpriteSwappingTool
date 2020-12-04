@@ -12,6 +12,7 @@ namespace SpriteSortingPlugin.UI
         public static readonly Texture BaseItemIcon;
         public static readonly Texture SortingGroupIcon;
         public static readonly Texture InfoIcon;
+        public static readonly Texture NoSortingOrderIssuesIcon;
 
         public static readonly GUIStyle HelpBoxStyle;
         public static readonly GUIStyle CenteredStyleBold;
@@ -28,6 +29,9 @@ namespace SpriteSortingPlugin.UI
         private static readonly Color HorizontalLineColorLight = new Color(0.62f, 0.62f, 0.62f, 1f);
         private static readonly Color SpriteDataPreviewSpriteBackgroundColorLight = new Color(1, 1, 1, 0.1216f);
         private static readonly Color SortingEditorPreviewSpriteBackgroundColorLight = new Color(1, 1, 1, 0.7647f);
+
+        private static readonly Color SpriteSortingNoSortingOrderIssuesBackgroundTextureLightColor =
+            new Color(0.2094f, 0.8019f, 0.043f, 0.5059f);
 
         private static Texture2D spriteDataOutlinePreviewBackgroundTextureLight;
 
@@ -46,6 +50,26 @@ namespace SpriteSortingPlugin.UI
 
 
                 return spriteDataOutlinePreviewBackgroundTextureLight;
+            }
+        }
+
+        private static Texture2D spriteSortingNoSortingOrderIssuesBackgroundTextureLight;
+
+        private static Texture2D SpriteSortingNoSortingOrderIssuesBackgroundTextureLight
+        {
+            get
+            {
+                if (spriteSortingNoSortingOrderIssuesBackgroundTextureLight == null)
+                {
+                    spriteSortingNoSortingOrderIssuesBackgroundTextureLight =
+                        new Texture2D(1, 1, TextureFormat.ARGB32, false)
+                            {name = nameof(spriteSortingNoSortingOrderIssuesBackgroundTextureLight)};
+                    spriteSortingNoSortingOrderIssuesBackgroundTextureLight.SetPixel(0, 0,
+                        SpriteSortingNoSortingOrderIssuesBackgroundTextureLightColor);
+                    spriteSortingNoSortingOrderIssuesBackgroundTextureLight.Apply();
+                }
+
+                return spriteSortingNoSortingOrderIssuesBackgroundTextureLight;
             }
         }
 
@@ -85,6 +109,9 @@ namespace SpriteSortingPlugin.UI
         private static readonly Color spritePreviewBackgroundTextureColorDark =
             new Color(0.1981f, 0.1981f, 0.1981f, 0.7f);
 
+        private static readonly Color SpriteSortingNoSortingOrderIssuesBackgroundTextureDarkColor =
+            new Color(0.0698f, 0.3208f, 0f, 0.7f);
+
         private static Texture2D spriteSortingPreviewBackgroundTextureDark;
 
         private static Texture2D SpritePreviewBackgroundTextureDark
@@ -100,6 +127,26 @@ namespace SpriteSortingPlugin.UI
                 }
 
                 return spriteSortingPreviewBackgroundTextureDark;
+            }
+        }
+
+        private static Texture2D spriteSortingNoSortingOrderIssuesBackgroundTextureDark;
+
+        private static Texture2D SpriteSortingNoSortingOrderIssuesBackgroundTextureDark
+        {
+            get
+            {
+                if (spriteSortingNoSortingOrderIssuesBackgroundTextureDark == null)
+                {
+                    spriteSortingNoSortingOrderIssuesBackgroundTextureDark =
+                        new Texture2D(1, 1, TextureFormat.ARGB32, false)
+                            {name = nameof(spriteSortingNoSortingOrderIssuesBackgroundTextureDark)};
+                    spriteSortingNoSortingOrderIssuesBackgroundTextureDark.SetPixel(0, 0,
+                        SpriteSortingNoSortingOrderIssuesBackgroundTextureDarkColor);
+                    spriteSortingNoSortingOrderIssuesBackgroundTextureDark.Apply();
+                }
+
+                return spriteSortingNoSortingOrderIssuesBackgroundTextureDark;
             }
         }
 
@@ -141,6 +188,11 @@ namespace SpriteSortingPlugin.UI
                 ? SpritePreviewBackgroundTextureDark
                 : SpriteDataOutlinePreviewBackgroundTextureLight;
 
+        public static Texture2D SpriteSortingNoSortingOrderIssuesBackgroundTexture =>
+            EditorGUIUtility.isProSkin
+                ? SpriteSortingNoSortingOrderIssuesBackgroundTextureDark
+                : SpriteSortingNoSortingOrderIssuesBackgroundTextureLight;
+
         static Styling()
         {
             MoveIcon = EditorGUIUtility.IconContent("MoveTool@2x").image;
@@ -150,6 +202,7 @@ namespace SpriteSortingPlugin.UI
             BaseItemIcon = EditorGUIUtility.IconContent("PreMatCylinder@2x").image;
             SortingGroupIcon = EditorGUIUtility.IconContent("BlendTree Icon").image;
             InfoIcon = EditorGUIUtility.IconContent("console.infoicon.sml").image;
+            NoSortingOrderIssuesIcon = EditorGUIUtility.IconContent("FilterSelectedOnly").image;
 
             HelpBoxStyle = new GUIStyle("HelpBox");
             ButtonStyle = new GUIStyle("Button");
