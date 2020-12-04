@@ -18,6 +18,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 {
     public class SpriteRendererSwappingDetectorEditorWindow : EditorWindow
     {
+        private static readonly float LargerButtonHeight = EditorGUIUtility.singleLineHeight * 1.25f;
         private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
         private static readonly Array SortingTypes = Enum.GetValues(typeof(SortingType));
 
@@ -32,6 +33,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         [SerializeField] private Camera camera;
         [SerializeField] private bool isApplyingAutoSorting;
         private SerializedObject serializedObject;
+        private float outlinePrecisionSliderValue;
 
         private int selectedSortingLayers;
         private List<string> selectedLayers;
@@ -218,11 +220,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 using (new EditorGUI.DisabledScope(isAnalyzedButtonDisabled))
                 {
-                    var analyzeLabel = new GUIContent("Find overlapping and unsorted SpriteRenderers");
-                    var analyzeButtonStyle = new GUIStyle("Button") {fontStyle = FontStyle.Bold};
-                    var buttonMinHeight = EditorGUIUtility.singleLineHeight * 1.5f;
+                    var analyzeButtonStyle = analyzeButtonWasClicked ? Styling.ButtonStyle : Styling.ButtonStyleBold;
 
-                    if (GUILayout.Button(analyzeLabel, analyzeButtonStyle, GUILayout.MinHeight(buttonMinHeight)))
+                    if (GUILayout.Button("Find overlapping and unsorted SpriteRenderers", analyzeButtonStyle,
+                        GUILayout.MinHeight(LargerButtonHeight)))
                     {
                         Analyze();
                         isAnalyzedButtonClickedThisFrame = true;
@@ -230,8 +231,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                     using (new EditorGUI.DisabledScope(!analyzeButtonWasClicked))
                     {
-                        if (GUILayout.Button("Clear Findings", analyzeButtonStyle, GUILayout.MinHeight(buttonMinHeight),
-                            GUILayout.ExpandWidth(false)))
+                        if (GUILayout.Button("Clear Findings", analyzeButtonStyle,
+                            GUILayout.MinHeight(LargerButtonHeight), GUILayout.ExpandWidth(false)))
                         {
                             analyzeButtonWasClicked = false;
                             CleanUpReordableList();
@@ -289,7 +290,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 : new[] {"Confirm"};
 
             var selectedConfirmButtonIndex =
-                GUILayout.SelectionGrid(-1, confirmButtonLabels, confirmButtonLabels.Length);
+                GUILayout.SelectionGrid(-1, confirmButtonLabels, confirmButtonLabels.Length, Styling.ButtonStyleBold,
+                    GUILayout.Height(LargerButtonHeight));
             if (selectedConfirmButtonIndex >= 0)
             {
                 ApplySortingOptions();
@@ -310,6 +312,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 return;
             }
 
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
             preview.DoPreview(isAnalyzedButtonClickedThisFrame);
 
             EndScrollRect();
@@ -851,8 +855,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EditorGUILayout.LabelField(new GUIContent(" "), selectedLabel);
         }
-
-        private float outlinePrecisionSliderValue;
 
         private bool IsCameraRequired(out string usedBy)
         {
