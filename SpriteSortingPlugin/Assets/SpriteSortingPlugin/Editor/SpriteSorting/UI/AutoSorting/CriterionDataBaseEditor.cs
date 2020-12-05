@@ -65,46 +65,84 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
                 headerRect = new Rect(backgroundRect) {height = 22};
             }
 
-            var labelRect = headerRect;
-            labelRect.xMin += 37f;
+            Rect removeButtonRect;
+            if (isShowingInInspector)
+            {
+                removeButtonRect = Rect.zero;
+            }
+            else
+            {
+                removeButtonRect = headerRect;
+                removeButtonRect.xMin = removeButtonRect.xMax - 31.5f;
+                removeButtonRect.yMax -= 2;
+                removeButtonRect.yMin += 2;
+            }
 
             var priorityRect = headerRect;
             priorityRect.yMax -= 2;
             priorityRect.yMin += 2;
-            if (!isShowingInInspector)
+            if (isShowingInInspector)
             {
-                priorityRect.xMax = priorityRect.width - 60;
-                priorityRect.xMin = priorityRect.width - 220;
+                if (sortingCriterionData is ContainmentSortingCriterionData)
+                {
+                    priorityRect.xMin += 175;
+                    priorityRect.width = 175;
+                }
+                else
+                {
+                    priorityRect.xMin += 207.5f;
+                    priorityRect.width = 100;
+                }
             }
             else
             {
-                priorityRect.xMax = priorityRect.width + 15;
-                priorityRect.xMin = priorityRect.width - 160;
+                if (sortingCriterionData is ContainmentSortingCriterionData)
+                {
+                    priorityRect.xMax = removeButtonRect.xMin;
+                    priorityRect.xMin = priorityRect.xMax - 175;
+                }
+                else
+                {
+                    priorityRect.width = 100;
+                    priorityRect.x = removeButtonRect.xMin - 140;
+                }
             }
 
-            var foldoutRect = new Rect(headerRect.x, headerRect.y + 2, 13, 13);
-            var toggleRect = new Rect(headerRect.x + 16, headerRect.y + 2, 13, 13);
+            var labelRect = headerRect;
+            labelRect.xMin += 37f;
+            labelRect.xMax = priorityRect.xMin;
 
-            // adjust rect, to draw it completely
-            // headerRect.xMin = 0f;
-            // headerRect.width += 4f;
+            var foldoutRect = new Rect(headerRect.x, headerRect.y, 13, headerRect.height);
+            var toggleRect = new Rect(headerRect.x + 16, headerRect.y, 13, headerRect.height);
+
             var headerColor = isShowingInInspector
                 ? Styling.SortingCriteriaInspectorHeaderBackgroundColor
                 : Styling.SortingCriteriaHeaderBackgroundColor;
             EditorGUI.DrawRect(headerRect, headerColor);
 
-
             using (new EditorGUI.DisabledScope(!sortingCriterionData.isActive))
             {
                 if (sortingCriterionData is ContainmentSortingCriterionData)
                 {
-                    GUI.Label(priorityRect, "Preferred over all other criteria");
+                    var labelStyle = new GUIStyle(EditorStyles.label);
+                    GUI.Label(priorityRect, new GUIContent("Preferred over all other criteria",
+                        UITooltipConstants.SortingCriteriaContainmentWeightTooltip), labelStyle);
                 }
                 else
                 {
                     EditorGUIUtility.labelWidth = 45;
-                    sortingCriterionData.priority =
-                        EditorGUI.IntSlider(priorityRect, "Priority", sortingCriterionData.priority, 1, 5);
+
+                    using (var changeCheckScope = new EditorGUI.ChangeCheckScope())
+                    {
+                        sortingCriterionData.priority = EditorGUI.FloatField(priorityRect,
+                            new GUIContent("Weight", UITooltipConstants.SortingCriteriaWeightTooltip),
+                            sortingCriterionData.priority);
+                        if (changeCheckScope.changed)
+                        {
+                            sortingCriterionData.priority = Mathf.Max(0, sortingCriterionData.priority);
+                        }
+                    }
+
                     EditorGUIUtility.labelWidth = 0;
                 }
 
@@ -113,12 +151,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
             if (!isShowingInInspector)
             {
-                var removeButtonRect = headerRect;
-                removeButtonRect.xMax = removeButtonRect.width + 7.5f;
-                removeButtonRect.xMin = removeButtonRect.width - 33f;
-                removeButtonRect.yMax -= 2;
-                removeButtonRect.yMin += 2;
-
                 if (GUI.Button(removeButtonRect, Styling.RemoveIcon))
                 {
                     sortingCriterionData.isAddedToEditorList = false;

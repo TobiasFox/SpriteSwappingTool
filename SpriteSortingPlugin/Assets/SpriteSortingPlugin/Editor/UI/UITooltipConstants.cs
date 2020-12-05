@@ -59,7 +59,13 @@
 
         public const string PerceivedLightnessForegroundSpriteTooltip =
             "When enabled, lighter sprites will be sorted in the foreground.";
-
+        
+        public const string SortingCriteriaWeightTooltip =
+            "Controls the weight of this sorting criterion. The higher the value, the more affects this criterion the resulting order of sprites.\n" +
+            "Minimum: 0.0";
+        
+        public const string SortingCriteriaContainmentWeightTooltip =
+            "The containment criterion is preferred over all other criteria as the calculation of the order of sprites differs when this criterion is enabled.";
 
         //--SpriteDataEditorWindow
         public const string SpriteDataSharpnessTooltip =

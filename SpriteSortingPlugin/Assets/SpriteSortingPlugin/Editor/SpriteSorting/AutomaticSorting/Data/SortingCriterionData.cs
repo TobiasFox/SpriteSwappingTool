@@ -5,7 +5,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
     public abstract class SortingCriterionData : ScriptableObject
     {
         public bool isActive;
-        public int priority = 1;
+        public float priority = 1;
         [HideInInspector] public bool isExpanded;
         [HideInInspector] public bool isAddedToEditorList;
 

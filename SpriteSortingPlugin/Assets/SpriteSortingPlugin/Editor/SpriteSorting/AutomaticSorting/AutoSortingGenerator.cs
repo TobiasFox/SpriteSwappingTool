@@ -250,7 +250,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                 return result;
             }
 
-            var resultCounter = new int[2];
+            var resultCounter = new float[2];
             foreach (var sortingCriteria in sortingCriterias)
             {
                 var tempResults = sortingCriteria.Sort(unsortedItem.sortingComponent, sortedItem.sortingComponent,
