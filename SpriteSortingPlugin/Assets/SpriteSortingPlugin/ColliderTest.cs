@@ -201,7 +201,7 @@ namespace SpriteSortingPlugin
             // lastDistance = distance.distance;
         }
 
-        public void CalculatePolygonSurface()
+        public void CalculatePolygonArea()
         {
             Debug.Log(CalculatePolygonArea(col1));
         }
@@ -230,9 +230,9 @@ namespace SpriteSortingPlugin
                 satTester.LineIntersectionTest();
             }
 
-            if (GUILayout.Button("Surface area Test"))
+            if (GUILayout.Button("Area Test"))
             {
-                satTester.CalculatePolygonSurface();
+                satTester.CalculatePolygonArea();
             }
         }
     }

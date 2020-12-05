@@ -31,7 +31,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             Initialize();
 
             SortingComponent smallestContainedBySortingComponent = null;
-            var lastSurfaceArea = float.PositiveInfinity;
+            var lastArea = float.PositiveInfinity;
 
             foreach (var sortingComponent in sortingComponentsToCheck)
             {
@@ -40,11 +40,10 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     continue;
                 }
 
-                if (ContainsBaseItem(sortingComponent, out var currentSurfaceArea) &&
-                    currentSurfaceArea < lastSurfaceArea)
+                if (ContainsBaseItem(sortingComponent, out var currentArea) && currentArea < lastArea)
                 {
                     smallestContainedBySortingComponent = sortingComponent;
-                    lastSurfaceArea = currentSurfaceArea;
+                    lastArea = currentArea;
                 }
             }
 
@@ -95,12 +94,12 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             }
         }
 
-        private bool ContainsBaseItem(SortingComponent sortingComponent, out float surfaceArea)
+        private bool ContainsBaseItem(SortingComponent sortingComponent, out float area)
         {
             var baseItemBounds = CreatePlaneBounds(baseItem.spriteRenderer.bounds);
             var sortingComponentsBounds = CreatePlaneBounds(sortingComponent.spriteRenderer.bounds);
 
-            surfaceArea = sortingComponentsBounds.size.x * sortingComponentsBounds.size.y;
+            area = sortingComponentsBounds.size.x * sortingComponentsBounds.size.y;
             if (!sortingComponentsBounds.Intersects(baseItemBounds))
             {
                 return false;
@@ -144,7 +143,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     var isContained = otherOOBB.Contains(baseOOBB);
                     if (isContained)
                     {
-                        surfaceArea = otherOOBB.GetSurfaceArea();
+                        area = otherOOBB.GetArea();
                     }
 
                     return isContained;
@@ -180,7 +179,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 
                     if (isContained)
                     {
-                        surfaceArea =
+                        area =
                             sortingComponentSpriteDataItem.CalculatePolygonArea(sortingComponent.spriteRenderer
                                 .transform);
                     }
