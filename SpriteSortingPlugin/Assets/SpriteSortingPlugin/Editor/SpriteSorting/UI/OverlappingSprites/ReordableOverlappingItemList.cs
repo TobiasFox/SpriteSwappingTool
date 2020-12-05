@@ -20,7 +20,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         private SpriteSortingEditorPreview preview;
         private bool isUsingRelativeSortingOrder = true;
         private float lastElementRectWidth;
-        
+
         public void InitReordableList(OverlappingItems overlappingItems, SpriteSortingEditorPreview preview)
         {
             this.overlappingItems = overlappingItems;
@@ -157,25 +157,23 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             {
                 rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
 
-                var sortingGroupLabel = new GUIContent("in outmost Sorting Group", Styling.SortingGroupIcon)
+                var sortingGroupLabelText =
+                    "in outer most Sorting Group \"" + sortingComponentOutmostSortingGroup.name + "\"";
+                var sortingGroupLabel = new GUIContent(sortingGroupLabelText, Styling.SortingGroupIcon)
                 {
                     tooltip = element.IsBaseItem
                         ? UITooltipConstants.OverlappingItemListBaseItemSortingGroupTooltip
                         : UITooltipConstants.OverlappingItemListSortingGroupTooltip
                 };
 
-                EditorGUI.LabelField(new Rect(rect.x, rect.y, 160, EditorGUIUtility.singleLineHeight),
+                GUI.Label(new Rect(rect.x, rect.y, 280, EditorGUIUtility.singleLineHeight),
                     sortingGroupLabel);
-
-                EditorGUI.LabelField(
-                    new Rect(rect.x + 160 + 2.5f, rect.y, 120, EditorGUIUtility.singleLineHeight),
-                    "\"" + sortingComponentOutmostSortingGroup.name + "\"");
 
                 if (GUI.Button(new Rect(rect.width - 56, rect.y, 83,
                     EditorGUIUtility.singleLineHeight), "Select Group"))
                 {
                     Selection.objects = new Object[] {sortingComponentOutmostSortingGroup.gameObject};
-                    SceneView.lastActiveSceneView.Frame(element.sortingComponent.spriteRenderer.bounds);
+                    SceneView.lastActiveSceneView.Frame(sortingComponentSpriteRenderer.bounds);
                     EditorGUIUtility.PingObject(sortingComponentOutmostSortingGroup);
                 }
             }

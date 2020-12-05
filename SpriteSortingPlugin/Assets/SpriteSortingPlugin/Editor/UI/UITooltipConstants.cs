@@ -138,10 +138,10 @@
             "This SpriteRenderer overlaps with the base item, and they had the same sorting options.";
 
         public const string OverlappingItemListSortingGroupTooltip =
-            "This is the SortingGroup of the SpriteRenderer, which had the same sorting options as the base item.";
+            "This is the outer most SortingGroup of the SpriteRenderer, which had the same sorting options as the base item.";
 
         public const string OverlappingItemListBaseItemSortingGroupTooltip =
-            "This is the SortingGroup of the base items SpriteRenderer.";
+            "This is the outer most SortingGroup of the base item's SpriteRenderer.";
 
         public const string OverlappingItemListSortingLayerTooltip = "Change the sorting layer of this SpriteRenderer.";
 
