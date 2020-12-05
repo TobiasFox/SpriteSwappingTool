@@ -100,7 +100,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
                 {
                     EditorGUI.BeginChangeCheck();
                     isVisualizingBoundsInScene = GUILayout.Toggle(isVisualizingBoundsInScene,
-                        new GUIContent("Bounds", UITooltipConstants.SortingEditorScenePreviewSpriteOutlineTooltip),
+                        new GUIContent("Outline", UITooltipConstants.SortingEditorScenePreviewSpriteOutlineTooltip),
                         Styling.ButtonStyle, GUILayout.ExpandWidth(true));
                     if (EditorGUI.EndChangeCheck())
                     {

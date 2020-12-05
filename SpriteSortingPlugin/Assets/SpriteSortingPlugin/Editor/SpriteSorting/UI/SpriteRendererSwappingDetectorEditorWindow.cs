@@ -34,6 +34,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         [SerializeField] private Camera camera;
         [SerializeField] private bool isApplyingAutoSorting;
         private SerializedObject serializedObject;
+        private SerializedProperty gameObjectParentsSerializedProperty;
         private float outlinePrecisionSliderValue;
 
         private int selectedSortingLayers;
@@ -161,11 +162,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 serializedObject = new SerializedObject(this);
 
-                serializedObject.Update();
-                var gameObjectParentsSerializedProp =
+                gameObjectParentsSerializedProperty =
                     serializedObject.FindProperty(nameof(gameObjectParents));
-                gameObjectParentsSerializedProp.isExpanded = true;
-                gameObjectParentsSerializedProp.arraySize = 2;
+                gameObjectParentsSerializedProperty.isExpanded = true;
+                gameObjectParentsSerializedProperty.arraySize = 2;
                 serializedObject.ApplyModifiedProperties();
             }
 
@@ -714,22 +714,20 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         if (isUsingGameObjectParents)
                         {
                             EditorGUI.indentLevel++;
-                            var gameObjectParentsSerializedProp =
-                                serializedObject.FindProperty(nameof(gameObjectParents));
 
-                            if (gameObjectParentsSerializedProp.isExpanded)
+                            if (gameObjectParentsSerializedProperty.isExpanded)
                             {
                                 using (var scrollScope = new EditorGUILayout.ScrollViewScope(
                                     gameObjectsParentScrollPosition, false, true,
                                     GUILayout.MaxHeight(80)))
                                 {
                                     gameObjectsParentScrollPosition = scrollScope.scrollPosition;
-                                    EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                                    EditorGUILayout.PropertyField(gameObjectParentsSerializedProperty, true);
                                 }
                             }
                             else
                             {
-                                EditorGUILayout.PropertyField(gameObjectParentsSerializedProp, true);
+                                EditorGUILayout.PropertyField(gameObjectParentsSerializedProperty, true);
                             }
 
                             EditorGUI.indentLevel--;
@@ -1092,8 +1090,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         selectedLayerIds.Add(SortingLayer.NameToID(selectedLayer));
                     }
 
+                    var parentTransforms = isUsingGameObjectParents && gameObjectParentsSerializedProperty.arraySize > 0
+                        ? gameObjectParents
+                        : null;
+
                     overlappingSpriteDetectionResult = overlappingSpriteDetector.DetectOverlappingSprites(
-                        selectedLayerIds, gameObjectParents, spriteDetectionData);
+                        selectedLayerIds, parentTransforms, spriteDetectionData);
                     break;
                 case SortingType.Sprite:
 

@@ -320,15 +320,20 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 
         private void InitializeSpriteRendererList(List<Transform> gameObjectsParents)
         {
-            if (gameObjectsParents == null || gameObjectsParents.Count == 0)
+            if (gameObjectsParents == null || gameObjectsParents.Count <= 0)
+            {
+                spriteRenderers = new List<SpriteRenderer>(Object.FindObjectsOfType<SpriteRenderer>());
+                return;
+            }
+
+            var validTransform = ValidateTransformParents(gameObjectsParents);
+            if (validTransform.Count <= 0)
             {
                 spriteRenderers = new List<SpriteRenderer>(Object.FindObjectsOfType<SpriteRenderer>());
                 return;
             }
 
             spriteRenderers = new List<SpriteRenderer>();
-            var validTransform = ValidateTransformParents(gameObjectsParents);
-
             foreach (var parent in validTransform)
             {
                 spriteRenderers.AddRange(parent.GetComponentsInChildren<SpriteRenderer>());
