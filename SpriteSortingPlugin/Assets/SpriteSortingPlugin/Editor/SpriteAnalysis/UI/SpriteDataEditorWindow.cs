@@ -365,7 +365,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                         {
                             EditorGUIUtility.labelWidth = 105;
                             isAnalyzingAllSprites =
-                                EditorGUILayout.ToggleLeft(new GUIContent("Is analyzing all sprites",
+                                EditorGUILayout.ToggleLeft(new GUIContent("Is analyzing all Sprites",
                                         UITooltipConstants.SortingEditorAnalyzingAllSpritesTooltip),
                                     isAnalyzingAllSprites, GUILayout.ExpandWidth(false));
 
@@ -381,7 +381,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     }
 
                     var buttonTextBuilder = new StringBuilder("Analyze ");
-                    buttonTextBuilder.Append(isAnalyzingAllSprites ? "all sprites " : " sprite ");
+                    buttonTextBuilder.Append(isAnalyzingAllSprites ? "all Sprites " : " Sprite ");
                     buttonTextBuilder.Append("+ add to ");
 
                     switch (spriteAnalyzedDataAddingChoice)

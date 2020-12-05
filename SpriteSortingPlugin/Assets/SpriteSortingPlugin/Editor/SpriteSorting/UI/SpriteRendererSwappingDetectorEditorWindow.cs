@@ -264,7 +264,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 };
 
                 GUILayout.Label(
-                    new GUIContent("No sorting order issues with overlapping sprites were found in all opened scenes.",
+                    new GUIContent(
+                        "No sorting order issues with overlapping SpriteRenderers were found in all opened scenes.",
                         Styling.NoSortingOrderIssuesIcon),
                     centeredStyleBold, GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.5f));
 
