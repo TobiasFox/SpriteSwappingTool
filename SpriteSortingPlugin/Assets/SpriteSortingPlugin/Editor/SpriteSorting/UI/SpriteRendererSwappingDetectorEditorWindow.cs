@@ -1266,7 +1266,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             autoSortingCalculationData.outlinePrecision = outlinePrecision;
             autoSortingCalculationData.spriteData = spriteData;
             autoSortingCalculationData.cameraProjectionType = cameraProjectionType;
-            autoSortingCalculationData.cameraTransform = camera?.transform;
+            autoSortingCalculationData.cameraTransform = camera == null ? null : camera.transform;
         }
 
         private void OnDisable()
