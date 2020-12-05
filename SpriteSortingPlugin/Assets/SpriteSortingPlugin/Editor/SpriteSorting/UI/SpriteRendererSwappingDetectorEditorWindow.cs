@@ -26,6 +26,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         [SerializeField] private SpriteData spriteData;
         [SerializeField] private OutlinePrecision outlinePrecision;
+        private TransparencySortMode lastConfiguredTransparencySortMode;
         private CameraProjectionType cameraProjectionType;
         private SortingType sortingType;
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -42,7 +43,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private OverlappingItems overlappingItems;
         private SpriteSortingEditorPreview preview;
 
-        private bool analyzeButtonWasClicked;
+        private bool wasAnalyzeButtonClicked;
         private bool isAnalyzedButtonDisabled;
         private ReordableOverlappingItemList reordableOverlappingItemList;
 
@@ -121,7 +122,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void UpdateChangedSortingLayerOrderInOverlappingItems()
         {
-            if (!analyzeButtonWasClicked || !HasOverlappingItems())
+            if (!wasAnalyzeButtonClicked || !HasOverlappingItems())
             {
                 return;
             }
@@ -170,7 +171,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             SortingLayerUtility.UpdateSortingLayerNames();
 
-            if (analyzeButtonWasClicked && HasOverlappingItems())
+            if (wasAnalyzeButtonClicked && HasOverlappingItems())
             {
                 reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
             }
@@ -197,7 +198,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             using (new EditorGUILayout.VerticalScope())
             {
-                using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
+                using (new EditorGUI.DisabledScope(wasAnalyzeButtonClicked))
                 {
                     GUILayout.Label("General Options");
                     DrawCameraOptions();
@@ -222,7 +223,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 using (new EditorGUI.DisabledScope(isAnalyzedButtonDisabled))
                 {
-                    var analyzeButtonStyle = analyzeButtonWasClicked ? Styling.ButtonStyle : Styling.ButtonStyleBold;
+                    var analyzeButtonStyle = wasAnalyzeButtonClicked ? Styling.ButtonStyle : Styling.ButtonStyleBold;
 
                     if (GUILayout.Button("Find overlapping and unsorted SpriteRenderers", analyzeButtonStyle,
                         GUILayout.MinHeight(LargerButtonHeight)))
@@ -231,12 +232,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         isAnalyzedButtonClickedThisFrame = true;
                     }
 
-                    using (new EditorGUI.DisabledScope(!analyzeButtonWasClicked))
+                    using (new EditorGUI.DisabledScope(!wasAnalyzeButtonClicked))
                     {
                         if (GUILayout.Button("Clear Findings", analyzeButtonStyle,
                             GUILayout.MinHeight(LargerButtonHeight), GUILayout.ExpandWidth(false)))
                         {
-                            analyzeButtonWasClicked = false;
+                            wasAnalyzeButtonClicked = false;
                             CleanUpReordableList();
                             preview.DisableSceneVisualizations();
 
@@ -247,7 +248,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 }
             }
 
-            if (!analyzeButtonWasClicked)
+            if (!wasAnalyzeButtonClicked)
             {
                 EndScrollRect();
                 return;
@@ -463,14 +464,14 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void DrawAutoSortingOptions()
         {
-            using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
+            using (new EditorGUI.DisabledScope(wasAnalyzeButtonClicked))
             {
                 GUILayout.Label("Automatic Sorting");
             }
 
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
+                using (new EditorGUI.DisabledScope(wasAnalyzeButtonClicked))
                 {
                     var labelContent = new GUIContent("Apply auto sorting?",
                         UITooltipConstants.SortingEditorUsingAutoSortingTooltip);
@@ -491,7 +492,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                 using (var headerScope = new EditorGUILayout.HorizontalScope())
                 {
-                    using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
+                    using (new EditorGUI.DisabledScope(wasAnalyzeButtonClicked))
                     {
                         EditorGUI.DrawRect(headerScope.rect, Styling.SortingCriteriaHeaderBackgroundColor);
 
@@ -501,10 +502,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     }
 
                     if (GUILayout.Button(
-                        analyzeButtonWasClicked ? "Save Criteria Preset" : "Save / Load Criteria Preset",
-                        GUILayout.Width(analyzeButtonWasClicked ? 135 : 170)))
+                        wasAnalyzeButtonClicked ? "Save Criteria Preset" : "Save / Load Criteria Preset",
+                        GUILayout.Width(wasAnalyzeButtonClicked ? 135 : 170)))
                     {
-                        if (!analyzeButtonWasClicked)
+                        if (!wasAnalyzeButtonClicked)
                         {
                             sortingCriteriaPresetSelector.ShowPresetSelector();
                         }
@@ -530,7 +531,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     }
                 }
 
-                using (new EditorGUI.DisabledScope(analyzeButtonWasClicked))
+                using (new EditorGUI.DisabledScope(wasAnalyzeButtonClicked))
                 {
                     DrawHorizontalLine(true);
                     var isMinOneSortingCriterionEditorDrawn = false;
@@ -762,7 +763,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         {
             using (var verticalScope = new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                var projectTransparencySortMode = GraphicsSettings.transparencySortMode;
+                if (!wasAnalyzeButtonClicked)
+                {
+                    lastConfiguredTransparencySortMode = GraphicsSettings.transparencySortMode;
+                }
 
                 using (new EditorGUI.DisabledScope(true))
                 {
@@ -770,12 +774,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     EditorGUILayout.LabelField(
                         new GUIContent("Transparency Sort Mode (Change via Project Settings):",
                             UITooltipConstants.SortingEditorTransparencySortModeTooltip),
-                        new GUIContent(projectTransparencySortMode.ToString()));
+                        new GUIContent(lastConfiguredTransparencySortMode.ToString()));
                     EditorGUIUtility.labelWidth = 0;
                 }
 
                 EditorGUI.indentLevel++;
-                switch (projectTransparencySortMode)
+                switch (lastConfiguredTransparencySortMode)
                 {
                     case TransparencySortMode.Perspective:
                         cameraProjectionType = CameraProjectionType.Perspective;
@@ -789,7 +793,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 }
 
                 var isCameraNeeded = IsCameraRequired(out var errorMessage);
-                if (isCameraNeeded)
+                if (isCameraNeeded && !wasAnalyzeButtonClicked)
                 {
                     var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
                     EditorGUILayout.PropertyField(cameraSerializedProp,
@@ -968,7 +972,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 }
             }
 
-            analyzeButtonWasClicked = false;
+            wasAnalyzeButtonClicked = false;
             overlappingItems = null;
             preview.CleanUpPreview();
         }
@@ -1061,7 +1065,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void Analyze()
         {
-            analyzeButtonWasClicked = true;
+            wasAnalyzeButtonClicked = true;
 
             var isVisualizingBoundsInScene = preview.IsVisualizingBoundsInScene;
 
