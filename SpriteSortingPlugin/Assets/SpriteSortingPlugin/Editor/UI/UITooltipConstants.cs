@@ -22,7 +22,7 @@
             "Compares the distance to the camera. Will be ignored when using orthographic Transparency Sort mode or Default Transparency Sort mode and orthographic camera project.";
 
         public const string CameraDistanceForegroundSpriteTooltip =
-            "When enabled, SpriteRenderer with a higher distance to the camera will be sorted in the foreground.";
+            "When enabled, SpriteRenderer with a shorter distance to the camera will be sorted in the foreground.";
 
         public const string PrimaryColorTooltip =
             "Compares the primary color of given SpriteRenderers and sorts SpriteRenderer in the foreground which are closer to the foreground color.";

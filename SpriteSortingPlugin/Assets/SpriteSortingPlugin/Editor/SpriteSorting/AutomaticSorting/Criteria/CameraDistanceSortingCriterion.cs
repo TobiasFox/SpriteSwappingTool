@@ -26,15 +26,15 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
             var perspectiveDistance = CalculatePerspectiveDistance(spriteRendererTransform, cameraTransform);
             var otherPerspectiveDistance = CalculatePerspectiveDistance(otherSpriteRendererTransform, cameraTransform);
-            var isAutoSortingComponentCloser = perspectiveDistance <= otherPerspectiveDistance;
+            var isSortingComponentCloser = perspectiveDistance <= otherPerspectiveDistance;
 
-            if (CameraDistanceSortingCriterionData.isFurtherAwaySpriteInForeground)
+            if (CameraDistanceSortingCriterionData.isCloserSpriteInForeground)
             {
-                sortingResults[isAutoSortingComponentCloser ? 0 : 1]++;
+                sortingResults[isSortingComponentCloser ? 0 : 1]++;
             }
             else
             {
-                sortingResults[!isAutoSortingComponentCloser ? 0 : 1]++;
+                sortingResults[!isSortingComponentCloser ? 0 : 1]++;
             }
         }
 

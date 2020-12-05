@@ -19,10 +19,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
         protected override void OnInspectorGuiInternal()
         {
-            CameraDistanceSortingCriterionData.isFurtherAwaySpriteInForeground = EditorGUILayout.ToggleLeft(
-                new GUIContent("Is further away Sprite in foreground",
+            CameraDistanceSortingCriterionData.isCloserSpriteInForeground = EditorGUILayout.ToggleLeft(
+                new GUIContent("Is closer Sprite in foreground",
                     UITooltipConstants.CameraDistanceForegroundSpriteTooltip),
-                CameraDistanceSortingCriterionData.isFurtherAwaySpriteInForeground);
+                CameraDistanceSortingCriterionData.isCloserSpriteInForeground);
         }
     }
 }

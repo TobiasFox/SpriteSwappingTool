@@ -19,7 +19,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     CreateSizeDataAndCriterion(ref sortingCriteriaComponent);
                     break;
                 case SortingCriterionType.Position:
-                    CreatePositionDataAndCriterion(ref sortingCriteriaComponent);
+                    CreateCameraDistanceDataAndCriterion(ref sortingCriteriaComponent);
                     break;
                 case SortingCriterionType.Resolution:
                     CreateResolutionDataAndCriterion(ref sortingCriteriaComponent);
@@ -57,7 +57,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
-        private static void CreatePositionDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
+        private static void CreateCameraDistanceDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<CameraDistanceSortingCriterionData>();
             sortingCriteriaComponent.sortingCriterion = new CameraDistanceSortingCriterion(sortingCriterionData);
