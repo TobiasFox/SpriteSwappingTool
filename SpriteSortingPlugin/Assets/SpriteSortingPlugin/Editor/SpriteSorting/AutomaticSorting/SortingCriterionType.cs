@@ -4,10 +4,12 @@
     {
         Containment,
         Size,
-        Position,
+        IntersectionArea,
+        CameraDistance,
+        SortPoint,
         Resolution,
         Sharpness,
-        Brightness,
+        Lightness,
         PrimaryColor,
     }
 }

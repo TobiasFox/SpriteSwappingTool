@@ -1,7 +1,6 @@
 ﻿using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
 using SpriteSortingPlugin.SpriteSorting.UI.AutoSorting;
-using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,7 +17,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                 case SortingCriterionType.Size:
                     CreateSizeDataAndCriterion(ref sortingCriteriaComponent);
                     break;
-                case SortingCriterionType.Position:
+                case SortingCriterionType.CameraDistance:
                     CreateCameraDistanceDataAndCriterion(ref sortingCriteriaComponent);
                     break;
                 case SortingCriterionType.Resolution:
@@ -27,7 +26,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                 case SortingCriterionType.Sharpness:
                     CreateSharpnessDataAndCriterion(ref sortingCriteriaComponent);
                     break;
-                case SortingCriterionType.Brightness:
+                case SortingCriterionType.Lightness:
                     CreateLightnessDataAndCriterion(ref sortingCriteriaComponent);
                     break;
                 case SortingCriterionType.PrimaryColor:
@@ -35,6 +34,12 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     break;
                 case SortingCriterionType.Containment:
                     CreateContainmentDataAndCriterion(ref sortingCriteriaComponent);
+                    break;
+                case SortingCriterionType.IntersectionArea:
+                    CreateIntersectionAreaDataAndCriterion(ref sortingCriteriaComponent);
+                    break;
+                case SortingCriterionType.SortPoint:
+                    CreateSortPointDataAndCriterion(ref sortingCriteriaComponent);
                     break;
             }
 
@@ -49,17 +54,35 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         private static void CreateSizeDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.criterionName = "Size";
-            sortingCriterionData.foregroundSortingName = "Is large sprite in foreground";
-            sortingCriterionData.foregroundSortingTooltip = UITooltipConstants.SizeForegroundSpriteTooltip;
-            sortingCriterionData.criterionTooltip = UITooltipConstants.SizeTooltip;
+            sortingCriterionData.sortingCriterionType = SortingCriterionType.Size;
             sortingCriteriaComponent.sortingCriterion = new SizeSortingCriterion(sortingCriterionData);
+            sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
+        }
+
+        private static void CreateIntersectionAreaDataAndCriterion(
+            ref SortingCriteriaComponent sortingCriteriaComponent)
+        {
+            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
+            sortingCriterionData.sortingCriterionType = SortingCriterionType.IntersectionArea;
+            sortingCriterionData.isSortingInForeground = true;
+            sortingCriteriaComponent.sortingCriterion = new IntersectionAreaCriterion(sortingCriterionData);
+            sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
+        }
+
+        private static void CreateSortPointDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
+        {
+            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
+            sortingCriterionData.sortingCriterionType = SortingCriterionType.SortPoint;
+            sortingCriterionData.isSortingInForeground = true;
+            sortingCriteriaComponent.sortingCriterion = new SpriteSortPointSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
         private static void CreateCameraDistanceDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<CameraDistanceSortingCriterionData>();
+            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
+            sortingCriterionData.sortingCriterionType = SortingCriterionType.CameraDistance;
+            sortingCriterionData.isSortingInForeground = true;
             sortingCriteriaComponent.sortingCriterion = new CameraDistanceSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -67,11 +90,8 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         private static void CreateResolutionDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
+            sortingCriterionData.sortingCriterionType = SortingCriterionType.Resolution;
             sortingCriterionData.isSortingInForeground = true;
-            sortingCriterionData.criterionName = "Sprite Resolution";
-            sortingCriterionData.criterionTooltip = UITooltipConstants.ResolutionTooltip;
-            sortingCriterionData.foregroundSortingName = "Is sprite with higher resolution in foreground";
-            sortingCriterionData.foregroundSortingTooltip = UITooltipConstants.ResolutionForegroundSpriteTooltip;
             sortingCriteriaComponent.sortingCriterion = new ResolutionSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -79,11 +99,8 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         private static void CreateSharpnessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.criterionName = "Sprite Sharpness";
-            sortingCriterionData.foregroundSortingName = "Is sharper sprite in foreground";
-            sortingCriterionData.criterionTooltip = UITooltipConstants.SharpnessTooltip;
+            sortingCriterionData.sortingCriterionType = SortingCriterionType.Sharpness;
             sortingCriterionData.isSortingInForeground = true;
-            sortingCriterionData.foregroundSortingTooltip = UITooltipConstants.SharpnessForegroundSpriteTooltip;
             sortingCriteriaComponent.sortingCriterion = new SharpnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -98,10 +115,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         private static void CreateLightnessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
             var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.criterionName = "Perceived Lightness";
-            sortingCriterionData.criterionTooltip = UITooltipConstants.PerceivedLightnessTooltip;
-            sortingCriterionData.foregroundSortingName = "Is lighter sprite in foreground";
-            sortingCriterionData.foregroundSortingTooltip = UITooltipConstants.PerceivedLightnessForegroundSpriteTooltip;
+            sortingCriterionData.sortingCriterionType = SortingCriterionType.Lightness;
             sortingCriterionData.isSortingInForeground = true;
             sortingCriteriaComponent.sortingCriterion = new LightnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;

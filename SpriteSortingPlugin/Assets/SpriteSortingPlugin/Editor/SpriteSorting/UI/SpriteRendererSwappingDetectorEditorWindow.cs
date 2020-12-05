@@ -880,12 +880,17 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
                 {
-                    if (sortingCriteriaComponent.sortingCriterionData is CameraDistanceSortingCriterionData
-                        cameraDistanceSortingCriterionData)
+                    if (sortingCriteriaComponent.sortingCriterionData is DefaultSortingCriterionData
+                        defaultSortingCriterionData)
                     {
+                        if (defaultSortingCriterionData.sortingCriterionType != SortingCriterionType.CameraDistance)
+                        {
+                            continue;
+                        }
+
                         var isRequiredForCameraDistanceCriterion =
-                            cameraDistanceSortingCriterionData.isAddedToEditorList &&
-                            cameraDistanceSortingCriterionData.isActive;
+                            defaultSortingCriterionData.isAddedToEditorList &&
+                            defaultSortingCriterionData.isActive;
 
                         if (isRequiredForCameraDistanceCriterion)
                         {

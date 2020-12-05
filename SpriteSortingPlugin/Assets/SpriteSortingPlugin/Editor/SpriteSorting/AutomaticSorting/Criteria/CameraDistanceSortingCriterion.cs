@@ -5,10 +5,10 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
     public class CameraDistanceSortingCriterion : SortingCriterion<SortingCriterionData>
     {
-        private CameraDistanceSortingCriterionData CameraDistanceSortingCriterionData =>
-            (CameraDistanceSortingCriterionData) sortingCriterionData;
+        private DefaultSortingCriterionData DefaultSortingCriterionData =>
+            (DefaultSortingCriterionData) sortingCriterionData;
 
-        public CameraDistanceSortingCriterion(CameraDistanceSortingCriterionData sortingCriterionData) : base(
+        public CameraDistanceSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
         }
@@ -28,7 +28,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
             var otherPerspectiveDistance = CalculatePerspectiveDistance(otherSpriteRendererTransform, cameraTransform);
             var isSortingComponentCloser = perspectiveDistance <= otherPerspectiveDistance;
 
-            if (CameraDistanceSortingCriterionData.isCloserSpriteInForeground)
+            if (DefaultSortingCriterionData.isSortingInForeground)
             {
                 sortingResults[isSortingComponentCloser ? 0 : 1]++;
             }
