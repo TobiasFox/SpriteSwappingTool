@@ -12,7 +12,7 @@
             "Range: 0.0 - 1.0";
 
         public const string ContainmentEncapsulatedSpriteInForegroundTooltip =
-            "When enabled, completely enclosed SpriteRenderers will be sorted in the foreground. Otherwise, enclosed SpriteRenderer will be sorted in the background and may be completely hidden.";
+            "When enabled, completely enclosed SpriteRenderers will be sorted in the foreground. Otherwise, the enclosed SpriteRenderer will be sorted in the background and may be completely hidden.";
 
         public const string ContainmentTooltip =
             "Compares if SpriteRenderers are completely enclosed by other SpriteRenderers.\n" +
@@ -42,13 +42,13 @@
         public const string SizeForegroundSpriteTooltip =
             "When enabled, larger sprites will be sorted in the foreground.";
 
-        public const string ResolutionTooltip = "Compares the sprites resolution in pixel.";
+        public const string ResolutionTooltip = "Compares sprites resolutions in pixel.";
 
         public const string ResolutionForegroundSpriteTooltip =
             "When enabled, sprites with higher resolutions will be sorted in the foreground.";
 
         public const string SharpnessTooltip =
-            "Compares the sharpness of sprites by analyze their amount of edges in a sprite.\n" +
+            "Compares the sharpness of sprites by analyzing their amount of edges (rapid intensity changes).\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SharpnessForegroundSpriteTooltip =
@@ -76,7 +76,7 @@
         public const string SpriteDataPrimaryColorTooltip =
             "This is the primary or average Color of a sprite ignoring completely transparent pixels.";
 
-        public const string SpriteDataResolutionTooltip = "The sprites resolution in pixel.";
+        public const string SpriteDataResolutionTooltip = "The sprite's resolution in pixel.";
 
         public const string SpriteDataAnalyzeAllTooltip =
             SpriteDataAnalyzeTooltipPrefix + "all visible sprites in opened scenes " + SpriteDataAnalyzeTooltipSuffix;
@@ -92,18 +92,17 @@
         public const string SpriteDataOutlineAnalysisTypeTooltip =
             "Specify the outline types to analyze. The Pixel Perfect outline is the most accurate but needs slightly more time to analyze.";
 
-        public const string SpriteDataAnalysisTypeTooltip = "Specify the types of data to be analyzed. ";
+        public const string SpriteDataAnalysisTypeTooltip = "Specify the types of data to be analyzed.";
 
         public const string SpriteDataSpriteListTooltip =
             "A list of all Sprites which were analyzed in the current " + nameof(SpriteData) + " asset.";
 
-        public const string SpriteDataOutlineColorTooltip = "Specify the color of the sprite outline.";
+        public const string SpriteDataOutlineColorTooltip = "Specify the color of the sprite's outline.";
 
         public const string SpriteDataPreviewOutlineTooltip =
             "Specify the type of the sprite outline to be drawn when a sprite is selected.";
 
-        public const string SpriteDataOutlinePrecisionAABBTooltip =
-            "This shows the already given bounds of a sprite.";
+        public const string SpriteDataOutlinePrecisionAABBTooltip = "This shows the already given bounds of a sprite.";
 
         public const string SpriteDataOutlinePrecisionOOBBTooltip =
             "This shows the generated OOBB based on the far most outside non-alpha pixel on each image side.";
@@ -118,28 +117,27 @@
             "Adjust the border of each side of the OOBB within the range of the sprite's size.";
 
         public const string SpriteDataPixelPerfectSimplifyOutlineTooltip =
-            "This value is used to evaluate which points should be removed from the outline. A higher value results in a simpler outline (less points). A positive value close to zero results in an outline with little to no reduction. A value of zero has no effect.";
+            "This value is used to evaluate which points should be removed from the outline. A higher value results in a simpler outline (fewer points). A positive value close to zero results in an outline with little to no reduction. A value of zero has no effect.";
 
         public const string SpriteDataAnalyzingActionDurationTooltip =
             "Depending on the amount of sprites to be analyzed this action may take some time.";
 
         //-- overlapping item list
         public const string OverlappingItemListBaseItemTooltip =
-            "Every identified SpriteRenderer overlaps with this base item SpriteRenderer and they all had the same sorting options.";
+            "Every identified SpriteRenderer overlaps with this base item SpriteRenderer, and they all had the same sorting options.";
 
         public const string OverlappingItemListBaseItemSpriteRendererTooltip = "The SpriteRenderer of the base item.";
 
         public const string OverlappingItemListSpriteRendererTooltip =
-            "This SpriteRenderer overlaps with the base item and they had the same sorting options.";
+            "This SpriteRenderer overlaps with the base item, and they had the same sorting options.";
 
         public const string OverlappingItemListSortingGroupTooltip =
-            "This is the outmost SortingGroup of the SpriteRenderer, which had the same sorting options as the base item.";
+            "This is the SortingGroup of the SpriteRenderer, which had the same sorting options as the base item.";
 
         public const string OverlappingItemListBaseItemSortingGroupTooltip =
-            "This is the outmost SortingGroup of the base items SpriteRenderer.";
+            "This is the SortingGroup of the base items SpriteRenderer.";
 
-        public const string OverlappingItemListSortingLayerTooltip =
-            "Change the sorting layer of this SpriteRenderer.";
+        public const string OverlappingItemListSortingLayerTooltip = "Change the sorting layer of this SpriteRenderer.";
 
         public const string OverlappingItemListTotalSortingOrderTooltip =
             "Change the sorting order of this SpriteRenderer.\nThis is the total sorting order of the SpriteRenderer.";
@@ -171,7 +169,7 @@
             "Select a SpriteRenderer to search for overlapping SpriteRenderers.";
 
         public const string SortingEditorTransparencySortModeTooltip =
-            "Determines how SpriteRenderers are being prioritized during sorting. Change this mode in the project setting.";
+            "Determines how SpriteRenderers are being prioritized and therefore sorted during the process of rendering. Change this mode in the project setting.";
 
         public const string SortingEditorCameraTooltip =
             "The camera which is used to render SpriteRenderers (especially overlapping ones).";
@@ -186,10 +184,10 @@
             "Overlapping SpriteRenderers can be identified very fast. The downside is that the sprite's outline is not very accurate.";
 
         public const string SortingEditorOutlinePrecisionAccurate =
-            "The sprite outline is very accurate, but it slows down the time to identify overlapping SpriteRenderers.";
+            "The sprite's outline is very accurate, but it slows down the time to identify overlapping SpriteRenderers.";
 
         public const string SortingEditorOutlinePrecisionAABBTooltip =
-            "Even this is fastest check, its accuracy is not high. Therefore it could identify some sprites which are not visually overlapping because their alpha regions are overlapping.";
+            "Even this is the fastest check, its accuracy is not high. Therefore, it could identify some sprites which are not visually overlapping because their alpha regions are overlapping.";
 
         public const string SortingEditorOutlinePrecisionOOBBTooltip =
             "This outline is more accurate, but the identification of overlapping SpriteRenderers will take slightly more time.\n" +
@@ -218,7 +216,7 @@
             " asset.";
 
         public const string SortingEditorAnalyzingAllSpritesTooltip =
-            "When enabled, sprites from all active and enabled SpriteRenderers of opened scenes are analyzed. Otherwise the selected Sprite will be analyzed only.";
+            "When enabled, sprites from all active and enabled SpriteRenderers of opened scenes are analyzed. Otherwise, the selected Sprite will be analyzed only.";
 
         public const string SortingEditorSpriteSwapDescriptionTooltip =
             "The order of rendering overlapping and unsorted SpriteRenderer might differ per frame depending on several criteria. " +
