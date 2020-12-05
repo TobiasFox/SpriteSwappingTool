@@ -7,7 +7,7 @@ namespace SpriteSortingPlugin.UI
     {
         private SerializedProperty spriteDataListProperty;
 
-        private void Awake()
+        private void OnEnable()
         {
             spriteDataListProperty = serializedObject.FindProperty("spriteDataList");
         }
@@ -16,19 +16,21 @@ namespace SpriteSortingPlugin.UI
         {
             serializedObject.Update();
             EditorGUILayout.PropertyField(spriteDataListProperty, false);
-            if (spriteDataListProperty.isExpanded)
+            if (!spriteDataListProperty.isExpanded)
             {
-                using (new EditorGUI.DisabledScope(true))
-                {
-                    EditorGUILayout.PropertyField(spriteDataListProperty.FindPropertyRelative("Array.size"));
-                }
+                return;
+            }
 
-                for (var i = 0; i < spriteDataListProperty.arraySize; i++)
-                {
-                    serializedObject.Update();
-                    EditorGUILayout.PropertyField(spriteDataListProperty.GetArrayElementAtIndex(i), true);
-                    serializedObject.ApplyModifiedProperties();
-                }
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.PropertyField(spriteDataListProperty.FindPropertyRelative("Array.size"));
+            }
+
+            for (var i = 0; i < spriteDataListProperty.arraySize; i++)
+            {
+                serializedObject.Update();
+                EditorGUILayout.PropertyField(spriteDataListProperty.GetArrayElementAtIndex(i), true);
+                serializedObject.ApplyModifiedProperties();
             }
         }
     }

@@ -157,27 +157,35 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
                 }
             }
 
+            var isGUIEnabled = GUI.enabled;
+            GUI.enabled = true;
             sortingCriterionData.isExpanded = GUI.Toggle(foldoutRect, sortingCriterionData.isExpanded, GUIContent.none,
                 EditorStyles.foldout);
+            GUI.enabled = isGUIEnabled;
 
             sortingCriterionData.isActive =
                 GUI.Toggle(toggleRect, sortingCriterionData.isActive, GUIContent.none);
 
-            var e = Event.current;
-            if (e.type != EventType.MouseDown)
+            //gui needs to be enabled to receive mouse events
+            GUI.enabled = true;
+            var currentEvent = Event.current;
+            if (currentEvent.type != EventType.MouseDown)
             {
+                GUI.enabled = isGUIEnabled;
                 return;
             }
 
-            if (labelRect.Contains(e.mousePosition))
+            if (labelRect.Contains(currentEvent.mousePosition))
             {
-                if (e.button == 0)
+                if (currentEvent.button == 0)
                 {
                     sortingCriterionData.isExpanded = !sortingCriterionData.isExpanded;
                 }
 
-                e.Use();
+                currentEvent.Use();
             }
+
+            GUI.enabled = isGUIEnabled;
         }
     }
 }
