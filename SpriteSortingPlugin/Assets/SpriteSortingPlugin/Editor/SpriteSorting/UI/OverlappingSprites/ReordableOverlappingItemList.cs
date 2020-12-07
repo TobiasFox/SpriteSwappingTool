@@ -93,7 +93,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             for (var i = 0; i < list.count; i++)
             {
                 var item = (OverlappingItem) list.list[i];
-                item.IsItemSelected = i == list.index;
+                item.isItemSelected = i == list.index;
             }
 
             lastFocussedIndex = list.index;
@@ -103,7 +103,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         private float ElementHeightCallback(int index)
         {
             var element = (OverlappingItem) reordableSpriteSortingList.list[index];
-            if (element.sortingComponent.sortingGroup == null)
+            if (element.SortingComponent.SortingGroup == null)
             {
                 return EditorGUIUtility.singleLineHeight * 2 + LineSpacing + LineSpacing * 3;
             }
@@ -114,8 +114,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
             var element = (OverlappingItem) reordableSpriteSortingList.list[index];
-            var sortingComponentSpriteRenderer = element.sortingComponent.spriteRenderer;
-            var sortingComponentOutmostSortingGroup = element.sortingComponent.sortingGroup;
+            var sortingComponentSpriteRenderer = element.SortingComponent.SpriteRenderer;
+            var sortingComponentOutmostSortingGroup = element.SortingComponent.SortingGroup;
             var isPreviewUpdating = false;
             var startX = rect.x;
 

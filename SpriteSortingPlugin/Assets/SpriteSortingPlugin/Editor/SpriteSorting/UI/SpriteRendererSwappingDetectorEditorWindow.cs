@@ -1143,7 +1143,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     for (var i = 0; i < overlappingItemList.Count; i++)
                     {
                         var overlappingItem = overlappingItemList[i];
-                        overlappingItem.OriginAutoSortingOrder = resultList[i].sortingOrder;
+                        overlappingItem.originAutoSortingOrder = resultList[i].sortingOrder;
                     }
                 }
                 else

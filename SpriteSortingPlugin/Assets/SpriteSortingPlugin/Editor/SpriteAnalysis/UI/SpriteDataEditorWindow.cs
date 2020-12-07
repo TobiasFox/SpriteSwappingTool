@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.UI
 {
-    public class SpriteDataEditorWindow : EditorWindow
+    public class SpriteDataEditorWindow : EditorWindow, ISerializationCallbackReceiver
     {
         private const int MinWidthRightContentBar = 200;
         private const float LineSpacing = 1.5f;
@@ -59,6 +59,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
         private SpriteOutlineAnalyzer spriteOutlineAnalyzer;
         private float outlineTolerance = 0.5f;
         private Dictionary<string, Vector2[]> originOutlines;
+        private List<OriginOutlineWrapper> serializedOutlines;
         private SimplifiedOutlineToleranceErrorAppearance simplifiedOutlineToleranceErrorAppearance;
 
         [MenuItem("Window/Sprite Data Analysis %e")]
@@ -1138,6 +1139,48 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             reorderableSpriteList.drawElementCallback = null;
             reorderableSpriteList.drawElementBackgroundCallback = null;
             reorderableSpriteList = null;
+        }
+
+        public void OnBeforeSerialize()
+        {
+            if (originOutlines == null)
+            {
+                return;
+            }
+
+            serializedOutlines = new List<OriginOutlineWrapper>(originOutlines.Count);
+
+            foreach (var outline in originOutlines)
+            {
+                serializedOutlines.Add(new OriginOutlineWrapper(outline.Key, outline.Value));
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if (serializedOutlines == null)
+            {
+                return;
+            }
+
+            originOutlines = new Dictionary<string, Vector2[]>();
+            foreach (var serializedOutline in serializedOutlines)
+            {
+                originOutlines.Add(serializedOutline.assetGuid, serializedOutline.outline);
+            }
+        }
+    }
+
+    [Serializable]
+    internal class OriginOutlineWrapper
+    {
+        public string assetGuid;
+        public Vector2[] outline;
+
+        public OriginOutlineWrapper(string assetGuid, Vector2[] outline)
+        {
+            this.assetGuid = assetGuid;
+            this.outline = outline;
         }
     }
 

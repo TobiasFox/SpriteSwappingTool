@@ -60,7 +60,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         {
             baseItemAssetGuid =
                 AssetDatabase.AssetPathToGUID(
-                    AssetDatabase.GetAssetPath(baseItem.spriteRenderer.sprite.GetInstanceID()));
+                    AssetDatabase.GetAssetPath(baseItem.SpriteRenderer.sprite.GetInstanceID()));
 
             hasBaseItemSpriteDataItem = spriteDetectionData.spriteData != null &&
                                         spriteDetectionData.spriteData.spriteDataDictionary.TryGetValue(
@@ -80,7 +80,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     }
 
                     baseOOBB = baseItemSpriteDataItem.objectOrientedBoundingBox;
-                    baseOOBB.UpdateBox(baseItem.spriteRenderer.transform);
+                    baseOOBB.UpdateBox(baseItem.SpriteRenderer.transform);
                     break;
                 case OutlinePrecision.PixelPerfect:
                     if (!baseItemSpriteDataItem.IsValidOutline())
@@ -89,15 +89,15 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     }
 
                     basePolygonCollider = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
-                        baseItemAssetGuid, baseItemSpriteDataItem, baseItem.spriteRenderer.transform);
+                        baseItemAssetGuid, baseItemSpriteDataItem, baseItem.SpriteRenderer.transform);
                     break;
             }
         }
 
         private bool ContainsBaseItem(SortingComponent sortingComponent, out float area)
         {
-            var baseItemBounds = CreatePlaneBounds(baseItem.spriteRenderer.bounds);
-            var sortingComponentsBounds = CreatePlaneBounds(sortingComponent.spriteRenderer.bounds);
+            var baseItemBounds = CreatePlaneBounds(baseItem.SpriteRenderer.bounds);
+            var sortingComponentsBounds = CreatePlaneBounds(sortingComponent.SpriteRenderer.bounds);
 
             area = sortingComponentsBounds.size.x * sortingComponentsBounds.size.y;
             if (!sortingComponentsBounds.Intersects(baseItemBounds))
@@ -112,7 +112,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 
             var sortingComponentAssetGuid =
                 AssetDatabase.AssetPathToGUID(
-                    AssetDatabase.GetAssetPath(sortingComponent.spriteRenderer.sprite.GetInstanceID()));
+                    AssetDatabase.GetAssetPath(sortingComponent.SpriteRenderer.sprite.GetInstanceID()));
 
             var hasSortingComponentSpriteDataItem =
                 spriteDetectionData.spriteData.spriteDataDictionary.TryGetValue(sortingComponentAssetGuid,
@@ -138,7 +138,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                         otherOOBB = (ObjectOrientedBoundingBox) otherOOBB.Clone();
                     }
 
-                    otherOOBB.UpdateBox(sortingComponent.spriteRenderer.transform);
+                    otherOOBB.UpdateBox(sortingComponent.SpriteRenderer.transform);
 
                     var isContained = otherOOBB.Contains(baseOOBB);
                     if (isContained)
@@ -156,7 +156,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 
                     var otherPolygonCollider = polygonColliderCacher.GetCachedColliderOrCreateNewCollider(
                         sortingComponentAssetGuid, sortingComponentSpriteDataItem,
-                        sortingComponent.spriteRenderer.transform);
+                        sortingComponent.SpriteRenderer.transform);
 
                     var distance = otherPolygonCollider.Distance(basePolygonCollider);
 
@@ -180,7 +180,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     if (isContained)
                     {
                         area =
-                            sortingComponentSpriteDataItem.CalculatePolygonArea(sortingComponent.spriteRenderer
+                            sortingComponentSpriteDataItem.CalculatePolygonArea(sortingComponent.SpriteRenderer
                                 .transform);
                     }
 

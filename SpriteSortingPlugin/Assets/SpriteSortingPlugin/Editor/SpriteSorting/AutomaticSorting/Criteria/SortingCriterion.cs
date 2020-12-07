@@ -25,9 +25,9 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
             {
                 var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
                 spriteDataItemValidator =
-                    spriteDataItemValidatorCache.GetOrCreateValidator(sortingComponent.spriteRenderer);
+                    spriteDataItemValidatorCache.GetOrCreateValidator(sortingComponent.SpriteRenderer);
                 otherSpriteDataItemValidator =
-                    spriteDataItemValidatorCache.GetOrCreateValidator(otherSortingComponent.spriteRenderer);
+                    spriteDataItemValidatorCache.GetOrCreateValidator(otherSortingComponent.SpriteRenderer);
             }
 
             sortingResults = new int[2];

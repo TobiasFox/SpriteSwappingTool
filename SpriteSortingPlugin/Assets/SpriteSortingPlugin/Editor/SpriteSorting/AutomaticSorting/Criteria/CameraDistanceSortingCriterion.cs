@@ -20,8 +20,8 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
                 return;
             }
 
-            var spriteRendererTransform = sortingComponent.spriteRenderer.transform;
-            var otherSpriteRendererTransform = otherSortingComponent.spriteRenderer.transform;
+            var spriteRendererTransform = sortingComponent.SpriteRenderer.transform;
+            var otherSpriteRendererTransform = otherSortingComponent.SpriteRenderer.transform;
             var cameraTransform = autoSortingCalculationData.cameraTransform;
 
             var perspectiveDistance = CalculatePerspectiveDistance(spriteRendererTransform, cameraTransform);

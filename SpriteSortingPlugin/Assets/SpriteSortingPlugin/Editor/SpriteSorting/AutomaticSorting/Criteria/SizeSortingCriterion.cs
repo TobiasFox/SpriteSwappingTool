@@ -1,5 +1,4 @@
 ﻿using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
-using SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
@@ -26,8 +25,8 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
-            spriteRenderer = sortingComponent.spriteRenderer;
-            otherSpriteRenderer = otherSortingComponent.spriteRenderer;
+            spriteRenderer = sortingComponent.SpriteRenderer;
+            otherSpriteRenderer = otherSortingComponent.SpriteRenderer;
 
             AnalyzeArea();
         }

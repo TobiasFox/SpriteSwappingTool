@@ -301,8 +301,8 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                 autoSortingComponent.containedByAutoSortingComponent =
                     autoSortingComponents[correspondingAutoSortingComponentIndex].sortingComponent;
 
-                Debug.LogFormat("containment found: {0} in {1} ", containedSortingComponent.spriteRenderer.name,
-                    autoSortingComponent.sortingComponent.spriteRenderer.name);
+                Debug.LogFormat("containment found: {0} in {1} ", containedSortingComponent.SpriteRenderer.name,
+                    autoSortingComponent.sortingComponent.SpriteRenderer.name);
             }
         }
 

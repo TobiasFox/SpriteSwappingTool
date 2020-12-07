@@ -31,10 +31,10 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
             }
 
             perceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(perceivedLightness,
-                sortingComponent.spriteRenderer.color);
+                sortingComponent.SpriteRenderer.color);
 
             otherPerceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(otherPerceivedLightness,
-                otherSortingComponent.spriteRenderer.color);
+                otherSortingComponent.SpriteRenderer.color);
 
             var isAutoSortingComponentIsLighter = perceivedLightness >= otherPerceivedLightness;
 

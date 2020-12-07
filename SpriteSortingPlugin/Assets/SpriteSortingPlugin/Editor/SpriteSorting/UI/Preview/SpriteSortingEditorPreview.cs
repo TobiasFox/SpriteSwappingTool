@@ -171,8 +171,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 
             foreach (var overlappingItem in overlappingItems.Items)
             {
-                var sortingComponentOutmostSortingGroup = overlappingItem.sortingComponent.sortingGroup;
-                var sortingComponentSpriteRenderer = overlappingItem.sortingComponent.spriteRenderer;
+                var sortingComponentOutmostSortingGroup = overlappingItem.SortingComponent.SortingGroup;
+                var sortingComponentSpriteRenderer = overlappingItem.SortingComponent.SpriteRenderer;
 
                 if (sortingComponentOutmostSortingGroup == null)
                 {
@@ -341,7 +341,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
                 }
             }
 
-            Handles.Label(item.sortingComponent.spriteRenderer.transform.position, text, sortingOrderStyle);
+            Handles.Label(item.SortingComponent.SpriteRenderer.transform.position, text, sortingOrderStyle);
 
             Handles.EndGUI();
         }
@@ -353,7 +353,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
                 return;
             }
 
-            Handles.color = item.IsItemSelected ? Color.yellow : Color.red;
+            Handles.color = item.isItemSelected ? Color.yellow : Color.red;
 
             var isDrawingSpriteRendererBounds = false;
 
@@ -364,7 +364,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 
                 if (hasSpriteDataItem && CanDrawOutlineType(spriteDataItem))
                 {
-                    DrawOutline(spriteDataItem, item.sortingComponent.spriteRenderer.transform);
+                    DrawOutline(spriteDataItem, item.SortingComponent.SpriteRenderer.transform);
                 }
                 else
                 {
@@ -378,7 +378,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 
             if (isDrawingSpriteRendererBounds)
             {
-                var bounds = item.sortingComponent.spriteRenderer.bounds;
+                var bounds = item.SortingComponent.SpriteRenderer.bounds;
                 Handles.DrawWireCube(bounds.center, new Vector3(bounds.size.x, bounds.size.y, 0));
             }
         }

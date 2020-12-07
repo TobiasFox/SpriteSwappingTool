@@ -21,8 +21,8 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
-            var spriteRenderer = sortingComponent.spriteRenderer;
-            var otherSpriteRenderer = otherSortingComponent.spriteRenderer;
+            var spriteRenderer = sortingComponent.SpriteRenderer;
+            var otherSpriteRenderer = otherSortingComponent.SpriteRenderer;
 
             var polygon = GetOutlinePoints(spriteDataItemValidator, spriteRenderer);
             var otherPolygon = GetOutlinePoints(otherSpriteDataItemValidator, otherSpriteRenderer);

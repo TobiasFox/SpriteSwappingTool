@@ -21,8 +21,8 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
             var otherPrimaryColor = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[otherSpriteDataItemValidator.AssetGuid].spriteAnalysisData.primaryColor;
 
-            primaryColor *= sortingComponent.spriteRenderer.color;
-            otherPrimaryColor *= otherSortingComponent.spriteRenderer.color;
+            primaryColor *= sortingComponent.SpriteRenderer.color;
+            otherPrimaryColor *= otherSortingComponent.SpriteRenderer.color;
 
             for (var i = 0; i < PrimaryColorSortingCriterionData.activeChannels.Length; i++)
             {

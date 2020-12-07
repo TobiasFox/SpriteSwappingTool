@@ -9,9 +9,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
     [Serializable]
     public class OverlappingItem
     {
-        public readonly SortingComponent sortingComponent;
         public int originSortingOrder;
         public int originSortingLayer;
+        public int originAutoSortingOrder;
+        public int originSortedIndex;
+        public bool isItemSelected;
 
         public SpriteRenderer previewSpriteRenderer;
         public SortingGroup previewSortingGroup;
@@ -19,12 +21,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         public int sortingLayerDropDownIndex;
         public string sortingLayerName;
         private bool isUsingRelativeSortingOrder = true;
+        private SortingComponent sortingComponent;
+        private bool isBaseItem;
+        private string spriteAssetGuid;
 
-        public bool IsItemSelected { get; set; }
-        public int OriginSortedIndex { get; set; }
-        public int OriginAutoSortingOrder { get; set; }
-        public bool IsBaseItem { get; private set; }
-        public string SpriteAssetGuid { get; private set; }
+        public SortingComponent SortingComponent => sortingComponent;
+
+        public bool IsBaseItem => isBaseItem;
+
+        public string SpriteAssetGuid => spriteAssetGuid;
 
         public OverlappingItem(SpriteRenderer originSpriteRenderer)
         {
@@ -34,22 +39,23 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
 
             sortingComponent = new SortingComponent(originSpriteRenderer, sortingGroup);
             Init();
+            
         }
 
         public OverlappingItem(SortingComponent sortingComponent, bool isBaseItem = false)
         {
             this.sortingComponent = sortingComponent;
             Init();
-            IsBaseItem = isBaseItem;
+            this.isBaseItem = isBaseItem;
 
-            SpriteAssetGuid = AssetDatabase.AssetPathToGUID(
-                AssetDatabase.GetAssetPath(sortingComponent.spriteRenderer.sprite.GetInstanceID()));
+            spriteAssetGuid = AssetDatabase.AssetPathToGUID(
+                AssetDatabase.GetAssetPath(sortingComponent.SpriteRenderer.sprite.GetInstanceID()));
         }
 
         private void Init()
         {
-            originSortingLayer = sortingComponent.OriginSortingLayer;
-            originSortingOrder = sortingComponent.OriginSortingOrder;
+            originSortingLayer = SortingComponent.OriginSortingLayer;
+            originSortingOrder = SortingComponent.OriginSortingOrder;
         }
 
         public void UpdatePreviewSortingOrderWithExistingOrder()
@@ -116,32 +122,32 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 newSortingOrder += originSortingOrder;
             }
 
-            if (sortingComponent.sortingGroup != null)
+            if (SortingComponent.SortingGroup != null)
             {
                 Debug.LogFormat(
                     "Update Sorting options on Sorting Group {0} - Sorting Layer from {1} to {2}, Sorting Order from {3} to {4}",
-                    sortingComponent.sortingGroup.name, sortingComponent.sortingGroup.sortingLayerName,
+                    SortingComponent.SortingGroup.name, SortingComponent.SortingGroup.sortingLayerName,
                     sortingLayerName,
-                    sortingComponent.sortingGroup.sortingOrder, newSortingOrder);
+                    SortingComponent.SortingGroup.sortingOrder, newSortingOrder);
 
-                Undo.RecordObject(sortingComponent.sortingGroup, "apply sorting options");
-                sortingComponent.sortingGroup.sortingLayerName = sortingLayerName;
-                sortingComponent.sortingGroup.sortingOrder = newSortingOrder;
-                EditorUtility.SetDirty(sortingComponent.sortingGroup);
+                Undo.RecordObject(SortingComponent.SortingGroup, "apply sorting options");
+                SortingComponent.SortingGroup.sortingLayerName = sortingLayerName;
+                SortingComponent.SortingGroup.sortingOrder = newSortingOrder;
+                EditorUtility.SetDirty(SortingComponent.SortingGroup);
 
                 return;
             }
 
             Debug.LogFormat(
                 "Update Sorting options on SpriteRenderer {0} - Sorting Layer from {1} to {2}, Sorting Order from {3} to {4}",
-                sortingComponent.spriteRenderer.name, sortingComponent.spriteRenderer.sortingLayerName,
+                SortingComponent.SpriteRenderer.name, SortingComponent.SpriteRenderer.sortingLayerName,
                 sortingLayerName,
-                sortingComponent.spriteRenderer.sortingOrder, newSortingOrder);
+                SortingComponent.SpriteRenderer.sortingOrder, newSortingOrder);
 
-            Undo.RecordObject(sortingComponent.spriteRenderer, "apply sorting options");
-            sortingComponent.spriteRenderer.sortingLayerName = sortingLayerName;
-            sortingComponent.spriteRenderer.sortingOrder = newSortingOrder;
-            EditorUtility.SetDirty(sortingComponent.spriteRenderer);
+            Undo.RecordObject(SortingComponent.SpriteRenderer, "apply sorting options");
+            SortingComponent.SpriteRenderer.sortingLayerName = sortingLayerName;
+            SortingComponent.SpriteRenderer.sortingOrder = newSortingOrder;
+            EditorUtility.SetDirty(SortingComponent.SpriteRenderer);
         }
 
         public int GetNewSortingOrder()
@@ -160,7 +166,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             return "OI[origin: " + SortingLayer.IDToName(originSortingLayer) + ", " + originSortingOrder +
                    " current: " + sortingLayerName + ", " + (originSortingOrder + sortingOrder) + "(" +
                    originSortingOrder + "+" + sortingOrder + "), baseItem: " + IsBaseItem +
-                   ", originSortedIndex:" + OriginSortedIndex + "]";
+                   ", originSortedIndex:" + originSortedIndex + "]";
         }
     }
 }

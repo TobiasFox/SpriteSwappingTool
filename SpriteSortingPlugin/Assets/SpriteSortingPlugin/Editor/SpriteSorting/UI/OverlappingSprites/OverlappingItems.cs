@@ -93,7 +93,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             var isAdjustingSortingOrderUpwards = newIndex < items.Count / 2;
             var lastItem = items[newIndex + (isAdjustingSortingOrderUpwards ? 1 : -1)];
 
-            if (itemWithNewIndex.sortingComponent.IsOverlapping(lastItem.sortingComponent))
+            if (itemWithNewIndex.SortingComponent.IsOverlapping(lastItem.SortingComponent))
             {
                 if (isAdjustingSortingOrderUpwards && itemWithNewIndex.sortingOrder <= lastItem.sortingOrder)
                 {
@@ -164,7 +164,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 }
 
                 var isOverlapping =
-                    currentItem.sortingComponent.IsOverlapping(currentItemToCompare.sortingComponent);
+                    currentItem.SortingComponent.IsOverlapping(currentItemToCompare.SortingComponent);
 
                 if (!isOverlapping || currentItemToCompare.sortingOrder > currentItem.sortingOrder)
                 {
@@ -192,7 +192,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 }
 
                 var isOverlapping =
-                    currentItem.sortingComponent.IsOverlapping(currentItemToCompare.sortingComponent);
+                    currentItem.SortingComponent.IsOverlapping(currentItemToCompare.SortingComponent);
 
                 if (!isOverlapping || currentItemToCompare.sortingOrder < currentItem.sortingOrder)
                 {
@@ -282,7 +282,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
 
                 if (!isReset)
                 {
-                    overlappingItem.OriginSortedIndex = i;
+                    overlappingItem.originSortedIndex = i;
                 }
 
                 if (!isAlreadySorted)
@@ -291,7 +291,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 }
                 else
                 {
-                    overlappingItem.sortingOrder = overlappingItem.OriginAutoSortingOrder;
+                    overlappingItem.sortingOrder = overlappingItem.originAutoSortingOrder;
                 }
 
                 overlappingItem.UpdatePreviewSortingOrderWithExistingOrder();
@@ -301,4 +301,5 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
         }
     }
+    
 }
