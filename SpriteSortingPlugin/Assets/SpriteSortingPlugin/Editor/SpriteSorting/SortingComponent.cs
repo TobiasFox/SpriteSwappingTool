@@ -126,11 +126,21 @@ namespace SpriteSortingPlugin.SpriteSorting
 
         public void OnBeforeSerialize()
         {
+            if (overlappingSortingComponents == null)
+            {
+                return;
+            }
+
             serializedOverlappingSortingComponents = new List<int>(overlappingSortingComponents);
         }
 
         public void OnAfterDeserialize()
         {
+            if (serializedOverlappingSortingComponents == null)
+            {
+                return;
+            }
+
             overlappingSortingComponents = new HashSet<int>(serializedOverlappingSortingComponents);
         }
     }
