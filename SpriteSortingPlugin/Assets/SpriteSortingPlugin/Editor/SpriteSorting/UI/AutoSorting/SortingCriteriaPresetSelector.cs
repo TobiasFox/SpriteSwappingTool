@@ -31,7 +31,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
                 initialValues.ApplyTo(currentPreset);
             }
 
-            currentWindow.UpdateSortingCriteriaFromPreset(currentPreset.Copy());
+            var presetClone = (SortingCriteriaPreset) currentPreset.Clone();
+            currentWindow.UpdateSortingCriteriaFromPreset(presetClone);
         }
     }
 }

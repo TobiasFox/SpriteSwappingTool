@@ -1,28 +1,28 @@
 ﻿using System;
+using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
     [Serializable]
-    public class SortingCriteriaPreset : ScriptableObject, ISerializationCallbackReceiver
+    public class SortingCriteriaPreset : ScriptableObject, ISerializationCallbackReceiver, ICloneable
     {
-        public string[] jsonStrings;
-        public string[] types;
-        public SortingCriterionData[] SortingCriterionData { get; set; }
+        [HideInInspector] public string[] jsonData;
+        public SortingCriterionData[] sortingCriterionData;
 
-        public SortingCriteriaPreset Copy()
+        public object Clone()
         {
             var clone = CreateInstance<SortingCriteriaPreset>();
-            if (SortingCriterionData.Length <= 0)
+            if (sortingCriterionData.Length <= 0)
             {
                 return clone;
             }
 
-            clone.SortingCriterionData = new SortingCriterionData[SortingCriterionData.Length];
-            for (var i = 0; i < SortingCriterionData.Length; i++)
+            clone.sortingCriterionData = new SortingCriterionData[sortingCriterionData.Length];
+            for (var i = 0; i < sortingCriterionData.Length; i++)
             {
-                clone.SortingCriterionData[i] = SortingCriterionData[i].Copy();
+                clone.sortingCriterionData[i] = (SortingCriterionData) sortingCriterionData[i].Clone();
             }
 
             return clone;
@@ -30,31 +30,94 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
         public void OnBeforeSerialize()
         {
-            if (SortingCriterionData == null)
-            {
-                return;
-            }
-
-            var length = SortingCriterionData.Length;
-            jsonStrings = new string[length];
-            types = new string[length];
-            for (var i = 0; i < length; i++)
-            {
-                var criterionData = SortingCriterionData[i];
-                jsonStrings[i] = JsonUtility.ToJson(criterionData);
-                types[i] = criterionData.GetType().FullName;
-            }
+            SaveData();
         }
 
         public void OnAfterDeserialize()
         {
-            SortingCriterionData = new SortingCriterionData[jsonStrings.Length];
-            for (var i = 0; i < jsonStrings.Length; i++)
+            LoadData();
+        }
+
+        private void SaveData()
+        {
+            var isValidForSaving = IsSortingCriteriaDataValidForSaving();
+            if (!isValidForSaving)
             {
-                var data = CreateInstance(types[i]);
-                JsonUtility.FromJsonOverwrite(jsonStrings[i], data);
-                SortingCriterionData[i] = (SortingCriterionData) data;
+                return;
             }
+
+            jsonData = new string[sortingCriterionData.Length];
+            for (var i = 0; i < sortingCriterionData.Length; i++)
+            {
+                var criterionData = sortingCriterionData[i];
+                jsonData[i] = JsonUtility.ToJson(criterionData);
+            }
+        }
+
+        private void LoadData()
+        {
+            var isValidForLoading = IsSavedDataValidForLoading();
+            if (!isValidForLoading)
+            {
+                return;
+            }
+
+            for (var i = 0; i < sortingCriterionData.Length; i++)
+            {
+                var data = CreateAppropriateCriterionData(sortingCriterionData[i].sortingCriterionType);
+                JsonUtility.FromJsonOverwrite(jsonData[i], data);
+                sortingCriterionData[i] = data;
+            }
+        }
+
+        private SortingCriterionData CreateAppropriateCriterionData(SortingCriterionType sortingCriterionType)
+        {
+            switch (sortingCriterionType)
+            {
+                case SortingCriterionType.Containment:
+                    return new ContainmentSortingCriterionData();
+                case SortingCriterionType.PrimaryColor:
+                    return new PrimaryColorSortingCriterionData();
+                default:
+                    return new DefaultSortingCriterionData();
+            }
+        }
+
+        private bool IsSortingCriteriaDataValidForSaving()
+        {
+            if (sortingCriterionData == null)
+            {
+                return false;
+            }
+
+            foreach (var currentSortingCriterionData in sortingCriterionData)
+            {
+                if (currentSortingCriterionData == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool IsSavedDataValidForLoading()
+        {
+            if (jsonData == null || sortingCriterionData == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < jsonData.Length; i++)
+            {
+                var json = jsonData[i];
+                if (string.IsNullOrEmpty(json) || sortingCriterionData[i] == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
 using SpriteSortingPlugin.SpriteSorting.UI.AutoSorting;
-using UnityEditor;
-using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 {
@@ -43,18 +41,20 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     break;
             }
 
-            var specificEditor = Editor.CreateEditor(sortingCriteriaComponent.sortingCriterionData);
-            var criterionDataBaseEditor = (CriterionDataBaseEditor<SortingCriterionData>) specificEditor;
+            var criterionDataBaseEditor =
+                SortingCriterionDataUIRepresentationFactory.CreateUIRepresentation(sortingCriteriaComponent.sortingCriterionData);
             criterionDataBaseEditor.Initialize(sortingCriteriaComponent.sortingCriterionData);
-            sortingCriteriaComponent.criterionDataBaseEditor = criterionDataBaseEditor;
+            sortingCriteriaComponent.criterionDataBaseUIRepresentation = criterionDataBaseEditor;
 
             return sortingCriteriaComponent;
         }
 
         private static void CreateSizeDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.sortingCriterionType = SortingCriterionType.Size;
+            var sortingCriterionData = new DefaultSortingCriterionData
+            {
+                sortingCriterionType = SortingCriterionType.Size
+            };
             sortingCriteriaComponent.sortingCriterion = new SizeSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
@@ -62,68 +62,74 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         private static void CreateIntersectionAreaDataAndCriterion(
             ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.sortingCriterionType = SortingCriterionType.IntersectionArea;
-            sortingCriterionData.isSortingInForeground = true;
+            var sortingCriterionData = new DefaultSortingCriterionData
+            {
+                sortingCriterionType = SortingCriterionType.IntersectionArea, isSortingInForeground = true
+            };
             sortingCriteriaComponent.sortingCriterion = new IntersectionAreaCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
         private static void CreateSortPointDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.sortingCriterionType = SortingCriterionType.SortPoint;
-            sortingCriterionData.isSortingInForeground = true;
+            var sortingCriterionData = new DefaultSortingCriterionData
+            {
+                sortingCriterionType = SortingCriterionType.SortPoint, isSortingInForeground = true
+            };
             sortingCriteriaComponent.sortingCriterion = new SpriteSortPointSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
         private static void CreateCameraDistanceDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.sortingCriterionType = SortingCriterionType.CameraDistance;
-            sortingCriterionData.isSortingInForeground = true;
+            var sortingCriterionData = new DefaultSortingCriterionData
+            {
+                sortingCriterionType = SortingCriterionType.CameraDistance, isSortingInForeground = true
+            };
             sortingCriteriaComponent.sortingCriterion = new CameraDistanceSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
         private static void CreateResolutionDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.sortingCriterionType = SortingCriterionType.Resolution;
-            sortingCriterionData.isSortingInForeground = true;
+            var sortingCriterionData = new DefaultSortingCriterionData
+            {
+                sortingCriterionType = SortingCriterionType.Resolution, isSortingInForeground = true
+            };
             sortingCriteriaComponent.sortingCriterion = new ResolutionSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
         private static void CreateSharpnessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.sortingCriterionType = SortingCriterionType.Sharpness;
-            sortingCriterionData.isSortingInForeground = true;
+            var sortingCriterionData = new DefaultSortingCriterionData
+            {
+                sortingCriterionType = SortingCriterionType.Sharpness, isSortingInForeground = true
+            };
             sortingCriteriaComponent.sortingCriterion = new SharpnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
         private static void CreatePrimaryColorDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<PrimaryColorSortingCriterionData>();
+            var sortingCriterionData = new PrimaryColorSortingCriterionData();
             sortingCriteriaComponent.sortingCriterion = new PrimaryColorSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
         private static void CreateLightnessDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<DefaultSortingCriterionData>();
-            sortingCriterionData.sortingCriterionType = SortingCriterionType.Lightness;
-            sortingCriterionData.isSortingInForeground = true;
+            var sortingCriterionData = new DefaultSortingCriterionData
+            {
+                sortingCriterionType = SortingCriterionType.Lightness, isSortingInForeground = true
+            };
             sortingCriteriaComponent.sortingCriterion = new LightnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 
         private static void CreateContainmentDataAndCriterion(ref SortingCriteriaComponent sortingCriteriaComponent)
         {
-            var sortingCriterionData = ScriptableObject.CreateInstance<ContainmentSortingCriterionData>();
+            var sortingCriterionData = new ContainmentSortingCriterionData();
             sortingCriteriaComponent.sortingCriterion = new ContainmentSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }

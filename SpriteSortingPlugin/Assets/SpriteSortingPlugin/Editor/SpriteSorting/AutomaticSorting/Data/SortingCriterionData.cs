@@ -1,13 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
 {
-    public abstract class SortingCriterionData : ScriptableObject
+    [Serializable]
+    public class SortingCriterionData : ICloneable
     {
         public bool isActive;
         public float priority = 1;
         [HideInInspector] public bool isExpanded;
         [HideInInspector] public bool isAddedToEditorList;
+        public SortingCriterionType sortingCriterionType;
 
         protected void CopyDataTo(SortingCriterionData copy)
         {
@@ -15,8 +18,14 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
             copy.priority = priority;
             copy.isExpanded = isExpanded;
             copy.isAddedToEditorList = isAddedToEditorList;
+            copy.sortingCriterionType = sortingCriterionType;
         }
 
-        public abstract SortingCriterionData Copy();
+        public virtual object Clone()
+        {
+            var clone = new SortingCriterionData();
+            CopyDataTo(clone);
+            return clone;
+        }
     }
 }

@@ -536,7 +536,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         continue;
                     }
 
-                    sortingCriteriaComponent.criterionDataBaseEditor.OnInspectorGUI();
+                    sortingCriteriaComponent.criterionDataBaseUIRepresentation.OnInspectorGUI();
                     isMinOneSortingCriterionEditorDrawn = true;
                     if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
                     {
@@ -608,7 +608,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 }
 
                 var content =
-                    new GUIContent(sortingCriteriaComponent.criterionDataBaseEditor.Title);
+                    new GUIContent(sortingCriteriaComponent.criterionDataBaseUIRepresentation.Title);
                 menu.AddItem(content, false, AddSortingCriteria, i);
             }
 
@@ -992,14 +992,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         {
             reordableOverlappingItemList?.CleanUp();
             autoSortingResultList = null;
-
-            if (sortingCriteriaComponents != null)
-            {
-                foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
-                {
-                    DestroyImmediate(sortingCriteriaComponent.criterionDataBaseEditor);
-                }
-            }
         }
 
         private bool HasOverlappingItems()
@@ -1282,12 +1274,13 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         public SortingCriteriaPreset GenerateSortingCriteriaPreset()
         {
             var preset = CreateInstance<SortingCriteriaPreset>();
-            preset.SortingCriterionData = new SortingCriterionData[sortingCriteriaComponents.Count];
+            preset.sortingCriterionData = new SortingCriterionData[sortingCriteriaComponents.Count];
 
             for (var i = 0; i < sortingCriteriaComponents.Count; i++)
             {
                 var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                preset.SortingCriterionData[i] = sortingCriteriaComponent.sortingCriterionData.Copy();
+                preset.sortingCriterionData[i] =
+                    (SortingCriterionData) sortingCriteriaComponent.sortingCriterionData.Clone();
             }
 
             return preset;
@@ -1295,11 +1288,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         public void UpdateSortingCriteriaFromPreset(SortingCriteriaPreset preset)
         {
-            for (var i = 0; i < preset.SortingCriterionData.Length; i++)
+            for (var i = 0; i < preset.sortingCriterionData.Length; i++)
             {
                 var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                sortingCriteriaComponent.sortingCriterionData = preset.SortingCriterionData[i];
-                sortingCriteriaComponent.criterionDataBaseEditor.UpdateSortingCriterionData(sortingCriteriaComponent
+                sortingCriteriaComponent.sortingCriterionData = preset.sortingCriterionData[i];
+                sortingCriteriaComponent.criterionDataBaseUIRepresentation.UpdateSortingCriterionData(sortingCriteriaComponent
                     .sortingCriterionData);
                 sortingCriteriaComponents[i] = sortingCriteriaComponent;
             }

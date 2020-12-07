@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    [CustomEditor(typeof(PrimaryColorSortingCriterionData))]
-    public class PrimaryColorCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
+    public class PrimaryColorCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation<SortingCriterionData>
     {
         private static readonly string[] ChannelNames = new string[] {"Red", "Green", "Blue"};
 

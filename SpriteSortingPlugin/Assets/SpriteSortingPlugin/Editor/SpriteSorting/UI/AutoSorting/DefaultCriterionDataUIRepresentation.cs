@@ -6,8 +6,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    [CustomEditor(typeof(DefaultSortingCriterionData))]
-    public class DefaultCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
+    public class DefaultCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation<SortingCriterionData>
     {
         private string foregroundSortingName;
         private string foregroundSortingTooltip;

@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    [CustomEditor(typeof(ContainmentSortingCriterionData))]
-    public class ContainmentCriterionDataEditor : CriterionDataBaseEditor<SortingCriterionData>
+    public class ContainmentCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation<SortingCriterionData>
     {
         private ContainmentSortingCriterionData ContainmentSortingCriterionData =>
             (ContainmentSortingCriterionData) sortingCriterionData;

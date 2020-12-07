@@ -1,16 +1,17 @@
-﻿namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
+﻿using System;
+
+namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
 {
+    [Serializable]
     public class DefaultSortingCriterionData : SortingCriterionData
     {
         public bool isSortingInForeground;
-        public SortingCriterionType sortingCriterionType;
 
-        public override SortingCriterionData Copy()
+        public override object Clone()
         {
-            var clone = CreateInstance<DefaultSortingCriterionData>();
+            var clone = new DefaultSortingCriterionData();
             CopyDataTo(clone);
             clone.isSortingInForeground = isSortingInForeground;
-            clone.sortingCriterionType = sortingCriterionType;
             return clone;
         }
     }

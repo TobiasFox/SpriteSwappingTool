@@ -6,36 +6,29 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
     [CustomEditor(typeof(SortingCriteriaPreset))]
     public class SortingCriteriaPresetEditor : Editor
     {
-        private Editor[] sortingCriteriaEditors;
+        private CriterionDataBaseUIRepresentation<SortingCriterionData>[] criterionDataBaseUIRepresentations;
 
         private void Awake()
         {
             var preset = (SortingCriteriaPreset) target;
 
-            sortingCriteriaEditors = new Editor[preset.SortingCriterionData.Length];
-            for (var i = 0; i < preset.SortingCriterionData.Length; i++)
+            criterionDataBaseUIRepresentations =
+                new CriterionDataBaseUIRepresentation<SortingCriterionData>[preset.sortingCriterionData.Length];
+            for (var i = 0; i < preset.sortingCriterionData.Length; i++)
             {
-                var sortingCriterionData = preset.SortingCriterionData[i];
-                var specificEditor = CreateEditor(sortingCriterionData);
-                var criterionDataBaseEditor = (CriterionDataBaseEditor<SortingCriterionData>) specificEditor;
+                var sortingCriterionData = preset.sortingCriterionData[i];
+                var criterionDataBaseEditor =
+                    SortingCriterionDataUIRepresentationFactory.CreateUIRepresentation(sortingCriterionData, true);
                 criterionDataBaseEditor.Initialize(sortingCriterionData, true);
-                sortingCriteriaEditors[i] = criterionDataBaseEditor;
+                criterionDataBaseUIRepresentations[i] = criterionDataBaseEditor;
             }
         }
 
         public override void OnInspectorGUI()
         {
-            foreach (var criteriaEditor in sortingCriteriaEditors)
+            foreach (var criteriaEditor in criterionDataBaseUIRepresentations)
             {
                 criteriaEditor.OnInspectorGUI();
-            }
-        }
-
-        private void OnDestroy()
-        {
-            foreach (var sortingCriteriaEditor in sortingCriteriaEditors)
-            {
-                DestroyImmediate(sortingCriteriaEditor);
             }
         }
     }

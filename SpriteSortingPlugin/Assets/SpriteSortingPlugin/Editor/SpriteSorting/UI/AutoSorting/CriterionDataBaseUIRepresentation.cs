@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    public abstract class CriterionDataBaseEditor<T> : Editor where T : SortingCriterionData
+    public abstract class CriterionDataBaseUIRepresentation<T>  where T : SortingCriterionData
     {
         protected T sortingCriterionData;
         protected string title = "Criteria";
@@ -15,8 +15,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
         private bool isShowingInInspector;
 
         public string Title => title;
-        public string Tooltip => tooltip;
-
+        
         public void Initialize(T sortingCriterionData, bool isShowingInInspector = false)
         {
             this.isShowingInInspector = isShowingInInspector;
@@ -33,7 +32,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
             this.sortingCriterionData = sortingCriterionData;
         }
 
-        public override void OnInspectorGUI()
+        public void OnInspectorGUI()
         {
             DrawHeader();
 
@@ -52,7 +51,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
         protected abstract void OnInspectorGuiInternal();
 
-        private new void DrawHeader()
+        private void DrawHeader()
         {
             var backgroundRect = GUILayoutUtility.GetRect(1f, 22);
             DrawHeader(backgroundRect);
