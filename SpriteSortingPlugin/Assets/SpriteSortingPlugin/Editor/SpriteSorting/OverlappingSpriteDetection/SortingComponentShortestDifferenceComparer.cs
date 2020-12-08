@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SpriteSortingPlugin.SpriteSorting
+namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 {
     public class SortingComponentShortestDifferenceComparer : Comparer<SortingComponent>
     {
