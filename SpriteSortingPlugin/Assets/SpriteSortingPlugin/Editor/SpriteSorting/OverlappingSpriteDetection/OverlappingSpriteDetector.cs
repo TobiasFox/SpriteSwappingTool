@@ -161,18 +161,19 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             List<OverlappingItem> overlappingItems, SpriteDetectionData spriteDetectionData)
         {
             var startTime = EditorApplication.timeSinceStartup;
+
+            var sortingOptions = new Dictionary<int, int>();
             if (overlappingItems == null || overlappingItems.Count <= 0)
             {
-                return null;
+                return sortingOptions;
             }
 
             InitializeSpriteRendererList(null);
             if (spriteRenderers.Count < 2)
             {
-                return null;
+                return sortingOptions;
             }
 
-            var sortingOptions = new Dictionary<int, int>();
             this.spriteDetectionData = spriteDetectionData;
 
             var excludingSpriteRendererList = new List<SpriteRenderer>();
@@ -183,7 +184,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                 excludingSpriteRendererList.Add(overlappingItem.SortingComponent.SpriteRenderer);
 
                 var newSortingOrder = overlappingItem.GetNewSortingOrder();
-                if (overlappingItem.originSortingOrder == newSortingOrder)
+                if (!overlappingItem.HasSortingLayerChanged() && overlappingItem.originSortingOrder == newSortingOrder)
                 {
                     continue;
                 }
@@ -191,6 +192,11 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                 var sortingComponent = overlappingItem.SortingComponent;
                 baseSortingComponents.Add(sortingComponent);
                 sortingOptions.Add(sortingComponent.GetInstanceId(), newSortingOrder);
+            }
+
+            if (baseSortingComponents.Count <= 0)
+            {
+                return sortingOptions;
             }
 
             this.selectedLayers = new List<int> {baseSortingComponents[0].OriginSortingLayer};
@@ -207,7 +213,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             spriteDataItemValidatorCache.Clear();
 
             var timeDif = EditorApplication.timeSinceStartup - startTime;
-            Debug.LogFormat("Analyzed and updated surrounding SpriteRenderers in {0} seconds", Math.Round(timeDif, 2));
+            Debug.LogFormat("Analyzed surrounding SpriteRenderers in {0} seconds", Math.Round(timeDif, 2));
             return sortingOptions;
         }
 

@@ -177,6 +177,14 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
         }
 
+        public void ApplySortingOption()
+        {
+            foreach (var overlappingItem in items)
+            {
+                overlappingItem.ApplySortingOption();
+            }
+        }
+
         private void UpdateSurroundingItemsUpwards(int currentIndex)
         {
             var currentItemToCompare = items[currentIndex];

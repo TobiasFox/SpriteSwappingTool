@@ -49,7 +49,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private ReordableOverlappingItemList reordableOverlappingItemList;
 
         private bool isAnalyzingWithChangedLayerFirst;
-        
+
         private bool isSearchingSurroundingSpriteRenderer = true;
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private SpriteDetectionData spriteDetectionData;
@@ -655,19 +655,42 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void ApplySortingOptions()
         {
+            if (isSearchingSurroundingSpriteRenderer)
+            {
+                ApplySortingOptionsIterative();
+            }
+            else
+            {
+                overlappingItems.ApplySortingOption();
+            }
+
+            wasAnalyzeButtonClicked = false;
+            overlappingItems = null;
+            preview.CleanUpPreview();
+        }
+
+        //TODO overlappingItems with changed but same layer are not considered
+        private void ApplySortingOptionsIterative()
+        {
             // Debug.Log("apply sorting options");
 
-            var itemCount = overlappingItems.Items.Count;
-            for (var i = 0; i < itemCount; i++)
+            var counter = 0;
+            while (counter < overlappingItems.Items.Count)
             {
-                var overlappingItem = overlappingItems.Items[i];
+                var overlappingItem = overlappingItems.Items[counter];
                 if (!overlappingItem.HasSortingLayerChanged())
                 {
+                    counter++;
                     continue;
                 }
 
-                overlappingItems.Items.RemoveAt(i);
+                overlappingItems.Items.RemoveAt(counter);
                 overlappingItem.ApplySortingOption();
+            }
+
+            if (overlappingItems.Items.Count <= 0)
+            {
+                return;
             }
 
             FillSpriteDetectionData();
@@ -686,7 +709,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 var sortingGroupComponent = sortingComponent as SortingGroup;
                 if (sortingGroupComponent != null)
                 {
-                    Debug.LogFormat("Update Sorting Order on Sorting Group {0} from {1} to {2}",
+                    if (sortingGroupComponent.sortingOrder == sortingOption.Value)
+                    {
+                        continue;
+                    }
+
+                    Debug.LogFormat("Update on Sorting Group {0} Sorting Order: {1} -> {2}",
                         sortingGroupComponent.name, sortingGroupComponent.sortingOrder, sortingOption.Value);
 
                     Undo.RecordObject(sortingGroupComponent, "apply sorting options");
@@ -698,7 +726,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 var spriteRendererComponent = sortingComponent as SpriteRenderer;
                 if (spriteRendererComponent != null)
                 {
-                    Debug.LogFormat("Update Sorting Order on SpriteRenderer {0} from {1} to {2}",
+                    if (spriteRendererComponent.sortingOrder == sortingOption.Value)
+                    {
+                        continue;
+                    }
+
+                    Debug.LogFormat("Update on SpriteRenderer {0} Sorting Order: {1} -> {2}",
                         spriteRendererComponent.name, spriteRendererComponent.sortingOrder, sortingOption.Value);
 
                     Undo.RecordObject(spriteRendererComponent, "apply sorting options");
@@ -706,10 +739,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     EditorUtility.SetDirty(spriteRendererComponent);
                 }
             }
-
-            wasAnalyzeButtonClicked = false;
-            overlappingItems = null;
-            preview.CleanUpPreview();
         }
 
         private void FillSpriteDetectionData()

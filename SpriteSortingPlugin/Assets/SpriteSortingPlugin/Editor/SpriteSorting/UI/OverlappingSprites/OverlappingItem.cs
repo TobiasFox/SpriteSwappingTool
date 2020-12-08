@@ -39,7 +39,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
 
             sortingComponent = new SortingComponent(originSpriteRenderer, sortingGroup);
             Init();
-            
         }
 
         public OverlappingItem(SortingComponent sortingComponent, bool isBaseItem = false)
@@ -124,30 +123,98 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
 
             if (SortingComponent.SortingGroup != null)
             {
-                Debug.LogFormat(
-                    "Update Sorting options on Sorting Group {0} - Sorting Layer from {1} to {2}, Sorting Order from {3} to {4}",
-                    SortingComponent.SortingGroup.name, SortingComponent.SortingGroup.sortingLayerName,
-                    sortingLayerName,
-                    SortingComponent.SortingGroup.sortingOrder, newSortingOrder);
-
-                Undo.RecordObject(SortingComponent.SortingGroup, "apply sorting options");
-                SortingComponent.SortingGroup.sortingLayerName = sortingLayerName;
-                SortingComponent.SortingGroup.sortingOrder = newSortingOrder;
-                EditorUtility.SetDirty(SortingComponent.SortingGroup);
+                ApplySortingOptionsToSortingGroup(newSortingOrder);
 
                 return;
             }
 
-            Debug.LogFormat(
-                "Update Sorting options on SpriteRenderer {0} - Sorting Layer from {1} to {2}, Sorting Order from {3} to {4}",
-                SortingComponent.SpriteRenderer.name, SortingComponent.SpriteRenderer.sortingLayerName,
-                sortingLayerName,
-                SortingComponent.SpriteRenderer.sortingOrder, newSortingOrder);
+            ApplySortingOptionsToSpriteRenderer(newSortingOrder);
+        }
+
+        private void ApplySortingOptionsToSpriteRenderer(int newSortingOrder)
+        {
+            var isSortingLayerIdentical = SortingComponent.SpriteRenderer.sortingLayerName.Equals(sortingLayerName);
+            var isSortingOrderIdentical = SortingComponent.SpriteRenderer.sortingOrder == newSortingOrder;
+
+            if (isSortingLayerIdentical && isSortingOrderIdentical)
+            {
+                return;
+            }
+
+            var message = "Update sorting options on SpriteRenderer " + sortingComponent.SpriteRenderer.name + " - ";
+
+            if (!isSortingLayerIdentical)
+            {
+                message += "Sorting Layer: " + SortingComponent.SpriteRenderer.sortingLayerName + " -> " +
+                           sortingLayerName + (!isSortingOrderIdentical ? ", " : "");
+            }
+
+            if (!isSortingOrderIdentical)
+            {
+                message += "Sorting Order: " + SortingComponent.SpriteRenderer.sortingOrder + " -> " +
+                           newSortingOrder;
+            }
 
             Undo.RecordObject(SortingComponent.SpriteRenderer, "apply sorting options");
-            SortingComponent.SpriteRenderer.sortingLayerName = sortingLayerName;
-            SortingComponent.SpriteRenderer.sortingOrder = newSortingOrder;
+            if (!isSortingLayerIdentical)
+            {
+                SortingComponent.SpriteRenderer.sortingLayerName = sortingLayerName;
+            }
+
+            if (!isSortingOrderIdentical)
+            {
+                SortingComponent.SpriteRenderer.sortingOrder = newSortingOrder;
+            }
+
             EditorUtility.SetDirty(SortingComponent.SpriteRenderer);
+
+            Debug.Log(message);
+        }
+
+        private void ApplySortingOptionsToSortingGroup(int newSortingOrder)
+        {
+            if (sortingComponent.SortingGroup == null)
+            {
+                return;
+            }
+
+            var isSortingLayerIdentical = SortingComponent.SortingGroup.sortingLayerName.Equals(sortingLayerName);
+            var isSortingOrderIdentical = SortingComponent.SortingGroup.sortingOrder == newSortingOrder;
+
+            if (isSortingLayerIdentical && isSortingOrderIdentical)
+            {
+                return;
+            }
+
+            var message = "Update sorting options on SortingGroup " + sortingComponent.SortingGroup.name + " - ";
+
+            if (!isSortingLayerIdentical)
+            {
+                message += "Sorting Layer: " + SortingComponent.SortingGroup.sortingLayerName + " -> " +
+                           sortingLayerName + (!isSortingOrderIdentical ? ", " : "");
+            }
+
+            if (!isSortingOrderIdentical)
+            {
+                message += "Sorting Order: " + SortingComponent.SortingGroup.sortingOrder + " -> " +
+                           newSortingOrder;
+            }
+
+
+            Undo.RecordObject(SortingComponent.SortingGroup, "apply sorting options");
+            if (!isSortingLayerIdentical)
+            {
+                SortingComponent.SortingGroup.sortingLayerName = sortingLayerName;
+            }
+
+            if (!isSortingOrderIdentical)
+            {
+                SortingComponent.SortingGroup.sortingOrder = newSortingOrder;
+            }
+
+            EditorUtility.SetDirty(SortingComponent.SortingGroup);
+
+            Debug.Log(message);
         }
 
         public int GetNewSortingOrder()
