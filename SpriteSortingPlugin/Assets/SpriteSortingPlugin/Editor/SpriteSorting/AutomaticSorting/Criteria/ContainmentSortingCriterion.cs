@@ -7,6 +7,9 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
         private ContainmentSortingCriterionData ContainmentSortingCriterionData =>
             (ContainmentSortingCriterionData) sortingCriterionData;
 
+        public bool IsSortingEnclosedSpriteInForeground =>
+            ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground;
+
         public ContainmentSortingCriterion(ContainmentSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {

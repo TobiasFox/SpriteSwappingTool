@@ -14,18 +14,15 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         private List<AutoSortingComponent> resultList;
         private List<SortingComponent> overlappingSortingComponents;
         private SortingComponent baseItem;
-        private ContainmentSortingCriterionData containmentSortingCriterionData;
-        private SortingCriterion<SortingCriterionData> containmentSortingCriterion;
+        private ContainmentSortingCriterion containmentSortingCriterion;
 
-        public void AddSortingCriteria(SortingCriterion<SortingCriterionData> sortingCriterion)
+        public void AddSortingCriterion(SortingCriterion<SortingCriterionData> sortingCriterion)
         {
             sortingCriterias.Add(sortingCriterion);
         }
 
-        public void SetContainmentCriteria(ContainmentSortingCriterionData containmentSortingCriterionData,
-            SortingCriterion<SortingCriterionData> containmentSortingCriterion)
+        public void SetContainmentCriterion(ContainmentSortingCriterion containmentSortingCriterion)
         {
-            this.containmentSortingCriterionData = containmentSortingCriterionData;
             this.containmentSortingCriterion = containmentSortingCriterion;
         }
 
@@ -49,7 +46,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 
             var autoSortingComponents = InitSortingDataList();
 
-            if (containmentSortingCriterionData != null && containmentSortingCriterionData.isActive)
+            if (containmentSortingCriterion != null)
             {
                 AnalyzeContainment(ref autoSortingComponents);
 
@@ -69,7 +66,6 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             resultList.Reverse();
 
             //TODO consider baseItem
-            containmentSortingCriterionData = null;
             containmentSortingCriterion = null;
             return resultList;
         }
@@ -89,7 +85,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     break;
                 }
 
-                var sortInForeground = containmentSortingCriterionData.isSortingEnclosedSpriteInForeground;
+                var sortInForeground = containmentSortingCriterion.IsSortingEnclosedSpriteInForeground;
 
                 if (!sortInForeground)
                 {
