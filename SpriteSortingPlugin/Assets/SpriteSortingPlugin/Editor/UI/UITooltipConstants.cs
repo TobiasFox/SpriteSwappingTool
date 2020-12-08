@@ -140,7 +140,7 @@
             "This value is used to evaluate which points should be removed from the outline. A higher value results in a simpler outline (fewer points). A positive value close to zero results in an outline with little to no reduction. A value of zero has no effect.";
 
         public const string SpriteDataAnalyzingActionDurationTooltip =
-            "Depending on the amount of Sprites to be analyzed this action may take some time.";
+            "The time needed for the analysis is affected by the amount of sprites and whether these sprites are readable. If they are not readable, a temporary copy will be created.";
 
         //-- overlapping item list
         public const string OverlappingItemListBaseItemTooltip =

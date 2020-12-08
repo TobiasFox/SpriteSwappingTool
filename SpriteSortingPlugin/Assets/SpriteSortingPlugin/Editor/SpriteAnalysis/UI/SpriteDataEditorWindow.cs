@@ -315,7 +315,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                             SetAnalyzeOptionsHeightDependingOnFoldoutExpand();
                         }
 
-                        GUILayout.Label(new GUIContent("Analysis might take some time", Styling.InfoIcon,
+                        GUILayout.Label(new GUIContent("Analysis might take some time.", Styling.InfoIcon,
                             UITooltipConstants.SpriteDataAnalyzingActionDurationTooltip), GUILayout.ExpandWidth(false));
                     }
 

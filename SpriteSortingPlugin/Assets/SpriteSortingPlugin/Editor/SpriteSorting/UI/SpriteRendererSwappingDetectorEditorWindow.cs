@@ -409,7 +409,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     {
                         EditorGUI.indentLevel++;
                         EditorGUILayout.LabelField(
-                            new GUIContent("Sprite Data Asset is not used by tool."));
+                            new GUIContent("Sprite Data Asset is not used by Sprite Swapping Detector."));
                         EditorGUI.indentLevel--;
                     }
                     else if (spriteData == null)
