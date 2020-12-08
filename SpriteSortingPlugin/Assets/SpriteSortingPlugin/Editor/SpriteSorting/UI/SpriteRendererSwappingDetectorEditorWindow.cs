@@ -49,7 +49,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private ReordableOverlappingItemList reordableOverlappingItemList;
 
         private bool isAnalyzingWithChangedLayerFirst;
-
+        
+        private bool isSearchingSurroundingSpriteRenderer = true;
         private OverlappingSpriteDetector overlappingSpriteDetector;
         private SpriteDetectionData spriteDetectionData;
 
@@ -288,6 +289,22 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 isAnalyzingWithChangedLayerFirst = EditorGUILayout.ToggleLeft(
                     "Analyse Sprites / Sorting Groups with changed Layer first?", isAnalyzingWithChangedLayerFirst);
+            }
+
+            var surroundingAnalysisToggleContent = new GUIContent(
+                "Is analyzing surrounding SpriteRenderers (recommended)",
+                UITooltipConstants.SortingEditorAnalyzeSurroundingSpriteRendererTooltip);
+
+            isSearchingSurroundingSpriteRenderer = EditorGUILayout.ToggleLeft(surroundingAnalysisToggleContent,
+                isSearchingSurroundingSpriteRenderer);
+
+            if (isSearchingSurroundingSpriteRenderer)
+            {
+                var surroundingAnalysisDurationInfoContent = new GUIContent(
+                    "The following option might take some time and can affect other surrounding SpriteRenderers of the ones listed above.",
+                    Styling.InfoIcon, UITooltipConstants.SortingEditorAnalyzeSurroundingSpriteRendererDurationTooltip);
+                GUILayout.Label(surroundingAnalysisDurationInfoContent,
+                    new GUIStyle(EditorStyles.label) {wordWrap = true});
             }
 
             ShowConfirmButton(out var isConfirmButtonPressed);
