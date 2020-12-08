@@ -638,7 +638,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void ApplySortingOptions()
         {
-            Debug.Log("apply sorting options");
+            // Debug.Log("apply sorting options");
 
             var itemCount = overlappingItems.Items.Count;
             for (var i = 0; i < itemCount; i++)
