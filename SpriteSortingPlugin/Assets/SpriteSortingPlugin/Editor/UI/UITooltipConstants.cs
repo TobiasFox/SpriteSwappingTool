@@ -183,7 +183,8 @@
             "Specify, if either a completely Sorting Layer or a single Sprite is used to identify overlapping SpriteRenderers.";
 
         public const string SortingEditorUsingGameObjectParentsTooltip =
-            "Search for overlapping SpriteRenderer in the given GameObjects only.";
+            "When enabled, only the given GameObject parents are being considered for the analysis.\n" +
+            "Otherwise, all active and enabled SpriteRenderers of all open scenes will be used.";
 
         public const string SortingEditorSingleSpriteRendererTooltip =
             "Select a SpriteRenderer to search for overlapping SpriteRenderers.";

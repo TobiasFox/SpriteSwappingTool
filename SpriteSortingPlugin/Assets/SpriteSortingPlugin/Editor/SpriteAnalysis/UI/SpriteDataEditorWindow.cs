@@ -147,7 +147,10 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                 lastHeight = GUILayoutUtility.GetLastRect().height;
             }
 
-            DrawLeftContentBar(leftBarWidth);
+            using (new EditorGUI.DisabledScope(!hasLoadedSpriteDataAsset))
+            {
+                DrawLeftContentBar(leftBarWidth);
+            }
 
             var rightAreaRect = new Rect(leftBarWidth + RightAreaOffset, lastHeight + RightAreaOffset,
                 position.width - leftBarWidth - RightAreaOffset, position.height - lastHeight - RightAreaOffset);
@@ -917,21 +920,28 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
 
         private void LoadSpriteDataList()
         {
-            if (spriteData == null)
-            {
-                return;
-            }
-
-            hasLoadedSpriteDataAsset = true;
             simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
-            FilterSpriteDataList();
-
             if (originOutlines == null)
             {
                 originOutlines = new Dictionary<string, Vector2[]>();
             }
+            else
+            {
+                originOutlines.Clear();
+            }
 
-            originOutlines.Clear();
+            hasLoadedSpriteDataAsset = spriteData != null;
+
+            if (!hasLoadedSpriteDataAsset)
+            {
+                selectedSpriteDataItem = null;
+                selectedSprite = null;
+                selectedSpriteAspectRatio = 0;
+                ResetSpriteList();
+                return;
+            }
+
+            FilterSpriteDataList();
         }
 
         private void AnalyzeSprites()
