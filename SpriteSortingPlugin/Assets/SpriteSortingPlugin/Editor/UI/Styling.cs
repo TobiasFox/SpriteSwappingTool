@@ -19,6 +19,7 @@ namespace SpriteSortingPlugin.UI
         public static readonly GUIStyle CenteredStyle;
         public static readonly GUIStyle ButtonStyle;
         public static readonly GUIStyle ButtonStyleBold;
+        public static readonly GUIStyle linkStyle;
 
         //light
         private static readonly Color ListElementBackground1Light = new Color(0.83f, 0.83f, 0.83f);
@@ -30,6 +31,7 @@ namespace SpriteSortingPlugin.UI
         private static readonly Color HorizontalLineColorLight = new Color(0.62f, 0.62f, 0.62f, 1f);
         private static readonly Color SpriteDataPreviewSpriteBackgroundColorLight = new Color(1, 1, 1, 0.1216f);
         private static readonly Color SortingEditorPreviewSpriteBackgroundColorLight = new Color(1, 1, 1, 0.7647f);
+        private static readonly Color LinkHighlightingColorLight = new Color(0, 0, 0.9333f, 1f);
 
         private static readonly Color SpriteSortingNoSortingOrderIssuesBackgroundTextureLightColor =
             new Color(0.2094f, 0.8019f, 0.043f, 0.5059f);
@@ -101,6 +103,7 @@ namespace SpriteSortingPlugin.UI
         private static readonly Color ListElementFocussingColorDark = new Color(0.1657f, 0.3355f, 0.4811f, 0.5804f);
         private static readonly Color TransparentBackgroundColorDark = new Color(0.217f, 0.217f, 0.217f, 0.7f);
         private static readonly Color SortingCriteriaHeaderBackgroundColorDark = new Color(0.22f, 0.22f, 0.22f, 0.3f);
+        private static readonly Color LinkHighlightingColorDark = new Color(0.3160f, 0.6925f, 1, 1f);
 
         private static readonly Color SortingCriteriaHeaderInspectorBackgroundColorDark =
             new Color(0.283f, 0.283f, 0.283f, 0.3f);
@@ -179,6 +182,9 @@ namespace SpriteSortingPlugin.UI
         public static Color HorizontalLineColor =>
             EditorGUIUtility.isProSkin ? HorizontalLineColorDark : HorizontalLineColorLight;
 
+        public static Color LinkHighlightingColor =>
+            EditorGUIUtility.isProSkin ? LinkHighlightingColorDark : LinkHighlightingColorLight;
+
         public static Texture2D SpriteSortingPreviewBackgroundTexture =>
             EditorGUIUtility.isProSkin
                 ? SpritePreviewBackgroundTextureDark
@@ -211,6 +217,13 @@ namespace SpriteSortingPlugin.UI
             CenteredStyleBold = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
             CenteredStyle = new GUIStyle(EditorStyles.boldLabel)
                 {alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Normal};
+            linkStyle = new GUIStyle(EditorStyles.label)
+            {
+                normal = {textColor = LinkHighlightingColor},
+                hover = {textColor = LinkHighlightingColor},
+                wordWrap = false,
+                stretchWidth = false
+            };
         }
     }
 }
