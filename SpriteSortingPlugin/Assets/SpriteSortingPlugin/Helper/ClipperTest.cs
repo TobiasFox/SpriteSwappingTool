@@ -14,7 +14,7 @@ namespace SpriteSortingPlugin.Helper
         public PolygonCollider2D outputCollider;
         public SpriteRenderer[] spriteRenderers;
         public SpriteData spriteData;
-        public PolygonCollider2D surfaceCollider;
+        public PolygonCollider2D areaCollider;
 
         public void ColliderIntersection()
         {
@@ -165,12 +165,12 @@ namespace SpriteSortingPlugin.Helper
             return path;
         }
 
-        public void CalculateSurfaceArea()
+        public void CalculateArea()
         {
-            var path = GenerateColliderPath(surfaceCollider);
-            var surface = Math.Abs(Clipper.Area(path));
-            surface /= ScaleFactor * ScaleFactor;
-            Debug.Log(surface);
+            var path = GenerateColliderPath(areaCollider);
+            var area = Math.Abs(Clipper.Area(path));
+            area /= ScaleFactor * ScaleFactor;
+            Debug.Log(area);
         }
     }
 
@@ -193,9 +193,9 @@ namespace SpriteSortingPlugin.Helper
                 clipperTest.ColliderIntersection();
             }
 
-            if (GUILayout.Button("Surface"))
+            if (GUILayout.Button("Area"))
             {
-                clipperTest.CalculateSurfaceArea();
+                clipperTest.CalculateArea();
             }
         }
     }

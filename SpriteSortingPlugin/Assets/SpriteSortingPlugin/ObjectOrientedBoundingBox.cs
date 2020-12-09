@@ -294,7 +294,7 @@ namespace SpriteSortingPlugin
             axes[1] = Vector2.Perpendicular(points[0] - points[1]);
         }
 
-        public float GetSurfaceArea()
+        public float GetArea()
         {
             return boundsSize.x * lastGlobalScale.x * boundsSize.y * lastGlobalScale.y;
         }

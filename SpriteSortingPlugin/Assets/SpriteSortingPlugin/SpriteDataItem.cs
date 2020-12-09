@@ -35,10 +35,10 @@ namespace SpriteSortingPlugin
         //https://answers.unity.com/questions/684909/how-to-calculate-the-surface-area-of-a-irregular-p.html
         public float CalculatePolygonArea(Transform polygonTransform)
         {
-            float surfaceArea = 0;
+            float area = 0;
             if (!IsValidOutline())
             {
-                return surfaceArea;
+                return area;
             }
 
             for (var i = 0; i < outlinePoints.Length; i++)
@@ -48,11 +48,11 @@ namespace SpriteSortingPlugin
 
                 var mulA = point1.x * point2.y;
                 var mulB = point2.x * point1.y;
-                surfaceArea += (mulA - mulB);
+                area += (mulA - mulB);
             }
 
-            surfaceArea *= 0.5f;
-            return Mathf.Abs(surfaceArea);
+            area *= 0.5f;
+            return Mathf.Abs(area);
         }
     }
 }
