@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using SpriteSortingPlugin.UI;
+using UnityEditor;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI
@@ -26,6 +27,22 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             isActive = GUI.Toggle(toggleRect, isActive, GUIContent.none);
 
             return isActive;
+        }
+
+        public static void DrawHorizontalLine(bool isBig = false)
+        {
+            var rect = GUILayoutUtility.GetRect(1f, isBig ? 1.5f : 1.25f);
+
+            // Splitter rect should be full-width
+            // rect.xMin = 0f;
+            // rect.width += 4f;
+
+            if (Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
+            EditorGUI.DrawRect(rect, Styling.HorizontalLineColor);
         }
     }
 }

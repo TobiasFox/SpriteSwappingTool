@@ -62,7 +62,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
         private List<OriginOutlineWrapper> serializedOutlines;
         private SimplifiedOutlineToleranceErrorAppearance simplifiedOutlineToleranceErrorAppearance;
 
-        [MenuItem("Window/Sprite Data Analysis %e")]
+
+        [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/" + GeneralData.DataAnalysisName +
+                  " " + GeneralData.DataAnalysisShortcut, false, 1)]
         public static void ShowWindow()
         {
             var window = GetWindow<SpriteDataEditorWindow>();
