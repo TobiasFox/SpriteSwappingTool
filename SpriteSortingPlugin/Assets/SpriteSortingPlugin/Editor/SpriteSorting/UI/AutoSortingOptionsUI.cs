@@ -92,7 +92,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     GUI.enabled = isGUIEnabled;
                 }
 
-                DrawHorizontalLine(true);
+                UIUtil.DrawHorizontalLine(true);
                 var isMinOneSortingCriterionEditorDrawn = false;
 
                 for (var i = 0; i < sortingCriteriaComponents.Count; i++)
@@ -107,13 +107,13 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     isMinOneSortingCriterionEditorDrawn = true;
                     if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
                     {
-                        DrawHorizontalLine();
+                        UIUtil.DrawHorizontalLine();
                     }
                 }
 
                 if (isMinOneSortingCriterionEditorDrawn)
                 {
-                    DrawHorizontalLine(true);
+                    UIUtil.DrawHorizontalLine(true);
                 }
 
                 var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
@@ -372,22 +372,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
             sortingCriteriaComponent.sortingCriterionData.isActive = true;
             sortingCriteriaComponents[index] = sortingCriteriaComponent;
-        }
-
-        private void DrawHorizontalLine(bool isBig = false)
-        {
-            var rect = GUILayoutUtility.GetRect(1f, isBig ? 1.5f : 1.25f);
-
-            // Splitter rect should be full-width
-            // rect.xMin = 0f;
-            // rect.width += 4f;
-
-            if (Event.current.type != EventType.Repaint)
-            {
-                return;
-            }
-
-            EditorGUI.DrawRect(rect, Styling.HorizontalLineColor);
         }
     }
 }
