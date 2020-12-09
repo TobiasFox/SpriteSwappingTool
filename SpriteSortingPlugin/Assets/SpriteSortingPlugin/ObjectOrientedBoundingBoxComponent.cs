@@ -73,9 +73,9 @@ namespace SpriteSortingPlugin
             Gizmos.DrawLine(oobbPoints[3], oobbPoints[0]);
         }
 
-        public void TestSurfaceArea()
+        public void TestArea()
         {
-            Debug.Log(oobb.GetSurfaceArea());
+            Debug.Log(oobb.GetArea());
         }
     }
 
@@ -92,9 +92,9 @@ namespace SpriteSortingPlugin
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            if (GUILayout.Button("surfaceArea"))
+            if (GUILayout.Button("Area"))
             {
-                targetObject.TestSurfaceArea();
+                targetObject.TestArea();
             }
         }
 

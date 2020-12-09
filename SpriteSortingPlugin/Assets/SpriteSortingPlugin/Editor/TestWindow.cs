@@ -1,27 +1,30 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-public class TestWindow : EditorWindow
+namespace SpriteSortingPlugin
 {
-    private int counter;
-
-    private void OnGUI()
+    public class TestWindow : EditorWindow
     {
-        EditorGUI.BeginChangeCheck();
+        private int counter;
 
-        var counterPosition = new Rect(0, 0, 300, 20);
-        counter = EditorGUI.IntField(counterPosition, "Counter", counter);
-
-        if (EditorGUI.EndChangeCheck())
+        private void OnGUI()
         {
-            Debug.Log("counter has changed");
-        }
-    }
+            EditorGUI.BeginChangeCheck();
 
-    [MenuItem("Window/TestWindow %t")]
-    public static void ShowWindow()
-    {
-        var window = GetWindow<TestWindow>();
-        window.Show();
+            var counterPosition = new Rect(0, 0, 300, 20);
+            counter = EditorGUI.IntField(counterPosition, "Counter", counter);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Debug.Log("counter has changed");
+            }
+        }
+
+        [MenuItem("Window/TestWindow %t")]
+        public static void ShowWindow()
+        {
+            var window = GetWindow<TestWindow>();
+            window.Show();
+        }
     }
 }
