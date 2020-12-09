@@ -196,7 +196,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 alignment = TextAnchor.MiddleCenter, wordWrap = true
             };
             var descriptionLabelContent = new GUIContent(
-                "This tool identifies and helps to sort overlapping and unsorted SpriteRenderers, since such renderers often lead to an unwanted swap.",
+                "This tool identifies and helps to sort overlapping and unsorted SpriteRenderers, since such renderers often lead to unwanted Sprite swaps.",
                 UITooltipConstants.SortingEditorSpriteSwapDescriptionTooltip);
 
             GUILayout.Label(descriptionLabelContent, descriptionLabelStyle, GUILayout.ExpandWidth(true));
@@ -516,14 +516,19 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     lastConfiguredTransparencySortMode = GraphicsSettings.transparencySortMode;
                 }
 
-                using (new EditorGUI.DisabledScope(true))
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    EditorGUIUtility.labelWidth = 350;
-                    EditorGUILayout.LabelField(
-                        new GUIContent("Transparency Sort Mode (Change via Project Settings):",
-                            UITooltipConstants.SortingEditorTransparencySortModeTooltip),
-                        new GUIContent(lastConfiguredTransparencySortMode.ToString()));
-                    EditorGUIUtility.labelWidth = 0;
+                    using (new EditorGUI.DisabledScope(true))
+                    {
+                        EditorGUILayout.LabelField(new GUIContent("Transparency Sort Mode:",
+                                UITooltipConstants.SortingEditorTransparencySortModeTooltip),
+                            new GUIContent(lastConfiguredTransparencySortMode.ToString()));
+                    }
+
+                    if (GUILayout.Button("Open Project Settings to change", GUILayout.ExpandWidth(false)))
+                    {
+                        SettingsService.OpenProjectSettings("Project/Graphics");
+                    }
                 }
 
                 EditorGUI.indentLevel++;
