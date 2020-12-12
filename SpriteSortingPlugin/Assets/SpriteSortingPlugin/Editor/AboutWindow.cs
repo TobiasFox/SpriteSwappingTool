@@ -58,7 +58,7 @@ namespace SpriteSortingPlugin
         private void LinkButton(string buttonName, string url)
         {
             var buttonContent = new GUIContent(buttonName);
-            var linkStyle = Styling.linkStyle;
+            var linkStyle = Styling.LinkStyle;
             var rect = EditorGUI.IndentedRect(GUILayoutUtility.GetLastRect());
             rect.y += EditorGUIUtility.singleLineHeight;
             var isLinkClicked = GUI.Button(rect, buttonContent, linkStyle);

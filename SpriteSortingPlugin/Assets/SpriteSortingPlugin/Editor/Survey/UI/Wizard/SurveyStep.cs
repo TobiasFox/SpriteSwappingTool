@@ -22,5 +22,10 @@
         public abstract void Rollback();
 
         public abstract void DrawContent();
+
+        public virtual void CleanUp()
+        {
+            
+        }
     }
 }

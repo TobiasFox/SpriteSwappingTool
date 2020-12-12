@@ -14,25 +14,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public int CurrentProgress
         {
-            get
-            {
-                var progress = 0;
-                for (var i = 0; i < currentSurveyStepIndex; i++)
-                {
-                    var surveyStep = steps[currentSurveyStepIndex];
-
-                    if (surveyStep is SurveyStepGroup surveyStepGroup)
-                    {
-                        progress += surveyStepGroup.CurrentProgress;
-                    }
-                    else
-                    {
-                        progress++;
-                    }
-                }
-
-                return progress;
-            }
+            get { return currentProgress; }
         }
 
         public void Forward()
@@ -49,6 +31,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 currentSurveyStepIndex++;
             }
+
+            UpdateCurrentProgress();
         }
 
         public void Backward()
@@ -65,18 +49,52 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 currentSurveyStepIndex--;
             }
+
+            UpdateCurrentProgress();
         }
 
         public SurveyStep GetCurrent()
         {
+            if (steps == null || currentSurveyStepIndex < 0 || currentSurveyStepIndex >= steps.Count)
+            {
+                return null;
+            }
+
             return steps[currentSurveyStepIndex];
+        }
+
+        public bool HasNextStep()
+        {
+            if (steps == null)
+            {
+                return false;
+            }
+
+            return currentSurveyStepIndex + 1 < steps.Count;
+        }
+
+        public bool HasPreviousStep()
+        {
+            if (steps == null)
+            {
+                return false;
+            }
+
+            return currentSurveyStepIndex > 0;
         }
 
         public void SetSurveySteps(List<SurveyStep> steps)
         {
+            if (steps == null || steps.Count == 0)
+            {
+                return;
+            }
+
             this.steps = steps;
 
+            currentSurveyStepIndex = 0;
             overallProgress = 0;
+            UpdateCurrentProgress();
             if (surveyStepGroups == null)
             {
                 surveyStepGroups = new List<SurveyStepGroup>();
@@ -99,6 +117,19 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 }
             }
         }
+        
+        public void CleanUp()
+        {
+            if (steps == null)
+            {
+                return;
+            }
+
+            foreach (var surveyStep in steps)
+            {
+                surveyStep.CleanUp();
+            }
+        }
 
         public List<SurveyStep> GetSurveySteps()
         {
@@ -108,6 +139,30 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public List<SurveyStepGroup> GetSurveyStepGroups()
         {
             return surveyStepGroups;
+        }
+
+        private void UpdateCurrentProgress()
+        {
+            if (steps == null || steps.Count == 0)
+            {
+                currentProgress = 0;
+                return;
+            }
+
+            currentProgress = 1;
+            for (var i = 0; i < currentSurveyStepIndex; i++)
+            {
+                var surveyStep = steps[currentSurveyStepIndex];
+
+                if (surveyStep is SurveyStepGroup surveyStepGroup)
+                {
+                    currentProgress += surveyStepGroup.CurrentProgress;
+                }
+                else
+                {
+                    currentProgress++;
+                }
+            }
         }
     }
 }

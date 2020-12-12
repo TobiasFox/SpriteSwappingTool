@@ -19,7 +19,8 @@ namespace SpriteSortingPlugin.UI
         public static readonly GUIStyle CenteredStyle;
         public static readonly GUIStyle ButtonStyle;
         public static readonly GUIStyle ButtonStyleBold;
-        public static readonly GUIStyle linkStyle;
+        public static readonly GUIStyle LinkStyle;
+        public static readonly GUIStyle LabelWrapStyle;
 
         //light
         private static readonly Color ListElementBackground1Light = new Color(0.83f, 0.83f, 0.83f);
@@ -217,13 +218,14 @@ namespace SpriteSortingPlugin.UI
             CenteredStyleBold = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
             CenteredStyle = new GUIStyle(EditorStyles.boldLabel)
                 {alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Normal};
-            linkStyle = new GUIStyle(EditorStyles.label)
+            LinkStyle = new GUIStyle(EditorStyles.label)
             {
                 normal = {textColor = LinkHighlightingColor},
                 hover = {textColor = LinkHighlightingColor},
                 wordWrap = false,
                 stretchWidth = false
             };
+            LabelWrapStyle = new GUIStyle(EditorStyles.label) {wordWrap = true};
         }
     }
 }
