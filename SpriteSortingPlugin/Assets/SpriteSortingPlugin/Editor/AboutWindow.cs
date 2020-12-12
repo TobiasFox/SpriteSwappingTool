@@ -7,7 +7,7 @@ namespace SpriteSortingPlugin
 {
     public class AboutWindow : EditorWindow
     {
-        [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/About %g", false, 3)]
+        [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/About", false, 3)]
         public static void ShowWindow()
         {
             var window = GetWindow<AboutWindow>();

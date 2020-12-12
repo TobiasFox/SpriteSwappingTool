@@ -35,7 +35,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 originIndexComparer = new OverlappingItemIndexComparer();
             }
 
-            ArrayList.Adapter(items).Sort(originIndexComparer);
+            items.Sort(originIndexComparer);
 
             InitOverlappingItems(true);
         }
@@ -137,7 +137,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 overlappingItemIdentityComparer = new OverlappingItemIdentityComparer();
             }
 
-            ArrayList.Adapter(items).Sort(overlappingItemIdentityComparer);
+            items.Sort(overlappingItemIdentityComparer);
 
             newIndexInList = items.IndexOf(element);
             UpdateSurroundingItems(newIndexInList);

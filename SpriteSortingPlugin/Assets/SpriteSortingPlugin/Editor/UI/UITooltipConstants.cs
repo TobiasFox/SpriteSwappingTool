@@ -249,5 +249,9 @@
 
         public const string SortingEditorAnalyzeSurroundingSpriteRendererDurationTooltip =
             "As this check analyzes surrounding SpriteRenderers it can affect many SpriteRenderers depending on the setups of opened scenes.";
+        
+        public const string SortingEditorAnalyzeSRorSGWithChangedLayerFirstTooltip =
+            "When enabled, SpriteRenderers or Sorting Groups with changed Sorting Layers will be analyzed regarding Sprite sorting issues first.\n" +
+            "Functionality is not implemented yet.";
     }
 }

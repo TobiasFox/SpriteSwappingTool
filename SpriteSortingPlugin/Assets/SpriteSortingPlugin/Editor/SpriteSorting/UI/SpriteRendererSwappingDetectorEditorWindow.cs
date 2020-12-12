@@ -5,7 +5,6 @@ using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
 using SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection;
-using SpriteSortingPlugin.SpriteSorting.UI.AutoSorting;
 using SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites;
 using SpriteSortingPlugin.SpriteSorting.UI.Preview;
 using SpriteSortingPlugin.UI;
@@ -89,7 +88,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             autoSortingOptionsUI = new AutoSortingOptionsUI();
             autoSortingOptionsUI.Init();
         }
-
 
         private void SelectDefaultSpriteAlphaData()
         {
@@ -287,11 +285,17 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EditorGUILayout.Space();
 
-            if (overlappingItems.HasChangedLayer)
-            {
-                isAnalyzingWithChangedLayerFirst = EditorGUILayout.ToggleLeft(
-                    "Analyse Sprites / Sorting Groups with changed Layer first?", isAnalyzingWithChangedLayerFirst);
-            }
+            //TODO analyze renderers or sorting groups with changed sorting layers first
+            // if (overlappingItems.HasChangedLayer)
+            // {
+            //     using (new EditorGUI.DisabledScope(true))
+            //     {
+            //         isAnalyzingWithChangedLayerFirst = EditorGUILayout.ToggleLeft(
+            //             new GUIContent("Analyse Sprites / Sorting Groups with changed Layer first?",
+            //                 UITooltipConstants.SortingEditorAnalyzeSRorSGWithChangedLayerFirstTooltip),
+            //             isAnalyzingWithChangedLayerFirst);
+            //     }
+            // }
 
             var surroundingAnalysisToggleContent = new GUIContent(
                 "Is analyzing surrounding SpriteRenderers (recommended)",
