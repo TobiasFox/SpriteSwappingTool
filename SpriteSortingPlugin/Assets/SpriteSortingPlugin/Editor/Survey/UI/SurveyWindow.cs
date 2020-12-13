@@ -19,6 +19,7 @@ namespace SpriteSortingPlugin.Survey.UI
         private Vector2 contentScrollPosition = Vector2.zero;
         private float lastHeaderHeight;
         private float lastFooterHeight;
+        private SurveyStep currentStep;
 
         [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/Survey %g", false, 2)]
         public static void ShowWindow()
@@ -36,6 +37,7 @@ namespace SpriteSortingPlugin.Survey.UI
 
             surveyWizard = new SurveyWizard();
             surveyWizard.SetSurveySteps(surveyStepGenerator.GenerateSurveySteps());
+            currentStep = surveyWizard.GetCurrent();
         }
 
         private void OnGUI()
@@ -67,6 +69,7 @@ namespace SpriteSortingPlugin.Survey.UI
 
                 DrawFooter();
 
+                EditorGUILayout.Space(5);
                 if (currentEventType == EventType.Repaint)
                 {
                     lastFooterHeight = footerScope.rect.height;
@@ -82,7 +85,12 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void DrawHeader()
         {
-            GUILayout.Label(surveyWizard.GetCurrent().Name, Styling.CenteredStyle);
+            if (currentStep == null)
+            {
+                return;
+            }
+
+            GUILayout.Label(currentStep.Name, Styling.CenteredStyle);
         }
 
         private void DrawProgressBars()
@@ -103,7 +111,7 @@ namespace SpriteSortingPlugin.Survey.UI
                     ")");
 
                 var surveyGroups = surveyWizard.GetSurveyStepGroups();
-                if (surveyGroups.Count <= 0)
+                if (surveyGroups == null || surveyGroups.Count <= 0)
                 {
                     return;
                 }
@@ -135,6 +143,11 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void DrawSurveyStepContent()
         {
+            if (currentStep == null)
+            {
+                return;
+            }
+
             var remainingContentHeight = position.height - lastHeaderHeight - lastFooterHeight;
 
             using (var scrollScope =
@@ -143,7 +156,7 @@ namespace SpriteSortingPlugin.Survey.UI
                 contentScrollPosition = scrollScope.scrollPosition;
                 using (new GUILayout.VerticalScope(GUILayout.ExpandHeight(true)))
                 {
-                    surveyWizard.GetCurrent()?.DrawContent();
+                    currentStep.DrawContent();
                 }
             }
         }
@@ -159,9 +172,13 @@ namespace SpriteSortingPlugin.Survey.UI
 
                 if (!surveyWizard.HasPreviousStep())
                 {
-                    if (GUILayout.Button("Start", buttonStyle, heightLayout))
+                    using (new EditorGUI.DisabledScope(currentStep == null))
                     {
-                        surveyWizard.Forward();
+                        if (GUILayout.Button("Start", buttonStyle, heightLayout))
+                        {
+                            surveyWizard.Forward();
+                            currentStep = surveyWizard.GetCurrent();
+                        }
                     }
                 }
                 else
@@ -169,6 +186,7 @@ namespace SpriteSortingPlugin.Survey.UI
                     if (GUILayout.Button("<-- Back", buttonStyle, heightLayout))
                     {
                         surveyWizard.Backward();
+                        currentStep = surveyWizard.GetCurrent();
                     }
 
                     GUILayout.Space(10);
@@ -177,6 +195,7 @@ namespace SpriteSortingPlugin.Survey.UI
                         if (GUILayout.Button("Next -->", buttonStyle, heightLayout))
                         {
                             surveyWizard.Forward();
+                            currentStep = surveyWizard.GetCurrent();
                         }
                     }
                 }
