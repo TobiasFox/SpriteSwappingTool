@@ -74,10 +74,11 @@ namespace SpriteSortingPlugin.Survey.UI
                     EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight,
                         GUILayout.ExpandWidth(true));
                 var tempCurrentProgress = surveyWizard.CurrentProgress;
-                var progressPercentage = tempCurrentProgress / surveyWizard.OverallProgress;
+                var progressPercentage = tempCurrentProgress / (float) surveyWizard.OverallProgress;
 
                 EditorGUI.ProgressBar(overallProgressBarRect, progressPercentage,
-                    tempCurrentProgress + "/" + surveyWizard.OverallProgress);
+                    (progressPercentage * 100) + "% (" + tempCurrentProgress + "/" + surveyWizard.OverallProgress +
+                    ")");
 
                 var surveyGroups = surveyWizard.GetSurveyStepGroups();
                 if (surveyGroups.Count <= 0)
@@ -95,10 +96,16 @@ namespace SpriteSortingPlugin.Survey.UI
                 for (var i = 0; i < surveyGroups.Count; i++)
                 {
                     var surveyGroup = surveyGroups[i];
-                    var surveyGroupCurrentProgress = surveyGroup.CurrentProgress / (float) surveyGroup.OverallProgress;
+
+                    var tempGroupProgress = surveyGroup.CurrentProgress;
+                    var surveyGroupCurrentProgress = tempGroupProgress / (float) surveyGroup.OverallProgress;
+
+                    var displayText = "Part " + (i + 1) + ": " + surveyGroup.Name + ", " +
+                                      (surveyGroupCurrentProgress * 100) + "% (" + tempGroupProgress + "/" +
+                                      surveyGroup.OverallProgress + ")";
+
                     EditorGUI.ProgressBar(groupProgressBarsRect, surveyGroupCurrentProgress,
-                        "Part " + (i + 1) + ": " + surveyGroup.Name + ", " + surveyGroup.CurrentProgress + "/" +
-                        surveyGroup.OverallProgress);
+                        displayText);
                     groupProgressBarsRect.x += groupProgressBarsRect.width + SpaceBetweenGroupProgressBars;
                 }
             }
@@ -108,7 +115,7 @@ namespace SpriteSortingPlugin.Survey.UI
         {
             using (new GUILayout.VerticalScope(GUILayout.ExpandHeight(true)))
             {
-                surveyWizard.GetCurrent().DrawContent();
+                surveyWizard.GetCurrent()?.DrawContent();
             }
         }
 
@@ -120,27 +127,34 @@ namespace SpriteSortingPlugin.Survey.UI
                 var heightLayout = GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.25f);
                 buttonStyle.fontSize++;
                 GUILayout.Space(10);
-                using (new EditorGUI.DisabledScope(!surveyWizard.HasPreviousStep()))
+
+                if (!surveyWizard.HasPreviousStep())
+                {
+                    if (GUILayout.Button("Start", buttonStyle, heightLayout))
+                    {
+                        surveyWizard.Forward();
+                    }
+                }
+                else
                 {
                     if (GUILayout.Button("<-- Back", buttonStyle, heightLayout))
                     {
                         surveyWizard.Backward();
                     }
-                }
 
-                GUILayout.Space(10);
-                using (new EditorGUI.DisabledScope(!surveyWizard.HasNextStep()))
-                {
-                    if (GUILayout.Button("Next -->", buttonStyle, heightLayout))
+                    GUILayout.Space(10);
+                    using (new EditorGUI.DisabledScope(!surveyWizard.HasNextStep()))
                     {
-                        surveyWizard.Forward();
+                        if (GUILayout.Button("Next -->", buttonStyle, heightLayout))
+                        {
+                            surveyWizard.Forward();
+                        }
                     }
                 }
 
                 GUILayout.Space(10);
             }
         }
-
 
         private void DrawFooter()
         {

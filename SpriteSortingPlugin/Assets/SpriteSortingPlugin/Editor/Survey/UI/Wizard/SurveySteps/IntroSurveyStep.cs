@@ -17,11 +17,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public override void Commit()
         {
+            base.Commit();
             Debug.Log("Intro completed");
+            Finish(SurveyFinishState.Succeeded);
         }
 
         public override void Rollback()
         {
+            base.Rollback();
             Debug.Log("rollback Intro");
         }
 

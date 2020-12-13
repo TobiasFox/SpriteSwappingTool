@@ -27,9 +27,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var surveyStep = steps[currentSurveyStepIndex];
             surveyStep.Commit();
 
-            if (!(surveyStep is SurveyStepGroup) && currentSurveyStepIndex < steps.Count)
+            if (surveyStep is SurveyStepGroup surveyStepGroup &&
+                !surveyStepGroup.IsFinished)
             {
-                currentSurveyStepIndex++;
+                surveyStepGroup.Forward();
+            }
+            else
+            {
+                if (currentSurveyStepIndex + 1 < steps.Count)
+                {
+                    currentSurveyStepIndex++;
+                    steps[currentSurveyStepIndex].Start();
+                }
             }
 
             UpdateCurrentProgress();
@@ -45,9 +54,17 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var surveyStep = steps[currentSurveyStepIndex];
             surveyStep.Rollback();
 
-            if (!(surveyStep is SurveyStepGroup) && currentSurveyStepIndex < steps.Count)
+            if (surveyStep is SurveyStepGroup surveyStepGroup && surveyStepGroup.HasPreviousStep())
             {
-                currentSurveyStepIndex--;
+                surveyStepGroup.Backward();
+            }
+            else
+            {
+                if (currentSurveyStepIndex > 0)
+                {
+                    currentSurveyStepIndex--;
+                    steps[currentSurveyStepIndex].Start();
+                }
             }
 
             UpdateCurrentProgress();
@@ -70,6 +87,16 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 return false;
             }
 
+            var currentStep = steps[currentSurveyStepIndex];
+
+            if (currentStep is SurveyStepGroup surveyStepGroup)
+            {
+                if (!surveyStepGroup.IsFinished)
+                {
+                    return true;
+                }
+            }
+
             return currentSurveyStepIndex + 1 < steps.Count;
         }
 
@@ -78,6 +105,16 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             if (steps == null)
             {
                 return false;
+            }
+
+            var currentStep = steps[currentSurveyStepIndex];
+
+            if (currentStep is SurveyStepGroup surveyStepGroup)
+            {
+                if (surveyStepGroup.HasPreviousStep())
+                {
+                    return true;
+                }
             }
 
             return currentSurveyStepIndex > 0;
@@ -91,6 +128,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             this.steps = steps;
+            this.steps[0].Start();
 
             currentSurveyStepIndex = 0;
             overallProgress = 0;
@@ -117,7 +155,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 }
             }
         }
-        
+
         public void CleanUp()
         {
             if (steps == null)
@@ -143,16 +181,19 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void UpdateCurrentProgress()
         {
+            currentProgress = 0;
+
             if (steps == null || steps.Count == 0)
             {
-                currentProgress = 0;
                 return;
             }
 
-            currentProgress = 1;
-            for (var i = 0; i < currentSurveyStepIndex; i++)
+            foreach (var surveyStep in steps)
             {
-                var surveyStep = steps[currentSurveyStepIndex];
+                if (!surveyStep.IsStarted)
+                {
+                    continue;
+                }
 
                 if (surveyStep is SurveyStepGroup surveyStepGroup)
                 {
