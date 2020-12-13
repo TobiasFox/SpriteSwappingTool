@@ -16,6 +16,9 @@ namespace SpriteSortingPlugin.Survey.UI
         private SurveyWizard surveyWizard;
         private SurveyStepGenerator surveyStepGenerator;
         private float currentProgress;
+        private Vector2 contentScrollPosition = Vector2.zero;
+        private float lastHeaderHeight;
+        private float lastFooterHeight;
 
         [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/Survey %g", false, 2)]
         public static void ShowWindow()
@@ -37,20 +40,38 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void OnGUI()
         {
-            GUILayout.Label(GeneralData.Name + " Survey", Styling.CenteredStyleBold);
+            var currentEventType = Event.current.type;
 
-            DrawProgressBars();
-            DrawHeader();
+            using (var headerScope = new EditorGUILayout.VerticalScope())
+            {
+                GUILayout.Label(GeneralData.Name + " Survey", Styling.CenteredStyleBold);
 
-            EditorGUILayout.Space(10);
+                DrawProgressBars();
+                DrawHeader();
+
+                EditorGUILayout.Space(10);
+
+                if (currentEventType == EventType.Repaint)
+                {
+                    lastHeaderHeight = headerScope.rect.height;
+                }
+            }
 
             DrawSurveyStepContent();
 
-            DrawNavigationButtons();
+            using (var footerScope = new EditorGUILayout.VerticalScope())
+            {
+                DrawNavigationButtons();
 
-            EditorGUILayout.Space(20);
+                EditorGUILayout.Space(20);
 
-            DrawFooter();
+                DrawFooter();
+
+                if (currentEventType == EventType.Repaint)
+                {
+                    lastFooterHeight = footerScope.rect.height;
+                }
+            }
 
             // if (GUILayout.Button("Generate and send "))
             // {
@@ -114,9 +135,16 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void DrawSurveyStepContent()
         {
-            using (new GUILayout.VerticalScope(GUILayout.ExpandHeight(true)))
+            var remainingContentHeight = position.height - lastHeaderHeight - lastFooterHeight;
+
+            using (var scrollScope =
+                new EditorGUILayout.ScrollViewScope(contentScrollPosition, GUILayout.Height(remainingContentHeight)))
             {
-                surveyWizard.GetCurrent()?.DrawContent();
+                contentScrollPosition = scrollScope.scrollPosition;
+                using (new GUILayout.VerticalScope(GUILayout.ExpandHeight(true)))
+                {
+                    surveyWizard.GetCurrent()?.DrawContent();
+                }
             }
         }
 
