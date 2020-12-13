@@ -7,10 +7,13 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class GeneralQuestions2 : SurveyStep
     {
+        private const int QuestionCounterStart = 5;
+
         private GeneralQuestionsData data;
         private float space = 17.5f;
         private float previewHeight = 150;
         private SurveyPreview preview;
+        private int questionCounter;
 
         public GeneralQuestions2(string name, GeneralQuestionsData data) : base(name)
         {
@@ -20,24 +23,49 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public override void DrawContent()
         {
+            questionCounter = QuestionCounterStart;
             EditorGUI.indentLevel++;
 
-            DrawQuestion1();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion1();
+                questionCounter++;
+            }
 
             EditorGUILayout.Space(space);
-            DrawQuestion2();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion2();
+                questionCounter++;
+            }
 
             EditorGUILayout.Space(space);
-            DrawQuestion3();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion3();
+                questionCounter++;
+            }
 
             EditorGUILayout.Space(space);
-            DrawQuestion4();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion4();
+                questionCounter++;
+            }
 
             EditorGUILayout.Space(space);
-            DrawQuestion5();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion5();
+                questionCounter++;
+            }
 
             EditorGUILayout.Space(space);
-            DrawQuestion6();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion6();
+                questionCounter++;
+            }
 
             EditorGUI.indentLevel--;
         }
@@ -49,8 +77,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion1()
         {
-            EditorGUILayout.LabelField(
-                "1. Do you already know the effect of visual glitches, where the order of Sprites to be rendered can swap? (see preview)",
+            EditorGUILayout.LabelField(questionCounter +
+                                       ". Do you already know the effect of visual glitches, where the order of Sprites to be rendered can swap? (see preview)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
@@ -68,8 +96,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion2()
         {
-            EditorGUILayout.LabelField(
-                "2. What do you think can cause such visual glitches?",
+            EditorGUILayout.LabelField(questionCounter + ". What do you think can cause such visual glitches?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
@@ -85,8 +112,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion3()
         {
-            EditorGUILayout.LabelField(
-                "3. Have you been working on 2D Unity applications where such visual glitches have happened?",
+            EditorGUILayout.LabelField(questionCounter +
+                                       ". Have you been working on 2D Unity applications where such visual glitches have happened?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
@@ -102,7 +129,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion4()
         {
-            EditorGUILayout.LabelField("4. If yes, how many?", Styling.QuestionLabelStyle);
+            EditorGUILayout.LabelField(questionCounter + ". If yes, how many?", Styling.QuestionLabelStyle);
             EditorGUI.indentLevel += 2;
 
             var selectionGrid =
@@ -121,7 +148,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion5()
         {
-            EditorGUILayout.LabelField("4. If yes, was there a solution found for these visual glitches?",
+            EditorGUILayout.LabelField(
+                questionCounter + ". If yes, was there a solution found for these visual glitches?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel += 2;
 
@@ -140,7 +168,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion6()
         {
-            EditorGUILayout.LabelField("4. If yes, how were these visual glitches been solved?",
+            EditorGUILayout.LabelField(questionCounter + ". If yes, how were these visual glitches been solved?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel += 3;
 

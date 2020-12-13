@@ -19,16 +19,16 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             // surveySteps.Add(generalQuestions2);
 
 
-            // var introStep = new IntroSurveyStep("Intro");
-            // surveySteps.Add(introStep);
-            // var introStep2 = new IntroSurveyStep2("Intro");
-            // surveySteps.Add(introStep2);
-            //
-            // {
-            //     var list = new List<SurveyStep>() {generalQuestions1, generalQuestions2};
-            //     var group = new SurveyStepGroup(list, "General Questions");
-            //     surveySteps.Add(group);
-            // }
+            var introStep = new IntroSurveyStep("Intro");
+            surveySteps.Add(introStep);
+            var introStep2 = new IntroSurveyStep2("Intro");
+            surveySteps.Add(introStep2);
+            
+            {
+                var list = new List<SurveyStep>() {generalQuestions1, generalQuestions2};
+                var group = new SurveyStepGroup(list, "General Questions");
+                surveySteps.Add(group);
+            }
 
             // {
             //     var list = new List<SurveyStep>() {new IntroSurveyStep("Intro"), new IntroSurveyStep2("Intro")};

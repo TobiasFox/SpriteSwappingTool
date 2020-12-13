@@ -8,8 +8,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class GeneralQuestions1 : SurveyStep
     {
+        private const int QuestionCounterStart = 1;
+        
         private GeneralQuestionsData data;
         private float space = 17.5f;
+        private int questionCounter;
 
         public GeneralQuestions1(string name, GeneralQuestionsData data) : base(name)
         {
@@ -18,24 +21,43 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public override void DrawContent()
         {
+            questionCounter = QuestionCounterStart;
             EditorGUI.indentLevel++;
 
-            DrawQuestion1();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion1();
+                questionCounter++;
+            }
 
             EditorGUILayout.Space(space);
-            DrawQuestion2();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion2();
+                questionCounter++;
+            }
 
             EditorGUILayout.Space(space);
-            DrawQuestion3();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion3();
+                questionCounter++;
+            }
 
             EditorGUILayout.Space(space);
-            DrawQuestion4();
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                DrawQuestion4();
+                questionCounter++;
+            }
+
             EditorGUI.indentLevel--;
         }
 
         private void DrawQuestion1()
         {
-            EditorGUILayout.LabelField("1. How are you related to the development of games? (multi-choice)",
+            EditorGUILayout.LabelField(questionCounter +
+                                       ". How are you related to the development of games? (multi-choice)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
@@ -92,7 +114,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawQuestion2()
         {
             EditorGUILayout.LabelField(
-                "2. If you develop games, what best describes your main field of work? (single-choice)",
+                questionCounter +
+                ". If you develop games, what best describes your main field of work? (single-choice)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
             using (var changeScope = new EditorGUI.ChangeCheckScope())
@@ -160,7 +183,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion3()
         {
-            EditorGUILayout.LabelField("3. Are you familiar with developing 2D Unity applications?",
+            EditorGUILayout.LabelField(questionCounter +
+                                       ". Are you familiar with developing 2D Unity applications?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
@@ -177,7 +201,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion4()
         {
-            EditorGUILayout.LabelField("4. If yes, on how many 2D Unity applications have you been working before?",
+            EditorGUILayout.LabelField(questionCounter +
+                                       ". If yes, on how many 2D Unity applications have you been working before?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
