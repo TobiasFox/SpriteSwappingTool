@@ -48,7 +48,7 @@ namespace SpriteSortingPlugin.Survey.UI
 
             DrawNavigationButtons();
 
-            EditorGUILayout.Space(30);
+            EditorGUILayout.Space(20);
 
             DrawFooter();
 
@@ -77,7 +77,8 @@ namespace SpriteSortingPlugin.Survey.UI
                 var progressPercentage = tempCurrentProgress / (float) surveyWizard.OverallProgress;
 
                 EditorGUI.ProgressBar(overallProgressBarRect, progressPercentage,
-                    (progressPercentage * 100) + "% (" + tempCurrentProgress + "/" + surveyWizard.OverallProgress +
+                    (Math.Round(progressPercentage * 100, 2)) + "% (" + tempCurrentProgress + "/" +
+                    surveyWizard.OverallProgress +
                     ")");
 
                 var surveyGroups = surveyWizard.GetSurveyStepGroups();
@@ -101,8 +102,8 @@ namespace SpriteSortingPlugin.Survey.UI
                     var surveyGroupCurrentProgress = tempGroupProgress / (float) surveyGroup.OverallProgress;
 
                     var displayText = "Part " + (i + 1) + ": " + surveyGroup.Name + ", " +
-                                      (surveyGroupCurrentProgress * 100) + "% (" + tempGroupProgress + "/" +
-                                      surveyGroup.OverallProgress + ")";
+                                      (Math.Round(surveyGroupCurrentProgress * 100, 2)) + "% (" + tempGroupProgress +
+                                      "/" + surveyGroup.OverallProgress + ")";
 
                     EditorGUI.ProgressBar(groupProgressBarsRect, surveyGroupCurrentProgress,
                         displayText);

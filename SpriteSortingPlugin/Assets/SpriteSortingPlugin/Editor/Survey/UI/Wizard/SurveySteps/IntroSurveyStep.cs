@@ -35,7 +35,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.Space(VerticalSpacing);
 
             GUILayout.Label(
-                "The topic of this survey is a visual glitch, where the order of Sprites to be rendered can swap (see preview). As part of my master thesis at the HAW Hamburg, I developed a Unity tool, which identifies such Sprites and helps to sort them.",
+                "The topic of this survey is a visual glitch in 2D games, where the order of Sprites to be rendered can swap (see preview). As part of my master thesis at the HAW Hamburg, I developed a Unity tool, which identifies such Sprites and helps to sort them.",
                 Styling.LabelWrapStyle);
 
             preview?.DoPreview();

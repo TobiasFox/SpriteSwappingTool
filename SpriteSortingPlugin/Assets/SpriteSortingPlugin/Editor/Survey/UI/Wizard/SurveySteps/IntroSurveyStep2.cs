@@ -28,12 +28,32 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             GUILayout.Label(
-                "If you want to be informed about the results or to keep updated, you can optionally enter your mail address at the end of this survey.");
+                "This editor window guides you through the survey and sends the data back to me. Therefore, please let this window the whole time opened and make sure this PC is connected to the internet to send the generated data.",
+                Styling.LabelWrapStyle);
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            var partNames = new string[]
+            {
+                "General Questions",
+                "Comparing manual sorting and using the Sprite Swapping tool",
+                "Evaluation of the functionality to generate sorting order suggestions",
+                "Usability"
+            };
+
+            GUILayout.Label("The survey consist of 4 parts:");
+
+            for (var i = 0; i < partNames.Length; i++)
+            {
+                EditorGUILayout.LabelField(" ", (i + 1) + ". " + partNames[i]);
+            }
+
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             GUILayout.Label(
-                "This editor window guides you through the survey and sends the data back to me. Therefore, please let this window the whole time opened and make sure this PC is connected to the internet to send the generated data.",
-                Styling.LabelWrapStyle);
+                "If you want to be informed about the results or to keep updated, you can optionally enter your mail address at the end of this survey.", Styling.LabelWrapStyle);
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
         }
     }
 }

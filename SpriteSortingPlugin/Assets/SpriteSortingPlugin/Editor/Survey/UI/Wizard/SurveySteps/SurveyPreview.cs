@@ -32,7 +32,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             previewEditor = Editor.CreateEditor(previewGameObject);
         }
 
-        public void DoPreview()
+        public void DoPreview(float previewHeight = -1)
         {
             if (previewGameObject == null)
             {
@@ -59,7 +59,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
 
             var bgColor = new GUIStyle {normal = {background = Styling.SpriteSortingPreviewBackgroundTexture}};
-            var previewRect = GUILayoutUtility.GetRect(1f, PreviewHeight);
+            var previewRect = GUILayoutUtility.GetRect(1f, previewHeight < 0 ? PreviewHeight : previewHeight);
+            previewRect = EditorGUI.IndentedRect(previewRect);
 
             //hack for not seeing the previewGameObject in the scene view 
             previewGameObject.SetActive(true);

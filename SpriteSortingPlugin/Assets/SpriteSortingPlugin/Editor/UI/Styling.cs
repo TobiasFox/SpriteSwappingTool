@@ -21,6 +21,7 @@ namespace SpriteSortingPlugin.UI
         public static readonly GUIStyle ButtonStyleBold;
         public static readonly GUIStyle LinkStyle;
         public static readonly GUIStyle LabelWrapStyle;
+        public static readonly GUIStyle QuestionLabelStyle;
 
         //light
         private static readonly Color ListElementBackground1Light = new Color(0.83f, 0.83f, 0.83f);
@@ -226,6 +227,7 @@ namespace SpriteSortingPlugin.UI
                 stretchWidth = false
             };
             LabelWrapStyle = new GUIStyle(EditorStyles.label) {wordWrap = true};
+            QuestionLabelStyle = new GUIStyle(EditorStyles.largeLabel) {wordWrap = true};
         }
     }
 }
