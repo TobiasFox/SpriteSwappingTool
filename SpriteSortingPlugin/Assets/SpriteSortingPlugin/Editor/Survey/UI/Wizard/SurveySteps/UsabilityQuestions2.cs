@@ -101,7 +101,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUILayout.LabelField(
                 questionCounter +
-                ". Which criteria could be added or was missing when using the functionality to generate Sprite order suggestions?",
+                ". Which criteria was missing when using the functionality to generate Sprite order suggestions?",
                 Styling.QuestionLabelStyle);
             using (new EditorGUI.IndentLevelScope())
             {

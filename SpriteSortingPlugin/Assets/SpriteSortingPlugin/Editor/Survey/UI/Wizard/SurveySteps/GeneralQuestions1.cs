@@ -9,7 +9,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     public class GeneralQuestions1 : SurveyStep
     {
         private const int QuestionCounterStart = 1;
-        
+        private static readonly string[] MainFields = new string[]
+        {
+            "Design", "Programming", "Game Design", "3D Modelling", "Audio", "Texture Artist", "VFX Artist",
+            "Animator", "Testing/QA", "Marketing"
+        };
+
         private GeneralQuestionsData data;
         private float space = 17.5f;
         private int questionCounter;
@@ -26,35 +31,35 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                DrawQuestion1();
+                DrawGameDevelopmentRelation();
                 questionCounter++;
             }
 
             EditorGUILayout.Space(space);
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                DrawQuestion2();
+                DrawMainFieldOfWork();
                 questionCounter++;
             }
 
             EditorGUILayout.Space(space);
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                DrawQuestion3();
+                DrawIsDevelopingGamesQuestion();
                 questionCounter++;
             }
 
             EditorGUILayout.Space(space);
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                DrawQuestion4();
+                DrawNumberOfApplicationsQuestions();
                 questionCounter++;
             }
 
             EditorGUI.indentLevel--;
         }
 
-        private void DrawQuestion1()
+        private void DrawGameDevelopmentRelation()
         {
             EditorGUILayout.LabelField(questionCounter +
                                        ". How are you related to the development of games? (multi-choice)",
@@ -63,12 +68,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                data.isGameDevelopmentStudent = EditorGUILayout.ToggleLeft("Student in the field of game development",
-                    data.isGameDevelopmentStudent);
-                data.isWorkingInGameDevelopment = EditorGUILayout.ToggleLeft("Working in the field of game development",
-                    data.isWorkingInGameDevelopment);
+                data.isGameDevelopmentStudent =
+                    EditorGUILayout.ToggleLeft("Professional", data.isGameDevelopmentStudent);
+                data.isWorkingInGameDevelopment =
+                    EditorGUILayout.ToggleLeft("Student", data.isWorkingInGameDevelopment);
                 data.isGameDevelopmentHobbyist =
-                    EditorGUILayout.ToggleLeft("Developing games in your free time", data.isGameDevelopmentHobbyist);
+                    EditorGUILayout.ToggleLeft("Hobbyist", data.isGameDevelopmentHobbyist);
                 data.isNotDevelopingGames =
                     EditorGUILayout.ToggleLeft("Not developing games", data.isNotDevelopingGames);
 
@@ -111,7 +116,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel--;
         }
 
-        private void DrawQuestion2()
+        private void DrawMainFieldOfWork()
         {
             EditorGUILayout.LabelField(
                 questionCounter +
@@ -120,9 +125,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel++;
             using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                var mainFields = new string[] {"Design", "Programming", "Audio", "Marketing", "All-rounder"};
-
-                var rows = Mathf.Ceil(mainFields.Length / 2f);
+                var rows = Mathf.Ceil(MainFields.Length / 2f);
                 var height = EditorGUIUtility.singleLineHeight * rows + (Math.Max(0, rows - 1) * 3);
 
                 var selectionGridRect =
@@ -131,7 +134,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 using (var changeSelectionGridScope = new EditorGUI.ChangeCheckScope())
                 {
                     data.mainFieldOfWork =
-                        GUI.SelectionGrid(selectionGridRect, data.mainFieldOfWork, mainFields, 2);
+                        GUI.SelectionGrid(selectionGridRect, data.mainFieldOfWork, MainFields, 2);
 
                     if (changeSelectionGridScope.changed && data.isMainFieldOfWorkOther)
                     {
@@ -181,7 +184,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel--;
         }
 
-        private void DrawQuestion3()
+        private void DrawIsDevelopingGamesQuestion()
         {
             EditorGUILayout.LabelField(questionCounter +
                                        ". Are you familiar with developing 2D Unity applications?",
@@ -199,7 +202,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel--;
         }
 
-        private void DrawQuestion4()
+        private void DrawNumberOfApplicationsQuestions()
         {
             EditorGUILayout.LabelField(questionCounter +
                                        ". If yes, on how many 2D Unity applications have you been working before?",
