@@ -7,12 +7,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         private GeneralQuestionsData generalQuestionsData;
         private UsabilityData usabilityData;
+        private UserData userData;
 
         public List<SurveyStep> GenerateSurveySteps()
         {
             var surveySteps = new List<SurveyStep>();
+
             generalQuestionsData = new GeneralQuestionsData();
             usabilityData = new UsabilityData();
+            userData = new UserData();
 
             var usabilityQuestions1 = new UsabilityQuestions1("Usability", usabilityData);
             var usabilityQuestions2 = new UsabilityQuestions2("Usability", usabilityData);
@@ -54,8 +57,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             // }
 
 
-            // var finishingStep = new FinishingSurvey("Finalizing");
+            // var finishingStep = new FinishingSurvey("Finalizing", userData);
+            // var sendingResultSurveyStep = new SendingResultSurveyStep("Sending Result");
             // surveySteps.Add(finishingStep);
+            // surveySteps.Add(sendingResultSurveyStep);
 
             return surveySteps;
         }
