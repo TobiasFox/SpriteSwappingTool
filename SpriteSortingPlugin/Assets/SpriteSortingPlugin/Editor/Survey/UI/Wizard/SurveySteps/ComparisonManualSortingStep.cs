@@ -4,31 +4,22 @@ using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class ComparisonManualSortingStep : SurveyStep
     {
-        private static int questionCounterStart = 1;
         private const string ScenePathAndName = "Assets/SpriteSortingPlugin/Editor/Survey/Scenes/ManualSorting.unity";
 
-        private bool isTaskStarted;
-        private DateTime taskStartTime;
-        private double neededTimeToFinishTask = -1;
-        private int questionCounter;
-        private Scene currentScene;
-        private ComparingData data;
+        private SortingTaskData sortingTaskData;
 
-        public ComparisonManualSortingStep(string name, ComparingData data) : base(name)
+        public ComparisonManualSortingStep(string name) : base(name)
         {
-            this.data = data;
-            questionCounterStart++;
+            sortingTaskData = new SortingTaskData(ScenePathAndName);
         }
 
         public override void DrawContent()
         {
-            questionCounter = questionCounterStart;
             EditorGUI.indentLevel++;
 
             EditorGUILayout.LabelField(
@@ -62,31 +53,29 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.LabelField("Instead, use the editor mode and move the SceneCamera.",
                     largeLabel);
 
-                var buttonLabel = (isTaskStarted ? "Restart" : "Start") + " and open scene";
+                var buttonLabel = (sortingTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
                 if (GUILayout.Button(buttonLabel))
                 {
-                    isTaskStarted = true;
-                    taskStartTime = DateTime.Now;
-                    neededTimeToFinishTask = -1;
+                    sortingTaskData.isTaskStarted = true;
+                    sortingTaskData.TaskStartTime = DateTime.Now;
+                    sortingTaskData.ResetTimeNeeded();
+                    
                     //TODO open Scene and may discard everything before
-                    currentScene = EditorSceneManager.OpenScene(ScenePathAndName, OpenSceneMode.Single);
-
-                    data.manualSortingNeededTime = neededTimeToFinishTask;
+                    sortingTaskData.LoadedScene = EditorSceneManager.OpenScene(ScenePathAndName, OpenSceneMode.Single);
                 }
 
-                if (isTaskStarted)
+                using (new EditorGUI.DisabledScope(!sortingTaskData.isTaskStarted))
                 {
                     EditorGUILayout.Space(20);
                     if (GUILayout.Button("Finish"))
                     {
-                        isTaskStarted = false;
-                        neededTimeToFinishTask = (DateTime.Now - taskStartTime).TotalMilliseconds;
+                        sortingTaskData.isTaskStarted = false;
+                        sortingTaskData.CalculateAndSetTimeNeeded();
 
                         var path = ScenePathAndName.Split(char.Parse("/"));
-                        path[path.Length - 1] = path[path.Length - 1] + "_modified";
+                        path[path.Length - 1] = "modified_" + path[path.Length - 1];
 
-                        EditorSceneManager.SaveScene(currentScene, string.Join("/", path), true);
-                        data.manualSortingNeededTime = neededTimeToFinishTask;
+                        EditorSceneManager.SaveScene(sortingTaskData.LoadedScene, string.Join("/", path), true);
                     }
                 }
             }

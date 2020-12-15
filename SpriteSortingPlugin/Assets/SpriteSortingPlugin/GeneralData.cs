@@ -6,7 +6,7 @@
         public const int MinorVersionNr = 1;
         public const int FixVersionNr = 1;
         public const string DevelopedBy = "Tobias Fox";
-        public const string DeveloperMailAddress = "TobiasFox@GMX.net";
+        public const string DeveloperMailAddress = "tobiasfox@gmx.net";
 
         public const string UnityMenuMainCategory = "Tools";
         public const string Name = "Sprite Swapping";

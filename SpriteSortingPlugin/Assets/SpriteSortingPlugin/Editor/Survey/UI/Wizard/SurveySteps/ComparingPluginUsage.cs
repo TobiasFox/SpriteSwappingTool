@@ -4,7 +4,6 @@ using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -14,15 +13,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             "Assets/SpriteSortingPlugin/Editor/Survey/Scenes/SortingWithPluginUsage.unity";
 
         private int questionCounter = 3;
-        private bool isTaskStarted;
-        private DateTime taskStartTime;
-        private double neededTimeToFinishTask = -1;
-        private Scene currentScene;
-        private ComparingData data;
+        private SortingTaskData sortingTaskData;
 
-        public ComparingPluginUsage(string name, ComparingData data) : base(name)
+        public ComparingPluginUsage(string name) : base(name)
         {
-            this.data = data;
+            sortingTaskData = new SortingTaskData(ScenePathAndName);
         }
 
         public override void DrawContent()
@@ -59,42 +54,40 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     GeneralData.Name + " " + GeneralData.DetectorName + ".",
                     taskLabelStyle);
 
-                var buttonLabel = (isTaskStarted ? "Restart" : "Start") + " and open scene";
+                EditorGUILayout.Space(10);
+
+                EditorGUILayout.LabelField(
+                    "You can optionally generate more accurate Sprite outlines by using a " + nameof(SpriteData) +
+                    ". Such an asset can be created with the " + GeneralData.Name + " " +
+                    GeneralData.DataAnalysisName + " window.", Styling.LabelWrapStyle);
+
+                EditorGUILayout.Space(10);
+
+                var buttonLabel = (sortingTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
                 if (GUILayout.Button(buttonLabel))
                 {
-                    isTaskStarted = true;
-                    taskStartTime = DateTime.Now;
-                    neededTimeToFinishTask = -1;
-                    currentScene = EditorSceneManager.OpenScene(ScenePathAndName, OpenSceneMode.Single);
-                    
-                    data.manualSortingNeededTime = neededTimeToFinishTask;
+                    sortingTaskData.isTaskStarted = true;
+                    sortingTaskData.TaskStartTime = DateTime.Now;
+                    sortingTaskData.ResetTimeNeeded();
+                    sortingTaskData.LoadedScene = EditorSceneManager.OpenScene(ScenePathAndName, OpenSceneMode.Single);
                 }
 
-                if (isTaskStarted)
+                EditorGUILayout.Space(20);
+
+                using (new EditorGUI.DisabledScope(!sortingTaskData.isTaskStarted))
                 {
-                    EditorGUILayout.Space(20);
                     if (GUILayout.Button("Finish"))
                     {
-                        isTaskStarted = false;
-                        neededTimeToFinishTask = (DateTime.Now - taskStartTime).TotalMilliseconds;
-                        Debug.Log(neededTimeToFinishTask);
+                        sortingTaskData.isTaskStarted = false;
+                        sortingTaskData.CalculateAndSetTimeNeeded();
 
                         var path = ScenePathAndName.Split(char.Parse("/"));
-                        path[path.Length - 1] = path[path.Length - 1] + "_modified";
+                        path[path.Length - 1] = "modified_" + path[path.Length - 1];
 
-                        EditorSceneManager.SaveScene(currentScene, string.Join("/", path), true);
-                        
-                        data.manualSortingNeededTime = neededTimeToFinishTask;
+                        EditorSceneManager.SaveScene(sortingTaskData.LoadedScene, string.Join("/", path), true);
                     }
                 }
             }
-
-            EditorGUILayout.Space(20);
-
-            EditorGUILayout.LabelField(
-                "You can optionally generate more accurate Sprite outlines by using a " + nameof(SpriteData) +
-                ". Such an asset can be created with the " + GeneralData.Name + " " +
-                GeneralData.DataAnalysisName + " window.", Styling.LabelWrapStyle);
 
 
             EditorGUI.indentLevel--;

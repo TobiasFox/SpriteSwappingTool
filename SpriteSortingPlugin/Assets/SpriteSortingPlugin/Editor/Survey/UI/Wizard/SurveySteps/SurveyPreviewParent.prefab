@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 4484783973941681589}
   - component: {fileID: 671911513289102476}
   m_Layer: 0
-  m_Name: plant (2)
+  m_Name: previewPlant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 6577801720773469304}
   - component: {fileID: 2512684273710500842}
   m_Layer: 0
-  m_Name: background (1)
+  m_Name: previewBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
