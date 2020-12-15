@@ -8,6 +8,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
         public double pluginUsageNeededTime;
         public double manualSortingNeededTime;
 
+        public double[] sortingSuggestionNeededTimeArray= new double[2];
+
         // [SerializeField] private List<double> manualSortingNeededTimeList = new List<double>();
         // [SerializeField] private List<double> pluginUsageNeededTimeList = new List<double>();
         // [SerializeField] private List<string> manualSortingSavedSceneList = new List<string>();
