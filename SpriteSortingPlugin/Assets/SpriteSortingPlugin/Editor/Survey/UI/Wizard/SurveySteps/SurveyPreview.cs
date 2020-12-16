@@ -25,6 +25,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PreviewPrefabPathAndName);
             var overlappingSpritesGO = Object.Instantiate(prefab, Vector3.zero, Quaternion.identity, parentTransform);
+            overlappingSpritesGO.hideFlags = HideFlags.DontSave;
             PreviewUtility.HideAndDontSaveGameObject(overlappingSpritesGO);
 
             PreviewUtility.HideAndDontSaveGameObject(previewGameObject);

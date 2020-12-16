@@ -8,6 +8,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private GeneralQuestionsData generalQuestionsData;
         private UsabilityData usabilityData;
         private UserData userData;
+        private ComparingData comparingData;
 
         public List<SurveyStep> GenerateSurveySteps()
         {
@@ -16,19 +17,35 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             generalQuestionsData = new GeneralQuestionsData();
             usabilityData = new UsabilityData();
             userData = new UserData();
+            comparingData = new ComparingData();
+
+            var evaluationAutoSortingSuggestionLabel =
+                "Evaluation of the functionality to generate sorting order suggestions";
+
+            var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel);
+            var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
+            // surveySteps.Add(sortingSuggestionStep1);
+            // surveySteps.Add(sortingSuggestionStep2);
 
             var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
-            var manualSortingScene1 = "";
-            var manualSortingScene2 = "";
-            // var manualSortingScene3 = "";
-            var comparisonManualSortingStep1 = new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene1);
-            var comparisonManualSortingStep2 = new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene2);
-            // var comparisonManualSortingStep3 = new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene3);
+            var manualSortingStep = new ManualSortingStep(manualSortingLabel);
+            var manualSortingStep2 = new ManualSortingStep2(manualSortingLabel);
+            // surveySteps.Add(comparisonManualSortingStep1);
+            // surveySteps.Add(comparisonManualSortingStep2);
 
-            surveySteps.Add(comparisonManualSortingStep1);
-            surveySteps.Add(comparisonManualSortingStep2);
+            var creatingSpriteData = new CreatingSpriteDataStep("Creating " + nameof(SpriteData) + " asset");
+            // surveySteps.Add(creatingSpriteData);
 
-            // var introStep = new IntroSurveyStep("Intro");
+            var pluginSorting1 = new PluginSorting1("Automatically detect visual glitches with the " +
+                                                    GeneralData.Name + " " + GeneralData.DetectorName);
+            var pluginSorting2 = new PluginSorting2("Automatically detect visual glitches with the " +
+                                                    GeneralData.Name + " " + GeneralData.DetectorName);
+            // surveySteps.Add(pluginSorting1);
+            // surveySteps.Add(pluginSorting2);
+            // surveySteps.Add(comparisonManualSortingStep2);
+
+
+            var introStep = new IntroSurveyStep("Intro");
             // surveySteps.Add(introStep);
             // var introStep2 = new IntroSurveyStep2("Intro");
             // surveySteps.Add(introStep2);
@@ -93,11 +110,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             //     surveySteps.Add(group);
             // }
 
+            // var finishingStep = new FinishingSurvey("Finalizing", userData);
+            // surveySteps.Add(finishingStep);
 
-            var finishingStep = new FinishingSurvey("Finalizing", userData);
-            var sendingResultSurveyStep = new SendingResultSurveyStep("Sending Result");
-            surveySteps.Add(finishingStep);
-            surveySteps.Add(sendingResultSurveyStep);
+            // surveySteps.AddRange(FinalSurveyStepList());
 
             return surveySteps;
         }
@@ -123,25 +139,43 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 surveySteps.Add(group);
             }
 
+            //Comparison manual sorting and plugin usage
+            // {
+            //     var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
+            //     var manualSortingScene1 = "";
+            //     var manualSortingScene2 = "";
+            //     // var manualSortingScene3 = "";
+            //     var comparisonManualSortingStep1 =
+            //         new ComparisonManualSortingStep(manualSortingLabel, comparingData);
+            //     var comparisonManualSortingStep2 =
+            //         new ComparisonManualSortingStep(manualSortingLabel, comparingData);
+            //     // var comparisonManualSortingStep3 = new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene3);
+            //
+            //     var list = new List<SurveyStep>();
+            //     for (var i = 0; i < 6; i++)
+            //     {
+            //         list.Add(new ComparisonManualSortingStep(manualSortingLabel, comparingData));
+            //     }
+            //
+            //     var group = new SurveyStepGroup(list, "");
+            //     surveySteps.Add(group);
+            // }
 
-            {
-                var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
-                var manualSortingScene1 = "";
-                var manualSortingScene2 = "";
-                // var manualSortingScene3 = "";
-                var comparisonManualSortingStep1 = new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene1);
-                var comparisonManualSortingStep2 = new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene2);
-                // var comparisonManualSortingStep3 = new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene3);
-                
-                var list = new List<SurveyStep>();
-                for (var i = 0; i < 6; i++)
-                {
-                    list.Add(new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene1));
-                }
-
-                var group = new SurveyStepGroup(list, "");
-                surveySteps.Add(group);
-            }
+            //auto sorting
+            // {
+            //     var list = new List<SurveyStep>();
+            //
+            //     var evaluationAutoSortingSuggestionLabel =
+            //         "Evaluation of the functionality to generate sorting order suggestions";
+            //     for (int i = 0; i < 4; i++)
+            //     {
+            //         var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel, comparingData);
+            //         list.Add(sortingSuggestionStep1);
+            //     }
+            //
+            //     var group = new SurveyStepGroup(list, "");
+            //     surveySteps.Add(group);
+            // }
 
             //Usability
             {

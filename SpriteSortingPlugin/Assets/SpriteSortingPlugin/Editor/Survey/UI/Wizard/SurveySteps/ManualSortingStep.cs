@@ -7,15 +7,15 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
-    public class ComparisonManualSortingStep : SurveyStep
+    public class ManualSortingStep : SurveyStep
     {
-        private const string ScenePathAndName = "Assets/SpriteSortingPlugin/Editor/Survey/Scenes/ManualSorting.unity";
+        private const string SceneName = "ManualSorting1.unity";
 
         private SortingTaskData sortingTaskData;
 
-        public ComparisonManualSortingStep(string name) : base(name)
+        public ManualSortingStep(string name) : base(name)
         {
-            sortingTaskData = new SortingTaskData(ScenePathAndName);
+            sortingTaskData = new SortingTaskData(SceneName);
         }
 
         public override void DrawContent()
@@ -23,7 +23,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel++;
 
             EditorGUILayout.LabelField(
-                "This part compares the manual approach to the approach used by the Sprite Swapping Detector. For this comparison, two short tasks are given.",
+                "This part compares the manual approach to the approach used by the Sprite Swapping Detector. For this comparison, short tasks are given.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(20);
@@ -34,7 +34,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
             EditorGUILayout.Space();
             EditorGUILayout.LabelField(
-                "To detect potential SpriteRenderer the manual method can be used, by moving around the Unity SceneCamera and watching out for Sprite swaps.",
+                "To detect potential SpriteRenderer the manual method can be used, by moving around the Unity SceneCamera in 3D perspective mode and watching out for Sprite swaps.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(20);
@@ -59,9 +59,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     sortingTaskData.isTaskStarted = true;
                     sortingTaskData.TaskStartTime = DateTime.Now;
                     sortingTaskData.ResetTimeNeeded();
-                    
+
                     //TODO open Scene and may discard everything before
-                    sortingTaskData.LoadedScene = EditorSceneManager.OpenScene(ScenePathAndName, OpenSceneMode.Single);
+                    sortingTaskData.LoadedScene =
+                        EditorSceneManager.OpenScene(sortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
                 }
 
                 using (new EditorGUI.DisabledScope(!sortingTaskData.isTaskStarted))
@@ -72,10 +73,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         sortingTaskData.isTaskStarted = false;
                         sortingTaskData.CalculateAndSetTimeNeeded();
 
-                        var path = ScenePathAndName.Split(char.Parse("/"));
-                        path[path.Length - 1] = "modified_" + path[path.Length - 1];
+                        var savePath = sortingTaskData.FullModifiedScenePath;
 
-                        EditorSceneManager.SaveScene(sortingTaskData.LoadedScene, string.Join("/", path), true);
+                        EditorSceneManager.SaveScene(sortingTaskData.LoadedScene, savePath, true);
                     }
                 }
             }

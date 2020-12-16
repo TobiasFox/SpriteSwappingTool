@@ -13,6 +13,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             "Assets/SpriteSortingPlugin/Editor/Survey/UI/Wizard/SurveySteps/firework2.jpg";
 
         private Sprite finishingSprite;
+        private bool isSendingDataButtonPressed;
+        private bool wasDataSendingSuccessfull;
+        private float progressValue;
+        private double lastEditorTime;
+        private bool isUpdatingProgressbarDelegatedAdded;
+        private float progressbarSpeed = 0.45f;
 
         public FinishingSurvey(string name, UserData userData) : base(name)
         {
@@ -30,6 +36,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             // var spritePosition = new Rect(0, 0, 300, 300);
             // EditorGUI.DrawTextureTransparent(spritePosition, finishingSprite.texture, ScaleMode.ScaleToFit);
 
+            progressbarSpeed = OwnGUIHelper.DrawField(progressbarSpeed);
 
             using (new EditorGUI.IndentLevelScope())
             {
@@ -50,6 +57,64 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.LabelField(
                     "Please keep this window open and make sure the PC is connected to the internet.",
                     Styling.LabelWrapStyle);
+
+
+                using (new EditorGUI.DisabledScope(isSendingDataButtonPressed))
+                {
+                    if (GUILayout.Button("Send data", GUILayout.Height(EditorGUIUtility.singleLineHeight * 2)))
+                    {
+                        isSendingDataButtonPressed = true;
+                        lastEditorTime = EditorApplication.timeSinceStartup;
+
+                        isUpdatingProgressbarDelegatedAdded = true;
+                        EditorApplication.update += UpdateProgressbar;
+                    }
+                }
+
+                var progressbarRect = EditorGUILayout.GetControlRect();
+                EditorGUI.ProgressBar(progressbarRect, progressValue, "");
+
+                if (wasDataSendingSuccessfull)
+                {
+                    EditorGUILayout.LabelField("The data was successfully sent!", Styling.LabelWrapStyle);
+                    EditorGUILayout.Space(15);
+                    EditorGUILayout.LabelField("You can now close this window.", Styling.LabelWrapStyle);
+                }
+
+                if (GUILayout.Button("Debug: successful send Data"))
+                {
+                    UpdateUIAfterSuccessfullySendData();
+                }
+            }
+        }
+
+        private void UpdateUIAfterSuccessfullySendData()
+        {
+            wasDataSendingSuccessfull = true;
+            isUpdatingProgressbarDelegatedAdded = false;
+            progressValue = 1;
+            EditorApplication.update -= UpdateProgressbar;
+        }
+
+        private void UpdateProgressbar()
+        {
+            var scaledEditorDeltaTime =
+                (float) (EditorApplication.timeSinceStartup - lastEditorTime) * progressbarSpeed;
+
+            progressValue += scaledEditorDeltaTime;
+            if (progressValue > 1)
+            {
+                progressValue = 0;
+            }
+
+            lastEditorTime = EditorApplication.timeSinceStartup;
+        }
+
+        public override void CleanUp()
+        {
+            if (isUpdatingProgressbarDelegatedAdded)
+            {
+                EditorApplication.update -= UpdateProgressbar;
             }
         }
 

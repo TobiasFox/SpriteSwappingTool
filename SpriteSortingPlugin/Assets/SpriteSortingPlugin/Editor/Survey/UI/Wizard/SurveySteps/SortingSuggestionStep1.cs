@@ -9,11 +9,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class SortingSuggestionStep1 : SurveyStep
     {
-        private const string ScenePathAndName1 =
-            "Assets/SpriteSortingPlugin/Editor/Survey/Scenes/SortingSuggestion1.unity";
-
-        private const string ScenePathAndName2 =
-            "Assets/SpriteSortingPlugin/Editor/Survey/Scenes/SortingSuggestion2.unity";
+        private const string SceneName = "SortingSuggestionExample1.unity";
 
         private static readonly string[] QuestionLabels = new string[]
         {
@@ -28,7 +24,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public SortingSuggestionStep1(string name) : base(name)
         {
-            taskDataArray = new[] {new SortingTaskData(ScenePathAndName1), new SortingTaskData(ScenePathAndName2)};
+            taskDataArray = new[] {new SortingTaskData(""), new SortingTaskData(SceneName)};
         }
 
         public override void DrawContent()
@@ -45,24 +41,23 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.Space(10);
 
             EditorGUILayout.LabelField(
-                "After SpriteRenderers are being identified by the " + GeneralData.Name + " " +
-                GeneralData.DetectorName +
-                " you can optionally use the automatic sorting functionality to generate a sorting suggestion of these SpriteRenderers.",
+                "It is a functionality, which generates sorting order suggestions after SpriteRenderers are being identified by the " +
+                GeneralData.Name + " " + GeneralData.DetectorName + ".",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField(
-                "The suggestion is based on several criteria which you can select and modify. More information about each criterion is displayed when hovering over one.",
+                "These suggestions are based on several criteria which you can select and modify. More information about each criterion is displayed when hovering over one.",
                 Styling.LabelWrapStyle);
 
-            EditorGUILayout.Space(10);
+            EditorGUILayout.Space(5);
             EditorGUILayout.LabelField(
                 "Some criteria need a Sprite Data asset. If you have not created such an asset yet, you might need to create one.",
                 Styling.LabelWrapStyle);
 
-            EditorGUILayout.Space(30);
+            EditorGUILayout.Space(25);
             EditorGUILayout.LabelField(
-                "A two-step process is used for the evaluation of this functionality; however your input really helps me a lot.",
+                "A two-step process is used for the evaluation of this functionality. However, 1. is already done, because the data from the last step can be reused :)",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
@@ -72,45 +67,54 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var currentTaskData = taskDataArray[i];
                 using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
-                    var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
-                    EditorGUILayout.LabelField(QuestionLabels[i],
-                        taskLabelStyle);
-
-                    if (i == 1)
+                    using (new EditorGUI.DisabledScope(i == 0))
                     {
-                        EditorGUILayout.Space(5);
+                        var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
+                        EditorGUILayout.LabelField(QuestionLabels[i],
+                            taskLabelStyle);
 
-                        EditorGUILayout.LabelField("The same SpriteRenderer setup is used.", Styling.LabelWrapStyle);
-                    }
-
-                    EditorGUILayout.Space(10);
-
-                    var buttonLabel = (currentTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
-                    if (GUILayout.Button(buttonLabel))
-                    {
-                        currentTaskData.isTaskStarted = true;
-                        currentTaskData.isTaskFinished = false;
-                        currentTaskData.TaskStartTime = DateTime.Now;
-                        currentTaskData.ResetTimeNeeded();
-                        currentTaskData.LoadedScene =
-                            EditorSceneManager.OpenScene(currentTaskData.scenePathAndName, OpenSceneMode.Single);
-
-                    }
-
-                    EditorGUILayout.Space(10);
-
-                    using (new EditorGUI.DisabledScope(!currentTaskData.isTaskStarted))
-                    {
-                        if (GUILayout.Button("Finish"))
+                        if (i == 0)
                         {
-                            currentTaskData.isTaskStarted = false;
-                            currentTaskData.isTaskFinished = true;
-                            currentTaskData.CalculateAndSetTimeNeeded();
+                            EditorGUILayout.LabelField(
+                                "This is already done, because the data of the last step can be reused:)",
+                                Styling.LabelWrapStyle);
+                        }
+                        else if (i == 1)
+                        {
+                            EditorGUILayout.Space(5);
 
-                            var path = currentTaskData.scenePathAndName.Split(char.Parse("/"));
-                            path[path.Length - 1] = "modified_" + path[path.Length - 1];
+                            EditorGUILayout.LabelField("The same SpriteRenderer setup as in 1. is used.",
+                                Styling.LabelWrapStyle);
+                        }
 
-                            EditorSceneManager.SaveScene(currentTaskData.LoadedScene, string.Join("/", path), true);
+                        EditorGUILayout.Space(10);
+
+                        var buttonLabel = (currentTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
+                        if (GUILayout.Button(buttonLabel))
+                        {
+                            currentTaskData.isTaskStarted = true;
+                            currentTaskData.isTaskFinished = false;
+                            currentTaskData.TaskStartTime = DateTime.Now;
+                            currentTaskData.ResetTimeNeeded();
+                            currentTaskData.LoadedScene =
+                                EditorSceneManager.OpenScene(currentTaskData.FullScenePathAndName,
+                                    OpenSceneMode.Single);
+                        }
+
+                        EditorGUILayout.Space(10);
+
+                        using (new EditorGUI.DisabledScope(!currentTaskData.isTaskStarted))
+                        {
+                            if (GUILayout.Button("Finish"))
+                            {
+                                currentTaskData.isTaskStarted = false;
+                                currentTaskData.isTaskFinished = true;
+                                currentTaskData.CalculateAndSetTimeNeeded();
+
+                                var savePath = currentTaskData.FullModifiedScenePath;
+
+                                EditorSceneManager.SaveScene(currentTaskData.LoadedScene, savePath, true);
+                            }
                         }
                     }
                 }

@@ -7,17 +7,15 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
-    public class ComparingPluginUsage : SurveyStep
+    public class PluginSorting1 : SurveyStep
     {
-        private const string ScenePathAndName =
-            "Assets/SpriteSortingPlugin/Editor/Survey/Scenes/SortingWithPluginUsage.unity";
+        private const string SceneName = "PluginSortingExample1.unity";
 
-        private int questionCounter = 3;
         private SortingTaskData sortingTaskData;
 
-        public ComparingPluginUsage(string name) : base(name)
+        public PluginSorting1(string name) : base(name)
         {
-            sortingTaskData = new SortingTaskData(ScenePathAndName);
+            sortingTaskData = new SortingTaskData(SceneName);
         }
 
         public override void DrawContent()
@@ -50,7 +48,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    "2. Please find and solve all visual glitches in the given scene by using the " +
+                    "3. Please find and solve all visual glitches in the given scene by using the " +
                     GeneralData.Name + " " + GeneralData.DetectorName + ".",
                     taskLabelStyle);
 
@@ -69,7 +67,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     sortingTaskData.isTaskStarted = true;
                     sortingTaskData.TaskStartTime = DateTime.Now;
                     sortingTaskData.ResetTimeNeeded();
-                    sortingTaskData.LoadedScene = EditorSceneManager.OpenScene(ScenePathAndName, OpenSceneMode.Single);
+                    sortingTaskData.LoadedScene =
+                        EditorSceneManager.OpenScene(sortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
                 }
 
                 EditorGUILayout.Space(20);
@@ -81,14 +80,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         sortingTaskData.isTaskStarted = false;
                         sortingTaskData.CalculateAndSetTimeNeeded();
 
-                        var path = ScenePathAndName.Split(char.Parse("/"));
-                        path[path.Length - 1] = "modified_" + path[path.Length - 1];
+                        var savePath = sortingTaskData.FullModifiedScenePath;
 
-                        EditorSceneManager.SaveScene(sortingTaskData.LoadedScene, string.Join("/", path), true);
+                        EditorSceneManager.SaveScene(sortingTaskData.LoadedScene, savePath, true);
                     }
                 }
             }
-
 
             EditorGUI.indentLevel--;
         }

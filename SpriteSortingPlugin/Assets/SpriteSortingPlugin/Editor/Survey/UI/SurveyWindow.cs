@@ -247,6 +247,14 @@ namespace SpriteSortingPlugin.Survey.UI
         {
             surveyWizard.CleanUp();
         }
+
+        private void OnInspectorUpdate()
+        {
+            if (currentStep is FinishingSurvey)
+            {
+                Repaint();
+            }
+        }
     }
 
     internal struct ThreadData
