@@ -7,12 +7,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
     [Serializable]
     public class SortingTaskData
     {
-        public static readonly string[] SceneFolderPath = new string[]
+        private static readonly string[] SceneFolderPath = new string[]
         {
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Scenes"
         };
 
-        public static readonly string[] ModifiedSceneFolderPath = new string[]
+        private static readonly string[] ModifiedSceneFolderPath = new string[]
         {
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Scenes", "Modified"
         };
@@ -26,7 +26,17 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
         public Scene LoadedScene { get; set; }
         public string FullScenePathAndName { get; private set; }
 
-        public string FullModifiedScenePath => Path.Combine(ModifiedSceneFolderPath) + Path.DirectorySeparatorChar + "Modified_" + sceneName;
+        public string FullModifiedScenePath
+        {
+            get
+            {
+                var directory = Path.Combine(ModifiedSceneFolderPath);
+                Directory.CreateDirectory(directory);
+
+                return Path.Combine(ModifiedSceneFolderPath) + Path.DirectorySeparatorChar +
+                       "Modified_" + sceneName;
+            }
+        }
 
         public SortingTaskData(string sceneName)
         {
