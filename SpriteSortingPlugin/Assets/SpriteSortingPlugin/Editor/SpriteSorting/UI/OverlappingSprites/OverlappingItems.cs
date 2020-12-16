@@ -143,6 +143,19 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             UpdateSurroundingItems(newIndexInList);
         }
 
+        public bool ContainsSortingGroupsOrSpriteRenderersInstanceId(int instanceId)
+        {
+            foreach (var overlappingItem in items)
+            {
+                if (overlappingItem.SortingComponent.GetInstanceId() == instanceId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void UpdateSurroundingItems(int currentIndex)
         {
             UpdateSurroundingItemsUpwards(currentIndex);
@@ -309,5 +322,4 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
         }
     }
-    
 }

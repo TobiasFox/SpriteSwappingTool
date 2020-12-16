@@ -73,7 +73,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
 
         private void Awake()
         {
-            titleContent = new GUIContent("Sprite Data Analysis");
+            titleContent = new GUIContent("Sprite " + GeneralData.DataAnalysisName);
             minSize = new Vector2(720, minSize.y);
             ResetSpriteList();
 

@@ -268,11 +268,23 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     normal = {background = Styling.SpriteSortingNoSortingOrderIssuesBackgroundTexture}
                 };
 
-                GUILayout.Label(
-                    new GUIContent(
-                        "No sorting order issues with overlapping SpriteRenderers were found in all opened scenes.",
-                        Styling.NoSortingOrderIssuesIcon),
-                    centeredStyleBold, GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.5f));
+                string message;
+                switch (sortingType)
+                {
+                    case SortingType.Layer:
+                        message = "No visual glitches were found in the layers " + string.Join(", ", selectedLayers)
+                            + " of all opened scenes.";
+                        break;
+                    case SortingType.Sprite:
+                        message = "No visual glitches were found on the SpriteRenderer " + spriteRenderer.name;
+                        break;
+                    default:
+                        message = "";
+                        break;
+                }
+
+                GUILayout.Label(new GUIContent(message, Styling.NoSortingOrderIssuesIcon), centeredStyleBold,
+                    GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.5f));
 
                 CleanUpReordableList();
                 preview.DisableSceneVisualizations();
@@ -497,13 +509,28 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                                 UITooltipConstants.SortingEditorSingleSpriteRendererTooltip), true);
 
                         //TODO: will not work for prefab scene
-                        if (serializedSpriteRenderer.objectReferenceValue == null ||
-                            !((SpriteRenderer) serializedSpriteRenderer.objectReferenceValue).gameObject.scene.isLoaded)
+                        var spriteRendererRef = (SpriteRenderer) serializedSpriteRenderer.objectReferenceValue;
+
+                        string errorMessage = null;
+                        if (spriteRendererRef == null)
+                        {
+                            isAnalyzedButtonDisabled = true;
+                        }
+                        else if (!spriteRendererRef.gameObject.scene.isLoaded)
+                        {
+                            errorMessage = "Please choose a SpriteRenderer of a currently loaded scene.";
+                        }
+                        else if (!spriteRendererRef.gameObject.activeInHierarchy || !spriteRendererRef.enabled ||
+                                 spriteRendererRef.sprite == null)
+                        {
+                            errorMessage =
+                                "The SpriteRenderer is not active in the scene or the sprite is null. Please choose another sprite.";
+                        }
+
+                        if (!string.IsNullOrEmpty(errorMessage))
                         {
                             EditorGUI.indentLevel++;
-                            EditorGUILayout.LabelField(new GUIContent(
-                                "Please choose a SpriteRenderer within an opened scene.",
-                                Styling.WarnIcon));
+                            EditorGUILayout.LabelField(new GUIContent(errorMessage, Styling.WarnIcon));
                             isAnalyzedButtonDisabled = true;
                             EditorGUI.indentLevel--;
                         }
@@ -725,8 +752,13 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         continue;
                     }
 
-                    Debug.LogFormat("Update on Sorting Group {0} Sorting Order: {1} -> {2}",
-                        sortingGroupComponent.name, sortingGroupComponent.sortingOrder, sortingOption.Value);
+                    var isChangedOverlappingItem = overlappingItems.ContainsSortingGroupsOrSpriteRenderersInstanceId(
+                        sortingComponent.GetInstanceID());
+
+                    Debug.LogFormat("Changed sorting options on " +
+                                    (isChangedOverlappingItem ? "previously" : "iterative ") +
+                                    " found Sorting Group {0} Sorting Order: {1} -> {2}", sortingGroupComponent.name,
+                        sortingGroupComponent.sortingOrder, sortingOption.Value);
 
                     Undo.RecordObject(sortingGroupComponent, "apply sorting options");
                     sortingGroupComponent.sortingOrder = sortingOption.Value;
@@ -742,7 +774,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         continue;
                     }
 
-                    Debug.LogFormat("Update on SpriteRenderer {0} Sorting Order: {1} -> {2}",
+                    var isChangedOverlappingItem = overlappingItems.ContainsSortingGroupsOrSpriteRenderersInstanceId(
+                        sortingComponent.GetInstanceID());
+
+                    Debug.LogFormat("Changed sorting options on " +
+                                    (isChangedOverlappingItem ? "previously" : "iterative ") +
+                                    " found SpriteRenderer {0}: Sorting Order: {1} -> {2}",
                         spriteRendererComponent.name, spriteRendererComponent.sortingOrder, sortingOption.Value);
 
                     Undo.RecordObject(spriteRendererComponent, "apply sorting options");
