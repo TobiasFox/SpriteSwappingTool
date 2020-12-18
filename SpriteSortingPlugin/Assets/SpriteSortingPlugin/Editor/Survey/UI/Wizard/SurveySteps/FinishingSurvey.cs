@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
@@ -21,11 +20,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Resources"
         };
 
-        // "Assets/SpriteSortingPlugin/Editor/Survey/UI/Wizard/SurveySteps/Confetti_0.png";
-
         private string mailAddress;
         private bool isSendingDataButtonPressed;
-        private bool wasDataSendingSuccessful;
+        private TransmitResult transmitResult;
 
         private bool isEditorUpdateMethodAdded;
 
@@ -39,6 +36,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private int currentSpriteIndex;
         private Sprite currentSprite;
         private Texture2D spriteTexture;
+
+        public bool IsSendingDataButtonPressedThisFrame { get; private set; }
 
         public FinishingSurvey(string name) : base(name)
         {
@@ -91,7 +90,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             using (new EditorGUI.DisabledScope(isSendingDataButtonPressed))
             {
-                if (GUILayout.Button("Send data", GUILayout.Height(EditorGUIUtility.singleLineHeight * 2)))
+                IsSendingDataButtonPressedThisFrame = GUILayout.Button("Send data",
+                    GUILayout.Height(EditorGUIUtility.singleLineHeight * 2));
+                if (IsSendingDataButtonPressedThisFrame)
                 {
                     StartSendingData();
                     AddingToMailingList();
@@ -101,18 +102,48 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var progressbarRect = EditorGUILayout.GetControlRect();
             EditorGUI.ProgressBar(progressbarRect, progressValue, "");
 
-            if (wasDataSendingSuccessful)
+            switch (transmitResult)
             {
-                var labelWrapStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
-                EditorGUILayout.LabelField("The data was successfully sent!", labelWrapStyle);
-                EditorGUILayout.Space(15);
-                EditorGUILayout.LabelField("You can now close this window.", labelWrapStyle);
+                case TransmitResult.Succeeded:
+                    var labelWrapStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
+                    EditorGUILayout.LabelField("The data was successfully sent!", labelWrapStyle);
+                    EditorGUILayout.Space(15);
+                    EditorGUILayout.LabelField("You can now close this window.", labelWrapStyle);
+                    break;
+                case TransmitResult.Failed:
+                    var labelCenteredWrapStyle = new GUIStyle(Styling.LabelWrapStyle)
+                        {alignment = TextAnchor.MiddleCenter};
+                    EditorGUILayout.LabelField("Some error occured, while sending the data. Please try again. ",
+                        labelCenteredWrapStyle);
+                    break;
             }
 
             if (GUILayout.Button("Debug: successful send Data"))
             {
                 UpdateUIAfterSuccessfullySendData();
             }
+        }
+
+        public void UpdateWithSendResult(TransmitResult transmitResult)
+        {
+            this.transmitResult = transmitResult;
+            isUpdatingProgressbar = false;
+
+            switch (transmitResult)
+            {
+                case TransmitResult.Succeeded:
+                    progressValue = 1;
+                    break;
+                case TransmitResult.Failed:
+                    progressValue = 0;
+                    isSendingDataButtonPressed = false;
+                    break;
+            }
+        }
+
+        public override void CleanUp()
+        {
+            RemoveEditorUpdate();
         }
 
         private void AddingToMailingList()
@@ -127,11 +158,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             transmitData.AddToMailingList(mailAddress);
         }
 
-        public override void CleanUp()
-        {
-            RemoveEditorUpdate();
-        }
-
         private void StartSendingData()
         {
             isSendingDataButtonPressed = true;
@@ -139,8 +165,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             isUpdatingProgressbar = true;
 
             AddEditorUpdate();
-            
-            //TODO copy everything in a final folder make pdf and send it
         }
 
         private void DrawCurrentSprite(float width = 0)
@@ -162,7 +186,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void UpdateUIAfterSuccessfullySendData()
         {
-            wasDataSendingSuccessful = true;
             isUpdatingProgressbar = false;
             progressValue = 1;
         }

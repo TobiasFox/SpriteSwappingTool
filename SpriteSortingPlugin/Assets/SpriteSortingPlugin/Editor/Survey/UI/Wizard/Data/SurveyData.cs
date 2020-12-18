@@ -19,6 +19,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
         public string SaveFolder =>
             UserId.ToString() + Path.DirectorySeparatorChar + "progress" + currentProgress;
 
+        public string ResultSaveFolder =>
+            UserId.ToString() + Path.DirectorySeparatorChar + "result";
+
         public Guid UserId { get; } = Guid.NewGuid();
 
         [SerializeField] private string userId;

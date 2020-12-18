@@ -15,7 +15,11 @@ namespace SpriteSortingPlugin.Survey
         private const string MailAddress = "spriteswappingsurvey38@mail.de";
         private const string Host = "smtp.mail.de";
         private const int Port = 587;
-        
+
+        public delegate void OnMailSendCompleted(TransmitResult transmitResult);
+
+        public event OnMailSendCompleted onMailSendCompleted;
+
         public void AddToMailingList(string mailAddress)
         {
             var mail = new MailMessage {From = new MailAddress(MailAddress)};
@@ -42,7 +46,7 @@ namespace SpriteSortingPlugin.Survey
             var mail = new MailMessage {From = new MailAddress(MailAddress)};
             mail.To.Add(mail.From);
             mail.Subject = "[" + surveyId + "] " + progress;
-            mail.Body = "test message";
+            mail.Body = $"userId: {surveyId}\nprogress: {progress}";
 
             if (!string.IsNullOrEmpty(zipFilePath))
             {
@@ -69,6 +73,8 @@ namespace SpriteSortingPlugin.Survey
 
             // smtpClient.SendCompleted += SendCompletedEventHandler;
             // smtpClient.SendAsync(mail, "asyncToken");
+
+            onMailSendCompleted?.Invoke(TransmitResult.Failed);
         }
 
         private void SendCompletedEventHandler(object sender, AsyncCompletedEventArgs e)
@@ -78,14 +84,19 @@ namespace SpriteSortingPlugin.Survey
                 Debug.Log("mail canceled");
             }
 
+            var transmitResult = TransmitResult.Succeeded;
+
             if (e.Error != null)
             {
                 Debug.LogException(e.Error);
+                transmitResult = TransmitResult.Failed;
             }
             else
             {
                 Debug.Log("Message sent.");
             }
+
+            onMailSendCompleted?.Invoke(transmitResult);
         }
     }
 }

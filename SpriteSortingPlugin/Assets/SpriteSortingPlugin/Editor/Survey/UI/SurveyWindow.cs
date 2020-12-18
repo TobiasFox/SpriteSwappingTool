@@ -68,6 +68,8 @@ namespace SpriteSortingPlugin.Survey.UI
 
             DrawSurveyStepContent();
 
+            CheckForSendingFinalData();
+
             using (var footerScope = new EditorGUILayout.VerticalScope())
             {
                 DrawNavigationButtons();
@@ -82,6 +84,26 @@ namespace SpriteSortingPlugin.Survey.UI
                     lastFooterHeight = footerScope.rect.height;
                 }
             }
+        }
+
+        private void CheckForSendingFinalData()
+        {
+            if (currentStep == null)
+            {
+                return;
+            }
+
+            if (!(currentStep is FinishingSurvey finishingSurvey))
+            {
+                return;
+            }
+
+            if (!finishingSurvey.IsSendingDataButtonPressedThisFrame)
+            {
+                return;
+            }
+
+            PrepareAndSendData(true);
         }
 
         private void DrawHeader()
@@ -132,7 +154,7 @@ namespace SpriteSortingPlugin.Survey.UI
                     var surveyGroupCurrentProgress = tempGroupProgress / (float) surveyGroup.TotalProgress;
 
                     var round = Math.Round(surveyGroupCurrentProgress * 100, 2);
-                    var displayText = "Part " + (i + 1) /*+ ": " + surveyGroup.Name + ", "*/ +": "+
+                    var displayText = "Part " + (i + 1) /*+ ": " + surveyGroup.Name + ", "*/ + ": " +
                                       round + "% (" + tempGroupProgress +
                                       "/" + surveyGroup.TotalProgress + ")";
 
@@ -180,7 +202,7 @@ namespace SpriteSortingPlugin.Survey.UI
                         {
                             surveyWizard.Forward();
                             currentStep = surveyWizard.GetCurrent();
-                            CreateAndSaveSurveyData();
+                            PrepareAndSendData();
                         }
                     }
                 }
@@ -190,7 +212,7 @@ namespace SpriteSortingPlugin.Survey.UI
                     {
                         surveyWizard.Backward();
                         currentStep = surveyWizard.GetCurrent();
-                        CreateAndSaveSurveyData();
+                        PrepareAndSendData();
                     }
 
                     GUILayout.Space(10);
@@ -200,7 +222,7 @@ namespace SpriteSortingPlugin.Survey.UI
                         {
                             surveyWizard.Forward();
                             currentStep = surveyWizard.GetCurrent();
-                            CreateAndSaveSurveyData();
+                            PrepareAndSendData();
                         }
                     }
                 }
@@ -209,25 +231,58 @@ namespace SpriteSortingPlugin.Survey.UI
             }
         }
 
-        private void CreateAndSaveSurveyData()
+        private void PrepareAndSendData(bool isResult = false)
         {
             surveyData.SurveyStepDataList = surveyWizard.GetData();
             surveyData.currentProgress = surveyWizard.CurrentProgress;
             surveyData.totalProgress = surveyWizard.TotalProgress;
 
             var directory = Application.temporaryCachePath + Path.DirectorySeparatorChar +
-                            Path.Combine(SurveyDataOutputPath) + Path.DirectorySeparatorChar + surveyData.SaveFolder;
+                            Path.Combine(SurveyDataOutputPath) + Path.DirectorySeparatorChar +
+                            (isResult ? surveyData.ResultSaveFolder : surveyData.SaveFolder);
+
             Directory.CreateDirectory(directory);
-            var pathAndName = directory + Path.DirectorySeparatorChar + "SurveyData.json";
+            var pathAndName = directory + Path.DirectorySeparatorChar + (isResult ? "Result" : "") + "SurveyData.json";
 
             var json = surveyData.GenerateJson();
             File.WriteAllText(pathAndName, json);
 
+            if (isResult)
+            {
+                CopyAllModifiedScenes(directory);
+            }
+
+            SendMail(isResult, directory);
+        }
+
+        private void SendMail(bool isResult, string directory)
+        {
             var zipSaveFolder = Directory.GetParent(directory).FullName;
 
             var thread = new Thread(GenerateAndSendDataThreadFunction);
             thread.Start(new ThreadData()
-                {zipFolder = directory, zipSaveFolder = zipSaveFolder, progress = surveyWizard.CurrentProgress});
+            {
+                zipFolder = directory,
+                zipSaveFolder = zipSaveFolder,
+                progress = surveyWizard.CurrentProgress,
+                isResult = isResult
+            });
+        }
+
+        private void CopyAllModifiedScenes(string zipSaveFolder)
+        {
+            var scenePath = Path.Combine(SortingTaskData.ModifiedSceneFolderPath);
+
+            var dirInfo = new DirectoryInfo(scenePath);
+            foreach (var fileInfo in dirInfo.EnumerateFiles())
+            {
+                if (!fileInfo.Extension.Equals(".unity"))
+                {
+                    continue;
+                }
+
+                fileInfo.CopyTo(zipSaveFolder + Path.DirectorySeparatorChar + fileInfo.Name, true);
+            }
         }
 
         private void DrawFooter()
@@ -246,8 +301,8 @@ namespace SpriteSortingPlugin.Survey.UI
 
             // Debug.Log("start thread");
             var collectedDataPath = threadData.zipFolder;
-            var zipFilePath = threadData.zipSaveFolder + Path.DirectorySeparatorChar + "progressData" +
-                              threadData.progress + ".zip";
+            var zipName = threadData.isResult ? "ResultData" : ("ProgressData" + threadData.progress);
+            var zipFilePath = threadData.zipSaveFolder + Path.DirectorySeparatorChar + zipName + ".zip";
 
             try
             {
@@ -256,18 +311,45 @@ namespace SpriteSortingPlugin.Survey.UI
                 var isSucceededZippingFiles = fileZipper.GenerateZip(collectedDataPath, zipFilePath);
                 // Debug.Log("zipping succeeded: " + isSucceededZippingFiles);
 
-                if (isSucceededZippingFiles)
+
+                if (!isSucceededZippingFiles)
                 {
-                    // Debug.Log("start sending mail");
-                    var transmitData = new TransmitData();
-                    transmitData.SendMail(surveyData.UserId, threadData.progress, zipFilePath);
+                    if (threadData.isResult)
+                    {
+                        OnCompleted(TransmitResult.Failed);
+                    }
+
+                    return;
                 }
+
+                var transmitData = new TransmitData();
+                if (threadData.isResult)
+                {
+                    transmitData.onMailSendCompleted += OnCompleted;
+                }
+
+                // Debug.Log("start sending mail");
+                transmitData.SendMail(surveyData.UserId, threadData.progress, zipFilePath);
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
             }
         }
+
+        private void OnCompleted(TransmitResult transmitResult)
+        {
+            // Debug.Log("mail sended");
+
+            if (!(currentStep is FinishingSurvey finishingSurvey))
+            {
+                return;
+            }
+
+            finishingSurvey.UpdateWithSendResult(transmitResult);
+        }
+
+        private bool isResultSendingFinished;
 
         private void OnDestroy()
         {
@@ -288,5 +370,6 @@ namespace SpriteSortingPlugin.Survey.UI
         public int progress;
         public string zipFolder;
         public string zipSaveFolder;
+        public bool isResult;
     }
 }

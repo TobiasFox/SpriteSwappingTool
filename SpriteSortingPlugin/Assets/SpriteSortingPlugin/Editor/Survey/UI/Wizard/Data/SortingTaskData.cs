@@ -12,7 +12,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Scenes"
         };
 
-        private static readonly string[] ModifiedSceneFolderPath = new string[]
+        public static readonly string[] ModifiedSceneFolderPath = new string[]
         {
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Scenes", "Modified"
         };
