@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using SpriteSortingPlugin.Survey.UI.Wizard;
 using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 using SpriteSortingPlugin.UI;
@@ -81,12 +82,6 @@ namespace SpriteSortingPlugin.Survey.UI
                     lastFooterHeight = footerScope.rect.height;
                 }
             }
-
-            // if (GUILayout.Button("Generate and send "))
-            // {
-            //     var thread = new Thread(GenerateAndSendDataThreadFunction);
-            //     thread.Start(new ThreadData() {progress = progress, tempPath = Application.temporaryCachePath});
-            // }
         }
 
         private void DrawHeader()
@@ -227,6 +222,12 @@ namespace SpriteSortingPlugin.Survey.UI
 
             var json = surveyData.GenerateJson();
             File.WriteAllText(pathAndName, json);
+
+            var zipSaveFolder = Directory.GetParent(directory).FullName;
+
+            var thread = new Thread(GenerateAndSendDataThreadFunction);
+            thread.Start(new ThreadData()
+                {zipFolder = directory, zipSaveFolder = zipSaveFolder, progress = surveyWizard.CurrentProgress});
         }
 
         private void DrawFooter()
@@ -243,20 +244,21 @@ namespace SpriteSortingPlugin.Survey.UI
                 return;
             }
 
+            // Debug.Log("start thread");
+            var collectedDataPath = threadData.zipFolder;
+            var zipFilePath = threadData.zipSaveFolder + Path.DirectorySeparatorChar + "progressData" +
+                              threadData.progress + ".zip";
+
             try
             {
-                Debug.Log("start thread");
-                var collectedDataPath = threadData.tempPath + "/data/progress0" /* + threadData.progress*/;
-                var zipFilePath = threadData.tempPath + "/data/data" + threadData.progress + ".zip";
-
-                Debug.Log("start zipping file");
+                // Debug.Log("start zipping file");
                 var fileZipper = new FileZipper();
                 var isSucceededZippingFiles = fileZipper.GenerateZip(collectedDataPath, zipFilePath);
                 Debug.Log("zipping succeeded: " + isSucceededZippingFiles);
 
                 if (isSucceededZippingFiles)
                 {
-                    Debug.Log("start sending mail");
+                    // Debug.Log("start sending mail");
                     var transmitData = new TransmitData();
                     transmitData.SendMail(surveyData.userData.id, threadData.progress, zipFilePath);
                 }
@@ -284,6 +286,7 @@ namespace SpriteSortingPlugin.Survey.UI
     internal struct ThreadData
     {
         public int progress;
-        public string tempPath;
+        public string zipFolder;
+        public string zipSaveFolder;
     }
 }
