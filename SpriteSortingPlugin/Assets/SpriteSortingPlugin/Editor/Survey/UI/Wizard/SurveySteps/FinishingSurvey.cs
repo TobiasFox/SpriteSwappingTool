@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -22,9 +23,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         // "Assets/SpriteSortingPlugin/Editor/Survey/UI/Wizard/SurveySteps/Confetti_0.png";
 
-        private UserData userData;
+        private string mailAddress;
         private bool isSendingDataButtonPressed;
-        private bool wasDataSendingSuccessfull;
+        private bool wasDataSendingSuccessful;
 
         private bool isEditorUpdateMethodAdded;
 
@@ -39,9 +40,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private Sprite currentSprite;
         private Texture2D spriteTexture;
 
-        public FinishingSurvey(string name, UserData userData) : base(name)
+        public FinishingSurvey(string name) : base(name)
         {
-            this.userData = userData;
         }
 
         public override void DrawContent()
@@ -81,7 +81,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     "If you want to be informed about the results or to keep updated, you can optionally fill in your mail address:",
                     Styling.LabelWrapStyle);
 
-                userData.mailAddress = EditorGUILayout.TextField("Your Email", userData.mailAddress);
+                mailAddress = EditorGUILayout.TextField("Your Email", mailAddress);
 
                 EditorGUILayout.Space(30);
                 EditorGUILayout.LabelField(
@@ -94,13 +94,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 if (GUILayout.Button("Send data", GUILayout.Height(EditorGUIUtility.singleLineHeight * 2)))
                 {
                     StartSendingData();
+                    AddingToMailingList();
                 }
             }
 
             var progressbarRect = EditorGUILayout.GetControlRect();
             EditorGUI.ProgressBar(progressbarRect, progressValue, "");
 
-            if (wasDataSendingSuccessfull)
+            if (wasDataSendingSuccessful)
             {
                 var labelWrapStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
                 EditorGUILayout.LabelField("The data was successfully sent!", labelWrapStyle);
@@ -112,6 +113,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 UpdateUIAfterSuccessfullySendData();
             }
+        }
+
+        private void AddingToMailingList()
+        {
+            var thread = new Thread(SendMailForAddingToMailingListThreadFunction);
+            thread.Start();
+        }
+
+        private void SendMailForAddingToMailingListThreadFunction()
+        {
+            var transmitData = new TransmitData();
+            transmitData.AddToMailingList(mailAddress);
         }
 
         public override void CleanUp()
@@ -126,6 +139,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             isUpdatingProgressbar = true;
 
             AddEditorUpdate();
+            
+            //TODO copy everything in a final folder make pdf and send it
         }
 
         private void DrawCurrentSprite(float width = 0)
@@ -147,7 +162,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void UpdateUIAfterSuccessfullySendData()
         {
-            wasDataSendingSuccessfull = true;
+            wasDataSendingSuccessful = true;
             isUpdatingProgressbar = false;
             progressValue = 1;
         }

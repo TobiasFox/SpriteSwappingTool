@@ -8,7 +8,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
     [Serializable]
     public class SurveyData
     {
-        public UserData userData;
         public GeneralQuestionsData generalQuestionsData;
         public UsabilityData usabilityData;
 
@@ -18,14 +17,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
         public List<SurveyStepData> SurveyStepDataList { get; set; }
 
         public string SaveFolder =>
-            userData.id.ToString() + Path.DirectorySeparatorChar + "progress" + currentProgress;
+            UserId.ToString() + Path.DirectorySeparatorChar + "progress" + currentProgress;
+
+        public Guid UserId { get; } = Guid.NewGuid();
+
+        [SerializeField] private string userId;
 
         public SurveyData()
         {
-            userData = new UserData();
             generalQuestionsData = new GeneralQuestionsData();
             usabilityData = new UsabilityData();
             SurveyStepDataList = new List<SurveyStepData>();
+            userId = UserId.ToString();
         }
 
         public string GenerateJson()

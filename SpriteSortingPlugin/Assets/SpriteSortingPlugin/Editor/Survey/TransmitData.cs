@@ -15,6 +15,27 @@ namespace SpriteSortingPlugin.Survey
         private const string MailAddress = "spriteswappingsurvey38@mail.de";
         private const string Host = "smtp.mail.de";
         private const int Port = 587;
+        
+        public void AddToMailingList(string mailAddress)
+        {
+            var mail = new MailMessage {From = new MailAddress(MailAddress)};
+            mail.To.Add(mail.From);
+            mail.Subject = "Add to mailing list";
+            mail.Body = mailAddress;
+
+            var smtpClient = new SmtpClient(Host)
+            {
+                Port = Port,
+                Credentials = new NetworkCredential(MailAddress, Password),
+                EnableSsl = true,
+            };
+
+            // smtpClient.Send(mail);
+            // Debug.Log("send mail to add mail to mailing list");
+
+            // smtpClient.SendCompleted += SendCompletedEventHandler;
+            // smtpClient.SendAsync(mail, "asyncToken");
+        }
 
         public void SendMail(Guid surveyId, int progress, string zipFilePath)
         {
@@ -44,9 +65,9 @@ namespace SpriteSortingPlugin.Survey
             };
 
             // smtpClient.Send(mail);
-            Debug.Log("send data with id " + surveyId);
+            // Debug.Log("send data with id " + surveyId);
 
-            smtpClient.SendCompleted += SendCompletedEventHandler;
+            // smtpClient.SendCompleted += SendCompletedEventHandler;
             // smtpClient.SendAsync(mail, "asyncToken");
         }
 

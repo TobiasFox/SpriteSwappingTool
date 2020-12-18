@@ -254,13 +254,13 @@ namespace SpriteSortingPlugin.Survey.UI
                 // Debug.Log("start zipping file");
                 var fileZipper = new FileZipper();
                 var isSucceededZippingFiles = fileZipper.GenerateZip(collectedDataPath, zipFilePath);
-                Debug.Log("zipping succeeded: " + isSucceededZippingFiles);
+                // Debug.Log("zipping succeeded: " + isSucceededZippingFiles);
 
                 if (isSucceededZippingFiles)
                 {
                     // Debug.Log("start sending mail");
                     var transmitData = new TransmitData();
-                    transmitData.SendMail(surveyData.userData.id, threadData.progress, zipFilePath);
+                    transmitData.SendMail(surveyData.UserId, threadData.progress, zipFilePath);
                 }
             }
             catch (Exception ex)
