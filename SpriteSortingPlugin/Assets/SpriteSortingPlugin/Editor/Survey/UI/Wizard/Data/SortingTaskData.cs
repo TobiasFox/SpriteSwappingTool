@@ -17,7 +17,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Scenes", "Modified"
         };
 
-        private string sceneName;
+        public string sceneName;
         public bool isTaskStarted;
         public bool isTaskFinished;
         public double timeNeeded = -1;
@@ -33,25 +33,31 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
                 var directory = Path.Combine(ModifiedSceneFolderPath);
                 Directory.CreateDirectory(directory);
 
-                return Path.Combine(ModifiedSceneFolderPath) + Path.DirectorySeparatorChar +
-                       "Modified_" + sceneName;
+                return directory + Path.DirectorySeparatorChar + "Modified_" + sceneName;
             }
         }
 
-        public SortingTaskData(string sceneName)
+        public void SetSceneName(string sceneName)
         {
             this.sceneName = sceneName;
             FullScenePathAndName = Path.Combine(SceneFolderPath) + Path.DirectorySeparatorChar + sceneName;
         }
 
-        public void CalculateAndSetTimeNeeded()
+        public void StartTask()
         {
-            timeNeeded = (DateTime.Now - TaskStartTime).TotalMilliseconds;
+            isTaskStarted = true;
+            isTaskFinished = false;
+
+            timeNeeded = -1;
+            TaskStartTime = DateTime.Now;
         }
 
-        public void ResetTimeNeeded()
+        public void FinishTask()
         {
-            timeNeeded = -1;
+            timeNeeded = (DateTime.Now - TaskStartTime).TotalMilliseconds;
+
+            isTaskStarted = false;
+            isTaskFinished = true;
         }
     }
 }

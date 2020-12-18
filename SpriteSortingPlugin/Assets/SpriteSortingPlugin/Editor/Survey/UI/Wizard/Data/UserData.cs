@@ -5,7 +5,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
     [Serializable]
     public class UserData
     {
-        public Guid userGuid=Guid.NewGuid();
+        public Guid id = Guid.NewGuid();
         public string mailAddress = "";
     }
 }

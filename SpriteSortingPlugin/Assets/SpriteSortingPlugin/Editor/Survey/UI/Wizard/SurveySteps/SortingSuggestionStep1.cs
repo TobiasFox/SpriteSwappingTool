@@ -9,7 +9,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class SortingSuggestionStep1 : SurveyStep
     {
-        private const string SceneName = "SortingSuggestionExample1.unity";
+        private static readonly string[] SceneNames = new string[]
+        {
+            "",
+            "SortingSuggestionExample1.unity"
+        };
 
         private static readonly string[] QuestionLabels = new string[]
         {
@@ -20,11 +24,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             " with the sorting suggestion functionality."
         };
 
-        private SortingTaskData[] taskDataArray;
+        private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
         public SortingSuggestionStep1(string name) : base(name)
         {
-            taskDataArray = new[] {new SortingTaskData(""), new SortingTaskData(SceneName)};
+            surveyStepData = new SurveyStepSortingData();
+
+            foreach (var sceneName in SceneNames)
+            {
+                var sortingTaskData = new SortingTaskData();
+                sortingTaskData.SetSceneName(sceneName);
+                SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
+            }
         }
 
         public override void DrawContent()
@@ -62,9 +73,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUILayout.Space(10);
 
-            for (var i = 0; i < taskDataArray.Length; i++)
+            for (var i = 0; i < SurveyStepSortingData.sortingTaskDataList.Count; i++)
             {
-                var currentTaskData = taskDataArray[i];
+                var currentTaskData = SurveyStepSortingData.sortingTaskDataList[i];
                 using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
                     using (new EditorGUI.DisabledScope(i == 0))
@@ -73,18 +84,19 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         EditorGUILayout.LabelField(QuestionLabels[i],
                             taskLabelStyle);
 
-                        if (i == 0)
+                        switch (i)
                         {
-                            EditorGUILayout.LabelField(
-                                "This is already done, because the data of the last step can be reused:)",
-                                Styling.LabelWrapStyle);
-                        }
-                        else if (i == 1)
-                        {
-                            EditorGUILayout.Space(5);
+                            case 0:
+                                EditorGUILayout.LabelField(
+                                    "This is already done, because the data of the last step can be reused :)",
+                                    Styling.LabelWrapStyle);
+                                break;
+                            case 1:
+                                EditorGUILayout.Space(5);
 
-                            EditorGUILayout.LabelField("The same SpriteRenderer setup as in 1. is used.",
-                                Styling.LabelWrapStyle);
+                                EditorGUILayout.LabelField("The same SpriteRenderer setup as in 1. is used.",
+                                    Styling.LabelWrapStyle);
+                                break;
                         }
 
                         EditorGUILayout.Space(10);
@@ -92,10 +104,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         var buttonLabel = (currentTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
                         if (GUILayout.Button(buttonLabel))
                         {
-                            currentTaskData.isTaskStarted = true;
-                            currentTaskData.isTaskFinished = false;
-                            currentTaskData.TaskStartTime = DateTime.Now;
-                            currentTaskData.ResetTimeNeeded();
+                            currentTaskData.StartTask();
+
                             currentTaskData.LoadedScene =
                                 EditorSceneManager.OpenScene(currentTaskData.FullScenePathAndName,
                                     OpenSceneMode.Single);
@@ -107,12 +117,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         {
                             if (GUILayout.Button("Finish"))
                             {
-                                currentTaskData.isTaskStarted = false;
-                                currentTaskData.isTaskFinished = true;
-                                currentTaskData.CalculateAndSetTimeNeeded();
+                                currentTaskData.FinishTask();
 
                                 var savePath = currentTaskData.FullModifiedScenePath;
-
                                 EditorSceneManager.SaveScene(currentTaskData.LoadedScene, savePath, true);
                             }
                         }

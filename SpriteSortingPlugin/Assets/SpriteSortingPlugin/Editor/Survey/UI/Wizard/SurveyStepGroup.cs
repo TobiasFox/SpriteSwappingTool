@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -11,7 +12,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             get
             {
-                if (!isStarted)
+                if (!surveyStepData.isStarted)
                 {
                     return 0;
                 }
@@ -20,11 +21,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
         }
 
-        public int OverallProgress => steps?.Count ?? 0;
+        public int TotalProgress => steps?.Count ?? 0;
+
+        private SurveyStepGroupData SurveyStepGroupData => (SurveyStepGroupData) surveyStepData;
 
         public SurveyStepGroup(List<SurveyStep> surveySteps, string groupName) : base(groupName)
         {
             steps = surveySteps;
+            surveyStepData = new SurveyStepGroupData();
         }
 
         public override void Start()
@@ -44,6 +48,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             if (currentProgress == steps.Count - 1)
             {
+                base.Commit();
+
                 var isGroupSucceeded = true;
                 var isGroupSkipped = true;
 
@@ -75,14 +81,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             if (currentProgress == steps.Count - 1)
             {
-                finishState = SurveyFinishState.None;
-                isFinished = false;
+                surveyStepData.finishState = SurveyFinishState.None;
+                surveyStepData.isFinished = false;
             }
             else if (currentProgress == 0)
             {
-                finishState = SurveyFinishState.None;
-                isFinished = false;
-                isStarted = false;
+                surveyStepData.finishState = SurveyFinishState.None;
+                surveyStepData.isFinished = false;
+                surveyStepData.isStarted = false;
             }
         }
 
@@ -102,6 +108,23 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 currentProgress--;
                 steps[currentProgress].Start();
             }
+        }
+
+        public override SurveyStepData GetSurveyStepData()
+        {
+            SurveyStepGroupData.SurveyStepsData = new List<SurveyStepData>();
+            foreach (var surveyStep in steps)
+            {
+                var stepData = surveyStep.GetSurveyStepData();
+                if (!stepData.isStarted)
+                {
+                    break;
+                }
+
+                SurveyStepGroupData.SurveyStepsData.Add(stepData);
+            }
+
+            return SurveyStepGroupData;
         }
 
         public override void DrawContent()

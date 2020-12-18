@@ -5,19 +5,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class SurveyStepGenerator
     {
-        private GeneralQuestionsData generalQuestionsData;
-        private UsabilityData usabilityData;
-        private UserData userData;
-        private ComparingData comparingData;
-
-        public List<SurveyStep> GenerateSurveySteps()
+        public List<SurveyStep> GenerateSurveySteps(SurveyData surveyData)
         {
             var surveySteps = new List<SurveyStep>();
 
-            generalQuestionsData = new GeneralQuestionsData();
-            usabilityData = new UsabilityData();
-            userData = new UserData();
-            comparingData = new ComparingData();
+            var introStep = new IntroSurveyStep("Intro");
+            var introStep2 = new IntroSurveyStep2("Intro");
+            // surveySteps.Add(introStep);
+            // surveySteps.Add(introStep2);
 
             var evaluationAutoSortingSuggestionLabel =
                 "Evaluation of the functionality to generate sorting order suggestions";
@@ -42,16 +37,16 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                                                     GeneralData.Name + " " + GeneralData.DetectorName);
             // surveySteps.Add(pluginSorting1);
             // surveySteps.Add(pluginSorting2);
-            // surveySteps.Add(comparisonManualSortingStep2);
+            {
+                var list = new List<SurveyStep>() {pluginSorting1, pluginSorting2};
+                var group = new SurveyStepGroup(list, "");
+                surveySteps.Add(group);
+            }
+            surveySteps.Add(introStep2);
 
 
-            var introStep = new IntroSurveyStep("Intro");
-            // surveySteps.Add(introStep);
-            // var introStep2 = new IntroSurveyStep2("Intro");
-            // surveySteps.Add(introStep2);
-
-            var generalQuestions1 = new GeneralQuestions1("General Questions", generalQuestionsData);
-            var generalQuestions2 = new GeneralQuestions2("General Questions", generalQuestionsData);
+            var generalQuestions1 = new GeneralQuestions1("General Questions", surveyData.generalQuestionsData);
+            var generalQuestions2 = new GeneralQuestions2("General Questions", surveyData.generalQuestionsData);
             // surveySteps.Add(generalQuestions1);
             // surveySteps.Add(generalQuestions2);
             // {
@@ -87,8 +82,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             //     surveySteps.Add(group);
             // }
 
-            var usabilityQuestions1 = new UsabilityQuestions1("Usability", usabilityData);
-            var usabilityQuestions2 = new UsabilityQuestions2("Usability", usabilityData);
+            var usabilityQuestions1 = new UsabilityQuestions1("Usability", surveyData.usabilityData);
+            var usabilityQuestions2 = new UsabilityQuestions2("Usability", surveyData.usabilityData);
 
             // surveySteps.Add(usabilityQuestions1);
             // surveySteps.Add(usabilityQuestions2);
@@ -110,7 +105,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             //     surveySteps.Add(group);
             // }
 
-            // var finishingStep = new FinishingSurvey("Finalizing", userData);
+            var finishingStep = new FinishingSurvey("Finalizing", surveyData.userData);
             // surveySteps.Add(finishingStep);
 
             // surveySteps.AddRange(FinalSurveyStepList());
@@ -118,7 +113,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return surveySteps;
         }
 
-        private List<SurveyStep> FinalSurveyStepList()
+        private List<SurveyStep> FinalSurveyStepList(SurveyData surveyData)
         {
             var surveySteps = new List<SurveyStep>();
 
@@ -132,8 +127,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             //General questions
             {
-                var generalQuestions1 = new GeneralQuestions1("General Questions", generalQuestionsData);
-                var generalQuestions2 = new GeneralQuestions2("General Questions", generalQuestionsData);
+                var generalQuestions1 = new GeneralQuestions1("General Questions", surveyData.generalQuestionsData);
+                var generalQuestions2 = new GeneralQuestions2("General Questions", surveyData.generalQuestionsData);
                 var list = new List<SurveyStep>() {generalQuestions1, generalQuestions2};
                 var group = new SurveyStepGroup(list, "");
                 surveySteps.Add(group);
@@ -179,8 +174,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             //Usability
             {
-                var usabilityQuestions1 = new UsabilityQuestions1("Usability", usabilityData);
-                var usabilityQuestions2 = new UsabilityQuestions2("Usability", usabilityData);
+                var usabilityQuestions1 = new UsabilityQuestions1("Usability", surveyData.usabilityData);
+                var usabilityQuestions2 = new UsabilityQuestions2("Usability", surveyData.usabilityData);
                 var list = new List<SurveyStep>() {usabilityQuestions1, usabilityQuestions2};
                 var group = new SurveyStepGroup(list, "");
                 surveySteps.Add(group);

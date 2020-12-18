@@ -1,48 +1,53 @@
 ﻿using System.Text;
+using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public abstract class SurveyStep
     {
-        protected SurveyFinishState finishState;
-        protected bool isStarted;
-        protected bool isFinished;
+        protected SurveyStepData surveyStepData;
         protected string jsonData;
         protected string name;
 
-        public SurveyFinishState FinishState => finishState;
+        public SurveyFinishState FinishState => surveyStepData.finishState;
         public string JsonData => jsonData;
         public string Name => name;
-        public bool IsFinished => isFinished;
-        public bool IsStarted => isStarted;
+        public bool IsFinished => surveyStepData.isFinished;
+        public bool IsStarted => surveyStepData.isStarted;
 
         public SurveyStep(string name)
         {
             this.name = name;
+            surveyStepData = new SurveyStepData();
         }
 
         public virtual void Start()
         {
-            isStarted = true;
-            finishState = SurveyFinishState.None;
-            isFinished = false;
+            surveyStepData.finishState = SurveyFinishState.None;
+            surveyStepData.isStarted = true;
+            surveyStepData.isFinished = false;
         }
 
         protected void Finish(SurveyFinishState finishState)
         {
-            isFinished = true;
-            this.finishState = finishState;
+            surveyStepData.finishState = finishState;
+            surveyStepData.isFinished = true;
         }
 
         public virtual void Commit()
         {
-            isFinished = true;
+            surveyStepData.isFinished = true;
         }
 
         public virtual void Rollback()
         {
-            isStarted = false;
-            finishState = SurveyFinishState.None;
+            surveyStepData.isStarted = false;
+            surveyStepData.finishState = SurveyFinishState.None;
+        }
+
+        public virtual SurveyStepData GetSurveyStepData()
+        {
+            return surveyStepData;
         }
 
         public abstract void DrawContent();
@@ -54,9 +59,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public override string ToString()
         {
             var builder = new StringBuilder();
-            builder.Append("SurveyStep[").Append(name).Append(", ").Append(nameof(isStarted)).Append(":")
-                .Append(isStarted).Append(", ").Append(nameof(isFinished)).Append(":").Append(isFinished).Append(", ")
-                .Append(nameof(finishState)).Append(":").Append(finishState).Append("]");
+            builder.Append("SurveyStep[").Append(name).Append(", ").Append(nameof(surveyStepData.isStarted)).Append(":")
+                .Append(surveyStepData.isStarted).Append(", ").Append(nameof(surveyStepData.isFinished)).Append(":")
+                .Append(surveyStepData.isFinished).Append(", ")
+                .Append(nameof(surveyStepData.finishState)).Append(":").Append(surveyStepData.finishState).Append("]");
 
             return builder.ToString();
         }

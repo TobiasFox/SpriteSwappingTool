@@ -9,8 +9,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class SortingSuggestionStep2 : SurveyStep
     {
-        private const string SceneName1 = "PluginSortingExample3.unity";
-        private const string SceneName2 = "SortingSuggestionExample2.unity";
+        private static readonly string[] SceneNames = new string[]
+        {
+            "PluginSortingExample3.unity",
+            "SortingSuggestionExample2.unity"
+        };
 
         private static readonly string[] QuestionLabels = new string[]
         {
@@ -21,12 +24,20 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             " with the sorting suggestion functionality."
         };
 
-        private SortingTaskData[] taskDataArray;
         private bool isDescriptionVisible;
+
+        private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
         public SortingSuggestionStep2(string name) : base(name)
         {
-            taskDataArray = new[] {new SortingTaskData(SceneName1), new SortingTaskData(SceneName2)};
+            surveyStepData = new SurveyStepSortingData();
+
+            foreach (var sceneName in SceneNames)
+            {
+                var sortingTaskData = new SortingTaskData();
+                sortingTaskData.SetSceneName(sceneName);
+                SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
+            }
         }
 
         public override void DrawContent()
@@ -67,9 +78,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUILayout.Space(10);
 
-            for (var i = 0; i < taskDataArray.Length; i++)
+            for (var i = 0; i < SurveyStepSortingData.sortingTaskDataList.Count; i++)
             {
-                var currentTaskData = taskDataArray[i];
+                var currentTaskData = SurveyStepSortingData.sortingTaskDataList[i];
                 using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
                     var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
@@ -89,12 +100,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     var buttonLabel = (currentTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
                     if (GUILayout.Button(buttonLabel))
                     {
-                        currentTaskData.isTaskStarted = true;
-                        currentTaskData.isTaskFinished = false;
-                        currentTaskData.TaskStartTime = DateTime.Now;
-                        currentTaskData.ResetTimeNeeded();
-                        currentTaskData.LoadedScene =
-                            EditorSceneManager.OpenScene(currentTaskData.FullScenePathAndName, OpenSceneMode.Single);
+                        currentTaskData.StartTask();
+                        currentTaskData.LoadedScene = EditorSceneManager.OpenScene(currentTaskData.FullScenePathAndName,
+                            OpenSceneMode.Single);
                     }
 
                     EditorGUILayout.Space(10);
@@ -103,12 +111,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     {
                         if (GUILayout.Button("Finish"))
                         {
-                            currentTaskData.isTaskStarted = false;
-                            currentTaskData.isTaskFinished = true;
-                            currentTaskData.CalculateAndSetTimeNeeded();
+                            currentTaskData.FinishTask();
 
                             var savePath = currentTaskData.FullModifiedScenePath;
-
                             EditorSceneManager.SaveScene(currentTaskData.LoadedScene, savePath, true);
                         }
                     }

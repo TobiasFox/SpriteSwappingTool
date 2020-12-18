@@ -11,12 +11,17 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         private const string SceneName = "ManualSorting2.unity";
 
-        private SortingTaskData sortingTaskData;
         private bool isDescriptionVisible;
+
+        private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
         public ManualSortingStep2(string name) : base(name)
         {
-            sortingTaskData = new SortingTaskData(SceneName);
+            surveyStepData = new SurveyStepSortingData();
+
+            var sortingTaskData = new SortingTaskData();
+            sortingTaskData.SetSceneName(SceneName);
+            SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
         }
 
         public override void DrawContent()
@@ -58,28 +63,28 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.LabelField("Instead, use the editor mode and move the SceneCamera.",
                     largeLabel);
 
-                var buttonLabel = (sortingTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
+                var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
+
+                var buttonLabel = (currentSortingTaskData.isTaskStarted ? "Restart" : "Start") +
+                                  " and open scene";
                 if (GUILayout.Button(buttonLabel))
                 {
-                    sortingTaskData.isTaskStarted = true;
-                    sortingTaskData.TaskStartTime = DateTime.Now;
-                    sortingTaskData.ResetTimeNeeded();
+                    currentSortingTaskData.StartTask();
 
                     //TODO open Scene and may discard everything before
-                    sortingTaskData.LoadedScene =
-                        EditorSceneManager.OpenScene(sortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
+                    currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
+                        currentSortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
                 }
 
-                using (new EditorGUI.DisabledScope(!sortingTaskData.isTaskStarted))
+                using (new EditorGUI.DisabledScope(!currentSortingTaskData.isTaskStarted))
                 {
                     EditorGUILayout.Space(20);
                     if (GUILayout.Button("Finish"))
                     {
-                        sortingTaskData.isTaskStarted = false;
-                        sortingTaskData.CalculateAndSetTimeNeeded();
+                        currentSortingTaskData.FinishTask();
 
-                        var combinedPath = sortingTaskData.FullModifiedScenePath;
-                        EditorSceneManager.SaveScene(sortingTaskData.LoadedScene, combinedPath, true);
+                        var combinedPath = currentSortingTaskData.FullModifiedScenePath;
+                        EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, combinedPath, true);
                     }
                 }
             }

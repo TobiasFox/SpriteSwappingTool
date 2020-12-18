@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using SpriteSortingPlugin.Survey.UI.Wizard;
+using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
@@ -10,8 +12,12 @@ namespace SpriteSortingPlugin.Survey.UI
     {
         private const float SpaceBetweenGroupProgressBars = 15;
 
-        private Guid surveyId;
-        private int progress;
+        private static readonly string[] SurveyDataOutputPath = new string[]
+        {
+            "SurveyData"
+        };
+
+        [SerializeField] private SurveyData surveyData;
 
         private SurveyWizard surveyWizard;
         private SurveyStepGenerator surveyStepGenerator;
@@ -30,13 +36,13 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void Awake()
         {
-            surveyId = Guid.NewGuid();
             titleContent = new GUIContent(GeneralData.Name + " Survey");
 
             surveyStepGenerator = new SurveyStepGenerator();
 
+            surveyData = new SurveyData();
             surveyWizard = new SurveyWizard();
-            surveyWizard.SetSurveySteps(surveyStepGenerator.GenerateSurveySteps());
+            surveyWizard.SetSurveySteps(surveyStepGenerator.GenerateSurveySteps(surveyData));
             currentStep = surveyWizard.GetCurrent();
         }
 
@@ -103,11 +109,11 @@ namespace SpriteSortingPlugin.Survey.UI
                     EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight,
                         GUILayout.ExpandWidth(true));
                 var tempCurrentProgress = surveyWizard.CurrentProgress;
-                var progressPercentage = tempCurrentProgress / (float) surveyWizard.OverallProgress;
+                var progressPercentage = tempCurrentProgress / (float) surveyWizard.TotalProgress;
 
                 EditorGUI.ProgressBar(overallProgressBarRect, progressPercentage,
                     (Math.Round(progressPercentage * 100, 2)) + "% (" + tempCurrentProgress + "/" +
-                    surveyWizard.OverallProgress +
+                    surveyWizard.TotalProgress +
                     ")");
 
                 var surveyGroups = surveyWizard.GetSurveyStepGroups();
@@ -128,12 +134,12 @@ namespace SpriteSortingPlugin.Survey.UI
                     var surveyGroup = surveyGroups[i];
 
                     var tempGroupProgress = surveyGroup.CurrentProgress;
-                    var surveyGroupCurrentProgress = tempGroupProgress / (float) surveyGroup.OverallProgress;
+                    var surveyGroupCurrentProgress = tempGroupProgress / (float) surveyGroup.TotalProgress;
 
                     var round = Math.Round(surveyGroupCurrentProgress * 100, 2);
                     var displayText = "Part " + (i + 1) /*+ ": " + surveyGroup.Name + ", "*/ +": "+
                                       round + "% (" + tempGroupProgress +
-                                      "/" + surveyGroup.OverallProgress + ")";
+                                      "/" + surveyGroup.TotalProgress + ")";
 
                     EditorGUI.ProgressBar(groupProgressBarsRect, surveyGroupCurrentProgress,
                         displayText);
@@ -179,6 +185,7 @@ namespace SpriteSortingPlugin.Survey.UI
                         {
                             surveyWizard.Forward();
                             currentStep = surveyWizard.GetCurrent();
+                            CreateAndSaveSurveyData();
                         }
                     }
                 }
@@ -188,6 +195,7 @@ namespace SpriteSortingPlugin.Survey.UI
                     {
                         surveyWizard.Backward();
                         currentStep = surveyWizard.GetCurrent();
+                        CreateAndSaveSurveyData();
                     }
 
                     GUILayout.Space(10);
@@ -197,12 +205,28 @@ namespace SpriteSortingPlugin.Survey.UI
                         {
                             surveyWizard.Forward();
                             currentStep = surveyWizard.GetCurrent();
+                            CreateAndSaveSurveyData();
                         }
                     }
                 }
 
                 GUILayout.Space(10);
             }
+        }
+
+        private void CreateAndSaveSurveyData()
+        {
+            surveyData.SurveyStepDataList = surveyWizard.GetData();
+            surveyData.currentProgress = surveyWizard.CurrentProgress;
+            surveyData.totalProgress = surveyWizard.TotalProgress;
+
+            var directory = Application.temporaryCachePath + Path.DirectorySeparatorChar +
+                            Path.Combine(SurveyDataOutputPath) + Path.DirectorySeparatorChar + surveyData.SaveFolder;
+            Directory.CreateDirectory(directory);
+            var pathAndName = directory + Path.DirectorySeparatorChar + "SurveyData.json";
+
+            var json = surveyData.GenerateJson();
+            File.WriteAllText(pathAndName, json);
         }
 
         private void DrawFooter()
@@ -234,7 +258,7 @@ namespace SpriteSortingPlugin.Survey.UI
                 {
                     Debug.Log("start sending mail");
                     var transmitData = new TransmitData();
-                    transmitData.SendMail(surveyId, threadData.progress, zipFilePath);
+                    transmitData.SendMail(surveyData.userData.id, threadData.progress, zipFilePath);
                 }
             }
             catch (Exception ex)

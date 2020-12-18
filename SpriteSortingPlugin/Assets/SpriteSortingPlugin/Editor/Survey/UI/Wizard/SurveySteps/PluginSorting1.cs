@@ -11,11 +11,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         private const string SceneName = "PluginSortingExample1.unity";
 
-        private SortingTaskData sortingTaskData;
+        private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
         public PluginSorting1(string name) : base(name)
         {
-            sortingTaskData = new SortingTaskData(SceneName);
+            surveyStepData = new SurveyStepSortingData();
+
+            var sortingTaskData = new SortingTaskData();
+            sortingTaskData.SetSceneName(SceneName);
+            SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
         }
 
         public override void DrawContent()
@@ -61,28 +65,28 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 EditorGUILayout.Space(10);
 
-                var buttonLabel = (sortingTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
+                var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
+                var buttonLabel = (currentSortingTaskData.isTaskStarted ? "Restart" : "Start") +
+                                  " and open scene";
                 if (GUILayout.Button(buttonLabel))
                 {
-                    sortingTaskData.isTaskStarted = true;
-                    sortingTaskData.TaskStartTime = DateTime.Now;
-                    sortingTaskData.ResetTimeNeeded();
-                    sortingTaskData.LoadedScene =
-                        EditorSceneManager.OpenScene(sortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
+                    currentSortingTaskData.StartTask();
+                    currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
+                        currentSortingTaskData.FullScenePathAndName,
+                        OpenSceneMode.Single);
                 }
 
                 EditorGUILayout.Space(20);
 
-                using (new EditorGUI.DisabledScope(!sortingTaskData.isTaskStarted))
+                using (new EditorGUI.DisabledScope(!currentSortingTaskData.isTaskStarted))
                 {
                     if (GUILayout.Button("Finish"))
                     {
-                        sortingTaskData.isTaskStarted = false;
-                        sortingTaskData.CalculateAndSetTimeNeeded();
+                        currentSortingTaskData.FinishTask();
 
-                        var savePath = sortingTaskData.FullModifiedScenePath;
+                        var savePath = currentSortingTaskData.FullModifiedScenePath;
 
-                        EditorSceneManager.SaveScene(sortingTaskData.LoadedScene, savePath, true);
+                        EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, savePath, true);
                     }
                 }
             }

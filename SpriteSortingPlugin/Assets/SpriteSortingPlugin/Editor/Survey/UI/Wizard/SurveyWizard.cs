@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -8,9 +9,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private List<SurveyStepGroup> surveyStepGroups;
         private int currentProgress;
         private int currentSurveyStepIndex;
-        private int overallProgress;
+        private int totalProgress;
 
-        public int OverallProgress => overallProgress;
+        public int TotalProgress => totalProgress;
 
         public int CurrentProgress
         {
@@ -131,7 +132,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             this.steps[0].Start();
 
             currentSurveyStepIndex = 0;
-            overallProgress = 0;
+            totalProgress = 0;
             UpdateCurrentProgress();
             if (surveyStepGroups == null)
             {
@@ -146,12 +147,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 if (surveyStep is SurveyStepGroup surveyStepGroup)
                 {
-                    overallProgress += surveyStepGroup.OverallProgress;
+                    totalProgress += surveyStepGroup.TotalProgress;
                     surveyStepGroups.Add(surveyStepGroup);
                 }
                 else
                 {
-                    overallProgress++;
+                    totalProgress++;
                 }
             }
         }
@@ -179,6 +180,23 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return surveyStepGroups;
         }
 
+        public List<SurveyStepData> GetData()
+        {
+            var surveyStepDataList = new List<SurveyStepData>();
+
+            foreach (var surveyStep in steps)
+            {
+                if (!surveyStep.IsStarted)
+                {
+                    break;
+                }
+
+                surveyStepDataList.Add(surveyStep.GetSurveyStepData());
+            }
+
+            return surveyStepDataList;
+        }
+
         private void UpdateCurrentProgress()
         {
             currentProgress = 0;
@@ -192,7 +210,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 if (!surveyStep.IsStarted)
                 {
-                    continue;
+                    break;
                 }
 
                 if (surveyStep is SurveyStepGroup surveyStepGroup)

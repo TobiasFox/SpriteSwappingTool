@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -12,8 +13,13 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private const float CurrentSpriteWidth = 200;
         private const float SpriteDisplayTime = 0.045f;
         private const float ProgressbarSpeed = 0.45f;
+        private const string FireworkSpriteName = "Confetti_small.png";
 
-        private const string FinishingSpritePathAndName = "Assets/Sprites/Confetti_small.png";
+        private static readonly string[] FireworkFolder = new string[]
+        {
+            "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Resources"
+        };
+
         // "Assets/SpriteSortingPlugin/Editor/Survey/UI/Wizard/SurveySteps/Confetti_0.png";
 
         private UserData userData;
@@ -44,7 +50,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 LoadFinishingSprite();
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 using (new EditorGUILayout.VerticalScope(GUILayout.Height(FireworkLabelHeight)))
@@ -175,7 +181,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void LoadFinishingSprite()
         {
-            var allAssets = AssetDatabase.LoadAllAssetsAtPath(FinishingSpritePathAndName);
+            var pathAndName = Path.Combine(FireworkFolder) + Path.DirectorySeparatorChar + FireworkSpriteName;
+            var allAssets = AssetDatabase.LoadAllAssetsAtPath(pathAndName);
             foreach (var asset in allAssets)
             {
                 switch (asset)
