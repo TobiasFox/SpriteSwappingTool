@@ -1,5 +1,4 @@
 ﻿using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
-using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
