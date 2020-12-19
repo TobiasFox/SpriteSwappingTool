@@ -9,7 +9,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private static readonly string[] PartNames = new string[]
         {
             "General Questions",
-            "Comparing manual sorting and using the Sprite Swapping tool",
+            "Comparing manual approach and using the Sprite Swapping tool",
             "Evaluation of the functionality to generate sorting order suggestions",
             "Usability"
         };
@@ -29,21 +29,25 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel++;
             EditorGUILayout.Space();
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField(
-                "This editor window guides you through the survey and sends the data back to me. Therefore, please let this window the whole time opened and make sure this PC is connected to the internet to send the generated data.",
-                Styling.LabelWrapStyle);
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("The survey consist of 4 parts:");
-
-            using (new EditorGUI.IndentLevelScope(2))
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                for (var i = 0; i < PartNames.Length; i++)
+                EditorGUILayout.LabelField(
+                    "This editor window guides you through the survey and sends the data back to me.",
+                    Styling.LabelWrapStyle);
+                EditorGUILayout.Space();
+                EditorGUILayout.Space();
+
+                EditorGUILayout.LabelField("The survey consist of 4 parts:");
+
+                using (new EditorGUI.IndentLevelScope(2))
                 {
-                    var content = new GUIContent((i + 1) + ". " + PartNames[i]);
-                    
-                    EditorGUILayout.LabelField(content, Styling.LabelWrapStyle);
+                    for (var i = 0; i < PartNames.Length; i++)
+                    {
+                        var content = new GUIContent((i + 1) + ". " + PartNames[i]);
+
+                        EditorGUILayout.LabelField(content, Styling.LabelWrapStyle);
+                    }
                 }
             }
 
@@ -52,8 +56,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField(
                 "If you want to be informed about the results or to keep updated, you can optionally enter your mail address at the end of this survey.",
                 Styling.LabelWrapStyle);
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
+            EditorGUILayout.Space(10);
+
+            EditorGUILayout.LabelField(new GUIContent(
+                "Please let this window the whole time opened and make sure this PC is connected to the internet to send the generated data.",
+                Styling.InfoIcon), Styling.LabelWrapStyle);
+            EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2f);
+            EditorGUILayout.LabelField(new GUIContent(
+                "Also, please do not recompile any code while the survey window is open. If you do so, it will result in exceptions due to Unity`s serialization behaviour.",
+                Styling.InfoIcon), Styling.LabelWrapStyle);
 
             EditorGUI.indentLevel--;
         }

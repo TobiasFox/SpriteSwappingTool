@@ -156,8 +156,7 @@ namespace SpriteSortingPlugin.Survey.UI
                     var surveyGroupCurrentProgress = tempGroupProgress / (float) surveyGroup.TotalProgress;
 
                     var round = Math.Round(surveyGroupCurrentProgress * 100, 2);
-                    var displayText = "Part " + (i + 1) /*+ ": " + surveyGroup.Name + ", "*/ + ": " +
-                                      round + "% (" + tempGroupProgress +
+                    var displayText = "Part " + (i + 1) + ": " + round + "% (" + tempGroupProgress +
                                       "/" + surveyGroup.TotalProgress + ")";
 
                     EditorGUI.ProgressBar(groupProgressBarsRect, surveyGroupCurrentProgress,

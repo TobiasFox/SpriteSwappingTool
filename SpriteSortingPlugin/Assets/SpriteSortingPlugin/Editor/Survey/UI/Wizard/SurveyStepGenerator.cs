@@ -103,7 +103,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var generalQuestions1 = new GeneralQuestions1("General Questions", surveyData.generalQuestionsData);
                 var generalQuestions2 = new GeneralQuestions2("General Questions", surveyData.generalQuestionsData);
                 var list = new List<SurveyStep>() {generalQuestions1, generalQuestions2};
-                var group = new SurveyStepGroup(list, "");
+                var group = new SurveyStepGroup(list, "General Questions");
                 surveySteps.Add(group);
             }
 
@@ -120,7 +120,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 var list = new List<SurveyStep> {manualSortingStep, manualSortingStep2, pluginSorting1, pluginSorting2};
 
-                var group = new SurveyStepGroup(list, "");
+                var group = new SurveyStepGroup(list, "Comparing manual approach and using the Sprite Swapping tool");
                 surveySteps.Add(group);
             }
 
@@ -133,7 +133,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
 
                 var list = new List<SurveyStep> {sortingSuggestionStep1, sortingSuggestionStep2};
-                var group = new SurveyStepGroup(list, "");
+                var group = new SurveyStepGroup(list, evaluationAutoSortingSuggestionLabel);
                 surveySteps.Add(group);
             }
 
@@ -142,7 +142,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var usabilityQuestions1 = new UsabilityQuestions1("Usability", surveyData.usabilityData);
                 var usabilityQuestions2 = new UsabilityQuestions2("Usability", surveyData.usabilityData);
                 var list = new List<SurveyStep>() {usabilityQuestions1, usabilityQuestions2};
-                var group = new SurveyStepGroup(list, "");
+                var group = new SurveyStepGroup(list, "Usability");
                 surveySteps.Add(group);
             }
 
