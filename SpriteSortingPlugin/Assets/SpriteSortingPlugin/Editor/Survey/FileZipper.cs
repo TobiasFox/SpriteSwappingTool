@@ -1,22 +1,20 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using System.Threading;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.Survey
 {
     public class FileZipper
     {
-        private const float FileInUseTimeout = 3000;
-
-        public bool GenerateZip(string folderPath, string outputPath)
+        public bool GenerateZip(string folderPath, string outputPath, out string adjustedOutputPath)
         {
-            var isTimeout = CheckIfFileIsAlreadyInUse(outputPath);
-            if (isTimeout)
+            if (File.Exists(outputPath))
             {
-                return false;
+                outputPath = GenerateUniqueName(outputPath);
             }
+
+            adjustedOutputPath = outputPath;
 
             try
             {
@@ -30,33 +28,17 @@ namespace SpriteSortingPlugin.Survey
             }
         }
 
-        private bool CheckIfFileIsAlreadyInUse(string outputPath)
+        private string GenerateUniqueName(string outputPath)
         {
-            var startTime = DateTime.Now;
+            var fileName = Path.GetFileNameWithoutExtension(outputPath);
+            var baseDir = Path.GetDirectoryName(outputPath);
 
-            while (true)
-            {
-                try
-                {
-                    if ((DateTime.Now - startTime).TotalMilliseconds > FileInUseTimeout)
-                    {
-                        return true;
-                    }
+            var uniqueName = fileName + "_" + Guid.NewGuid();
+            var extension = Path.GetExtension(outputPath);
 
-                    if (File.Exists(outputPath))
-                    {
-                        File.Delete(outputPath);
-                    }
+            var uniqueFileName = $"{baseDir}{Path.DirectorySeparatorChar}{uniqueName}{extension}";
 
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Thread.Sleep(200);
-                }
-            }
-
-            return false;
+            return uniqueFileName;
         }
     }
 }

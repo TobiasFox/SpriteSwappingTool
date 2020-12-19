@@ -237,9 +237,20 @@ namespace SpriteSortingPlugin.Survey.UI
             surveyData.currentProgress = surveyWizard.CurrentProgress;
             surveyData.totalProgress = surveyWizard.TotalProgress;
 
-            var directory = Application.temporaryCachePath + Path.DirectorySeparatorChar +
+            string directory;
+
+            if (isResult)
+            {
+                directory = Application.persistentDataPath + Path.DirectorySeparatorChar +
                             Path.Combine(SurveyDataOutputPath) + Path.DirectorySeparatorChar +
-                            (isResult ? surveyData.ResultSaveFolder : surveyData.SaveFolder);
+                            surveyData.ResultSaveFolder;
+            }
+            else
+            {
+                directory = Application.temporaryCachePath + Path.DirectorySeparatorChar +
+                            Path.Combine(SurveyDataOutputPath) + Path.DirectorySeparatorChar +
+                            surveyData.SaveFolder;
+            }
 
             Directory.CreateDirectory(directory);
             var pathAndName = directory + Path.DirectorySeparatorChar + (isResult ? "Result" : "") + "SurveyData.json";
@@ -308,7 +319,8 @@ namespace SpriteSortingPlugin.Survey.UI
             {
                 // Debug.Log("start zipping file");
                 var fileZipper = new FileZipper();
-                var isSucceededZippingFiles = fileZipper.GenerateZip(collectedDataPath, zipFilePath);
+                var isSucceededZippingFiles =
+                    fileZipper.GenerateZip(collectedDataPath, zipFilePath, out var adjustedOutputPath);
                 // Debug.Log("zipping succeeded: " + isSucceededZippingFiles);
 
 
@@ -329,7 +341,7 @@ namespace SpriteSortingPlugin.Survey.UI
                 }
 
                 // Debug.Log("start sending mail");
-                transmitData.SendMail(surveyData.UserId, threadData.progress, zipFilePath);
+                transmitData.SendMail(surveyData.UserId, threadData.progress, adjustedOutputPath);
             }
             catch (Exception ex)
             {
