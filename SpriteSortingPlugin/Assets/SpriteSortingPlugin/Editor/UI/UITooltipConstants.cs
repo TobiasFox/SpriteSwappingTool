@@ -50,7 +50,7 @@
             "When enabled, Sprites with a smaller ratio of their own area to the intersection area will be sorted in the foreground.";
 
         public const string SpriteSortPointTooltip =
-            "Compares the Sort Points of Sprites by testing if they overlap another Sprite.\n"+
+            "Compares the Sort Points of Sprites by testing if they overlap another Sprite.\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SpriteSortPointForegroundSpriteTooltip =
@@ -228,6 +228,10 @@
         public const string SortingEditorScenePreviewDisplaySortingLayerTooltip =
             "When enabled, the current sorting layer and the modified sorting layer will be displayed in the scene as text.";
 
+        public const string SortingEditorScenePreviewReflectSortingOptionsInSceneTooltip =
+            "When enabled, changed sorting options will be reflected directly in the scene.\n" +
+            "Any not confirmed sorting option adjustments will be reverted, when closing this window.";
+
         public const string SortingEditorScenePreviewSpriteOutlineTooltip =
             "When enabled, SpriteRenderer outlines will be drawn in the scene.";
 
@@ -242,14 +246,14 @@
         public const string SortingEditorSpriteSwapDescriptionTooltip =
             "The order of rendering overlapping and unsorted SpriteRenderer might differ per frame depending on several criteria. " +
             "The resulting effect is an abrupt swap of the SpriteRenderer in the foreground from such a group of renderers.";
-        
+
         public const string SortingEditorAnalyzeSurroundingSpriteRendererTooltip =
             "When enabled, it will be searched iteratively in surrounding SpriteRenderer for Sprite swapping issues based on the previously found overlapping items and their adjusted sorting options. Newfound Sprite swapping issues will be solved by incrementing the sorting order of correspondent SpriteRenderers.\n\n" +
             "Although it might take some time this option is recommended as it finds and solves resulting Sprite swapping issues automatically.";
 
         public const string SortingEditorAnalyzeSurroundingSpriteRendererDurationTooltip =
             "As this check analyzes surrounding SpriteRenderers it can affect many SpriteRenderers depending on the setups of opened scenes.";
-        
+
         public const string SortingEditorAnalyzeSRorSGWithChangedLayerFirstTooltip =
             "When enabled, SpriteRenderers or Sorting Groups with changed Sorting Layers will be analyzed regarding Sprite sorting issues first.\n" +
             "Functionality is not implemented yet.";

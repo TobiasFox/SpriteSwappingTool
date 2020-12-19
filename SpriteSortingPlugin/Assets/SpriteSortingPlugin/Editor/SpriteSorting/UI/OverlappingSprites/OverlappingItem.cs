@@ -113,7 +113,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                    SortingLayer.NameToID(SortingLayerUtility.SortingLayerNames[sortingLayerDropDownIndex]);
         }
 
-        public void ApplySortingOption()
+        public void ApplySortingOption(bool isContinuous = false)
         {
             var newSortingOrder = sortingOrder;
             if (isUsingRelativeSortingOrder)
@@ -123,15 +123,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
 
             if (SortingComponent.SortingGroup != null)
             {
-                ApplySortingOptionsToSortingGroup(newSortingOrder);
+                ApplySortingOptionsToSortingGroup(newSortingOrder, isContinuous);
 
                 return;
             }
 
-            ApplySortingOptionsToSpriteRenderer(newSortingOrder);
+            ApplySortingOptionsToSpriteRenderer(newSortingOrder, isContinuous);
         }
 
-        private void ApplySortingOptionsToSpriteRenderer(int newSortingOrder)
+        private void ApplySortingOptionsToSpriteRenderer(int newSortingOrder, bool isContinuous = false)
         {
             var isSortingLayerIdentical = SortingComponent.SpriteRenderer.sortingLayerName.Equals(sortingLayerName);
             var isSortingOrderIdentical = SortingComponent.SpriteRenderer.sortingOrder == newSortingOrder;
@@ -141,21 +141,28 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 return;
             }
 
-            var message = "Update sorting options on SpriteRenderer " + sortingComponent.SpriteRenderer.name + " - ";
+            string message = null;
 
-            if (!isSortingLayerIdentical)
+            if (!isContinuous)
             {
-                message += "Sorting Layer: " + SortingComponent.SpriteRenderer.sortingLayerName + " -> " +
-                           sortingLayerName + (!isSortingOrderIdentical ? ", " : "");
+                message = "Update sorting options on SpriteRenderer " + sortingComponent.SpriteRenderer.name +
+                          " - ";
+
+                if (!isSortingLayerIdentical)
+                {
+                    message += "Sorting Layer: " + SortingComponent.SpriteRenderer.sortingLayerName + " -> " +
+                               sortingLayerName + (!isSortingOrderIdentical ? ", " : "");
+                }
+
+                if (!isSortingOrderIdentical)
+                {
+                    message += "Sorting Order: " + SortingComponent.SpriteRenderer.sortingOrder + " -> " +
+                               newSortingOrder;
+                }
+
+                Undo.RecordObject(SortingComponent.SpriteRenderer, "apply sorting options");
             }
 
-            if (!isSortingOrderIdentical)
-            {
-                message += "Sorting Order: " + SortingComponent.SpriteRenderer.sortingOrder + " -> " +
-                           newSortingOrder;
-            }
-
-            Undo.RecordObject(SortingComponent.SpriteRenderer, "apply sorting options");
             if (!isSortingLayerIdentical)
             {
                 SortingComponent.SpriteRenderer.sortingLayerName = sortingLayerName;
@@ -166,12 +173,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 SortingComponent.SpriteRenderer.sortingOrder = newSortingOrder;
             }
 
-            EditorUtility.SetDirty(SortingComponent.SpriteRenderer);
+            if (!isContinuous)
+            {
+                EditorUtility.SetDirty(SortingComponent.SpriteRenderer);
 
-            Debug.Log(message);
+                Debug.Log(message);
+            }
         }
 
-        private void ApplySortingOptionsToSortingGroup(int newSortingOrder)
+        private void ApplySortingOptionsToSortingGroup(int newSortingOrder, bool isContinuous)
         {
             if (sortingComponent.SortingGroup == null)
             {
@@ -186,22 +196,28 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 return;
             }
 
-            var message = "Update sorting options on SortingGroup " + sortingComponent.SortingGroup.name + " - ";
+            string message = null;
 
-            if (!isSortingLayerIdentical)
+            if (!isContinuous)
             {
-                message += "Sorting Layer: " + SortingComponent.SortingGroup.sortingLayerName + " -> " +
-                           sortingLayerName + (!isSortingOrderIdentical ? ", " : "");
+                message = "Update sorting options on SortingGroup " + sortingComponent.SortingGroup.name + " - ";
+
+                if (!isSortingLayerIdentical)
+                {
+                    message += "Sorting Layer: " + SortingComponent.SortingGroup.sortingLayerName + " -> " +
+                               sortingLayerName + (!isSortingOrderIdentical ? ", " : "");
+                }
+
+                if (!isSortingOrderIdentical)
+                {
+                    message += "Sorting Order: " + SortingComponent.SortingGroup.sortingOrder + " -> " +
+                               newSortingOrder;
+                }
+
+
+                Undo.RecordObject(SortingComponent.SortingGroup, "apply sorting options");
             }
 
-            if (!isSortingOrderIdentical)
-            {
-                message += "Sorting Order: " + SortingComponent.SortingGroup.sortingOrder + " -> " +
-                           newSortingOrder;
-            }
-
-
-            Undo.RecordObject(SortingComponent.SortingGroup, "apply sorting options");
             if (!isSortingLayerIdentical)
             {
                 SortingComponent.SortingGroup.sortingLayerName = sortingLayerName;
@@ -212,9 +228,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 SortingComponent.SortingGroup.sortingOrder = newSortingOrder;
             }
 
-            EditorUtility.SetDirty(SortingComponent.SortingGroup);
+            if (!isContinuous)
+            {
+                EditorUtility.SetDirty(SortingComponent.SortingGroup);
 
-            Debug.Log(message);
+                Debug.Log(message);
+            }
         }
 
         public int GetNewSortingOrder()
@@ -226,6 +245,19 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
 
             return newSortingOrder;
+        }
+
+        public void RestoreSpriteRendererSortingOptions()
+        {
+            if (SortingComponent.SortingGroup != null)
+            {
+                SortingComponent.SortingGroup.sortingLayerID = originSortingLayer;
+                SortingComponent.SortingGroup.sortingOrder = originSortingOrder;
+                return;
+            }
+
+            SortingComponent.SpriteRenderer.sortingLayerID = originSortingLayer;
+            SortingComponent.SpriteRenderer.sortingOrder = originSortingOrder;
         }
 
         public override string ToString()

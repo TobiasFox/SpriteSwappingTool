@@ -14,10 +14,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         private OverlappingItemIndexComparer originIndexComparer;
         private OverlappingItemIdentityComparer overlappingItemIdentityComparer;
         private bool isAlreadySorted;
+        private bool isContinuouslyReflectingSortingOptionsInScene;
 
         public List<OverlappingItem> Items => items;
         public OverlappingItem BaseItem => baseItem;
         public bool HasChangedLayer => hasChangedLayer;
+        public bool IsContinuouslyReflectingSortingOptionsInScene => isContinuouslyReflectingSortingOptionsInScene;
 
         public OverlappingItems(OverlappingItem baseItem, List<OverlappingItem> items, bool isAlreadySorted = false)
         {
@@ -190,11 +192,31 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
         }
 
-        public void ApplySortingOption()
+        public void ApplySortingOption(bool isContinuous = false)
         {
             foreach (var overlappingItem in items)
             {
-                overlappingItem.ApplySortingOption();
+                overlappingItem.ApplySortingOption(isContinuous);
+            }
+
+            if (isContinuous)
+            {
+                isContinuouslyReflectingSortingOptionsInScene = true;
+            }
+        }
+
+        public void RestoreSpriteRendererSortingOptions()
+        {
+            if (!isContinuouslyReflectingSortingOptionsInScene)
+            {
+                return;
+            }
+
+            isContinuouslyReflectingSortingOptionsInScene = false;
+
+            foreach (var overlappingItem in items)
+            {
+                overlappingItem.RestoreSpriteRendererSortingOptions();
             }
         }
 

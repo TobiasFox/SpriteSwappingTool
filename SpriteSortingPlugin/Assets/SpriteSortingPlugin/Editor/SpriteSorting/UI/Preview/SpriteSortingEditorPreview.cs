@@ -22,6 +22,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
         private bool isSceneVisualizingDelegateIsAdded;
         private bool isVisualizingSortingOrder;
         private bool isVisualizingSortingLayer;
+        private bool isUpdatingSpriteRendererInScene;
         private OverlappingItems overlappingItems;
         private SpriteData spriteData;
         private OutlinePrecision outlinePrecision;
@@ -30,6 +31,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
         private GUIStyle sortingOrderStyle;
 
         public bool IsVisualizingBoundsInScene => isVisualizingBoundsInScene;
+        public bool IsUpdatingSpriteRendererInScene => isUpdatingSpriteRendererInScene;
 
         public void UpdateOverlappingItems(OverlappingItems overlappingItems)
         {
@@ -109,7 +111,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 
                     EditorGUI.BeginChangeCheck();
                     isVisualizingSortingOrder = GUILayout.Toggle(isVisualizingSortingOrder, new GUIContent(
-                            "Sorting Order", UITooltipConstants.SortingEditorScenePreviewDisplaySortingOrderTooltip),
+                            "Label: Sorting Order",
+                            UITooltipConstants.SortingEditorScenePreviewDisplaySortingOrderTooltip),
                         Styling.ButtonStyle, GUILayout.ExpandWidth(true));
                     if (EditorGUI.EndChangeCheck())
                     {
@@ -118,12 +121,18 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 
                     EditorGUI.BeginChangeCheck();
                     isVisualizingSortingLayer = GUILayout.Toggle(isVisualizingSortingLayer, new GUIContent(
-                            "Sorting Layer", UITooltipConstants.SortingEditorScenePreviewDisplaySortingLayerTooltip),
+                            "Label: Sorting Layer",
+                            UITooltipConstants.SortingEditorScenePreviewDisplaySortingLayerTooltip),
                         Styling.ButtonStyle, GUILayout.ExpandWidth(true));
                     if (EditorGUI.EndChangeCheck())
                     {
                         EnableSceneVisualization(isVisualizingSortingLayer);
                     }
+
+                    isUpdatingSpriteRendererInScene = GUILayout.Toggle(isUpdatingSpriteRendererInScene, new GUIContent(
+                            "Update SpriteRenderers",
+                            UITooltipConstants.SortingEditorScenePreviewReflectSortingOptionsInSceneTooltip),
+                        Styling.ButtonStyle, GUILayout.ExpandWidth(true));
                 }
 
                 if (!isSceneVisualizingDelegateIsAdded &&

@@ -242,6 +242,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                             GUILayout.MinHeight(LargerButtonHeight), GUILayout.ExpandWidth(false)))
                         {
                             wasAnalyzeButtonClicked = false;
+                            if (HasOverlappingItems() && preview.IsUpdatingSpriteRendererInScene)
+                            {
+                                overlappingItems.RestoreSpriteRendererSortingOptions();
+                            }
+
                             CleanUpReordableList();
                             preview.DisableSceneVisualizations();
 
@@ -338,6 +343,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             preview.DoPreview(isAnalyzedButtonClickedThisFrame);
+
+            if (preview.IsUpdatingSpriteRendererInScene)
+            {
+                overlappingItems.ApplySortingOption(true);
+            }
+            else
+            {
+                overlappingItems.RestoreSpriteRendererSortingOptions();
+            }
 
             EndScrollRect();
         }
@@ -695,6 +709,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void ApplySortingOptions()
         {
+            if (preview.IsUpdatingSpriteRendererInScene)
+            {
+                overlappingItems.RestoreSpriteRendererSortingOptions();
+            }
+
             if (isSearchingSurroundingSpriteRenderer)
             {
                 ApplySortingOptionsIterative();
@@ -724,7 +743,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 }
 
                 overlappingItems.Items.RemoveAt(counter);
-                overlappingItem.ApplySortingOption();
+                overlappingItem.ApplySortingOption(false);
             }
 
             if (overlappingItems.Items.Count <= 0)
@@ -877,6 +896,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             if (isVisualizingBoundsInScene)
             {
                 preview.EnableSceneVisualization(false);
+            }
+
+            if (HasOverlappingItems() && preview.IsUpdatingSpriteRendererInScene)
+            {
+                overlappingItems.RestoreSpriteRendererSortingOptions();
             }
 
             FillSpriteDetectionData();
@@ -1078,6 +1102,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void OnDestroy()
         {
+            if (HasOverlappingItems() && overlappingItems.IsContinuouslyReflectingSortingOptionsInScene)
+            {
+                overlappingItems.RestoreSpriteRendererSortingOptions();
+            }
+
             preview.CleanUpPreview();
             PolygonColliderCacher.GetInstance().CleanUp();
             autoSortingOptionsUI.Cleanup();
