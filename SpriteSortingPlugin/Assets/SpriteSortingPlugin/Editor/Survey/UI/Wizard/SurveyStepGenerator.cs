@@ -25,8 +25,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
             var manualSortingStep = new ManualSortingStep(manualSortingLabel);
             var manualSortingStep2 = new ManualSortingStep2(manualSortingLabel);
-            // surveySteps.Add(comparisonManualSortingStep1);
-            // surveySteps.Add(comparisonManualSortingStep2);
+            // surveySteps.Add(manualSortingStep);
+            // surveySteps.Add(manualSortingStep2);
 
             var creatingSpriteData = new CreatingSpriteDataStep("Creating " + nameof(SpriteData) + " asset");
             // surveySteps.Add(creatingSpriteData);
@@ -37,12 +37,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                                                     GeneralData.Name + " " + GeneralData.DetectorName);
             // surveySteps.Add(pluginSorting1);
             // surveySteps.Add(pluginSorting2);
-            {
-                var list = new List<SurveyStep>() {pluginSorting1, pluginSorting2};
-                var group = new SurveyStepGroup(list, "");
-                surveySteps.Add(group);
-            }
-            surveySteps.Add(introStep2);
+            // {
+            //     var list = new List<SurveyStep>() {pluginSorting1, pluginSorting2};
+            //     var group = new SurveyStepGroup(list, "");
+            //     surveySteps.Add(group);
+            // }
+            // surveySteps.Add(introStep2);
 
 
             var generalQuestions1 = new GeneralQuestions1("General Questions", surveyData.generalQuestionsData);
@@ -51,33 +51,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             // surveySteps.Add(generalQuestions2);
             // {
             //     var list = new List<SurveyStep>() {generalQuestions1, generalQuestions2};
-            //     var group = new SurveyStepGroup(list, "");
-            //     surveySteps.Add(group);
-            // }
-
-            // surveySteps.Add(comparisonManualSortingStep3);
-
-            // {
-            //     var list = new List<SurveyStep>();
-            //     for (int i = 0; i < 6; i++)
-            //     {
-            //         list.Add(new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene1));
-            //     }
-            //
-            //     // var list = new List<SurveyStep>() {comparisonManualSortingStep1, comparisonManualSortingStep2};
-            //     var group = new SurveyStepGroup(list, "");
-            //     surveySteps.Add(group);
-            // }
-            //
-            // {
-            //     var autoSortingLabel = "Evaluation of the functionality to generate sorting order suggestions";
-            //     var list = new List<SurveyStep>();
-            //     for (int i = 0; i < 4; i++)
-            //     {
-            //         list.Add(new ComparisonManualSortingStep(manualSortingLabel, autoSortingLabel));
-            //     }
-            //
-            //     // var list = new List<SurveyStep>() {comparisonManualSortingStep1, comparisonManualSortingStep2};
             //     var group = new SurveyStepGroup(list, "");
             //     surveySteps.Add(group);
             // }
@@ -105,10 +78,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             //     surveySteps.Add(group);
             // }
 
-            var finishingStep = new FinishingSurvey("Finalizing", surveyData.userData);
+            var finishingStep = new FinishingSurvey("Finalizing");
             // surveySteps.Add(finishingStep);
 
-            // surveySteps.AddRange(FinalSurveyStepList());
+            surveySteps.AddRange(FinalSurveyStepList(surveyData));
 
             return surveySteps;
         }
@@ -135,42 +108,34 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             //Comparison manual sorting and plugin usage
-            // {
-            //     var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
-            //     var manualSortingScene1 = "";
-            //     var manualSortingScene2 = "";
-            //     // var manualSortingScene3 = "";
-            //     var comparisonManualSortingStep1 =
-            //         new ComparisonManualSortingStep(manualSortingLabel, comparingData);
-            //     var comparisonManualSortingStep2 =
-            //         new ComparisonManualSortingStep(manualSortingLabel, comparingData);
-            //     // var comparisonManualSortingStep3 = new ComparisonManualSortingStep(manualSortingLabel, manualSortingScene3);
-            //
-            //     var list = new List<SurveyStep>();
-            //     for (var i = 0; i < 6; i++)
-            //     {
-            //         list.Add(new ComparisonManualSortingStep(manualSortingLabel, comparingData));
-            //     }
-            //
-            //     var group = new SurveyStepGroup(list, "");
-            //     surveySteps.Add(group);
-            // }
+            {
+                var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
+                var pluginSortingLabel = "Automatically detect visual glitches with the " +
+                                         GeneralData.Name + " " + GeneralData.DetectorName;
+
+                var manualSortingStep = new ManualSortingStep(manualSortingLabel);
+                var manualSortingStep2 = new ManualSortingStep2(manualSortingLabel);
+                var pluginSorting1 = new PluginSorting1(pluginSortingLabel);
+                var pluginSorting2 = new PluginSorting2(pluginSortingLabel);
+
+                var list = new List<SurveyStep> {manualSortingStep, manualSortingStep2, pluginSorting1, pluginSorting2};
+
+                var group = new SurveyStepGroup(list, "");
+                surveySteps.Add(group);
+            }
 
             //auto sorting
-            // {
-            //     var list = new List<SurveyStep>();
-            //
-            //     var evaluationAutoSortingSuggestionLabel =
-            //         "Evaluation of the functionality to generate sorting order suggestions";
-            //     for (int i = 0; i < 4; i++)
-            //     {
-            //         var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel, comparingData);
-            //         list.Add(sortingSuggestionStep1);
-            //     }
-            //
-            //     var group = new SurveyStepGroup(list, "");
-            //     surveySteps.Add(group);
-            // }
+            {
+                var evaluationAutoSortingSuggestionLabel =
+                    "Evaluation of the functionality to generate sorting order suggestions";
+
+                var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel);
+                var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
+
+                var list = new List<SurveyStep> {sortingSuggestionStep1, sortingSuggestionStep2};
+                var group = new SurveyStepGroup(list, "");
+                surveySteps.Add(group);
+            }
 
             //Usability
             {
@@ -180,6 +145,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var group = new SurveyStepGroup(list, "");
                 surveySteps.Add(group);
             }
+
+            var finishingStep = new FinishingSurvey("Finalizing");
+            surveySteps.Add(finishingStep);
 
             return surveySteps;
         }

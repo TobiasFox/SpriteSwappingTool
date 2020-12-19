@@ -59,5 +59,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
             isTaskStarted = false;
             isTaskFinished = true;
         }
+
+        public void CancelTask()
+        {
+            isTaskStarted = false;
+            isTaskFinished = false;
+        }
     }
 }

@@ -45,6 +45,8 @@ namespace SpriteSortingPlugin.Survey.UI
             surveyWizard = new SurveyWizard();
             surveyWizard.SetSurveySteps(surveyStepGenerator.GenerateSurveySteps(surveyData));
             currentStep = surveyWizard.GetCurrent();
+            GeneralData.isSurveyActive = true;
+            GeneralData.isAutomaticSortingActive = false;
         }
 
         private void OnGUI()
@@ -365,6 +367,8 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void OnDestroy()
         {
+            GeneralData.isSurveyActive = false;
+            GeneralData.isAutomaticSortingActive = true;
             surveyWizard.CleanUp();
         }
 

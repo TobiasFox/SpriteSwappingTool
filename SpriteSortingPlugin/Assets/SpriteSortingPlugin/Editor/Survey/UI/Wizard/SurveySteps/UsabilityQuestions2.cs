@@ -9,9 +9,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         private const int QuestionCounterStart = 10;
         private const float QuestionWidthPercentage = 0.6f;
-        
+
         private static readonly float HighlightHeight = EditorGUIUtility.singleLineHeight * 4;
         private static readonly float TextAreaHeight = EditorGUIUtility.singleLineHeight * 3;
+
         private static readonly string[] RatingQuestions = new string[]
         {
             "How easy to use was the Sprite Swapping Detector?",
@@ -21,10 +22,17 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private UsabilityData data;
         private int questionCounter;
-        
+
         public UsabilityQuestions2(string name, UsabilityData data) : base(name)
         {
             this.data = data;
+        }
+
+        public override void Commit()
+        {
+            base.Commit();
+
+            Finish(SurveyFinishState.Succeeded);
         }
 
         public override void DrawContent()
@@ -69,6 +77,19 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             EditorGUILayout.Space();
+        }
+
+        private bool IsSkipped()
+        {
+            foreach (var ratingAnswer in data.ratingAnswers)
+            {
+                if (ratingAnswer >= 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void DrawHighLowlightQuestion()

@@ -1,4 +1,5 @@
-﻿using SpriteSortingPlugin.UI;
+﻿using System.IO;
+using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,24 +9,36 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         private const float VerticalSpacing = 5;
 
+        private static readonly string[] PreviewPrefabPathAndName = new string[]
+        {
+            "Assets",
+            "SpriteSortingPlugin",
+            "Editor",
+            "Survey",
+            "UI",
+            "Wizard",
+            "SurveySteps",
+            "SurveyPreviewParent.prefab"
+        };
+
         private SurveyPreview preview;
 
         public IntroSurveyStep(string name) : base(name)
         {
-            preview = new SurveyPreview();
+            preview = new SurveyPreview(Path.Combine(PreviewPrefabPathAndName));
         }
 
         public override void Commit()
         {
             base.Commit();
-            Debug.Log("Intro completed");
             Finish(SurveyFinishState.Succeeded);
+            preview.CleanUp();
         }
 
         public override void Rollback()
         {
             base.Rollback();
-            Debug.Log("rollback Intro");
+            preview.CleanUp();
         }
 
         public override void DrawContent()
@@ -41,11 +54,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             preview?.DoPreview();
             EditorGUILayout.Space(VerticalSpacing);
 
-            GUILayout.Label(
-                "With your participation, you help to evaluate the tool, especially the functionality to generate automatic sorting order suggestions.",
-                Styling.LabelWrapStyle);
-
-            EditorGUILayout.Space(VerticalSpacing);
+            // GUILayout.Label(
+            //     "With your participation, you help to evaluate the tool, especially the functionality to generate automatic sorting order suggestions.",
+            //     Styling.LabelWrapStyle);
+            //
+            // EditorGUILayout.Space(VerticalSpacing);
 
             EditorGUILayout.LabelField("Duration", "10 - 15 min");
             EditorGUILayout.LabelField("Data",

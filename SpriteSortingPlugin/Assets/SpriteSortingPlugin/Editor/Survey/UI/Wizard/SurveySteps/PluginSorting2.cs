@@ -23,6 +23,35 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
         }
 
+        public override void Commit()
+        {
+            base.Commit();
+
+            var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
+
+            if (!currentSortingTaskData.isTaskStarted)
+            {
+                var isFinishedTask = currentSortingTaskData.timeNeeded > 0;
+                Finish(isFinishedTask ? SurveyFinishState.Succeeded : SurveyFinishState.Skipped);
+            }
+            else if (!currentSortingTaskData.isTaskFinished)
+            {
+                currentSortingTaskData.CancelTask();
+                Finish(SurveyFinishState.Skipped);
+            }
+        }
+
+        public override void Rollback()
+        {
+            base.Rollback();
+
+            var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
+            if (currentSortingTaskData.isTaskStarted)
+            {
+                currentSortingTaskData.CancelTask();
+            }
+        }
+
         public override void DrawContent()
         {
             EditorGUI.indentLevel++;

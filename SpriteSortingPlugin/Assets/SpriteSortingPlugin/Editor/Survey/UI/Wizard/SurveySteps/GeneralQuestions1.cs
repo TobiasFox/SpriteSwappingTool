@@ -9,6 +9,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     public class GeneralQuestions1 : SurveyStep
     {
         private const int QuestionCounterStart = 1;
+
         private static readonly string[] MainFields = new string[]
         {
             "Design", "Programming", "Game Design", "3D Modelling", "Audio", "Texture Artist", "VFX Artist",
@@ -22,6 +23,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public GeneralQuestions1(string name, GeneralQuestionsData data) : base(name)
         {
             this.data = data;
+        }
+
+        public override void Commit()
+        {
+            base.Commit();
+
+            // var isSkipped = IsSkipped();
+            Finish(SurveyFinishState.Succeeded);
         }
 
         public override void DrawContent()
@@ -57,6 +66,38 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             EditorGUI.indentLevel--;
+        }
+
+        private bool IsSkipped()
+        {
+            if (data.isGameDevelopmentStudent || data.isWorkingInGameDevelopment ||
+                data.isGameDevelopmentHobbyist || data.isNotDevelopingGames ||
+                data.isGameDevelopmentRelationOther || data.isGameDevelopmentRelationNoAnswer)
+            {
+                return false;
+            }
+
+            if (data.mainFieldOfWork >= 0 || data.isMainFieldOfWorkOther || data.isMainFieldOfWorkNoAnswer)
+            {
+                return false;
+            }
+
+            if (data.developing2dGames < 0)
+            {
+                return true;
+            }
+
+            if (data.developing2dGames == 1)
+            {
+                return false;
+            }
+
+            if (data.numberOfDeveloped2dGames >= 0 || data.isNumberOfDeveloped2dGamesNoAnswer)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void DrawGameDevelopmentRelation()

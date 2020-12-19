@@ -1,4 +1,5 @@
-﻿using SpriteSortingPlugin.Survey.UI.Wizard.Data;
+﻿using System.IO;
+using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
@@ -9,6 +10,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         private const int QuestionCounterStart = 5;
 
+        private static readonly string[] PreviewPrefabPathAndName = new string[]
+        {
+            "Assets",
+            "SpriteSortingPlugin",
+            "Editor",
+            "Survey",
+            "UI",
+            "Wizard",
+            "SurveySteps",
+            "GeneralQuestionPreview.prefab"
+        };
+
         private GeneralQuestionsData data;
         private float space = 17.5f;
         private float previewHeight = 150;
@@ -18,7 +31,21 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public GeneralQuestions2(string name, GeneralQuestionsData data) : base(name)
         {
             this.data = data;
-            preview = new SurveyPreview();
+            preview = new SurveyPreview(Path.Combine(PreviewPrefabPathAndName));
+        }
+
+        public override void Commit()
+        {
+            base.Commit();
+
+            Finish(SurveyFinishState.Succeeded);
+            preview.CleanUp();
+        }
+
+        public override void Rollback()
+        {
+            base.Rollback();
+            preview.CleanUp();
         }
 
         public override void DrawContent()
@@ -75,6 +102,53 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             preview?.CleanUp();
         }
 
+        private bool IsSkipped()
+        {
+            if (data.knowingVisualGlitches >= 0)
+            {
+                return false;
+            }
+
+            if (data.workingOnApplicationWithVisualGlitch < 0)
+            {
+                return true;
+            }
+
+            if (data.workingOnApplicationWithVisualGlitch == 1)
+            {
+                return false;
+            }
+
+            if (data.solvedVisualGlitches >= 0)
+            {
+                return false;
+            }
+
+            if (data.workingOnApplicationWithVisualGlitch < 0)
+            {
+                return true;
+            }
+
+            if (data.workingOnApplicationWithVisualGlitch == 1)
+            {
+                return false;
+            }
+
+            if (data.numberOfApplicationsWithVisualGlitches < 0 &&
+                !data.isNotKnowingNumberOfApplicationsWithVisualGlitches &&
+                !data.isNumberOfApplicationsWithVisualGlitchesNoAnswer)
+            {
+                return true;
+            }
+
+            if (data.solvedVisualGlitches >= 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private void DrawQuestion1()
         {
             EditorGUILayout.LabelField(questionCounter +
@@ -113,7 +187,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawQuestion3()
         {
             EditorGUILayout.LabelField(questionCounter +
-                                       ". Have you been working on 2D Unity applications where such visual glitches have happened?",
+                                       ". Have you worked on Unity 2D applications, where such visual glitches occurred?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
@@ -129,7 +203,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion4()
         {
-            EditorGUILayout.LabelField(questionCounter + ". If yes, how many?", Styling.QuestionLabelStyle);
+            EditorGUILayout.LabelField(
+                questionCounter + ". If [7] yes, in how many Unity 2D application occurred visual glitches?",
+                Styling.QuestionLabelStyle);
             EditorGUI.indentLevel += 2;
 
             var selectionGrid =
@@ -138,9 +214,41 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var answers = new string[] {"1 - 3", "3 - 6", "6 - 9", "9 - 12", "> 12"};
             using (new EditorGUI.DisabledScope(data.workingOnApplicationWithVisualGlitch != 0))
             {
-                data.numberOfApplicationsWithVisualGlitches = GUI.SelectionGrid(selectionGrid,
-                    data.numberOfApplicationsWithVisualGlitches,
-                    answers, answers.Length);
+                using (var changeScope = new EditorGUI.ChangeCheckScope())
+                {
+                    data.numberOfApplicationsWithVisualGlitches = GUI.SelectionGrid(selectionGrid,
+                        data.numberOfApplicationsWithVisualGlitches,
+                        answers, answers.Length);
+
+                    if (changeScope.changed && data.numberOfApplicationsWithVisualGlitches > -1)
+                    {
+                        data.isNotKnowingNumberOfApplicationsWithVisualGlitches = false;
+                        data.isNumberOfApplicationsWithVisualGlitchesNoAnswer = false;
+                    }
+                }
+
+                using (var changeScope = new EditorGUI.ChangeCheckScope())
+                {
+                    data.isNotKnowingNumberOfApplicationsWithVisualGlitches = EditorGUILayout.ToggleLeft("Don't know",
+                        data.isNotKnowingNumberOfApplicationsWithVisualGlitches);
+
+                    if (changeScope.changed && data.isNotKnowingNumberOfApplicationsWithVisualGlitches)
+                    {
+                        data.numberOfApplicationsWithVisualGlitches = -1;
+                        data.isNumberOfApplicationsWithVisualGlitchesNoAnswer = false;
+                    }
+                }
+
+                using (var changeScope = new EditorGUI.ChangeCheckScope())
+                {
+                    data.isNumberOfApplicationsWithVisualGlitchesNoAnswer =
+                        EditorGUILayout.ToggleLeft("No answer", data.isNumberOfApplicationsWithVisualGlitchesNoAnswer);
+                    if (changeScope.changed & data.isNumberOfApplicationsWithVisualGlitchesNoAnswer)
+                    {
+                        data.numberOfApplicationsWithVisualGlitches = -1;
+                        data.isNotKnowingNumberOfApplicationsWithVisualGlitches = false;
+                    }
+                }
             }
 
             EditorGUI.indentLevel -= 2;
@@ -149,7 +257,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawQuestion5()
         {
             EditorGUILayout.LabelField(
-                questionCounter + ". If yes, was there a solution found for these visual glitches?",
+                questionCounter + ". If [7] yes, could these visual glitches be fixed?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel += 2;
 
@@ -168,7 +276,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void DrawQuestion6()
         {
-            EditorGUILayout.LabelField(questionCounter + ". If yes, how were these visual glitches been solved?",
+            EditorGUILayout.LabelField(questionCounter + ". If [8] yes, how were these visual glitches fixed?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel += 3;
 

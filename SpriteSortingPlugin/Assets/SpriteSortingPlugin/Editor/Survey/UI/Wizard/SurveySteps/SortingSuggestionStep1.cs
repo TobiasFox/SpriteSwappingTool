@@ -37,8 +37,39 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
         }
 
+        public override void Commit()
+        {
+            base.Commit();
+
+            var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[1];
+
+            if (!currentSortingTaskData.isTaskStarted)
+            {
+                var isFinishedTask = currentSortingTaskData.timeNeeded > 0;
+                Finish(isFinishedTask ? SurveyFinishState.Succeeded : SurveyFinishState.Skipped);
+            }
+            else if (!currentSortingTaskData.isTaskFinished)
+            {
+                currentSortingTaskData.CancelTask();
+                Finish(SurveyFinishState.Skipped);
+            }
+        }
+
+        public override void Rollback()
+        {
+            base.Rollback();
+
+            var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[1];
+            if (currentSortingTaskData.isTaskStarted)
+            {
+                currentSortingTaskData.CancelTask();
+            }
+        }
+
         public override void DrawContent()
         {
+            GeneralData.isAutomaticSortingActive = true;
+
             EditorGUI.indentLevel++;
 
             EditorGUILayout.LabelField("Okay, very good!", Styling.LabelWrapStyle);

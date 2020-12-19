@@ -23,11 +23,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
         public int numberOfDeveloped2dGames = -1;
         public bool isNumberOfDeveloped2dGamesNoAnswer;
 
+        
         public int knowingVisualGlitches = -1;
         public string visualGlitchReasons = "";
 
         public int workingOnApplicationWithVisualGlitch = -1;
         public int numberOfApplicationsWithVisualGlitches = -1;
+        public bool isNotKnowingNumberOfApplicationsWithVisualGlitches;
+        public bool isNumberOfApplicationsWithVisualGlitchesNoAnswer;
 
         public int solvedVisualGlitches = -1;
         public string solvingVisualGlitchApproach = "";

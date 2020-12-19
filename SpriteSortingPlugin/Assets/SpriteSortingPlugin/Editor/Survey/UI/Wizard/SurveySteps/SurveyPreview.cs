@@ -7,15 +7,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class SurveyPreview
     {
-        private const string PreviewPrefabPathAndName =
-            "Assets/SpriteSortingPlugin/Editor/Survey/UI/Wizard/SurveySteps/SurveyPreviewParent.prefab";
-
         private const float PreviewHeight = 300;
         private static readonly Quaternion DefaultPreviewRotation = Quaternion.Euler(0, 120f, 0);
 
         private GameObject previewGameObject;
         private Editor previewEditor;
         private bool isPreviewVisible = true;
+        private string previewPrefabPathAndName;
+
+        public SurveyPreview(string assetPath)
+        {
+            previewPrefabPathAndName = assetPath;
+        }
 
         private void GeneratePreview()
         {
@@ -23,7 +26,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var parentTransform = previewGameObject.transform;
             parentTransform.rotation = DefaultPreviewRotation;
 
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PreviewPrefabPathAndName);
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(previewPrefabPathAndName);
             var overlappingSpritesGO = Object.Instantiate(prefab, Vector3.zero, Quaternion.identity, parentTransform);
             overlappingSpritesGO.hideFlags = HideFlags.DontSave;
             PreviewUtility.HideAndDontSaveGameObject(overlappingSpritesGO);
@@ -80,6 +83,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             if (previewEditor != null)
             {
                 Object.DestroyImmediate(previewEditor);
+                previewEditor = null;
             }
         }
     }

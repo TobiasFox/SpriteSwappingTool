@@ -37,6 +37,26 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             DrawSusQuestions();
         }
 
+        public override void Commit()
+        {
+            base.Commit();
+
+            Finish(SurveyFinishState.Succeeded);
+        }
+
+        private bool IsSkipped()
+        {
+            foreach (var susAnswer in data.susAnswers)
+            {
+                if (susAnswer >= 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private void DrawSusQuestions()
         {
             UsabilityQuestionsUtility.DrawRatingHeader(QuestionWidthPercentage, "Overall usability of the system",
@@ -48,7 +68,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 {
                     data.susAnswers[i] = UsabilityQuestionsUtility.DrawSingleRatingQuestion(data.susAnswers[i],
                         QuestionWidthPercentage, questionCounter, SusQuestion[i]);
-                    // DrawSingleSusQuestion(i);
                     questionCounter++;
                 }
 

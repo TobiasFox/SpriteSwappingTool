@@ -51,22 +51,13 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 base.Commit();
 
                 var isGroupSucceeded = true;
-                var isGroupSkipped = true;
 
                 foreach (var currentStep in steps)
                 {
                     isGroupSucceeded &= currentStep.FinishState == SurveyFinishState.Succeeded;
-                    isGroupSkipped &= currentStep.FinishState == SurveyFinishState.Skipped;
                 }
 
-                if (isGroupSucceeded)
-                {
-                    Finish(SurveyFinishState.Succeeded);
-                }
-                else if (isGroupSkipped)
-                {
-                    Finish(SurveyFinishState.Skipped);
-                }
+                Finish(isGroupSucceeded ? SurveyFinishState.Succeeded : SurveyFinishState.Skipped);
             }
         }
 
