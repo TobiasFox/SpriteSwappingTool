@@ -1,4 +1,5 @@
-﻿using SpriteSortingPlugin.Survey.UI.Wizard.Data;
+﻿using System.Collections.Generic;
+using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -64,6 +65,19 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 currentSortingTaskData.CancelTask();
             }
+        }
+
+        public override List<string> CollectFilePathsToCopy()
+        {
+            if (FinishState != SurveyFinishState.Succeeded)
+            {
+                return null;
+            }
+
+            return new List<string>()
+            {
+                SurveyStepSortingData.sortingTaskDataList[1].FullModifiedScenePath
+            };
         }
 
         public override void DrawContent()

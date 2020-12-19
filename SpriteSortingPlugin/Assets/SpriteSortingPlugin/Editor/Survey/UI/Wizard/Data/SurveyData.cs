@@ -16,11 +16,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
 
         public List<SurveyStepData> SurveyStepDataList { get; set; }
 
-        public string SaveFolder =>
-            UserId.ToString() + Path.DirectorySeparatorChar + "progress" + currentProgress;
+        public string SaveFolder => Path.Combine(userId, "progress" + currentProgress);
+        // UserId.ToString() + Path.DirectorySeparatorChar + "progress" + currentProgress;
 
-        public string ResultSaveFolder =>
-            UserId.ToString() + Path.DirectorySeparatorChar + "result";
+        public string ResultSaveFolder => Path.Combine(userId, "result");
+        // UserId.ToString() + Path.DirectorySeparatorChar + "result";
 
         public Guid UserId { get; } = Guid.NewGuid();
 

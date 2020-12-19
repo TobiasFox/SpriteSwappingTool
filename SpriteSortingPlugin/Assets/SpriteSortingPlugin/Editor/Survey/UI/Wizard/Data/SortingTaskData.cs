@@ -33,14 +33,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
                 var directory = Path.Combine(ModifiedSceneFolderPath);
                 Directory.CreateDirectory(directory);
 
-                return directory + Path.DirectorySeparatorChar + "Modified_" + sceneName;
+                return Path.Combine(directory, "Modified_" + sceneName);
             }
         }
 
         public void SetSceneName(string sceneName)
         {
             this.sceneName = sceneName;
-            FullScenePathAndName = Path.Combine(SceneFolderPath) + Path.DirectorySeparatorChar + sceneName;
+            FullScenePathAndName = Path.Combine(Path.Combine(SceneFolderPath), sceneName);
         }
 
         public void StartTask()

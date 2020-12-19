@@ -222,7 +222,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void LoadFinishingSprite()
         {
-            var pathAndName = Path.Combine(FireworkFolder) + Path.DirectorySeparatorChar + FireworkSpriteName;
+            var pathAndName = Path.Combine(Path.Combine(FireworkFolder), FireworkSpriteName);
             var allAssets = AssetDatabase.LoadAllAssetsAtPath(pathAndName);
             foreach (var asset in allAssets)
             {

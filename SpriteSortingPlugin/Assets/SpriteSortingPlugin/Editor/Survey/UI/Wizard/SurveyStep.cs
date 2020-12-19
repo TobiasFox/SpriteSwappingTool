@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
@@ -59,7 +60,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public virtual bool IsSendingData()
         {
             return false;
-        } 
+        }
+
+        public virtual List<string> CollectFilePathsToCopy()
+        {
+            return null;
+        }
 
         public override string ToString()
         {

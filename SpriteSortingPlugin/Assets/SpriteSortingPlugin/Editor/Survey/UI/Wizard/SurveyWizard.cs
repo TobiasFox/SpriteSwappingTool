@@ -197,6 +197,31 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return surveyStepDataList;
         }
 
+        public List<string> CollectFilePathsToCopy()
+        {
+            List<string> collectedDataPathList = null;
+
+            for (var i = 0; i < currentSurveyStepIndex; i++)
+            {
+                var surveyStep = steps[i];
+                var collectedPaths = surveyStep.CollectFilePathsToCopy();
+
+                if (collectedPaths == null || collectedPaths.Count <= 0)
+                {
+                    continue;
+                }
+
+                if (collectedDataPathList == null)
+                {
+                    collectedDataPathList = new List<string>();
+                }
+
+                collectedDataPathList.AddRange(collectedPaths);
+            }
+
+            return collectedDataPathList;
+        }
+
         private void UpdateCurrentProgress()
         {
             currentProgress = 0;

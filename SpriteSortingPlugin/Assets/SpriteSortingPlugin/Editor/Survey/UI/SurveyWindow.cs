@@ -232,7 +232,7 @@ namespace SpriteSortingPlugin.Survey.UI
         private void NextSurveyStep()
         {
             var isSendingData = currentStep.IsSendingData();
-            
+
             surveyWizard.Forward();
 
             if (isSendingData)
@@ -253,27 +253,22 @@ namespace SpriteSortingPlugin.Survey.UI
 
             if (isResult)
             {
-                directory = Application.persistentDataPath + Path.DirectorySeparatorChar +
-                            Path.Combine(SurveyDataOutputPath) + Path.DirectorySeparatorChar +
-                            surveyData.ResultSaveFolder;
+                directory = Path.Combine(Application.persistentDataPath, Path.Combine(SurveyDataOutputPath),
+                    surveyData.ResultSaveFolder);
             }
             else
             {
-                directory = Application.temporaryCachePath + Path.DirectorySeparatorChar +
-                            Path.Combine(SurveyDataOutputPath) + Path.DirectorySeparatorChar +
-                            surveyData.SaveFolder;
+                directory = Path.Combine(Application.temporaryCachePath, Path.Combine(SurveyDataOutputPath),
+                    surveyData.SaveFolder);
             }
 
             Directory.CreateDirectory(directory);
-            var pathAndName = directory + Path.DirectorySeparatorChar + (isResult ? "Result" : "") + "SurveyData.json";
+            var pathAndName = Path.Combine(directory, (isResult ? "Result" : "") + "SurveyData.json");
 
             var json = surveyData.GenerateJson();
             File.WriteAllText(pathAndName, json);
 
-            if (isResult)
-            {
-                CopyAllModifiedScenes(directory);
-            }
+            CopyCollectedFiles(directory);
 
             SendMail(isResult, directory);
         }
@@ -292,19 +287,19 @@ namespace SpriteSortingPlugin.Survey.UI
             });
         }
 
-        private void CopyAllModifiedScenes(string zipSaveFolder)
+        private void CopyCollectedFiles(string zipSaveFolder)
         {
-            var scenePath = Path.Combine(SortingTaskData.ModifiedSceneFolderPath);
-
-            var dirInfo = new DirectoryInfo(scenePath);
-            foreach (var fileInfo in dirInfo.EnumerateFiles())
+            var filePaths = surveyWizard.CollectFilePathsToCopy();
+            if (filePaths == null)
             {
-                if (!fileInfo.Extension.Equals(".unity"))
-                {
-                    continue;
-                }
+                return;
+            }
 
-                fileInfo.CopyTo(zipSaveFolder + Path.DirectorySeparatorChar + fileInfo.Name, true);
+            foreach (var filePath in filePaths)
+            {
+                var fileName = Path.GetFileName(filePath);
+                var targetFilePath = Path.Combine(zipSaveFolder, fileName);
+                File.Copy(filePath, targetFilePath, true);
             }
         }
 
@@ -325,7 +320,7 @@ namespace SpriteSortingPlugin.Survey.UI
             // Debug.Log("start thread");
             var collectedDataPath = threadData.zipFolder;
             var zipName = threadData.isResult ? "ResultData" : ("ProgressData" + threadData.progress);
-            var zipFilePath = threadData.zipSaveFolder + Path.DirectorySeparatorChar + zipName + ".zip";
+            var zipFilePath = Path.Combine(threadData.zipSaveFolder, zipName + ".zip");
 
             try
             {

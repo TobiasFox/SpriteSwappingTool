@@ -15,6 +15,10 @@ namespace SpriteSortingPlugin.Survey
             }
 
             adjustedOutputPath = outputPath;
+            if (string.IsNullOrEmpty(outputPath))
+            {
+                return false;
+            }
 
             try
             {
@@ -30,13 +34,23 @@ namespace SpriteSortingPlugin.Survey
 
         private string GenerateUniqueName(string outputPath)
         {
+            if (string.IsNullOrEmpty(outputPath))
+            {
+                return null;
+            }
+
             var fileName = Path.GetFileNameWithoutExtension(outputPath);
             var baseDir = Path.GetDirectoryName(outputPath);
+
+            if (string.IsNullOrEmpty(baseDir))
+            {
+                return null;
+            }
 
             var uniqueName = fileName + "_" + Guid.NewGuid();
             var extension = Path.GetExtension(outputPath);
 
-            var uniqueFileName = $"{baseDir}{Path.DirectorySeparatorChar}{uniqueName}{extension}";
+            var uniqueFileName = Path.Combine(baseDir, uniqueName + extension);
 
             return uniqueFileName;
         }
