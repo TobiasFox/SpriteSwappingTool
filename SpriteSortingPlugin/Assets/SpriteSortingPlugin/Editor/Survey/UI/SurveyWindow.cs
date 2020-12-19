@@ -45,8 +45,10 @@ namespace SpriteSortingPlugin.Survey.UI
             surveyWizard = new SurveyWizard();
             surveyWizard.SetSurveySteps(surveyStepGenerator.GenerateSurveySteps(surveyData));
             currentStep = surveyWizard.GetCurrent();
+
             GeneralData.isSurveyActive = true;
             GeneralData.isAutomaticSortingActive = false;
+            GeneralData.isLoggingActive = true;
         }
 
         private void OnGUI()
@@ -201,9 +203,7 @@ namespace SpriteSortingPlugin.Survey.UI
                     {
                         if (GUILayout.Button("Start", buttonStyle, heightLayout))
                         {
-                            surveyWizard.Forward();
-                            currentStep = surveyWizard.GetCurrent();
-                            PrepareAndSendData();
+                            NextSurveyStep();
                         }
                     }
                 }
@@ -213,7 +213,6 @@ namespace SpriteSortingPlugin.Survey.UI
                     {
                         surveyWizard.Backward();
                         currentStep = surveyWizard.GetCurrent();
-                        PrepareAndSendData();
                     }
 
                     GUILayout.Space(10);
@@ -221,15 +220,27 @@ namespace SpriteSortingPlugin.Survey.UI
                     {
                         if (GUILayout.Button("Next -->", buttonStyle, heightLayout))
                         {
-                            surveyWizard.Forward();
-                            currentStep = surveyWizard.GetCurrent();
-                            PrepareAndSendData();
+                            NextSurveyStep();
                         }
                     }
                 }
 
                 GUILayout.Space(10);
             }
+        }
+
+        private void NextSurveyStep()
+        {
+            var isSendingData = currentStep.IsSendingData();
+            
+            surveyWizard.Forward();
+
+            if (isSendingData)
+            {
+                PrepareAndSendData();
+            }
+
+            currentStep = surveyWizard.GetCurrent();
         }
 
         private void PrepareAndSendData(bool isResult = false)
@@ -342,7 +353,7 @@ namespace SpriteSortingPlugin.Survey.UI
                 }
 
                 // Debug.Log("start sending mail");
-                transmitData.SendMail(surveyData.UserId, threadData.progress, adjustedOutputPath);
+                transmitData.SendMail(surveyData.UserId, threadData.progress, adjustedOutputPath, threadData.isResult);
             }
             catch (Exception ex)
             {
@@ -368,6 +379,7 @@ namespace SpriteSortingPlugin.Survey.UI
         {
             GeneralData.isSurveyActive = false;
             GeneralData.isAutomaticSortingActive = true;
+            GeneralData.isLoggingActive = false;
             surveyWizard.CleanUp();
         }
 

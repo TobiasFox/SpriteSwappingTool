@@ -100,6 +100,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             preview?.CleanUp();
         }
 
+        public override bool IsSendingData()
+        {
+            return true;
+        }
+
         private bool IsSkipped()
         {
             if (data.knowingVisualGlitches >= 0)

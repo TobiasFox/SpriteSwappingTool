@@ -35,6 +35,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             Finish(SurveyFinishState.Succeeded);
         }
 
+        // public override bool IsSendingData()
+        // {
+        //     return true;
+        // }
+
         public override void DrawContent()
         {
             questionCounter = QuestionCounterStart;

@@ -73,6 +73,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 }
             }
         }
+        
+        public override bool IsSendingData()
+        {
+            return true;
+        }
 
         public override void DrawContent()
         {

@@ -101,6 +101,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
         }
 
+        public override bool IsSendingData()
+        {
+            return steps[currentProgress].IsSendingData();
+        }
+
         public override SurveyStepData GetSurveyStepData()
         {
             SurveyStepGroupData.SurveyStepsData = new List<SurveyStepData>();

@@ -56,6 +56,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
         }
 
+        public virtual bool IsSendingData()
+        {
+            return false;
+        } 
+
         public override string ToString()
         {
             var builder = new StringBuilder();

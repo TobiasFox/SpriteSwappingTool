@@ -20,7 +20,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Resources"
         };
 
-        private string mailAddress;
+        private string mailAddress = "";
         private bool isSendingDataButtonPressed;
         private TransmitResult transmitResult;
 
@@ -95,7 +95,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 if (IsSendingDataButtonPressedThisFrame)
                 {
                     StartSendingData();
-                    AddingToMailingList();
+                    if (!string.IsNullOrEmpty(mailAddress))
+                    {
+                        AddingToMailingList();
+                    }
                 }
             }
 
