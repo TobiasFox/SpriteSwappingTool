@@ -271,7 +271,6 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 
                 // Debug.Log("check overlapping sprites against " + baseSortingComponent.SpriteRenderer.name);
 
-
                 if (!cachedOverlappingSortingComponentDictionaryForSurroundingSpriteAnalysis.TryGetValue(
                     baseSortingComponent, out var foundOverlappingSprites))
                 {
@@ -300,12 +299,12 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 
                 var newExcludingList = new List<SpriteRenderer>(excludingSpriteRendererList);
 
-                var counter = 0;
+                // var counter = 0;
                 foreach (var overlappingSprite in overlappingSprites)
                 {
                     // Debug.LogFormat("iteration {0}: check {1} against {2}", counter,
                     // baseSortingComponent.spriteRenderer.name, overlappingSprite.spriteRenderer.name);
-                    counter++;
+                    // counter++;
 
                     newExcludingList.Add(overlappingSprite.SpriteRenderer);
 
@@ -326,15 +325,24 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                         sortingOptions.Add(currentSortingComponentInstanceId, currentSortingOrder);
                     }
 
+                    var isSortingOrderUpdated = false;
+
                     // first compare current (unchanged or origin) sorting order and then compare their new sorting order values
                     if (currentBaseSortingOrder > currentSortingOrder && newBaseSortingOrder <= newSortingOrder)
                     {
                         newSortingOrder = newBaseSortingOrder - 1;
+                        isSortingOrderUpdated = true;
                     }
                     else if (currentBaseSortingOrder < currentSortingOrder &&
                              newBaseSortingOrder >= newSortingOrder)
                     {
                         newSortingOrder = newBaseSortingOrder + 1;
+                        isSortingOrderUpdated = true;
+                    }
+
+                    if (!isSortingOrderUpdated)
+                    {
+                        continue;
                     }
 
                     sortingOptions[currentSortingComponentInstanceId] = newSortingOrder;
