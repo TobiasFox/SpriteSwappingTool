@@ -1,4 +1,4 @@
-﻿using SpriteSortingPlugin.Survey.UI.Wizard.Data;
+﻿using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 

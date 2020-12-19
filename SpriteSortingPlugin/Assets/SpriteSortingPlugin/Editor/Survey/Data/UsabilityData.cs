@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
+namespace SpriteSortingPlugin.Survey.Data
 {
     [Serializable]
     public class UsabilityData

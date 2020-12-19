@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SpriteSortingPlugin.Survey.UI.Wizard.Data;
+using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.Survey.UI.Wizard;
-using SpriteSortingPlugin.Survey.UI.Wizard.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;

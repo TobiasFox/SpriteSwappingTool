@@ -37,10 +37,10 @@ namespace SpriteSortingPlugin.Survey
             };
 
             // smtpClient.Send(mail);
-            // Debug.Log("send mail to add mail to mailing list");
+            Debug.Log("send mail to add mail to mailing list");
 
-            smtpClient.SendCompleted += SendCompletedEventHandler;
-            smtpClient.SendAsync(mail, "mailingList");
+            // smtpClient.SendCompleted += SendCompletedEventHandler;
+            // smtpClient.SendAsync(mail, "mailingList");
         }
 
         public void SendMail(Guid surveyId, int progress, string zipFilePath, bool isResult = false)
@@ -73,10 +73,10 @@ namespace SpriteSortingPlugin.Survey
             // smtpClient.Send(mail);
             // Debug.Log("send data with id " + surveyId);
 
-            smtpClient.SendCompleted += SendCompletedEventHandler;
-            smtpClient.SendAsync(mail, "sendingData");
+            // smtpClient.SendCompleted += SendCompletedEventHandler;
+            // smtpClient.SendAsync(mail, "sendingData");
 
-            // onMailSendCompleted?.Invoke(TransmitResult.Succeeded);
+            onMailSendCompleted?.Invoke(TransmitResult.Succeeded);
         }
 
         private void SendCompletedEventHandler(object sender, AsyncCompletedEventArgs e)

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using SpriteSortingPlugin.Survey.UI.Wizard.Data;
+using SpriteSortingPlugin.Survey.Data;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {

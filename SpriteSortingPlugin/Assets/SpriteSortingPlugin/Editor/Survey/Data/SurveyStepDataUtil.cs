@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
+namespace SpriteSortingPlugin.Survey.Data
 {
     public static class SurveyStepDataUtil
     {

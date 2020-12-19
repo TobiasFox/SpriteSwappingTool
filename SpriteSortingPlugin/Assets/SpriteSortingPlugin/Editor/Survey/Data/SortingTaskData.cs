@@ -2,7 +2,7 @@
 using System.IO;
 using UnityEngine.SceneManagement;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
+namespace SpriteSortingPlugin.Survey.Data
 {
     [Serializable]
     public class SortingTaskData

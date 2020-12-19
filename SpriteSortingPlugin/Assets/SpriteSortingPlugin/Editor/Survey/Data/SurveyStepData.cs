@@ -1,7 +1,8 @@
 ﻿using System;
+using SpriteSortingPlugin.Survey.UI.Wizard;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
+namespace SpriteSortingPlugin.Survey.Data
 {
     [Serializable]
     public class SurveyStepData

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard.Data
+namespace SpriteSortingPlugin.Survey.Data
 {
     [Serializable]
     public class SurveyData
