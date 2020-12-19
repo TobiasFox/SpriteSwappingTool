@@ -74,7 +74,7 @@ namespace SpriteSortingPlugin.Survey
             // smtpClient.SendCompleted += SendCompletedEventHandler;
             // smtpClient.SendAsync(mail, "asyncToken");
 
-            onMailSendCompleted?.Invoke(TransmitResult.Failed);
+            onMailSendCompleted?.Invoke(TransmitResult.Succeeded);
         }
 
         private void SendCompletedEventHandler(object sender, AsyncCompletedEventArgs e)

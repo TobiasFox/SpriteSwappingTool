@@ -16,9 +16,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             "SpriteSortingPlugin",
             "Editor",
             "Survey",
-            "UI",
-            "Wizard",
-            "SurveySteps",
+            "Prefabs",
             "GeneralQuestionPreview.prefab"
         };
 

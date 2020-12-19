@@ -108,7 +108,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUILayout.Space(25);
             EditorGUILayout.LabelField(
-                "This time a two-step process is used with a scene setup with slightly more SpriteRenderers.",
+                "This time a two-step process is used with a scene setup which has slightly more SpriteRenderers.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);

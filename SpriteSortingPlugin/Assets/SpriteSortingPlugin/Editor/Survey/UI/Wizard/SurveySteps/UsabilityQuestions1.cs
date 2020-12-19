@@ -6,7 +6,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class UsabilityQuestions1 : SurveyStep
     {
-        private const int QuestionCounterStart = 0;
+        private const int QuestionCounterStart = 1;
         private const float QuestionWidthPercentage = 0.6f;
 
         private static readonly string[] SusQuestion = new string[]
