@@ -352,16 +352,18 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             var selectedConfirmButtonIndex =
                 GUILayout.SelectionGrid(-1, confirmButtonLabels, confirmButtonLabels.Length, Styling.ButtonStyleBold,
                     GUILayout.Height(LargerButtonHeight));
-            if (selectedConfirmButtonIndex >= 0)
+            if (selectedConfirmButtonIndex < 0)
             {
-                ApplySortingOptions();
-                isConfirmButtonPressed = true;
+                return;
+            }
 
-                if (selectedConfirmButtonIndex == 1)
-                {
-                    //TODO: check isAnalyzingWithChangedLayerFirst
-                    Analyze();
-                }
+            ApplySortingOptions();
+            isConfirmButtonPressed = true;
+
+            if (selectedConfirmButtonIndex == 1)
+            {
+                //TODO: check isAnalyzingWithChangedLayerFirst
+                Analyze();
             }
         }
 
@@ -704,14 +706,13 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             wasAnalyzeButtonClicked = false;
             overlappingItems = null;
+            preview.EnableSceneVisualization(false);
             preview.CleanUpPreview();
         }
 
         //TODO overlappingItems with changed but same layer are not considered
         private void ApplySortingOptionsIterative()
         {
-            // Debug.Log("apply sorting options");
-
             var counter = 0;
             while (counter < overlappingItems.Items.Count)
             {
