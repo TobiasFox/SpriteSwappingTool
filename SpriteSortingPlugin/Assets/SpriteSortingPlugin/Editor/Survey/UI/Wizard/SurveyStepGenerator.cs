@@ -10,9 +10,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var surveySteps = new List<SurveyStep>();
 
             var introStep = new IntroSurveyStep("Intro");
-            var introStep2 = new IntroSurveyStep2("Intro");
-            // surveySteps.Add(introStep);
-            // surveySteps.Add(introStep2);
+            surveySteps.Add(introStep);
 
             var evaluationAutoSortingSuggestionLabel =
                 "Evaluation of the functionality to generate sorting order suggestions";
@@ -46,7 +44,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
 
             var generalQuestions1 = new GeneralQuestions1("General Questions", surveyData.generalQuestionsData);
-            surveySteps.Add(generalQuestions1);
+            // surveySteps.Add(generalQuestions1);
             // surveySteps.Add(generalQuestions2);
             // {
             //     var list = new List<SurveyStep>() {generalQuestions1, generalQuestions2};
@@ -92,9 +90,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             //intro
             {
                 var introStep = new IntroSurveyStep("Intro");
-                var introStep2 = new IntroSurveyStep2("Intro");
                 surveySteps.Add(introStep);
-                surveySteps.Add(introStep2);
             }
 
             //General questions
