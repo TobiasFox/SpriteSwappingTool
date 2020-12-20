@@ -33,12 +33,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             preview.CleanUp();
         }
 
-        public override void Rollback()
-        {
-            base.Rollback();
-            preview.CleanUp();
-        }
-
         public override void DrawContent()
         {
             GUILayout.Label("Thank you very much for taking the time to participate in this survey :) ",
@@ -51,12 +45,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             preview?.DoPreview();
             EditorGUILayout.Space(VerticalSpacing);
-
-            // GUILayout.Label(
-            //     "With your participation, you help to evaluate the tool, especially the functionality to generate automatic sorting order suggestions.",
-            //     Styling.LabelWrapStyle);
-            //
-            // EditorGUILayout.Space(VerticalSpacing);
 
             EditorGUILayout.LabelField("Duration", "10 - 15 min");
             EditorGUILayout.LabelField("Data",

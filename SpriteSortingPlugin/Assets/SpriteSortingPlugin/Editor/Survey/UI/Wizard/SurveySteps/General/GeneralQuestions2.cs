@@ -40,12 +40,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             preview.CleanUp();
         }
 
-        public override void Rollback()
-        {
-            base.Rollback();
-            preview.CleanUp();
-        }
-
         public override void DrawContent()
         {
             questionCounter = QuestionCounterStart;

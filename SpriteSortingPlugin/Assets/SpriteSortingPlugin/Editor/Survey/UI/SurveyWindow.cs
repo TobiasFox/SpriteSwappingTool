@@ -209,13 +209,6 @@ namespace SpriteSortingPlugin.Survey.UI
                 }
                 else
                 {
-                    if (GUILayout.Button("<-- Back", buttonStyle, heightLayout))
-                    {
-                        surveyWizard.Backward();
-                        currentStep = surveyWizard.GetCurrent();
-                    }
-
-                    GUILayout.Space(10);
                     using (new EditorGUI.DisabledScope(!surveyWizard.HasNextStep()))
                     {
                         if (GUILayout.Button("Next -->", buttonStyle, heightLayout))
@@ -299,7 +292,15 @@ namespace SpriteSortingPlugin.Survey.UI
             {
                 var fileName = Path.GetFileName(filePath);
                 var targetFilePath = Path.Combine(zipSaveFolder, fileName);
-                File.Copy(filePath, targetFilePath, true);
+                //TODO: exc after Skipped and therefore mail with data is not send
+                try
+                {
+                    File.Copy(filePath, targetFilePath, true);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
         }
 

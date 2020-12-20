@@ -61,42 +61,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
         }
 
-        public override void Rollback()
-        {
-            if (currentProgress < 0 || currentProgress >= steps.Count)
-            {
-                return;
-            }
-
-            steps[currentProgress].Rollback();
-
-            if (currentProgress == steps.Count - 1)
-            {
-                surveyStepData.finishState = SurveyFinishState.None;
-                surveyStepData.isFinished = false;
-            }
-            else if (currentProgress == 0)
-            {
-                surveyStepData.finishState = SurveyFinishState.None;
-                surveyStepData.isFinished = false;
-                surveyStepData.isStarted = false;
-            }
-        }
-
         public void Forward()
         {
             if (currentProgress + 1 < steps.Count)
             {
                 currentProgress++;
-                steps[currentProgress].Start();
-            }
-        }
-
-        public void Backward()
-        {
-            if (currentProgress > 0)
-            {
-                currentProgress--;
                 steps[currentProgress].Start();
             }
         }

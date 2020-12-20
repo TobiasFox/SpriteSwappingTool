@@ -40,12 +40,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             surveyStepData.isFinished = true;
         }
 
-        public virtual void Rollback()
-        {
-            surveyStepData.isStarted = false;
-            surveyStepData.finishState = SurveyFinishState.None;
-        }
-
         public virtual SurveyStepData GetSurveyStepData()
         {
             return surveyStepData;

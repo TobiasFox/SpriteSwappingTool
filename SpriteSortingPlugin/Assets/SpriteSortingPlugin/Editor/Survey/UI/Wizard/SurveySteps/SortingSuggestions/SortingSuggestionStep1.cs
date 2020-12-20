@@ -56,17 +56,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
         }
 
-        public override void Rollback()
-        {
-            base.Rollback();
-
-            var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[1];
-            if (currentSortingTaskData.isTaskStarted)
-            {
-                currentSortingTaskData.CancelTask();
-            }
-        }
-
         public override List<string> CollectFilePathsToCopy()
         {
             if (FinishState != SurveyFinishState.Succeeded)

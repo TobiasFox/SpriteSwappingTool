@@ -62,19 +62,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             Finish(isTaskSucceeded ? SurveyFinishState.Succeeded : SurveyFinishState.Skipped);
         }
 
-        public override void Rollback()
-        {
-            base.Rollback();
-
-            foreach (var sortingTaskData in SurveyStepSortingData.sortingTaskDataList)
-            {
-                if (sortingTaskData.isTaskStarted)
-                {
-                    sortingTaskData.CancelTask();
-                }
-            }
-        }
-
         public override bool IsSendingData()
         {
             return true;

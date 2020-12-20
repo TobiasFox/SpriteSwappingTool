@@ -45,32 +45,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             UpdateCurrentProgress();
         }
 
-        public void Backward()
-        {
-            if (currentSurveyStepIndex < 0 || currentSurveyStepIndex >= steps.Count)
-            {
-                return;
-            }
-
-            var surveyStep = steps[currentSurveyStepIndex];
-            surveyStep.Rollback();
-
-            if (surveyStep is SurveyStepGroup surveyStepGroup && surveyStepGroup.HasPreviousStep())
-            {
-                surveyStepGroup.Backward();
-            }
-            else
-            {
-                if (currentSurveyStepIndex > 0)
-                {
-                    currentSurveyStepIndex--;
-                    steps[currentSurveyStepIndex].Start();
-                }
-            }
-
-            UpdateCurrentProgress();
-        }
-
         public SurveyStep GetCurrent()
         {
             if (steps == null || currentSurveyStepIndex < 0 || currentSurveyStepIndex >= steps.Count)
