@@ -1,20 +1,15 @@
-﻿using System;
-using SpriteSortingPlugin.Survey.Data;
+﻿using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class GeneralQuestions1 : SurveyStep
     {
         private const int QuestionCounterStart = 1;
-
-        private static readonly string[] MainFields = new string[]
-        {
-            "Design", "Programming", "Game Design", "3D Modelling", "Audio", "Texture Artist", "VFX Artist",
-            "Animator", "Testing/QA", "Marketing"
-        };
+        private const float IndentLevelWidth = 10;
 
         private GeneralQuestionsData data;
         private float space = 17.5f;
@@ -29,7 +24,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             base.Commit();
 
-            // var isSkipped = IsSkipped();
             Finish(SurveyFinishState.Succeeded);
         }
 
@@ -40,64 +34,118 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                DrawGameDevelopmentRelation();
+                DrawUnderstandingEnglishQuestion();
                 questionCounter++;
             }
 
-            EditorGUILayout.Space(space);
-            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            //criterion of exclusion
+            if (data.understandingEnglish == 1)
             {
-                DrawMainFieldOfWork();
-                questionCounter++;
+                DrawExclusion();
+                EditorGUI.indentLevel--;
+                return;
             }
 
-            EditorGUILayout.Space(space);
-            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            using (new EditorGUI.DisabledScope(data.understandingEnglish != 0))
             {
-                DrawIsDevelopingGamesQuestion();
-                questionCounter++;
-            }
+                EditorGUILayout.Space(space);
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                {
+                    DrawIsDevelopingGamesQuestion();
+                    questionCounter++;
+                }
 
-            EditorGUILayout.Space(space);
-            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
-            {
-                DrawNumberOfApplicationsQuestions();
-                questionCounter++;
+                //criterion of exclusion
+                if (data.developing2dGames == 1)
+                {
+                    DrawExclusion();
+
+                    EditorGUI.indentLevel--;
+                    return;
+                }
+
+                using (new EditorGUI.DisabledScope(data.developing2dGames != 0))
+                {
+                    EditorGUILayout.Space(space);
+                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                    {
+                        DrawNumberOfApplicationsQuestions();
+                        questionCounter++;
+                    }
+
+                    EditorGUILayout.Space(space);
+                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                    {
+                        DrawIsExperiencedVisualGlitchQuestion();
+                        questionCounter++;
+                    }
+
+                    EditorGUILayout.Space(space);
+                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                    {
+                        DrawGameDevelopmentRelation();
+                        questionCounter++;
+                    }
+
+                    EditorGUILayout.Space(space);
+                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                    {
+                        DrawMainFieldOfWork();
+                        questionCounter++;
+                    }
+                }
             }
 
             EditorGUI.indentLevel--;
         }
 
-        private bool IsSkipped()
+        private void DrawExclusion()
         {
-            if (data.isGameDevelopmentStudent || data.isWorkingInGameDevelopment ||
-                data.isGameDevelopmentHobbyist || data.isNotDevelopingGames ||
-                data.isGameDevelopmentRelationOther || data.isGameDevelopmentRelationNoAnswer)
+            EditorGUILayout.Space(20);
+            var centeredStyle = new GUIStyle(Styling.CenteredStyle) {wordWrap = true};
+
+            var excludeMessage =
+                "Thank you very much for your interest! However, this survey presumes";
+
+            if (data.understandingEnglish == 1)
             {
-                return false;
+                excludeMessage += " that you can read and understand english";
+            }
+            else if (data.developing2dGames == 1)
+            {
+                excludeMessage += " experiences in developing 2d Unity applications";
             }
 
-            if (data.mainFieldOfWork >= 0 || data.isMainFieldOfWorkOther || data.isMainFieldOfWorkNoAnswer)
-            {
-                return false;
-            }
+            excludeMessage += ".\nYou can close this window now.";
 
-            if (data.developing2dGames < 0)
-            {
-                return true;
-            }
+            EditorGUILayout.LabelField(excludeMessage, centeredStyle);
 
-            if (data.developing2dGames == 1)
-            {
-                return false;
-            }
+            EditorGUILayout.Space(20);
+            EditorGUILayout.LabelField(
+                "However, if you want you can try using the " + GeneralData.Name +
+                " tool, which is located here:",
+                centeredStyle);
 
-            if (data.numberOfDeveloped2dGames >= 0 || data.isNumberOfDeveloped2dGamesNoAnswer)
-            {
-                return false;
-            }
+            EditorGUILayout.LabelField(
+                GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name + " -> " +
+                GeneralData.DetectorName,
+                centeredStyle);
+        }
 
-            return true;
+        private void DrawUnderstandingEnglishQuestion()
+        {
+            EditorGUILayout.LabelField(questionCounter + ". Can you reed and understand english?",
+                Styling.QuestionLabelStyle);
+            EditorGUI.indentLevel++;
+
+            var selectionGrid =
+                EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));
+
+            var answers = new[] {"Yes", "No"};
+
+            data.understandingEnglish = GUI.SelectionGrid(selectionGrid, data.understandingEnglish, answers, 2);
+
+            EditorGUI.indentLevel--;
         }
 
         private void DrawGameDevelopmentRelation()
@@ -109,14 +157,25 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                data.isGameDevelopmentStudent =
-                    EditorGUILayout.ToggleLeft("Professional", data.isGameDevelopmentStudent);
-                data.isWorkingInGameDevelopment =
-                    EditorGUILayout.ToggleLeft("Student", data.isWorkingInGameDevelopment);
-                data.isGameDevelopmentHobbyist =
-                    EditorGUILayout.ToggleLeft("Hobbyist", data.isGameDevelopmentHobbyist);
-                data.isNotDevelopingGames =
-                    EditorGUILayout.ToggleLeft("Not developing games", data.isNotDevelopingGames);
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Space(3 * IndentLevelWidth);
+                    data.isGameDevelopmentStudent =
+                        GUILayout.Toggle(data.isGameDevelopmentStudent, "Student", Styling.ButtonStyle);
+
+                    data.isWorkingInGameDevelopment = GUILayout.Toggle(data.isWorkingInGameDevelopment, "Professional",
+                        Styling.ButtonStyle);
+                }
+
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Space(3 * IndentLevelWidth);
+                    data.isGameDevelopmentHobbyist =
+                        GUILayout.Toggle(data.isGameDevelopmentHobbyist, "Hobbyist", Styling.ButtonStyle);
+
+                    data.isNotDevelopingGames = GUILayout.Toggle(data.isNotDevelopingGames, "Not developing games",
+                        Styling.ButtonStyle);
+                }
 
                 using (new GUILayout.HorizontalScope())
                 {
@@ -161,39 +220,38 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUILayout.LabelField(
                 questionCounter +
-                ". If you develop games, what best describes your main field of work? (single-choice)",
+                ". If you develop games, what best describes your main field of work? (multi-choice)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
             using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                var rows = Mathf.Ceil(MainFields.Length / 2f);
-                var height = EditorGUIUtility.singleLineHeight * rows + (Math.Max(0, rows - 1) * 3);
+                var rows = (int) Mathf.Ceil(GeneralQuestionsData.MainFieldsOfWork.Length / 2f);
 
-                var selectionGridRect =
-                    EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false, height));
-
-                using (var changeSelectionGridScope = new EditorGUI.ChangeCheckScope())
+                for (var i = 0; i < rows; i++)
                 {
-                    data.mainFieldOfWork =
-                        GUI.SelectionGrid(selectionGridRect, data.mainFieldOfWork, MainFields, 2);
-
-                    if (changeSelectionGridScope.changed && data.isMainFieldOfWorkOther)
+                    var currentIndex = 2 * i;
+                    using (new GUILayout.HorizontalScope())
                     {
-                        data.isMainFieldOfWorkOther = false;
+                        GUILayout.Space(3 * IndentLevelWidth);
+
+                        data.mainFieldOfWork[currentIndex] = GUILayout.Toggle(
+                            data.mainFieldOfWork[currentIndex], GeneralQuestionsData.MainFieldsOfWork[currentIndex],
+                            Styling.ButtonStyle);
+
+                        if (currentIndex + 1 < GeneralQuestionsData.MainFieldsOfWork.Length)
+                        {
+                            data.mainFieldOfWork[currentIndex + 1] = GUILayout.Toggle(
+                                data.mainFieldOfWork[currentIndex + 1],
+                                GeneralQuestionsData.MainFieldsOfWork[currentIndex + 1],
+                                Styling.ButtonStyle);
+                        }
                     }
                 }
 
                 using (new GUILayout.HorizontalScope())
                 {
-                    using (var isOtherChangeScope = new EditorGUI.ChangeCheckScope())
-                    {
-                        data.isMainFieldOfWorkOther = EditorGUILayout.ToggleLeft("Other",
-                            data.isMainFieldOfWorkOther, GUILayout.ExpandWidth(false));
-                        if (isOtherChangeScope.changed && data.mainFieldOfWork >= 0)
-                        {
-                            data.mainFieldOfWork = -1;
-                        }
-                    }
+                    data.isMainFieldOfWorkOther = EditorGUILayout.ToggleLeft("Other",
+                        data.isMainFieldOfWorkOther, GUILayout.ExpandWidth(false));
 
                     using (new EditorGUI.DisabledScope(!data.isMainFieldOfWorkOther))
                     {
@@ -204,7 +262,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 if (changeScope.changed)
                 {
-                    if (data.mainFieldOfWork >= 0 || data.isMainFieldOfWorkOther)
+                    if (data.IsAnyMainFieldOfWork() || data.isMainFieldOfWorkOther)
                     {
                         data.isMainFieldOfWorkNoAnswer = false;
                     }
@@ -217,8 +275,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     EditorGUILayout.ToggleLeft("No answer", data.isMainFieldOfWorkNoAnswer);
                 if (changeScope.changed & data.isMainFieldOfWorkNoAnswer)
                 {
-                    data.mainFieldOfWork = -1;
                     data.isMainFieldOfWorkOther = false;
+                    data.ResetMainFieldOfWork();
                 }
             }
 
@@ -246,7 +304,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawNumberOfApplicationsQuestions()
         {
             EditorGUILayout.LabelField(questionCounter +
-                                       ". If yes, on how many 2D Unity applications have you been working before?",
+                                       ". If yes, on how many 2D Unity applications have you already worked?",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
@@ -276,6 +334,27 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         data.numberOfDeveloped2dGames = -1;
                     }
                 }
+            }
+
+            EditorGUI.indentLevel--;
+        }
+
+        private void DrawIsExperiencedVisualGlitchQuestion()
+        {
+            EditorGUILayout.LabelField(questionCounter +
+                                       ". Have you worked on Unity 2D applications, where you experienced visual glitches (the order of Sprites to be rendered swapped)?",
+                Styling.QuestionLabelStyle);
+            EditorGUI.indentLevel++;
+
+            var selectionGrid =
+                EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));
+
+            var answers = new[] {"Yes", "No"};
+
+            using (new EditorGUI.DisabledScope(data.developing2dGames != 0))
+            {
+                data.workingOnApplicationWithVisualGlitch =
+                    GUI.SelectionGrid(selectionGrid, data.workingOnApplicationWithVisualGlitch, answers, 2);
             }
 
             EditorGUI.indentLevel--;
