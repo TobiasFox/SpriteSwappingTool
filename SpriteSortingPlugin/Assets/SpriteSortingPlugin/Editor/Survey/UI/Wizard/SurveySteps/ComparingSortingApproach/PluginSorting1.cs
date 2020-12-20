@@ -57,10 +57,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.LabelField("Well done :)", Styling.LabelWrapStyle);
-
-            EditorGUILayout.Space(5);
-
             EditorGUILayout.LabelField("After the manual approach were used, it's now time to use the plugin.",
                 Styling.LabelWrapStyle);
 

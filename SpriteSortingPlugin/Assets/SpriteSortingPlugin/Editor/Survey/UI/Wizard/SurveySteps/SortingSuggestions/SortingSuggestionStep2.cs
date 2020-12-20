@@ -82,9 +82,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.LabelField("Nice!", Styling.LabelWrapStyle);
-            EditorGUILayout.Space(5);
-
             isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
                 "Information about the sorting order suggestion functionality", true);
 

@@ -64,10 +64,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.LabelField("Awesome :)", Styling.LabelWrapStyle);
-
-            EditorGUILayout.Space(5);
-
             isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
                 "Information about the " + GeneralData.Name + " " + GeneralData.DetectorName, true);
 
