@@ -22,27 +22,6 @@ namespace SpriteSortingPlugin.Survey
 
         public event OnMailSendCompleted onMailSendCompleted;
 
-        public void AddToMailingList(string mailAddress)
-        {
-            var mail = new MailMessage {From = new MailAddress(MailAddress2)};
-            mail.To.Add(mail.From);
-            mail.Subject = "Add to mailing list";
-            mail.Body = mailAddress;
-
-            var smtpClient = new SmtpClient(Host2)
-            {
-                Port = Port,
-                Credentials = new NetworkCredential(MailAddress2, Password),
-                EnableSsl = true,
-            };
-
-            // smtpClient.Send(mail);
-            Debug.Log("send mail to add mail to mailing list");
-
-            // smtpClient.SendCompleted += SendCompletedEventHandler;
-            // smtpClient.SendAsync(mail, "mailingList");
-        }
-
         public void SendMail(Guid surveyId, int progress, string zipFilePath, bool isResult = false)
         {
             var mail = new MailMessage {From = new MailAddress(MailAddress2)};
@@ -83,7 +62,7 @@ namespace SpriteSortingPlugin.Survey
         {
             if (e.Cancelled)
             {
-                Debug.Log("mail canceled");
+                // Debug.Log("mail canceled");
             }
 
             var transmitResult = TransmitResult.Succeeded;
@@ -95,7 +74,7 @@ namespace SpriteSortingPlugin.Survey
             }
             else
             {
-                Debug.Log("Message sent.");
+                // Debug.Log("Message sent.");
             }
 
             onMailSendCompleted?.Invoke(transmitResult);

@@ -20,7 +20,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Resources"
         };
 
-        private string mailAddress = "";
         private bool isSendingDataButtonPressed;
         private TransmitResult transmitResult;
 
@@ -76,12 +75,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             using (new EditorGUI.IndentLevelScope())
             {
-                EditorGUILayout.LabelField(
-                    "If you want to be informed about the results or to keep updated, you can optionally fill in your mail address:",
-                    Styling.LabelWrapStyle);
-
-                mailAddress = EditorGUILayout.TextField("Your Email", mailAddress);
-
                 EditorGUILayout.Space(30);
                 EditorGUILayout.LabelField(
                     "Please keep this window open and make sure the PC is connected to the internet.",
@@ -95,10 +88,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 if (IsSendingDataButtonPressedThisFrame)
                 {
                     StartSendingData();
-                    if (!string.IsNullOrEmpty(mailAddress))
-                    {
-                        AddingToMailingList();
-                    }
                 }
             }
 
@@ -147,18 +136,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public override void CleanUp()
         {
             RemoveEditorUpdate();
-        }
-
-        private void AddingToMailingList()
-        {
-            var thread = new Thread(SendMailForAddingToMailingListThreadFunction);
-            thread.Start();
-        }
-
-        private void SendMailForAddingToMailingListThreadFunction()
-        {
-            var transmitData = new TransmitData();
-            transmitData.AddToMailingList(mailAddress);
         }
 
         private void StartSendingData()
