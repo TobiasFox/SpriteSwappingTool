@@ -1,6 +1,7 @@
 ﻿using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
+using UnityEngine;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -44,21 +45,21 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             Finish(SurveyFinishState.Succeeded);
         }
 
-        private bool IsSkipped()
-        {
-            foreach (var susAnswer in data.susAnswers)
-            {
-                if (susAnswer >= 0)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         private void DrawSusQuestions()
         {
+            var richTextStyle = new GUIStyle(Styling.LabelWrapStyle) {richText = true};
+            EditorGUILayout.LabelField(
+                "To evaluate the overall usability of the " + GeneralData.Name +
+                " tool, the standardized questionnaire <i>System Usability Score</i> is used.", richTextStyle);
+
+            EditorGUILayout.Space(2);
+
+            EditorGUILayout.LabelField(
+                "It consists of ten questions rated from strongly disagree to strongly agree. The system to which all questions refer is the " +
+                GeneralData.Name + " tool.", Styling.LabelWrapStyle);
+
+            EditorGUILayout.Space(25);
+
             UsabilityQuestionsUtility.DrawRatingHeader(QuestionWidthPercentage, "Overall usability of the system",
                 "Strongly\nDisagree", "Strongly\nAgree");
 
