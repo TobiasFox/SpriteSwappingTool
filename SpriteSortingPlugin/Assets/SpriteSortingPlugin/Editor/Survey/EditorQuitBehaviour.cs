@@ -8,6 +8,11 @@ namespace SpriteSortingPlugin.Survey
     [InitializeOnLoad]
     public class EditorQuitBehaviour
     {
+        private static readonly string[] SurveyDataOutputPath = new string[]
+        {
+            "SurveyData"
+        };
+
         static EditorQuitBehaviour()
         {
             EditorApplication.quitting += Quit;
@@ -20,30 +25,15 @@ namespace SpriteSortingPlugin.Survey
 
         private static void DeleteCache()
         {
-            var dirInfo = new DirectoryInfo(Application.temporaryCachePath);
+            var surveyDataPath = Path.Combine(Application.temporaryCachePath, Path.Combine(SurveyDataOutputPath));
 
-            foreach (var file in dirInfo.GetFiles())
+            try
             {
-                try
-                {
-                    file.Delete();
-                }
-                catch (Exception e)
-                {
-                    // ignored
-                }
+                Directory.Delete(surveyDataPath, true);
             }
-
-            foreach (var dir in dirInfo.GetDirectories())
+            catch (Exception e)
             {
-                try
-                {
-                    dir.Delete(true);
-                }
-                catch (Exception e)
-                {
-                    // ignored
-                }
+                // ignored
             }
         }
     }
