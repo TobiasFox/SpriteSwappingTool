@@ -68,11 +68,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUILayout.LabelField("Short Description about what causes a visual glitch:", Styling.LabelWrapStyle);
             var visualGlitchDescription =
-                "Depending on the position of the camera which renders a scene, a visual glitch happens, when SpriteRenderers overlap and have identical sorting options.";
+                "Depending on the position of the camera which renders a scene, a visual glitch happens, when SpriteRenderers overlap and have identical sorting options (Sorting Layer and Sorting Order).";
             EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
             EditorGUILayout.Space();
             EditorGUILayout.LabelField(
-                "To detect potential SpriteRenderer the manual method can be used, by moving around the Unity SceneCamera in 3D perspective mode and watching out for Sprite swaps.",
+                "To detect potential SpriteRenderer the manual method can be used, by moving around the Unity SceneCamera in 3D perspective mode and watching out for Sprite swaps. To solve a detected glitch, change the sorting options.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(20);
@@ -82,7 +82,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
                     "1. Please find and solve all visual glitches in the given scene by using the manual approach.\n" +
-                    "Please solve these glitches so it makes visually sense for you but as fast as possible.",
+                    "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
                     taskLabelStyle);
 
                 EditorGUILayout.Space();

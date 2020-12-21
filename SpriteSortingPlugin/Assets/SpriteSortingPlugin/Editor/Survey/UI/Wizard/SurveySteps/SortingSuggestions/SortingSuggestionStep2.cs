@@ -19,11 +19,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             "3. Please find and solve all visual glitches in the given scene by using the " +
             GeneralData.Name + " " + GeneralData.DetectorName + ".\n" +
-            "Please solve these glitches so it makes visually sense for you but as fast as possible.",
+            "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
             "4. Please find and solve all visual glitches in the given scene by using the " +
             GeneralData.Name + " " + GeneralData.DetectorName +
             " with the sorting suggestion functionality.\n" +
-            "Please solve these glitches so it makes visually sense for you but as fast as possible."
+            "Please solve the task as quickly as possible. However, the result should make visual sense to you."
         };
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;

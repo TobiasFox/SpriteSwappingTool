@@ -76,7 +76,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField(
-                    "To detect potential SpriteRenderer the manual method can be used, by moving around the Unity SceneCamera in 3D perspective mode and watching out for Sprite swaps.",
+                    "To detect potential SpriteRenderer the manual method can be used, by moving around the Unity SceneCamera in 3D perspective mode and watching out for Sprite swaps. To solve a detected glitch, change the sorting options.",
                     Styling.LabelWrapStyle);
             }
 
@@ -87,7 +87,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
                     "2. Please find and solve all visual glitches in the given scene by using the manual approach.\n" +
-                    "Please solve these glitches so it makes visually sense for you but as fast as possible.",
+                    "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
                     taskLabelStyle);
 
                 EditorGUILayout.Space();

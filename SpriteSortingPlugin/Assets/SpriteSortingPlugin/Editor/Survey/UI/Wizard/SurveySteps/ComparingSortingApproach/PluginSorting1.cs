@@ -84,7 +84,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.LabelField(
                     "3. Please find and solve all visual glitches in the given scene by using the " +
                     GeneralData.Name + " " + GeneralData.DetectorName + ".\n" +
-                    "Please solve these glitches so it makes visually sense for you but as fast as possible.",
+                    "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
                     taskLabelStyle);
 
                 EditorGUILayout.Space(10);
