@@ -61,15 +61,17 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawSusQuestions()
         {
             var richTextStyle = new GUIStyle(Styling.LabelWrapStyle) {richText = true};
-            EditorGUILayout.LabelField(
-                "To evaluate the overall usability of the " + GeneralData.Name +
-                " tool, the standardized questionnaire <i>System Usability Score</i> is used.", richTextStyle);
-
-            EditorGUILayout.Space(2);
 
             EditorGUILayout.LabelField(
-                "It consists of ten questions rated from strongly disagree to strongly agree. The system to which all questions refer is the " +
-                GeneralData.Name + " tool.", Styling.LabelWrapStyle);
+                "This is the last part of the survey. It addresses the usability of the " + GeneralData.Name + " tool.",
+                Styling.LabelWrapStyle);
+
+            EditorGUILayout.Space(5);
+
+            EditorGUILayout.LabelField(
+                "To evaluate the overall usability, the standardized questionnaire <i>System Usability Score</i> is used. It consists of ten questions rated from strongly disagree to strongly agree. The system to which all questions refer is the " +
+                GeneralData.Name + " tool.",
+                richTextStyle);
 
             EditorGUILayout.Space(20);
 

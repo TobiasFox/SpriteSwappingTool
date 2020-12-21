@@ -91,18 +91,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel++;
 
             //neutral formulation
-            // EditorGUILayout.LabelField("Now, it is time to use another functionality of the plugin.",
-            //     Styling.LabelWrapStyle);
-
-            // EditorGUILayout.Space(10);
-
-            // EditorGUILayout.LabelField(
-            //     "It is a functionality, which generates sorting order suggestions after SpriteRenderers are being identified by the " +
-            //     GeneralData.FullDetectorName + ".",
-            //     Styling.LabelWrapStyle);
             EditorGUILayout.LabelField(
                 "The " + GeneralData.FullDetectorName +
-                " have also a functionality to generate sorting order suggestions after SpriteRenderers are being identified.",
+                " can also generate sorting order suggestions after SpriteRenderers are being identified.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);

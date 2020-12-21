@@ -93,7 +93,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUI.indentLevel++;
             EditorGUILayout.LabelField(
-                "This time the two-step process has a SpriteRenderer setup with slightly more SpriteRenderers.",
+                "To finalize Part 4, another two-step process is used with slightly more SpriteRenderers in the setup.",
                 Styling.LabelWrapStyle);
             isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
                 "Information about the sorting order suggestion functionality", true);
