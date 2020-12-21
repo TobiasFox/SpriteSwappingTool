@@ -76,6 +76,24 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             };
         }
 
+        public override bool IsFilledOut()
+        {
+            foreach (var sortingTaskData in SurveyStepSortingData.sortingTaskDataList)
+            {
+                if (sortingTaskData.isTaskStarted)
+                {
+                    return false;
+                }
+
+                if (sortingTaskData.timeNeeded < 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public override void DrawContent()
         {
             GeneralData.isAutomaticSortingActive = true;

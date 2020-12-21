@@ -101,6 +101,38 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel--;
         }
 
+        public override bool IsFilledOut()
+        {
+            if (data.developing2dGames != 0)
+            {
+                return false;
+            }
+
+            if (data.numberOfDeveloped2dGames < 0 && !data.isNumberOfDeveloped2dGamesNoAnswer)
+            {
+                return false;
+            }
+
+            if (!data.isStudent && !data.isProfessional && !data.isHobbyist &&
+                !data.isNotDevelopingGames && !data.isGameDevelopmentRelationNoAnswer &&
+                !data.isGameDevelopmentRelationOther)
+            {
+                return false;
+            }
+
+            if (data.workingOnApplicationWithVisualGlitch < 0)
+            {
+                return false;
+            }
+
+            if (!data.IsAnyMainFieldOfWork() && !data.isMainFieldOfWorkOther && !data.isMainFieldOfWorkNoAnswer)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private void DrawExclusion()
         {
             EditorGUILayout.Space(20);
@@ -162,18 +194,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 using (new GUILayout.HorizontalScope())
                 {
                     GUILayout.Space(3 * IndentLevelWidth);
-                    data.isGameDevelopmentStudent =
-                        GUILayout.Toggle(data.isGameDevelopmentStudent, "Student", Styling.ButtonStyle);
+                    data.isStudent =
+                        GUILayout.Toggle(data.isStudent, "Student", Styling.ButtonStyle);
 
-                    data.isWorkingInGameDevelopment = GUILayout.Toggle(data.isWorkingInGameDevelopment, "Professional",
+                    data.isProfessional = GUILayout.Toggle(data.isProfessional, "Professional",
                         Styling.ButtonStyle);
                 }
 
                 using (new GUILayout.HorizontalScope())
                 {
                     GUILayout.Space(3 * IndentLevelWidth);
-                    data.isGameDevelopmentHobbyist =
-                        GUILayout.Toggle(data.isGameDevelopmentHobbyist, "Hobbyist", Styling.ButtonStyle);
+                    data.isHobbyist =
+                        GUILayout.Toggle(data.isHobbyist, "Hobbyist", Styling.ButtonStyle);
 
                     data.isNotDevelopingGames = GUILayout.Toggle(data.isNotDevelopingGames, "Not developing games",
                         Styling.ButtonStyle);
@@ -192,8 +224,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 if (changeScope.changed)
                 {
-                    if (data.isGameDevelopmentStudent || data.isWorkingInGameDevelopment ||
-                        data.isGameDevelopmentHobbyist || data.isNotDevelopingGames ||
+                    if (data.isStudent || data.isProfessional ||
+                        data.isHobbyist || data.isNotDevelopingGames ||
                         data.isGameDevelopmentRelationOther)
                     {
                         data.isGameDevelopmentRelationNoAnswer = false;
@@ -207,9 +239,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     EditorGUILayout.ToggleLeft("No answer", data.isGameDevelopmentRelationNoAnswer);
                 if (changeScope.changed && data.isGameDevelopmentRelationNoAnswer)
                 {
-                    data.isGameDevelopmentStudent = false;
-                    data.isWorkingInGameDevelopment = false;
-                    data.isGameDevelopmentHobbyist = false;
+                    data.isStudent = false;
+                    data.isProfessional = false;
+                    data.isHobbyist = false;
                     data.isNotDevelopingGames = false;
                     data.isGameDevelopmentRelationOther = false;
                 }

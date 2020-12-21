@@ -212,7 +212,10 @@ namespace SpriteSortingPlugin.Survey.UI
                     buttonText = "Already finished";
                 }
 
-                using (new EditorGUI.DisabledScope(surveyWizard.CurrentProgress == surveyWizard.TotalProgress))
+                var isDisabled = (GeneralData.IsValidatingUserInput && !currentStep.IsFilledOut()) ||
+                                 surveyWizard.CurrentProgress == surveyWizard.TotalProgress;
+
+                using (new EditorGUI.DisabledScope(isDisabled))
                 {
                     if (GUILayout.Button(buttonText, buttonStyle, heightLayout))
                     {

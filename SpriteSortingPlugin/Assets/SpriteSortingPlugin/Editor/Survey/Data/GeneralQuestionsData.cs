@@ -13,9 +13,9 @@ namespace SpriteSortingPlugin.Survey.Data
 
         public int understandingEnglish = -1;
 
-        public bool isGameDevelopmentStudent;
-        public bool isWorkingInGameDevelopment;
-        public bool isGameDevelopmentHobbyist;
+        public bool isStudent;
+        public bool isProfessional;
+        public bool isHobbyist;
         public bool isNotDevelopingGames;
         public bool isGameDevelopmentRelationNoAnswer;
         public bool isGameDevelopmentRelationOther;

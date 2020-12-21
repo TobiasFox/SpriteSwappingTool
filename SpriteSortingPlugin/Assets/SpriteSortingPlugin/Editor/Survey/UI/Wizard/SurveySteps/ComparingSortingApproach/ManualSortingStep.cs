@@ -53,6 +53,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             };
         }
 
+        public override bool IsFilledOut()
+        {
+            var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
+
+            if (currentSortingTaskData.isTaskStarted)
+            {
+                return false;
+            }
+
+            return currentSortingTaskData.timeNeeded >= 0;
+        }
+
         public override void DrawContent()
         {
             EditorGUI.indentLevel++;

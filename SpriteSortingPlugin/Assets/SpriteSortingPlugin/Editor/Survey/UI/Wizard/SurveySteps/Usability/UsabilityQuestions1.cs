@@ -45,6 +45,19 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             Finish(SurveyFinishState.Succeeded);
         }
 
+        public override bool IsFilledOut()
+        {
+            foreach (var susAnswer in data.susAnswers)
+            {
+                if (susAnswer < 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private void DrawSusQuestions()
         {
             var richTextStyle = new GUIStyle(Styling.LabelWrapStyle) {richText = true};

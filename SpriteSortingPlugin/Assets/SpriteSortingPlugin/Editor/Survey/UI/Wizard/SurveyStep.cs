@@ -56,6 +56,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return false;
         }
 
+        public virtual bool IsFilledOut()
+        {
+            return true;
+        }
+
         public virtual List<string> CollectFilePathsToCopy()
         {
             return null;

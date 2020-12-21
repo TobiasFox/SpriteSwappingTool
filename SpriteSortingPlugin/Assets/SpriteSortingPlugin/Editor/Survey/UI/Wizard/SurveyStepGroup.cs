@@ -75,6 +75,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return steps[currentProgress].IsSendingData();
         }
 
+        public override bool IsFilledOut()
+        {
+            return steps[currentProgress].IsFilledOut();
+        }
+
         public override SurveyStepData GetSurveyStepData()
         {
             SurveyStepGroupData.SurveyStepsData = new List<SurveyStepData>();
