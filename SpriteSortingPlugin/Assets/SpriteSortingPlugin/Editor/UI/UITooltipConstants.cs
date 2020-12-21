@@ -12,8 +12,8 @@
             "Range: 0.0 - 1.0";
 
         public const string ContainmentEncapsulatedSpriteInForegroundTooltip =
-            "When enabled, completely enclosed SpriteRenderers will be sorted in the foreground. Otherwise, the enclosed SpriteRenderer will be sorted in the background and may be completely hidden.";
-
+            "Control, whether completely enclosed SpriteRenderer will be sorted in the foreground or background. When choosing the background, the contained Sprite may be completely hidden.";
+        
         public const string ContainmentTooltip =
             "Compares if SpriteRenderers are completely enclosed by other SpriteRenderers.\n" +
             "When analyzing the alpha value, a " + nameof(SpriteData) + " asset is required.";
@@ -22,7 +22,7 @@
             "Compares the distance to the camera. Will be ignored when using orthographic Transparency Sort mode or Default Transparency Sort mode and orthographic camera project.";
 
         public const string CameraDistanceForegroundSpriteTooltip =
-            "When enabled, SpriteRenderer with a shorter distance to the camera will be sorted in the foreground.";
+            "Control, whether SpriteRenderers with a shorter distance to the camera will be sorted in the foreground or background.";
 
         public const string PrimaryColorTooltip =
             "Compares the primary color of given SpriteRenderers and sorts SpriteRenderer in the foreground which are closer to the foreground color.";
@@ -40,40 +40,40 @@
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SizeForegroundSpriteTooltip =
-            "When enabled, larger Sprites will be sorted in the foreground.";
+            "Control, whether large Sprites will be sorted in the foreground or background.";
 
         public const string IntersectionAreaTooltip =
             "Calculates the intersection area of overlapping Sprites and sets these intersection area in ration to the area of these overlapping Sprites.\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string IntersectionAreaForegroundSpriteTooltip =
-            "When enabled, Sprites with a smaller ratio of their own area to the intersection area will be sorted in the foreground.";
+            "Control, whether Sprites with a smaller ratio of their own area to the intersection area will be sorted in the foreground or background.";
 
         public const string SpriteSortPointTooltip =
             "Compares the Sort Points of Sprites by testing if they overlap another Sprite.\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SpriteSortPointForegroundSpriteTooltip =
-            "When enabled, a Sprite will be sorted in the foreground if a Sprite's Sort Point overlaps another Sprite.";
-
+            "Control, whether SpriteRenderers will be sorted in the foreground or background if a Sprite's Sort Point overlaps another Sprite.";
+        
         public const string ResolutionTooltip = "Compares Sprites resolutions in pixel.";
 
         public const string ResolutionForegroundSpriteTooltip =
-            "When enabled, Sprites with higher resolutions will be sorted in the foreground.";
-
+            "Control, whether Sprites with higher resolution will be sorted in the foreground or background.";
+        
         public const string SharpnessTooltip =
             "Compares the sharpness of Sprites by analyzing their amount of edges (rapid intensity changes).\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SharpnessForegroundSpriteTooltip =
-            "When enabled, sharper Sprites will be sorted in the foreground.";
+            "Control, whether sharper Sprites will be sorted in the foreground or background.";
 
         public const string PerceivedLightnessTooltip = "Compares only the perceived lightness of Sprites.\n" +
                                                         "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string PerceivedLightnessForegroundSpriteTooltip =
-            "When enabled, lighter Sprites will be sorted in the foreground.";
-
+            "Control, whether lighter Sprites will be sorted in the foreground or background.";
+        
         public const string SortingCriteriaWeightTooltip =
             "Controls the weight of this sorting criterion. The higher the value, the more affects this criterion the resulting order of Sprites.\n" +
             "Minimum: 0.0";

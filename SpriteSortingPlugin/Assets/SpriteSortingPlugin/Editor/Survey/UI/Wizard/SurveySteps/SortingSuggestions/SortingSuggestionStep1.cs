@@ -127,19 +127,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     EditorGUILayout.LabelField(QuestionLabels[i],
                         taskLabelStyle);
 
-                    switch (i)
+                    if (i == 1)
                     {
-                        case 0:
-                            // EditorGUILayout.LabelField(
-                            //     "This is already done, because the data of the last step can be reused :)",
-                            //     Styling.LabelWrapStyle);
-                            break;
-                        case 1:
-                            EditorGUILayout.Space(5);
+                        EditorGUILayout.Space(5);
 
-                            EditorGUILayout.LabelField("The same SpriteRenderer setup as in 1. is used.",
-                                Styling.LabelWrapStyle);
-                            break;
+                        EditorGUILayout.LabelField("The same SpriteRenderer setup as in 1. is used.",
+                            Styling.LabelWrapStyle);
                     }
 
                     EditorGUILayout.Space(10);

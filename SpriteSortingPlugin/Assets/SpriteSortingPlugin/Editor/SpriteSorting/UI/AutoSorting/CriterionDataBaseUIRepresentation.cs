@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    public abstract class CriterionDataBaseUIRepresentation<T>  where T : SortingCriterionData
+    public abstract class CriterionDataBaseUIRepresentation<T> where T : SortingCriterionData
     {
         protected T sortingCriterionData;
         protected string title = "Criteria";
@@ -15,7 +15,9 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
         private bool isShowingInInspector;
 
         public string Title => title;
-        
+
+        protected float CalculateIndentSpace => (EditorGUI.indentLevel * EditorGUIUtility.singleLineHeight) * 0.8f;
+
         public void Initialize(T sortingCriterionData, bool isShowingInInspector = false)
         {
             this.isShowingInInspector = isShowingInInspector;

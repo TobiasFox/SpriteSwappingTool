@@ -18,10 +18,31 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
         protected override void OnInspectorGuiInternal()
         {
-            ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground = EditorGUILayout.ToggleLeft(
-                new GUIContent("Is contained Sprite in foreground",
-                    UITooltipConstants.ContainmentEncapsulatedSpriteInForegroundTooltip),
-                ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(CalculateIndentSpace);
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        GUILayout.FlexibleSpace();
+                        GUILayout.Label(new GUIContent("Sort contained Sprite in",
+                            UITooltipConstants.ContainmentEncapsulatedSpriteInForegroundTooltip));
+                        GUILayout.FlexibleSpace();
+                    }
+
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground = GUILayout.Toggle(
+                            ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground, "Foreground",
+                            Styling.ButtonStyle);
+
+                        ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground = !GUILayout.Toggle(
+                            !ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground, "Background",
+                            Styling.ButtonStyle);
+                    }
+                }
+            }
 
             using (new EditorGUI.DisabledScope(ContainmentSortingCriterionData.isSortingEnclosedSpriteInForeground))
             {

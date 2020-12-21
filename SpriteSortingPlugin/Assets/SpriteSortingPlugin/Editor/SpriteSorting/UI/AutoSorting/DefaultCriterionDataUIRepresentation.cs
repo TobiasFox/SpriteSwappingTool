@@ -26,9 +26,30 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
         protected override void OnInspectorGuiInternal()
         {
-            DefaultSortingCriterionData.isSortingInForeground = EditorGUILayout.ToggleLeft(
-                new GUIContent(foregroundSortingName, foregroundSortingTooltip),
-                DefaultSortingCriterionData.isSortingInForeground);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(CalculateIndentSpace);
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        GUILayout.FlexibleSpace();
+                        GUILayout.Label(new GUIContent(foregroundSortingName, foregroundSortingTooltip));
+                        GUILayout.FlexibleSpace();
+                    }
+
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        DefaultSortingCriterionData.isSortingInForeground = GUILayout.Toggle(
+                            DefaultSortingCriterionData.isSortingInForeground, "Foreground",
+                            Styling.ButtonStyle);
+
+                        DefaultSortingCriterionData.isSortingInForeground = !GUILayout.Toggle(
+                            !DefaultSortingCriterionData.isSortingInForeground, "Background",
+                            Styling.ButtonStyle);
+                    }
+                }
+            }
         }
 
         private string GetSortingCriteriaTitle(SortingCriterionType sortingCriterionType)
@@ -99,25 +120,25 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
             switch (sortingCriterionType)
             {
                 case SortingCriterionType.Size:
-                    returnString = "Is large Sprite in foreground";
+                    returnString = "Sort large Sprite in";
                     break;
                 case SortingCriterionType.IntersectionArea:
-                    returnString = "Is Sprite with smaller \"area-intersection area\" ratio in foreground";
+                    returnString = "Sort Sprite with smaller \"area-intersection area\" ratio in";
                     break;
                 case SortingCriterionType.SortPoint:
-                    returnString = "Is Sprite with overlapping Sprite Sort Point in foreground";
+                    returnString = "Sort Sprite with overlapping Sprite Sort Point in";
                     break;
                 case SortingCriterionType.Resolution:
-                    returnString = "Is Sprite with higher resolution in foreground";
+                    returnString = "Sort Sprite with higher resolution in";
                     break;
                 case SortingCriterionType.Sharpness:
-                    returnString = "Is sharper Sprite in foreground";
+                    returnString = "Sort sharper Sprite in";
                     break;
                 case SortingCriterionType.Lightness:
-                    returnString = "Is lighter Sprite in foreground";
+                    returnString = "Sort lighter Sprite in";
                     break;
                 case SortingCriterionType.CameraDistance:
-                    returnString = "Is closer Sprite in foreground";
+                    returnString = "Sort closer Sprite in";
                     break;
             }
 
