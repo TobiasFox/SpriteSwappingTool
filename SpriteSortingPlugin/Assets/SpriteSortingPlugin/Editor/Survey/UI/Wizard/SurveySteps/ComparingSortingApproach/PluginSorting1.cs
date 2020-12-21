@@ -57,7 +57,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.LabelField("After the manual approach were used, it's now time to use the plugin.",
+            EditorGUILayout.LabelField("After the manual approach is used, the usage with the plugin is evaluated.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
@@ -73,7 +73,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name + " -> " + GeneralData.DetectorName,
                 Styling.LabelWrapStyle);
 
-            EditorGUILayout.Space(10);
+            EditorGUILayout.Space(20);
 
             using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
             {

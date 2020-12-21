@@ -58,7 +58,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 "It consists of ten questions rated from strongly disagree to strongly agree. The system to which all questions refer is the " +
                 GeneralData.Name + " tool.", Styling.LabelWrapStyle);
 
-            EditorGUILayout.Space(25);
+            EditorGUILayout.Space(20);
 
             UsabilityQuestionsUtility.DrawRatingHeader(QuestionWidthPercentage, "Overall usability of the system",
                 "Strongly\nDisagree", "Strongly\nAgree");

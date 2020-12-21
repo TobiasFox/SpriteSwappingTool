@@ -59,7 +59,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.LabelField("The next SpriteRenderer setup has slightly more Sprites.",
+            EditorGUILayout.LabelField("The setup of this task has slightly more Sprites.",
                 Styling.LabelWrapStyle);
             EditorGUILayout.Space(5);
 
@@ -77,7 +77,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     Styling.LabelWrapStyle);
             }
 
-            EditorGUILayout.Space(10);
+            EditorGUILayout.Space(20);
 
             using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
             {

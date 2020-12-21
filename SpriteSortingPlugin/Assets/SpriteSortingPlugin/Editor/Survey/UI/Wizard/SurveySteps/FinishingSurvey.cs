@@ -110,10 +110,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     break;
             }
 
-            if (GUILayout.Button("Debug: successful send Data"))
-            {
-                UpdateUIAfterSuccessfullySendData();
-            }
+            // if (GUILayout.Button("Debug: successful send Data"))
+            // {
+            //     UpdateUIAfterSuccessfullySendData();
+            // }
         }
 
         public void UpdateWithSendResult(TransmitResult transmitResult)

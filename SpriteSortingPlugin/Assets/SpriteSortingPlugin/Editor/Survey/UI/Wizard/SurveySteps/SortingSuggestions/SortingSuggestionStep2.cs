@@ -81,7 +81,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             GeneralData.isAutomaticSortingActive = true;
 
             EditorGUI.indentLevel++;
-
+            EditorGUILayout.LabelField(
+                "This time the two-step process has a SpriteRenderer setup with slightly more SpriteRenderers.",
+                Styling.LabelWrapStyle);
             isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
                 "Information about the sorting order suggestion functionality", true);
 
@@ -105,12 +107,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     Styling.LabelWrapStyle);
             }
 
-            EditorGUILayout.Space(25);
-            EditorGUILayout.LabelField(
-                "This time a two-step process is used with a scene setup which has slightly more SpriteRenderers.",
-                Styling.LabelWrapStyle);
 
-            EditorGUILayout.Space(10);
+            EditorGUILayout.Space(20);
 
             for (var i = 0; i < SurveyStepSortingData.sortingTaskDataList.Count; i++)
             {

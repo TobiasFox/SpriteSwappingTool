@@ -44,7 +44,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 "The following usability questions addresses specific parts of the " + GeneralData.Name + " tool.",
                 Styling.LabelWrapStyle);
 
-            EditorGUILayout.Space(25);
+            EditorGUILayout.Space(20);
 
             for (var i = 0; i < RatingQuestions.Length; i++)
             {
@@ -97,14 +97,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var entireQuestionRect = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false));
                 data.ratingAnswers[index] =
-                    (int) GUI.HorizontalSlider(entireQuestionRect, data.ratingAnswers[index], 0, 100);
+                    GUI.HorizontalSlider(entireQuestionRect, data.ratingAnswers[index], 0, 100);
             }
         }
 
         private void DrawHighLowlightQuestion()
         {
             EditorGUILayout.LabelField(
-                questionCounter + ". What are your highlights and lowlights of the tool? (optional)",
+                questionCounter + ". What are your highlights and lowlights of the " + GeneralData.Name +
+                " tool? (optional)",
                 Styling.QuestionLabelStyle);
 
             using (new EditorGUI.IndentLevelScope())

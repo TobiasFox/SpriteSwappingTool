@@ -55,7 +55,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var usabilityQuestions2 = new UsabilityQuestions2("Usability", surveyData.usabilityData);
 
             // surveySteps.Add(usabilityQuestions1);
-            surveySteps.Add(usabilityQuestions2);
+            // surveySteps.Add(usabilityQuestions2);
             // {
             //     var list = new List<SurveyStep>() {usabilityQuestions1, usabilityQuestions2};
             //     var group = new SurveyStepGroup(list, "");
@@ -75,9 +75,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             // }
 
             var finishingStep = new FinishingSurvey("Finalizing");
-            surveySteps.Add(finishingStep);
+            // surveySteps.Add(finishingStep);
 
-            // surveySteps.AddRange(FinalSurveyStepList(surveyData));
+            surveySteps.AddRange(FinalSurveyStepList(surveyData));
 
             return surveySteps;
         }
@@ -96,7 +96,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var generalQuestions1 = new GeneralQuestions1("General Questions", surveyData.generalQuestionsData);
                 var list = new List<SurveyStep>() {generalQuestions1};
-                var group = new SurveyStepGroup(list, "General Questions");
+                var group = new SurveyStepGroup(list, "Part 1");
                 surveySteps.Add(group);
             }
 
@@ -113,7 +113,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 var list = new List<SurveyStep> {manualSortingStep, manualSortingStep2, pluginSorting1, pluginSorting2};
 
-                var group = new SurveyStepGroup(list, "Comparing manual approach and using the Sprite Swapping tool");
+                var group = new SurveyStepGroup(list, "Part 2");
                 surveySteps.Add(group);
             }
 
@@ -126,7 +126,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
 
                 var list = new List<SurveyStep> {sortingSuggestionStep1, sortingSuggestionStep2};
-                var group = new SurveyStepGroup(list, evaluationAutoSortingSuggestionLabel);
+                var group = new SurveyStepGroup(list, "Part 3");
                 surveySteps.Add(group);
             }
 
@@ -135,7 +135,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var usabilityQuestions1 = new UsabilityQuestions1("Usability", surveyData.usabilityData);
                 var usabilityQuestions2 = new UsabilityQuestions2("Usability", surveyData.usabilityData);
                 var list = new List<SurveyStep>() {usabilityQuestions1, usabilityQuestions2};
-                var group = new SurveyStepGroup(list, "Usability");
+                var group = new SurveyStepGroup(list, "Part 4");
                 surveySteps.Add(group);
             }
 

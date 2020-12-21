@@ -64,6 +64,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUI.indentLevel++;
 
+            EditorGUILayout.LabelField(
+                "To finalize this part, one more SpriteRenderer ssetup with slightly more SpriteRenderers is used.",
+                Styling.LabelWrapStyle);
+            
             isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
                 "Information about the " + GeneralData.Name + " " + GeneralData.DetectorName, true);
 
@@ -81,12 +85,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     Styling.LabelWrapStyle);
             }
 
-            EditorGUILayout.Space(15);
-
-            EditorGUILayout.LabelField(
-                "To finalize this part one more scene with slightly more SpriteRenderers is used.",
-                Styling.LabelWrapStyle);
-            EditorGUILayout.Space(5);
+            EditorGUILayout.Space(20);
 
             using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
             {

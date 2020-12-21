@@ -197,24 +197,26 @@ namespace SpriteSortingPlugin.Survey.UI
                 buttonStyle.fontSize++;
                 GUILayout.Space(10);
 
-                if (!surveyWizard.HasPreviousStep())
+                var buttonText = "Continue";
+
+                if (surveyWizard.CurrentProgress == 1)
                 {
-                    using (new EditorGUI.DisabledScope(currentStep == null))
-                    {
-                        if (GUILayout.Button("Start", buttonStyle, heightLayout))
-                        {
-                            NextSurveyStep();
-                        }
-                    }
+                    buttonText = "Start";
                 }
-                else
+                else if (surveyWizard.CurrentProgress == surveyWizard.TotalProgress - 1)
                 {
-                    using (new EditorGUI.DisabledScope(!surveyWizard.HasNextStep()))
+                    buttonText = "Finish and Send data";
+                }
+                else if (surveyWizard.CurrentProgress == surveyWizard.TotalProgress)
+                {
+                    buttonText = "Already finished";
+                }
+
+                using (new EditorGUI.DisabledScope(surveyWizard.CurrentProgress == surveyWizard.TotalProgress))
+                {
+                    if (GUILayout.Button(buttonText, buttonStyle, heightLayout))
                     {
-                        if (GUILayout.Button("Next -->", buttonStyle, heightLayout))
-                        {
-                            NextSurveyStep();
-                        }
+                        NextSurveyStep();
                     }
                 }
 

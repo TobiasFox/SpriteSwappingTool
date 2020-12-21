@@ -2,7 +2,6 @@
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -32,69 +31,72 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             questionCounter = QuestionCounterStart;
             EditorGUI.indentLevel++;
 
+            EditorGUILayout.LabelField(
+                "At the beginning of this survey some general questions are asked.", Styling.LabelWrapStyle);
+            EditorGUILayout.Space(20);
+            // using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            // {
+            //     DrawUnderstandingEnglishQuestion();
+            //     questionCounter++;
+            // }
+
+            //criterion of exclusion
+            // if (data.understandingEnglish == 1)
+            // {
+            //     DrawExclusion();
+            //     EditorGUI.indentLevel--;
+            //     return;
+            // }
+
+            // using (new EditorGUI.DisabledScope(data.understandingEnglish != 0))
+            // {
+            // EditorGUILayout.Space(space);
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                DrawUnderstandingEnglishQuestion();
+                DrawIsDevelopingGamesQuestion();
                 questionCounter++;
             }
 
             //criterion of exclusion
-            if (data.understandingEnglish == 1)
+            if (data.developing2dGames == 1)
             {
                 DrawExclusion();
+
                 EditorGUI.indentLevel--;
                 return;
             }
 
-            using (new EditorGUI.DisabledScope(data.understandingEnglish != 0))
+            using (new EditorGUI.DisabledScope(data.developing2dGames != 0))
             {
                 EditorGUILayout.Space(space);
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
-                    DrawIsDevelopingGamesQuestion();
+                    DrawNumberOfApplicationsQuestions();
                     questionCounter++;
                 }
 
-                //criterion of exclusion
-                if (data.developing2dGames == 1)
+                EditorGUILayout.Space(space);
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
-                    DrawExclusion();
-
-                    EditorGUI.indentLevel--;
-                    return;
+                    DrawIsExperiencedVisualGlitchQuestion();
+                    questionCounter++;
                 }
 
-                using (new EditorGUI.DisabledScope(data.developing2dGames != 0))
+                EditorGUILayout.Space(space);
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
-                    EditorGUILayout.Space(space);
-                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
-                    {
-                        DrawNumberOfApplicationsQuestions();
-                        questionCounter++;
-                    }
+                    DrawGameDevelopmentRelation();
+                    questionCounter++;
+                }
 
-                    EditorGUILayout.Space(space);
-                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
-                    {
-                        DrawIsExperiencedVisualGlitchQuestion();
-                        questionCounter++;
-                    }
-
-                    EditorGUILayout.Space(space);
-                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
-                    {
-                        DrawGameDevelopmentRelation();
-                        questionCounter++;
-                    }
-
-                    EditorGUILayout.Space(space);
-                    using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
-                    {
-                        DrawMainFieldOfWork();
-                        questionCounter++;
-                    }
+                EditorGUILayout.Space(space);
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+                {
+                    DrawMainFieldOfWork();
+                    questionCounter++;
                 }
             }
+            // }
 
             EditorGUI.indentLevel--;
         }
@@ -286,7 +288,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawIsDevelopingGamesQuestion()
         {
             EditorGUILayout.LabelField(questionCounter +
-                                       ". Are you familiar with developing 2D Unity applications?",
+                                       ". Are you familiar with developing 2D Unity applications? (exclusion criterion)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
