@@ -10,6 +10,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     public class ManualSortingStep2 : SurveyStep
     {
         private const string SceneName = "ManualSorting2.unity";
+        private const int QuestionNumber = 2;
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
@@ -86,7 +87,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    "2. Please find and solve all visual glitches in the given scene by using the manual approach.\n" +
+                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the manual approach.\n" +
                     "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
                     taskLabelStyle);
 
@@ -99,27 +100,33 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
 
-                var buttonLabel = "Start by opening and focussing scene";
+                var buttonLabel = $"{QuestionNumber}a Start by opening and focussing scene";
                 var isDisable = currentSortingTaskData.taskState != TaskState.NotStarted;
                 using (new EditorGUI.DisabledScope(isDisable))
                 {
-                    if (GUILayout.Button(buttonLabel, GUILayout.Height(TaskButtonHeight)))
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        currentSortingTaskData.StartTask();
-
-                        //TODO open Scene and may discard everything before
-                        currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
-                            currentSortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
-
-                        EditorWindow.FocusWindowIfItsOpen<SceneView>();
-
-                        var setupGameObject = GameObject.Find("setup");
-                        if (setupGameObject != null)
+                        GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
+                        if (GUILayout.Button(buttonLabel, GUILayout.Height(TaskButtonHeight)))
                         {
-                            Selection.objects = new Object[] {setupGameObject};
-                            SceneView.FrameLastActiveSceneView();
-                            EditorGUIUtility.PingObject(setupGameObject);
+                            currentSortingTaskData.StartTask();
+
+                            //TODO open Scene and may discard everything before
+                            currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
+                                currentSortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
+
+                            EditorWindow.FocusWindowIfItsOpen<SceneView>();
+
+                            var setupGameObject = GameObject.Find("setup");
+                            if (setupGameObject != null)
+                            {
+                                Selection.objects = new Object[] {setupGameObject};
+                                SceneView.FrameLastActiveSceneView();
+                                EditorGUIUtility.PingObject(setupGameObject);
+                            }
                         }
+
+                        GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
                     }
                 }
 
@@ -133,12 +140,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 using (new EditorGUI.DisabledScope(currentSortingTaskData.taskState != TaskState.Started))
                 {
-                    if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        currentSortingTaskData.FinishTask();
+                        GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
+                        if (GUILayout.Button($"{QuestionNumber}b Finish", GUILayout.Height(TaskButtonHeight)))
+                        {
+                            currentSortingTaskData.FinishTask();
 
-                        var combinedPath = currentSortingTaskData.FullModifiedScenePath;
-                        EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, combinedPath, true);
+                            var combinedPath = currentSortingTaskData.FullModifiedScenePath;
+                            EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, combinedPath, true);
+                        }
+
+                        GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
                     }
                 }
             }

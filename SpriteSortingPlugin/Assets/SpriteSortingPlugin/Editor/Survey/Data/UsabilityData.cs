@@ -10,8 +10,7 @@ namespace SpriteSortingPlugin.Survey.Data
         public string highlights = "";
         public string lowlights = "";
 
-        //TODO float or int?
-        public float[] ratingAnswers = Array.ConvertAll(new float[3], i => 50f);
+        public int[] ratingAnswers = Array.ConvertAll(new int[3], i => 50);
 
         public string missingCriteriaText = "";
 

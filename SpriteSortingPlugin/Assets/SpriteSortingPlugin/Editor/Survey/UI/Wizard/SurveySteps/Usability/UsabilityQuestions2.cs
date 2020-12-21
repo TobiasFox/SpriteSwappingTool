@@ -97,7 +97,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var entireQuestionRect = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false));
                 data.ratingAnswers[index] =
-                    GUI.HorizontalSlider(entireQuestionRect, data.ratingAnswers[index], 0, 100);
+                    (int) GUI.HorizontalSlider(entireQuestionRect, data.ratingAnswers[index], 0, 100);
             }
         }
 

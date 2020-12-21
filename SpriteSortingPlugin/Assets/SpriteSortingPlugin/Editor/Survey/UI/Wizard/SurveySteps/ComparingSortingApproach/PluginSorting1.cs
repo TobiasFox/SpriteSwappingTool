@@ -10,6 +10,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     public class PluginSorting1 : SurveyStep
     {
         private const string SceneName = "PluginSortingExample1.unity";
+        private const int QuestionNumber = 3;
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
@@ -66,13 +67,13 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.Space(10);
 
             EditorGUILayout.LabelField(
-                "The " + GeneralData.Name + " " + GeneralData.DetectorName +
+                "The " + GeneralData.FullDetectorName +
                 " automatically identifies overlapping and unsorted SpritesRenderers and helps to sort them.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField(
-                "You can find the " + GeneralData.Name + " " + GeneralData.DetectorName + " here:\n" +
+                "You can find the " + GeneralData.FullDetectorName + " here:\n" +
                 GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name + " -> " + GeneralData.DetectorName,
                 Styling.LabelWrapStyle);
 
@@ -82,8 +83,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    "3. Please find and solve all visual glitches in the given scene by using the " +
-                    GeneralData.Name + " " + GeneralData.DetectorName + ".\n" +
+                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the " +
+                    GeneralData.FullDetectorName + ".\n" +
                     "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
                     taskLabelStyle);
 
@@ -91,33 +92,39 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 EditorGUILayout.LabelField(
                     "You can optionally generate more accurate Sprite outlines by using a " + nameof(SpriteData) +
-                    ". Such an asset can be created with the " + GeneralData.Name + " " +
-                    GeneralData.DataAnalysisName + " window.", Styling.LabelWrapStyle);
+                    ". Such an asset can be created with the " + GeneralData.FullDataAnalysisName + " window.",
+                    Styling.LabelWrapStyle);
 
                 EditorGUILayout.Space(10);
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
 
-                var buttonLabel = "Start by opening and focussing scene";
+                var buttonLabel = $"{QuestionNumber}a Start by opening and focussing scene";
                 var isDisable = currentSortingTaskData.taskState != TaskState.NotStarted;
                 using (new EditorGUI.DisabledScope(isDisable))
                 {
-                    if (GUILayout.Button(buttonLabel, GUILayout.Height(TaskButtonHeight)))
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        currentSortingTaskData.StartTask();
-                        currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
-                            currentSortingTaskData.FullScenePathAndName,
-                            OpenSceneMode.Single);
-
-                        EditorWindow.FocusWindowIfItsOpen<SceneView>();
-
-                        var setupGameObject = GameObject.Find("setup");
-                        if (setupGameObject != null)
+                        GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
+                        if (GUILayout.Button(buttonLabel, GUILayout.Height(TaskButtonHeight)))
                         {
-                            Selection.objects = new Object[] {setupGameObject};
-                            SceneView.FrameLastActiveSceneView();
-                            EditorGUIUtility.PingObject(setupGameObject);
+                            currentSortingTaskData.StartTask();
+                            currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
+                                currentSortingTaskData.FullScenePathAndName,
+                                OpenSceneMode.Single);
+
+                            EditorWindow.FocusWindowIfItsOpen<SceneView>();
+
+                            var setupGameObject = GameObject.Find("setup");
+                            if (setupGameObject != null)
+                            {
+                                Selection.objects = new Object[] {setupGameObject};
+                                SceneView.FrameLastActiveSceneView();
+                                EditorGUIUtility.PingObject(setupGameObject);
+                            }
                         }
+
+                        GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
                     }
                 }
 
@@ -131,12 +138,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 using (new EditorGUI.DisabledScope(currentSortingTaskData.taskState != TaskState.Started))
                 {
-                    if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        currentSortingTaskData.FinishTask();
+                        GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
+                        if (GUILayout.Button($"{QuestionNumber}b Finish", GUILayout.Height(TaskButtonHeight)))
+                        {
+                            currentSortingTaskData.FinishTask();
 
-                        var savePath = currentSortingTaskData.FullModifiedScenePath;
-                        EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, savePath, true);
+                            var savePath = currentSortingTaskData.FullModifiedScenePath;
+                            EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, savePath, true);
+                        }
+
+                        GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
                     }
                 }
             }

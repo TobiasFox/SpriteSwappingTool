@@ -30,9 +30,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             // surveySteps.Add(creatingSpriteData);
 
             var pluginSorting1 = new PluginSorting1("Automatically detect visual glitches with the " +
-                                                    GeneralData.Name + " " + GeneralData.DetectorName);
+                                                    GeneralData.FullDetectorName);
             var pluginSorting2 = new PluginSorting2("Automatically detect visual glitches with the " +
-                                                    GeneralData.Name + " " + GeneralData.DetectorName);
+                                                    GeneralData.FullDetectorName);
             // surveySteps.Add(pluginSorting1);
             // surveySteps.Add(pluginSorting2);
             // {
@@ -104,7 +104,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
                 var pluginSortingLabel = "Automatically detect visual glitches with the " +
-                                         GeneralData.Name + " " + GeneralData.DetectorName;
+                                         GeneralData.FullDetectorName;
 
                 var manualSortingStep = new ManualSortingStep(manualSortingLabel);
                 var manualSortingStep2 = new ManualSortingStep2(manualSortingLabel);

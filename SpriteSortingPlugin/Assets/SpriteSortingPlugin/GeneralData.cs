@@ -29,6 +29,9 @@
         public static bool isAutomaticSortingActive;
         public static bool isLoggingActive;
 
+        public static string FullDetectorName => Name + " " + DetectorName;
+        public static string FullDataAnalysisName => Name + " " + DataAnalysisName;
+
         public static string GetFullVersionNumber()
         {
             return MayorVersionNr + "." + MinorVersionNr + "." + FixVersionNr;

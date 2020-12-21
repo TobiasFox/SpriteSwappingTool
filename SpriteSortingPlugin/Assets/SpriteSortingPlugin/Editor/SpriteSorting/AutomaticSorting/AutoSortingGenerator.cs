@@ -148,8 +148,9 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     containedByAutoSortingComponent);
                 if (correspondingIndex < 0)
                 {
-                    Debug.LogWarning("should not happen, break for");
-                    break;
+                    Debug.LogWarning("should not happen -> continue. Is probably a cycle " +
+                                     containedComponent.sortingComponent + " " + containedByAutoSortingComponent);
+                    continue;
                 }
 
                 var sortInForeground = containmentSortingCriterion.IsSortingEnclosedSpriteInForeground;
