@@ -233,7 +233,7 @@ namespace SpriteSortingPlugin
             return colliderPointList;
         }
 
-        //TODO: consider edge pixel
+        //TOD O: consider edge pixel
         private bool HasPixelOutlineNeighbour(int currentPixelIndex, out int nextPixelIndex)
         {
             var potentialNeighbours = new bool[8];
@@ -556,7 +556,7 @@ namespace SpriteSortingPlugin
                         continue;
                     }
 
-                    //TODO consider edge pixel
+                    //TOD O consider edge pixel
                     // if (y == 0 || y == spriteTexture.height - 1 || x == 0 || x == spriteTexture.width - 1)
                     // {
                     //     //edge pixel

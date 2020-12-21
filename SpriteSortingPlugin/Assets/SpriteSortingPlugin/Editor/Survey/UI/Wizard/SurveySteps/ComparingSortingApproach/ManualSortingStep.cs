@@ -105,7 +105,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         {
                             currentSortingTaskData.StartTask();
 
-                            //TODO open Scene and may discard everything before
                             currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
                                 currentSortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
 
