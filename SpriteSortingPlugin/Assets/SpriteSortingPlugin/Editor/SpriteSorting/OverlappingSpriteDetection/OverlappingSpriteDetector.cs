@@ -290,21 +290,18 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     continue;
                 }
 
-                //exclude list
+                //exclude and sort overlappings
                 var overlappingSprites = ExcludeSortingComponents(foundOverlappingSprites, excludingSpriteRendererList);
+                SortOverlappingSortingComponents(ref overlappingSprites, currentBaseSortingOrder);
 
                 // Debug.Log("found overlapping sprites " + overlappingSprites.Count);
 
-                SortOverlappingSortingComponents(ref overlappingSprites, currentBaseSortingOrder);
-
                 var newExcludingList = new List<SpriteRenderer>(excludingSpriteRendererList);
 
-                // var counter = 0;
                 foreach (var overlappingSprite in overlappingSprites)
                 {
                     // Debug.LogFormat("iteration {0}: check {1} against {2}", counter,
                     // baseSortingComponent.spriteRenderer.name, overlappingSprite.spriteRenderer.name);
-                    // counter++;
 
                     newExcludingList.Add(overlappingSprite.SpriteRenderer);
 
@@ -322,27 +319,38 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     if (!isSortingOptionContained)
                     {
                         newSortingOrder = currentSortingOrder;
-                        sortingOptions.Add(currentSortingComponentInstanceId, currentSortingOrder);
                     }
-
-                    var isSortingOrderUpdated = false;
 
                     // first compare current (unchanged or origin) sorting order and then compare their new sorting order values
-                    if (currentBaseSortingOrder > currentSortingOrder && newBaseSortingOrder <= newSortingOrder)
+                    var isBaseSortingOrderHigherThanOverlappingItem = currentBaseSortingOrder > currentSortingOrder;
+                    var isUpdatedSortingOrderHigherThanOverlappingItem = newBaseSortingOrder <= newSortingOrder;
+
+                    var isBaseSortingOrderLowerThanOverlappingItem = currentBaseSortingOrder < currentSortingOrder;
+                    var isUpdatedSortingOrderLowerThanOverlappingItem = newBaseSortingOrder >= newSortingOrder;
+
+
+                    if (isBaseSortingOrderHigherThanOverlappingItem && isUpdatedSortingOrderHigherThanOverlappingItem)
                     {
                         newSortingOrder = newBaseSortingOrder - 1;
-                        isSortingOrderUpdated = true;
                     }
-                    else if (currentBaseSortingOrder < currentSortingOrder &&
-                             newBaseSortingOrder >= newSortingOrder)
+                    else if (isBaseSortingOrderLowerThanOverlappingItem &&
+                             isUpdatedSortingOrderLowerThanOverlappingItem)
                     {
                         newSortingOrder = newBaseSortingOrder + 1;
-                        isSortingOrderUpdated = true;
+                    }
+                    else
+                    {
+                        //sorting order doesnt need to adjust. Therefore no need to add a recursive check
+                        continue;
                     }
 
-                    if (!isSortingOrderUpdated)
+                    if (!isSortingOptionContained)
                     {
-                        continue;
+                        sortingOptions.Add(currentSortingComponentInstanceId, currentSortingOrder);
+                    }
+                    else
+                    {
+                        sortingOptions[currentSortingComponentInstanceId] = newSortingOrder;
                     }
 
                     sortingOptions[currentSortingComponentInstanceId] = newSortingOrder;
