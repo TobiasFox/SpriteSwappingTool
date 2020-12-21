@@ -40,11 +40,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             using (new EditorGUI.DisabledScope(isDisable))
             {
-                GUILayout.Label("Automatic Sorting");
+                GUILayout.Label("Generation of Sorting order suggestion");
 
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
-                    var labelContent = new GUIContent("Apply auto sorting?",
+                    var labelContent = new GUIContent("Generate sorting order?",
                         UITooltipConstants.SortingEditorUsingAutoSortingTooltip);
                     isApplyingAutoSorting = UIUtil.DrawFoldoutBoolContent(isApplyingAutoSorting, labelContent);
 

@@ -7,7 +7,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 {
     public class AutoSortingGenerator
     {
-        private readonly List<SortingCriterion<SortingCriterionData>> sortingCriterias =
+        private readonly List<SortingCriterion<SortingCriterionData>> sortingCriteria =
             new List<SortingCriterion<SortingCriterionData>>();
 
         private AutoSortingCalculationData autoSortingCalculationData;
@@ -18,7 +18,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 
         public void AddSortingCriterion(SortingCriterion<SortingCriterionData> sortingCriterion)
         {
-            sortingCriterias.Add(sortingCriterion);
+            sortingCriteria.Add(sortingCriterion);
         }
 
         public void SetContainmentCriterion(ContainmentSortingCriterion containmentSortingCriterion)
@@ -27,24 +27,32 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         }
 
         public List<AutoSortingComponent> GenerateAutomaticSortingOrder(SortingComponent baseItem,
-            List<SortingComponent> overlappingSortingComponents, AutoSortingCalculationData autoSortingCalculationData)
+            List<SortingComponent> overlappingSortingComponents, AutoSortingCalculationData autoSortingCalculationData,
+            out List<SortingCriterionType> skippedSortingCriteria)
         {
             resultList = new List<AutoSortingComponent>();
+            skippedSortingCriteria = new List<SortingCriterionType>();
 
             if (overlappingSortingComponents == null || overlappingSortingComponents.Count + 1 <= 1)
             {
                 return resultList;
             }
 
-            this.overlappingSortingComponents = overlappingSortingComponents;
+            this.overlappingSortingComponents = new List<SortingComponent>(overlappingSortingComponents);
             this.baseItem = baseItem;
             this.autoSortingCalculationData = autoSortingCalculationData;
-            overlappingSortingComponents.Insert(0, baseItem);
+            this.overlappingSortingComponents.Insert(0, baseItem);
+            var autoSortingComponents = InitSortingDataList();
 
             var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
             spriteDataItemValidatorCache.UpdateSpriteData(this.autoSortingCalculationData.spriteData);
 
-            var autoSortingComponents = InitSortingDataList();
+            var hasValidSortingCriteria = ValidateSortingCriteria(out skippedSortingCriteria);
+            if (!hasValidSortingCriteria)
+            {
+                spriteDataItemValidatorCache.Clear();
+                return autoSortingComponents;
+            }
 
             if (containmentSortingCriterion != null)
             {
@@ -65,9 +73,68 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 
             resultList.Reverse();
 
-            //TODO consider baseItem
             containmentSortingCriterion = null;
             return resultList;
+        }
+
+        private bool ValidateSortingCriteria(out List<SortingCriterionType> skippedSortingCriteria)
+        {
+            skippedSortingCriteria = new List<SortingCriterionType>();
+
+            var isUsingSpriteData = false;
+            foreach (var sortingCriterion in sortingCriteria)
+            {
+                isUsingSpriteData |= sortingCriterion.IsUsingSpriteData();
+            }
+
+            if (containmentSortingCriterion != null)
+            {
+                isUsingSpriteData |= containmentSortingCriterion.IsUsingSpriteData();
+            }
+
+            if (!isUsingSpriteData)
+            {
+                return true;
+            }
+
+            if (autoSortingCalculationData.spriteData == null)
+            {
+                return false;
+            }
+
+            var collectedGuidList = new List<string>();
+
+            var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
+            foreach (var sortingComponent in overlappingSortingComponents)
+            {
+                var spriteDataItemValidator =
+                    spriteDataItemValidatorCache.GetOrCreateValidator(sortingComponent.SpriteRenderer);
+                if (spriteDataItemValidator == null)
+                {
+                    continue;
+                }
+
+                collectedGuidList.Add(spriteDataItemValidator.AssetGuid);
+            }
+
+            var isAllGuidsContained =
+                autoSortingCalculationData.spriteData.SpriteDataDictionaryContainsAllGuids(collectedGuidList);
+
+            foreach (var sortingCriterion in sortingCriteria)
+            {
+                if (sortingCriterion.IsUsingSpriteData() && !isAllGuidsContained)
+                {
+                    skippedSortingCriteria.Add(sortingCriterion.SortingCriterionType);
+                }
+            }
+
+            if (containmentSortingCriterion != null && containmentSortingCriterion.IsUsingSpriteData())
+            {
+                skippedSortingCriteria.Add(containmentSortingCriterion.SortingCriterionType);
+            }
+
+            var isSkippingAllSortingCriteria = skippedSortingCriteria.Count == sortingCriteria.Count;
+            return !isSkippingAllSortingCriteria;
         }
 
         private void SortContainedComponents(List<AutoSortingComponent> containedComponents)
@@ -247,9 +314,9 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             }
 
             var resultCounter = new float[2];
-            foreach (var sortingCriteria in sortingCriterias)
+            foreach (var sortingCriterion in sortingCriteria)
             {
-                var tempResults = sortingCriteria.Sort(unsortedItem.sortingComponent, sortedItem.sortingComponent,
+                var tempResults = sortingCriterion.Sort(unsortedItem.sortingComponent, sortedItem.sortingComponent,
                     autoSortingCalculationData);
 
                 for (var i = 0; i < resultCounter.Length; i++)
@@ -298,7 +365,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
                     autoSortingComponents[correspondingAutoSortingComponentIndex].sortingComponent;
 
                 // Debug.LogFormat("containment found: {0} in {1} ", containedSortingComponent.SpriteRenderer.name,
-                    // autoSortingComponent.sortingComponent.SpriteRenderer.name);
+                // autoSortingComponent.sortingComponent.SpriteRenderer.name);
             }
         }
 
@@ -325,7 +392,6 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             foreach (var overlappingItem in overlappingSortingComponents)
             {
                 var autoSortingComponent = new AutoSortingComponent(overlappingItem);
-
                 autoSortingComponents.Add(autoSortingComponent);
             }
 

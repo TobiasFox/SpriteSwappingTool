@@ -28,6 +28,11 @@ namespace SpriteSortingPlugin
 
         public SpriteDataItemValidator GetOrCreateValidator(SpriteRenderer spriteRenderer)
         {
+            if (spriteRenderer == null || spriteRenderer.sprite == null)
+            {
+                return null;
+            }
+
             var containsValidator =
                 validationDictionary.TryGetValue(spriteRenderer.sprite.GetInstanceID(), out var validator);
 

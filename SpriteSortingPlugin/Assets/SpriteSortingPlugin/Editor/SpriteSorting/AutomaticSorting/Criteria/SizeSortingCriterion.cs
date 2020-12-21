@@ -16,6 +16,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
         public SizeSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(sortingCriterionData)
         {
+            sortingCriterionType = SizeSortingCriterionData.sortingCriterionType;
         }
 
         public override bool IsUsingSpriteData()

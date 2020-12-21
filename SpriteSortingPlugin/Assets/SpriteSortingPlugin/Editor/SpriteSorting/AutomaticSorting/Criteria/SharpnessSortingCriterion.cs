@@ -10,6 +10,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
         public SharpnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
+            sortingCriterionType = DefaultSortingCriterionData.sortingCriterionType;
         }
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)

@@ -32,5 +32,23 @@ namespace SpriteSortingPlugin
                 }
             }
         }
+
+        public bool SpriteDataDictionaryContainsAllGuids(List<string> guidList)
+        {
+            if (spriteDataDictionary == null || guidList == null)
+            {
+                return false;
+            }
+
+            foreach (var guid in guidList)
+            {
+                if (!spriteDataDictionary.ContainsKey(guid))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

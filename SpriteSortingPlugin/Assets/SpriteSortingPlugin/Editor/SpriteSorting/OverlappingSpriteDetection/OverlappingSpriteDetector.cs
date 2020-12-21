@@ -426,7 +426,9 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
         private bool ValidateSortingComponent(SpriteRenderer spriteRenderer, out SortingComponent sortingComponent)
         {
             sortingComponent = null;
-            if (!spriteRenderer.enabled)
+
+            if (!spriteRenderer.gameObject.activeInHierarchy || !spriteRenderer.enabled ||
+                spriteRenderer.sprite == null)
             {
                 return false;
             }
@@ -587,6 +589,13 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             planeBoundsToCheck = CreatePlaneBounds(boundsToCheck);
 
             spriteDataItemValidator = SpriteDataItemValidatorCache.GetInstance().GetOrCreateValidator(spriteRenderer);
+
+            if (spriteDataItemValidator == null)
+            {
+                currentValidOutlinePrecision = OutlinePrecision.AxisAlignedBoundingBox;
+                return;
+            }
+
             currentValidOutlinePrecision =
                 spriteDataItemValidator.GetValidOutlinePrecision(spriteDetectionData.outlinePrecision);
 
@@ -627,6 +636,12 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             }
 
             var otherValidator = SpriteDataItemValidatorCache.GetInstance().GetOrCreateValidator(spriteRenderer);
+
+            if (otherValidator == null)
+            {
+                return true;
+            }
+
             var otherValidOutlinePrecision =
                 otherValidator.GetValidOutlinePrecision(spriteDetectionData.outlinePrecision);
 

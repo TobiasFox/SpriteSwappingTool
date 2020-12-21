@@ -2,6 +2,7 @@
 {
     public static class GeneralData
     {
+        //TODO set to true
         public const bool IsValidatingUserInput = false;
 
         public const int MayorVersionNr = 1;

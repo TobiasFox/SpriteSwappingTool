@@ -13,6 +13,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
         public ContainmentSortingCriterion(ContainmentSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
+            sortingCriterionType = SortingCriterionType.Containment;
         }
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)

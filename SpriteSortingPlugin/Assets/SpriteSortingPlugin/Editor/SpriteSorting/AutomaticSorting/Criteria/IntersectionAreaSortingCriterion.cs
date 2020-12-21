@@ -12,6 +12,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
         public IntersectionAreaCriterion(DefaultSortingCriterionData sortingCriterionData) : base(sortingCriterionData)
         {
+            sortingCriterionType = IntersectionAreaCriterionData.sortingCriterionType;
         }
 
         public override bool IsUsingSpriteData()

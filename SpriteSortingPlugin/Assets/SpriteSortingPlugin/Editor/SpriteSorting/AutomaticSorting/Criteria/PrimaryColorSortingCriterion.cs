@@ -11,6 +11,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
         public PrimaryColorSortingCriterion(PrimaryColorSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
+            sortingCriterionType = SortingCriterionType.PrimaryColor;
         }
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
