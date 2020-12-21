@@ -2,6 +2,8 @@
 {
     public static class GeneralData
     {
+        public const bool IsValidatingUserInput = false;
+
         public const int MayorVersionNr = 1;
         public const int MinorVersionNr = 0;
         public const int FixVersionNr = 0;
