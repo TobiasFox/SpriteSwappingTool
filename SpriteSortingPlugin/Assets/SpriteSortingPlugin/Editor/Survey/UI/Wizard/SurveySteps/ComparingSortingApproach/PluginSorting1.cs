@@ -11,6 +11,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         private const string SceneName = "PluginSortingExample1.unity";
 
+        private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
+
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
         public PluginSorting1(string name) : base(name)
@@ -26,18 +28,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             base.Commit();
 
-            var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
-
-            if (!currentSortingTaskData.isTaskStarted)
-            {
-                var isFinishedTask = currentSortingTaskData.timeNeeded > 0;
-                Finish(isFinishedTask ? SurveyFinishState.Succeeded : SurveyFinishState.Skipped);
-            }
-            else if (!currentSortingTaskData.isTaskFinished)
-            {
-                currentSortingTaskData.CancelTask();
-                Finish(SurveyFinishState.Skipped);
-            }
+            Finish(SurveyFinishState.Succeeded);
         }
 
         public override List<string> CollectFilePathsToCopy()
@@ -46,18 +37,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 return null;
             }
-            
+
             return new List<string>()
             {
                 SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath
             };
         }
-        
+
         public override bool IsFilledOut()
         {
             var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
 
-            if (currentSortingTaskData.isTaskStarted)
+            if (currentSortingTaskData.taskState == TaskState.NotStarted)
             {
                 return false;
             }
@@ -92,7 +83,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
                     "3. Please find and solve all visual glitches in the given scene by using the " +
-                    GeneralData.Name + " " + GeneralData.DetectorName + ".",
+                    GeneralData.Name + " " + GeneralData.DetectorName + ".\n" +
+                    "Please solve these glitches so it makes visually sense for you but as fast as possible.",
                     taskLabelStyle);
 
                 EditorGUILayout.Space(10);
@@ -105,26 +97,45 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.Space(10);
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
-                var buttonLabel = (currentSortingTaskData.isTaskStarted ? "Restart" : "Start") +
-                                  " and open scene";
-                if (GUILayout.Button(buttonLabel))
+
+                var buttonLabel = "Start by opening and focussing scene";
+                var isDisable = currentSortingTaskData.taskState != TaskState.NotStarted;
+                using (new EditorGUI.DisabledScope(isDisable))
                 {
-                    currentSortingTaskData.StartTask();
-                    currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
-                        currentSortingTaskData.FullScenePathAndName,
-                        OpenSceneMode.Single);
+                    if (GUILayout.Button(buttonLabel, GUILayout.Height(TaskButtonHeight)))
+                    {
+                        currentSortingTaskData.StartTask();
+                        currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
+                            currentSortingTaskData.FullScenePathAndName,
+                            OpenSceneMode.Single);
+
+                        EditorWindow.FocusWindowIfItsOpen<SceneView>();
+
+                        var setupGameObject = GameObject.Find("setup");
+                        if (setupGameObject != null)
+                        {
+                            Selection.objects = new Object[] {setupGameObject};
+                            SceneView.FrameLastActiveSceneView();
+                            EditorGUIUtility.PingObject(setupGameObject);
+                        }
+                    }
                 }
 
-                EditorGUILayout.Space(20);
+                EditorGUILayout.Space(10);
+                var wrapCenterStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
+                EditorGUILayout.LabelField("Time will be measured.", wrapCenterStyle);
+                EditorGUILayout.LabelField(
+                    "It starts when clicking the button above and ends when clicking the finish button.",
+                    wrapCenterStyle);
+                EditorGUILayout.Space(10);
 
-                using (new EditorGUI.DisabledScope(!currentSortingTaskData.isTaskStarted))
+                using (new EditorGUI.DisabledScope(currentSortingTaskData.taskState != TaskState.Started))
                 {
-                    if (GUILayout.Button("Finish"))
+                    if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
                     {
                         currentSortingTaskData.FinishTask();
 
                         var savePath = currentSortingTaskData.FullModifiedScenePath;
-
                         EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, savePath, true);
                     }
                 }

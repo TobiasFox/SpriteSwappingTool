@@ -18,11 +18,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private static readonly string[] QuestionLabels = new string[]
         {
             "1. Please find and solve all visual glitches in the given scene by using the " +
-            GeneralData.Name + " " + GeneralData.DetectorName + ".",
+            GeneralData.Name + " " + GeneralData.DetectorName + ".\n" +
+            "Please solve these glitches so it makes visually sense for you but as fast as possible.",
             "2. Please find and solve all visual glitches in the given scene by using the " +
             GeneralData.Name + " " + GeneralData.DetectorName +
-            " with the sorting suggestion functionality."
+            " with the sorting suggestion functionality.\n" +
+            "Please solve these glitches so it makes visually sense for you but as fast as possible."
         };
+
+        private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
@@ -42,18 +46,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             base.Commit();
 
-            var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[1];
-
-            if (!currentSortingTaskData.isTaskStarted)
-            {
-                var isFinishedTask = currentSortingTaskData.timeNeeded > 0;
-                Finish(isFinishedTask ? SurveyFinishState.Succeeded : SurveyFinishState.Skipped);
-            }
-            else if (!currentSortingTaskData.isTaskFinished)
-            {
-                currentSortingTaskData.CancelTask();
-                Finish(SurveyFinishState.Skipped);
-            }
+            Finish(SurveyFinishState.Succeeded);
         }
 
         public override List<string> CollectFilePathsToCopy()
@@ -73,7 +66,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             foreach (var sortingTaskData in SurveyStepSortingData.sortingTaskDataList)
             {
-                if (sortingTaskData.isTaskStarted)
+                if (sortingTaskData.taskState == TaskState.NotStarted)
                 {
                     return false;
                 }
@@ -130,8 +123,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var currentTaskData = SurveyStepSortingData.sortingTaskDataList[i];
                 using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
-                    // using (new EditorGUI.DisabledScope(i == 0))
-                    // {
                     var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                     EditorGUILayout.LabelField(QuestionLabels[i],
                         taskLabelStyle);
@@ -153,21 +144,48 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                     EditorGUILayout.Space(10);
 
-                    var buttonLabel = (currentTaskData.isTaskStarted ? "Restart" : "Start") + " and open scene";
-                    if (GUILayout.Button(buttonLabel))
-                    {
-                        currentTaskData.StartTask();
+                    var buttonLabel = "Start by opening and focussing scene";
+                    var isDisable = currentTaskData.taskState != TaskState.NotStarted;
 
-                        currentTaskData.LoadedScene =
-                            EditorSceneManager.OpenScene(currentTaskData.FullScenePathAndName,
-                                OpenSceneMode.Single);
+                    if (i == 1)
+                    {
+                        var firstSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
+                        isDisable |= firstSortingTaskData.taskState != TaskState.Finished;
+                    }
+
+                    using (new EditorGUI.DisabledScope(isDisable))
+                    {
+                        if (GUILayout.Button(buttonLabel, GUILayout.Height(TaskButtonHeight)))
+                        {
+                            currentTaskData.StartTask();
+
+                            currentTaskData.LoadedScene =
+                                EditorSceneManager.OpenScene(currentTaskData.FullScenePathAndName,
+                                    OpenSceneMode.Single);
+
+                            EditorWindow.FocusWindowIfItsOpen<SceneView>();
+
+                            var setupGameObject = GameObject.Find("setup");
+                            if (setupGameObject != null)
+                            {
+                                Selection.objects = new Object[] {setupGameObject};
+                                SceneView.FrameLastActiveSceneView();
+                                EditorGUIUtility.PingObject(setupGameObject);
+                            }
+                        }
                     }
 
                     EditorGUILayout.Space(10);
+                    var wrapCenterStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
+                    EditorGUILayout.LabelField("Time will be measured.", wrapCenterStyle);
+                    EditorGUILayout.LabelField(
+                        "It starts when clicking the button above and ends when clicking the finish button.",
+                        wrapCenterStyle);
+                    EditorGUILayout.Space(10);
 
-                    using (new EditorGUI.DisabledScope(!currentTaskData.isTaskStarted))
+                    using (new EditorGUI.DisabledScope(currentTaskData.taskState != TaskState.Started))
                     {
-                        if (GUILayout.Button("Finish"))
+                        if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
                         {
                             currentTaskData.FinishTask();
 
@@ -175,8 +193,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                             EditorSceneManager.SaveScene(currentTaskData.LoadedScene, savePath, true);
                         }
                     }
-
-                    // }
                 }
 
                 EditorGUILayout.Space(20);

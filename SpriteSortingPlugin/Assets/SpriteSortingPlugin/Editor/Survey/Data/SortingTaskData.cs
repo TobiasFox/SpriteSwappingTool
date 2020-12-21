@@ -18,9 +18,8 @@ namespace SpriteSortingPlugin.Survey.Data
         };
 
         public string sceneName;
-        public bool isTaskStarted;
-        public bool isTaskFinished;
         public double timeNeeded = -1;
+        public TaskState taskState;
 
         public DateTime TaskStartTime { get; set; }
         public Scene LoadedScene { get; set; }
@@ -45,8 +44,7 @@ namespace SpriteSortingPlugin.Survey.Data
 
         public void StartTask()
         {
-            isTaskStarted = true;
-            isTaskFinished = false;
+            taskState = TaskState.Started;
 
             timeNeeded = -1;
             TaskStartTime = DateTime.Now;
@@ -56,14 +54,7 @@ namespace SpriteSortingPlugin.Survey.Data
         {
             timeNeeded = (DateTime.Now - TaskStartTime).TotalMilliseconds;
 
-            isTaskStarted = false;
-            isTaskFinished = true;
-        }
-
-        public void CancelTask()
-        {
-            isTaskStarted = false;
-            isTaskFinished = false;
+            taskState = TaskState.Finished;
         }
     }
 }
