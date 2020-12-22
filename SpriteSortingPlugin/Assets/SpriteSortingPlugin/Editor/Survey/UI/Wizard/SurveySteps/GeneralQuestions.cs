@@ -364,7 +364,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawIsDevelopingGamesQuestion()
         {
             EditorGUILayout.LabelField(questionCounter +
-                                       ". Are you familiar with developing 2D Unity applications? (exclusion criterion)",
+                                       ". Are you familiar with developing 2D Unity applications and know how to adjust SpriteRenderer's sorting options (Sorting Layer and Sorting Layer)? (exclusion criterion)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
@@ -373,8 +373,26 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));
 
             var answers = new[] {"Yes", "No"};
-            data.developing2dGames = GUI.SelectionGrid(developingGamesSelectionGridRect, data.developing2dGames,
-                answers, 2);
+            using (var changeScope = new EditorGUI.ChangeCheckScope())
+            {
+                data.developing2dGames = GUI.SelectionGrid(developingGamesSelectionGridRect, data.developing2dGames,
+                    answers, 2);
+                if (changeScope.changed)
+                {
+                    if (data.developing2dGames == 0)
+                    {
+                        GeneralData.isSurveyActive = true;
+                        GeneralData.isAutomaticSortingActive = false;
+                        GeneralData.isLoggingActive = true;
+                    }
+                    else
+                    {
+                        GeneralData.isSurveyActive = false;
+                        GeneralData.isAutomaticSortingActive = true;
+                        GeneralData.isLoggingActive = false;
+                    }
+                }
+            }
 
             EditorGUI.indentLevel--;
         }
