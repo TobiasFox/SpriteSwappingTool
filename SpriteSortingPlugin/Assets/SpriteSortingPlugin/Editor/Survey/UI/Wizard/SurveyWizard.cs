@@ -13,10 +13,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public int TotalProgress => totalProgress;
 
-        public int CurrentProgress
-        {
-            get { return currentProgress; }
-        }
+        public int CurrentProgress => currentProgress;
 
         public void Forward()
         {
@@ -55,46 +52,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return steps[currentSurveyStepIndex];
         }
 
-        public bool HasNextStep()
-        {
-            if (steps == null)
-            {
-                return false;
-            }
-
-            var currentStep = steps[currentSurveyStepIndex];
-
-            if (currentStep is SurveyStepGroup surveyStepGroup)
-            {
-                if (!surveyStepGroup.IsFinished)
-                {
-                    return true;
-                }
-            }
-
-            return currentSurveyStepIndex + 1 < steps.Count;
-        }
-
-        public bool HasPreviousStep()
-        {
-            if (steps == null)
-            {
-                return false;
-            }
-
-            var currentStep = steps[currentSurveyStepIndex];
-
-            if (currentStep is SurveyStepGroup surveyStepGroup)
-            {
-                if (surveyStepGroup.HasPreviousStep())
-                {
-                    return true;
-                }
-            }
-
-            return currentSurveyStepIndex > 0;
-        }
-
         public void SetSurveySteps(List<SurveyStep> steps)
         {
             if (steps == null || steps.Count == 0)
@@ -128,6 +85,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 {
                     totalProgress++;
                 }
+            }
+
+            if (totalProgress > 0)
+            {
+                totalProgress--;
             }
         }
 
@@ -216,7 +178,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 {
                     currentProgress += surveyStepGroup.CurrentProgress;
                 }
-                else
+                else if (surveyStep.IsFinished)
                 {
                     currentProgress++;
                 }

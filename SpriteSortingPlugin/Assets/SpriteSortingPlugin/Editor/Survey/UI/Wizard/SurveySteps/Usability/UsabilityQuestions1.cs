@@ -38,13 +38,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             DrawSusQuestions();
         }
 
-        public override void Commit()
-        {
-            base.Commit();
-
-            Finish(SurveyFinishState.Succeeded);
-        }
-
         public override bool IsFilledOut()
         {
             foreach (var susAnswer in data.susAnswers)
@@ -56,6 +49,33 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             return true;
+        }
+
+        public override int GetProgress(out int totalProgress)
+        {
+            totalProgress = SusQuestion.Length;
+
+            var currentProgress = 0;
+
+            if (!IsStarted)
+            {
+                return currentProgress;
+            }
+
+            if (IsFinished)
+            {
+                return totalProgress;
+            }
+
+            foreach (var susAnswer in data.susAnswers)
+            {
+                if (susAnswer >= 0)
+                {
+                    currentProgress++;
+                }
+            }
+
+            return currentProgress;
         }
 
         private void DrawSusQuestions()

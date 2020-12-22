@@ -7,11 +7,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     public abstract class SurveyStep
     {
         protected SurveyStepData surveyStepData;
-        protected string jsonData;
         protected string name;
 
-        public SurveyFinishState FinishState => surveyStepData.finishState;
-        public string JsonData => jsonData;
         public string Name => name;
         public bool IsFinished => surveyStepData.isFinished;
         public bool IsStarted => surveyStepData.isStarted;
@@ -24,15 +21,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public virtual void Start()
         {
-            surveyStepData.finishState = SurveyFinishState.None;
             surveyStepData.isStarted = true;
             surveyStepData.isFinished = false;
-        }
-
-        protected void Finish(SurveyFinishState finishState)
-        {
-            surveyStepData.finishState = finishState;
-            surveyStepData.isFinished = true;
         }
 
         public virtual void Commit()
@@ -66,13 +56,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return null;
         }
 
+        public abstract int GetProgress(out int totalProgress);
+
         public override string ToString()
         {
             var builder = new StringBuilder();
             builder.Append("SurveyStep[").Append(name).Append(", ").Append(nameof(surveyStepData.isStarted)).Append(":")
                 .Append(surveyStepData.isStarted).Append(", ").Append(nameof(surveyStepData.isFinished)).Append(":")
-                .Append(surveyStepData.isFinished).Append(", ")
-                .Append(nameof(surveyStepData.finishState)).Append(":").Append(surveyStepData.finishState).Append("]");
+                .Append(surveyStepData.isFinished).Append("]");
 
             return builder.ToString();
         }

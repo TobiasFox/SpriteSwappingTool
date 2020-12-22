@@ -26,7 +26,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             // surveySteps.Add(manualSortingStep);
             // surveySteps.Add(manualSortingStep2);
 
-            var creatingSpriteData = new CreatingSpriteDataStep("Creating " + nameof(SpriteData) + " asset");
+            // var creatingSpriteData = new CreatingSpriteDataStep("Creating " + nameof(SpriteData) + " asset");
             // surveySteps.Add(creatingSpriteData);
 
             var pluginSorting1 = new PluginSorting1("Automatically detect visual glitches with the " +

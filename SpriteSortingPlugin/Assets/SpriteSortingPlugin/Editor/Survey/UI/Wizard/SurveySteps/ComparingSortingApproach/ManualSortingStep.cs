@@ -4,6 +4,7 @@ using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -25,16 +26,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
         }
 
-        public override void Commit()
-        {
-            base.Commit();
-
-            Finish(SurveyFinishState.Succeeded);
-        }
-
         public override List<string> CollectFilePathsToCopy()
         {
-            if (FinishState != SurveyFinishState.Succeeded)
+            if (!IsFinished)
             {
                 return null;
             }
@@ -43,6 +37,38 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath
             };
+        }
+
+        public override int GetProgress(out int totalProgress)
+        {
+            totalProgress = SurveyStepSortingData.sortingTaskDataList.Count * 2;
+
+            if (!IsStarted)
+            {
+                return 0;
+            }
+
+            if (IsFinished)
+            {
+                return totalProgress;
+            }
+
+            var currentProgress = 0;
+
+            foreach (var currentSortingTaskData in SurveyStepSortingData.sortingTaskDataList)
+            {
+                switch (currentSortingTaskData.taskState)
+                {
+                    case TaskState.Started:
+                        currentProgress++;
+                        break;
+                    case TaskState.Finished:
+                        currentProgress += 2;
+                        break;
+                }
+            }
+
+            return currentProgress;
         }
 
         public override bool IsFilledOut()

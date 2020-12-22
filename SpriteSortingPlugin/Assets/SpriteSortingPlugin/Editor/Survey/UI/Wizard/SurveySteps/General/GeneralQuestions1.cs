@@ -19,13 +19,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             this.data = data;
         }
 
-        public override void Commit()
-        {
-            base.Commit();
-
-            Finish(SurveyFinishState.Succeeded);
-        }
-
         public override void DrawContent()
         {
             questionCounter = QuestionCounterStart;
@@ -131,6 +124,57 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             return true;
+        }
+
+        public override int GetProgress(out int totalProgress)
+        {
+            if (data.developing2dGames == 1)
+            {
+                totalProgress = 1;
+                return 1;
+            }
+
+            totalProgress = 5;
+
+            if (!IsStarted)
+            {
+                return 0;
+            }
+
+            if (IsFinished)
+            {
+                return totalProgress;
+            }
+
+            var currentProgress = 0;
+            if (data.developing2dGames == 0)
+            {
+                currentProgress++;
+            }
+
+            if (data.isStudent || data.isProfessional || data.isHobbyist ||
+                data.isNotDevelopingGames || data.isGameDevelopmentRelationNoAnswer ||
+                data.isGameDevelopmentRelationOther)
+            {
+                currentProgress++;
+            }
+
+            if (data.numberOfDeveloped2dGames >= 0 || data.isNumberOfDeveloped2dGamesNoAnswer)
+            {
+                currentProgress++;
+            }
+
+            if (data.workingOnApplicationWithVisualGlitch >= 0)
+            {
+                currentProgress++;
+            }
+
+            if (data.IsAnyMainFieldOfWork())
+            {
+                currentProgress++;
+            }
+
+            return currentProgress;
         }
 
         private void DrawExclusion()

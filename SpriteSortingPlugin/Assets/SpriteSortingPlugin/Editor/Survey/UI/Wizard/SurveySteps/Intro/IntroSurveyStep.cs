@@ -29,7 +29,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public override void Commit()
         {
             base.Commit();
-            Finish(SurveyFinishState.Succeeded);
             preview.CleanUp();
         }
 
@@ -44,11 +43,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 GUILayout.Label(
                     "The topic of this survey is a visual glitch in 2D games, where the order of Sprites to be rendered can swap (see preview). As part of my master thesis at the HAW Hamburg, I developed a Unity tool, which identifies such Sprites and helps to sort them.",
                     Styling.LabelWrapStyle);
-                
+
                 EditorGUILayout.Space();
 
                 var wrappedCenterStyle = new GUIStyle(Styling.CenteredStyle) {wordWrap = true};
-                GUILayout.Label( "I really appreciate your input!", wrappedCenterStyle);
+                GUILayout.Label("I really appreciate your input!", wrappedCenterStyle);
             }
 
             preview?.DoPreview();
@@ -98,6 +97,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public override void CleanUp()
         {
             preview?.CleanUp();
+        }
+
+        public override int GetProgress(out int totalProgress)
+        {
+            totalProgress = 1;
+            return totalProgress;
         }
     }
 }

@@ -28,13 +28,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             this.data = data;
         }
 
-        public override void Commit()
-        {
-            base.Commit();
-
-            Finish(SurveyFinishState.Succeeded);
-        }
-
         public override void DrawContent()
         {
             EditorGUI.indentLevel++;
@@ -87,6 +80,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUILayout.Space();
             EditorGUI.indentLevel--;
+        }
+
+        public override int GetProgress(out int totalProgress)
+        {
+            totalProgress = 0;
+            return totalProgress;
         }
 
         private void DrawRatingQuestion(int index)

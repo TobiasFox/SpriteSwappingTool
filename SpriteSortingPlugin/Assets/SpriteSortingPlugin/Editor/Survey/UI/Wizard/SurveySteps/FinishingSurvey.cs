@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
@@ -136,6 +135,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public override void CleanUp()
         {
             RemoveEditorUpdate();
+        }
+
+        public override int GetProgress(out int totalProgress)
+        {
+            totalProgress = 1;
+            return totalProgress;
         }
 
         private void StartSendingData()

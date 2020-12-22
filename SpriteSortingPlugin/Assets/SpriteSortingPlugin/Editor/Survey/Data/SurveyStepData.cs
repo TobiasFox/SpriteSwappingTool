@@ -7,7 +7,6 @@ namespace SpriteSortingPlugin.Survey.Data
     [Serializable]
     public class SurveyStepData
     {
-        public SurveyFinishState finishState;
         public bool isFinished;
         public bool isStarted;
 

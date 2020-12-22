@@ -47,13 +47,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
         }
 
-        public override void Commit()
-        {
-            base.Commit();
-
-            Finish(SurveyFinishState.Succeeded);
-        }
-
         public override bool IsSendingData()
         {
             return true;
@@ -61,11 +54,51 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public override List<string> CollectFilePathsToCopy()
         {
-            return new List<string>()
+            if (!IsFinished)
             {
-                SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath,
-                SurveyStepSortingData.sortingTaskDataList[1].FullModifiedScenePath
-            };
+                return null;
+            }
+
+            var collectFileList = new List<string>();
+
+            foreach (var sortingTaskData in SurveyStepSortingData.sortingTaskDataList)
+            {
+                collectFileList.Add(sortingTaskData.FullModifiedScenePath);
+            }
+
+            return collectFileList;
+        }
+
+        public override int GetProgress(out int totalProgress)
+        {
+            totalProgress = SurveyStepSortingData.sortingTaskDataList.Count * 2;
+
+            if (!IsStarted)
+            {
+                return 0;
+            }
+
+            if (IsFinished)
+            {
+                return totalProgress;
+            }
+
+            var currentProgress = 0;
+
+            foreach (var currentSortingTaskData in SurveyStepSortingData.sortingTaskDataList)
+            {
+                switch (currentSortingTaskData.taskState)
+                {
+                    case TaskState.Started:
+                        currentProgress++;
+                        break;
+                    case TaskState.Finished:
+                        currentProgress += 2;
+                        break;
+                }
+            }
+
+            return currentProgress;
         }
 
         public override bool IsFilledOut()

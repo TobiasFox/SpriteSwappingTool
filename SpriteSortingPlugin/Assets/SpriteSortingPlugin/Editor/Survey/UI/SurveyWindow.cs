@@ -126,16 +126,28 @@ namespace SpriteSortingPlugin.Survey.UI
             {
                 GUILayout.Label("Progress", Styling.CenteredStyle);
 
-                var overallProgressBarRect =
-                    EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight,
-                        GUILayout.ExpandWidth(true));
-                var tempCurrentProgress = surveyWizard.CurrentProgress;
-                var progressPercentage = tempCurrentProgress / (float) surveyWizard.TotalProgress;
+                int tempCurrentProgress;
+                var tempTotalProgress = surveyWizard.TotalProgress;
+                float progressPercentage;
 
-                EditorGUI.ProgressBar(overallProgressBarRect, progressPercentage,
-                    (Math.Round(progressPercentage * 100, 2)) + "% (" + tempCurrentProgress + "/" +
-                    surveyWizard.TotalProgress +
-                    ")");
+                if (surveyData.generalQuestionsData.developing2dGames == 1)
+                {
+                    tempCurrentProgress = 1;
+                    tempTotalProgress = 1;
+                    progressPercentage = 1;
+                }
+                else
+                {
+                    tempCurrentProgress = surveyWizard.CurrentProgress;
+                    progressPercentage = tempCurrentProgress / (float) tempTotalProgress;
+                }
+
+                var overallDisplayText =
+                    $"{Math.Round(progressPercentage * 100, 2)}% ({tempCurrentProgress}/{tempTotalProgress})";
+
+                var overallProgressBarRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight,
+                    GUILayout.ExpandWidth(true));
+                EditorGUI.ProgressBar(overallProgressBarRect, progressPercentage, overallDisplayText);
 
                 var surveyGroups = surveyWizard.GetSurveyStepGroups();
                 if (surveyGroups == null || surveyGroups.Count <= 0)
@@ -154,15 +166,11 @@ namespace SpriteSortingPlugin.Survey.UI
                 {
                     var surveyGroup = surveyGroups[i];
 
-                    var tempGroupProgress = surveyGroup.CurrentProgress;
-                    var surveyGroupCurrentProgress = tempGroupProgress / (float) surveyGroup.TotalProgress;
+                    var tempGroupCurrentProgress = surveyGroup.GetProgress(out var tempGroupTotalProgress);
+                    var surveyGroupCurrentProgress = tempGroupCurrentProgress / (float) tempGroupTotalProgress;
 
-                    var round = Math.Round(surveyGroupCurrentProgress * 100, 2);
-                    var displayText = "Part " + (i + 1) + ": " + round + "% (" + tempGroupProgress +
-                                      "/" + surveyGroup.TotalProgress + ")";
-
-                    EditorGUI.ProgressBar(groupProgressBarsRect, surveyGroupCurrentProgress,
-                        displayText);
+                    var groupDisplayText = $"Part {i + 1}: {Math.Round(surveyGroupCurrentProgress * 100, 2)}%";
+                    EditorGUI.ProgressBar(groupProgressBarsRect, surveyGroupCurrentProgress, groupDisplayText);
                     groupProgressBarsRect.x += groupProgressBarsRect.width + SpaceBetweenGroupProgressBars;
                 }
             }

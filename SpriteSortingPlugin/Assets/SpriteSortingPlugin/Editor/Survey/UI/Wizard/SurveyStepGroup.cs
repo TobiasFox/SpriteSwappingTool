@@ -17,7 +17,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     return 0;
                 }
 
-                return currentProgress + 1;
+                if (surveyStepData.isFinished)
+                {
+                    return currentProgress + 1;
+                }
+
+                return currentProgress;
             }
         }
 
@@ -49,15 +54,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             if (currentProgress == steps.Count - 1)
             {
                 base.Commit();
-
-                var isGroupSucceeded = true;
-
-                foreach (var currentStep in steps)
-                {
-                    isGroupSucceeded &= currentStep.FinishState == SurveyFinishState.Succeeded;
-                }
-
-                Finish(isGroupSucceeded ? SurveyFinishState.Succeeded : SurveyFinishState.Skipped);
             }
         }
 
@@ -102,26 +98,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             steps[currentProgress].DrawContent();
         }
 
-        public bool HasNextStep()
-        {
-            if (steps == null)
-            {
-                return false;
-            }
-
-            return currentProgress + 1 < steps.Count;
-        }
-
-        public bool HasPreviousStep()
-        {
-            if (steps == null)
-            {
-                return false;
-            }
-
-            return currentProgress > 0;
-        }
-
         public override List<string> CollectFilePathsToCopy()
         {
             List<string> collectedDataPathList = null;
@@ -145,6 +121,30 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             return collectedDataPathList;
+        }
+
+        public override int GetProgress(out int totalProgress)
+        {
+            var tempCurrentProgress = 0;
+            totalProgress = 0;
+
+            foreach (var surveyStep in steps)
+            {
+                tempCurrentProgress += surveyStep.GetProgress(out var surveyStepTotalProgress);
+                totalProgress += surveyStepTotalProgress;
+            }
+
+            if (!IsStarted)
+            {
+                return 0;
+            }
+
+            if (IsFinished)
+            {
+                return totalProgress;
+            }
+
+            return tempCurrentProgress;
         }
     }
 }
