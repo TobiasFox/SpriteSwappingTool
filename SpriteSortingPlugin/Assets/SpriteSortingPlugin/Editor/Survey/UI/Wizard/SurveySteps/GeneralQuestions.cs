@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
-    public class GeneralQuestions1 : SurveyStep
+    public class GeneralQuestions : SurveyStep
     {
         private const int QuestionCounterStart = 1;
         private const float IndentLevelWidth = 10;
@@ -14,7 +14,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private float space = 17.5f;
         private int questionCounter;
 
-        public GeneralQuestions1(string name, GeneralQuestionsData data) : base(name)
+        public GeneralQuestions(string name, GeneralQuestionsData data) : base(name)
         {
             this.data = data;
         }

@@ -43,7 +43,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             // surveySteps.Add(introStep2);
 
 
-            var generalQuestions1 = new GeneralQuestions1("General Questions", surveyData.generalQuestionsData);
+            var generalQuestions1 = new GeneralQuestions("General Questions", surveyData.generalQuestionsData);
             // surveySteps.Add(generalQuestions1);
             // {
             //     var list = new List<SurveyStep>() {generalQuestions1, generalQuestions2};
@@ -94,7 +94,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             //General questions
             {
-                var generalQuestions1 = new GeneralQuestions1("General Questions", surveyData.generalQuestionsData);
+                var generalQuestions1 = new GeneralQuestions("General Questions", surveyData.generalQuestionsData);
                 var list = new List<SurveyStep>() {generalQuestions1};
                 var group = new SurveyStepGroup(list, "Part 1");
                 surveySteps.Add(group);
