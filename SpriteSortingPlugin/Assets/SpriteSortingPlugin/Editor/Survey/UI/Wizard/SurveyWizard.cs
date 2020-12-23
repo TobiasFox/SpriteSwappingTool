@@ -116,21 +116,44 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return surveyStepGroups;
         }
 
-        public List<SurveyStepData> GetData()
+        public List<SortingTaskData> GetSortingTaskDataList()
         {
-            var surveyStepDataList = new List<SurveyStepData>();
+            var sortingTaskDataList = new List<SortingTaskData>();
 
+            var partCounter = 1;
             foreach (var surveyStep in steps)
             {
-                if (!surveyStep.IsStarted)
+                if (!surveyStep.IsFinished)
                 {
                     break;
                 }
 
-                surveyStepDataList.Add(surveyStep.GetSurveyStepData());
+                var isStepGroup = surveyStep is SurveyStepGroup;
+
+                if (!surveyStep.GetSortingTaskData(out var taskDataList))
+                {
+                    if (isStepGroup)
+                    {
+                        partCounter++;
+                    }
+
+                    continue;
+                }
+
+                if (isStepGroup)
+                {
+                    foreach (var sortingTaskData in taskDataList)
+                    {
+                        sortingTaskData.surveyPart = partCounter;
+                    }
+
+                    partCounter++;
+                }
+
+                sortingTaskDataList.AddRange(taskDataList);
             }
 
-            return surveyStepDataList;
+            return sortingTaskDataList;
         }
 
         public List<string> CollectFilePathsToCopy()

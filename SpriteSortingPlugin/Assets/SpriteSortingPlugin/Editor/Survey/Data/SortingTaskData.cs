@@ -20,6 +20,8 @@ namespace SpriteSortingPlugin.Survey.Data
         public string sceneName;
         public double timeNeeded = -1;
         public TaskState taskState;
+        public string question;
+        public int surveyPart;
 
         public DateTime TaskStartTime { get; set; }
         public Scene LoadedScene { get; set; }

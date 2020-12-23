@@ -251,7 +251,7 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void PrepareAndSendData(bool isResult = false)
         {
-            surveyData.SurveyStepDataList = surveyWizard.GetData();
+            surveyData.sortingTaskDataList = surveyWizard.GetSortingTaskDataList();
             surveyData.currentProgress = surveyWizard.CurrentProgress;
             surveyData.totalProgress = surveyWizard.TotalProgress;
 
@@ -268,10 +268,11 @@ namespace SpriteSortingPlugin.Survey.UI
                     surveyData.SaveFolder);
             }
 
+            var json = JsonUtility.ToJson(surveyData);
+
             Directory.CreateDirectory(directory);
             var pathAndName = Path.Combine(directory, (isResult ? "Result" : "") + "SurveyData.json");
-
-            var json = surveyData.GenerateJson();
+            
             File.WriteAllText(pathAndName, json);
 
             CopyCollectedFiles(directory);

@@ -22,6 +22,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             var sortingTaskData = new SortingTaskData();
             sortingTaskData.SetSceneName(SceneName);
+            sortingTaskData.question = QuestionNumber.ToString();
             SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
         }
 

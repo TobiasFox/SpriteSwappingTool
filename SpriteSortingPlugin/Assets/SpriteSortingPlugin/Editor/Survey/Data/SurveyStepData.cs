@@ -1,5 +1,4 @@
 ﻿using System;
-using SpriteSortingPlugin.Survey.UI.Wizard;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.Survey.Data
@@ -17,11 +16,6 @@ namespace SpriteSortingPlugin.Survey.Data
         public SurveyStepData()
         {
             type = GetType().Name;
-        }
-
-        public virtual string GenerateJson()
-        {
-            return JsonUtility.ToJson(this);
         }
     }
 }

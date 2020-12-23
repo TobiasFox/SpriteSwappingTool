@@ -30,11 +30,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             surveyStepData.isFinished = true;
         }
 
-        public virtual SurveyStepData GetSurveyStepData()
-        {
-            return surveyStepData;
-        }
-
         public abstract void DrawContent();
 
         public virtual void CleanUp()
@@ -54,6 +49,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public virtual List<string> CollectFilePathsToCopy()
         {
             return null;
+        }
+
+        public virtual bool GetSortingTaskData(out List<SortingTaskData> sortingTaskDataList)
+        {
+            if (surveyStepData is SurveyStepSortingData surveyStepSortingData)
+            {
+                sortingTaskDataList = surveyStepSortingData.sortingTaskDataList;
+                return true;
+            }
+
+            sortingTaskDataList = null;
+            return false;
         }
 
         public abstract int GetProgress(out int totalProgress);

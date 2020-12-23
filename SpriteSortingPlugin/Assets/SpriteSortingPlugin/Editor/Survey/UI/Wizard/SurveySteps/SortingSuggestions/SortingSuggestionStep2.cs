@@ -39,11 +39,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             surveyStepData = new SurveyStepSortingData();
 
+            questionCounter = QuestionCounterStart;
             foreach (var sceneName in SceneNames)
             {
                 var sortingTaskData = new SortingTaskData();
                 sortingTaskData.SetSceneName(sceneName);
+                sortingTaskData.question = questionCounter.ToString();
                 SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
+                
+                questionCounter++;
             }
         }
 

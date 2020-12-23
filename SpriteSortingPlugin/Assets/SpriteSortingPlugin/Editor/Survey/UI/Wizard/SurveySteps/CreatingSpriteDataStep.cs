@@ -1,8 +1,4 @@
-﻿using SpriteSortingPlugin.UI;
-using UnityEditor;
-using UnityEngine;
-
-namespace SpriteSortingPlugin.Survey.UI.Wizard
+﻿namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class CreatingSpriteDataStep 
     {

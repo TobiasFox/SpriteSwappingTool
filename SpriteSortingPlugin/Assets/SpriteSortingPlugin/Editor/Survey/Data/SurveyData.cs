@@ -13,14 +13,11 @@ namespace SpriteSortingPlugin.Survey.Data
 
         public int currentProgress;
         public int totalProgress;
-
-        public List<SurveyStepData> SurveyStepDataList { get; set; }
+        public List<SortingTaskData> sortingTaskDataList;
 
         public string SaveFolder => Path.Combine(userId, "progress" + currentProgress);
-        // UserId.ToString() + Path.DirectorySeparatorChar + "progress" + currentProgress;
 
         public string ResultSaveFolder => Path.Combine(userId, "result");
-        // UserId.ToString() + Path.DirectorySeparatorChar + "result";
 
         public Guid UserId { get; } = Guid.NewGuid();
 
@@ -30,18 +27,7 @@ namespace SpriteSortingPlugin.Survey.Data
         {
             generalQuestionsData = new GeneralQuestionsData();
             usabilityData = new UsabilityData();
-            SurveyStepDataList = new List<SurveyStepData>();
             userId = UserId.ToString();
-        }
-
-        public string GenerateJson()
-        {
-            var json = JsonUtility.ToJson(this);
-            var surveyStepDataBuilder =
-                SurveyStepDataUtil.GenerateSurveyStepsDataListJson(SurveyStepDataList, nameof(SurveyStepDataList));
-
-            json = json.Insert(json.Length - 1, surveyStepDataBuilder);
-            return json;
         }
     }
 }

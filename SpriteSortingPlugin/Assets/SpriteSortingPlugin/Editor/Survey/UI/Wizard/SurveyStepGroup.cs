@@ -28,12 +28,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public int TotalProgress => steps?.Count ?? 0;
 
-        private SurveyStepGroupData SurveyStepGroupData => (SurveyStepGroupData) surveyStepData;
-
         public SurveyStepGroup(List<SurveyStep> surveySteps, string groupName) : base(groupName)
         {
             steps = surveySteps;
-            surveyStepData = new SurveyStepGroupData();
         }
 
         public override void Start()
@@ -76,21 +73,30 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return steps[currentProgress].IsFilledOut();
         }
 
-        public override SurveyStepData GetSurveyStepData()
+        public override bool GetSortingTaskData(out List<SortingTaskData> sortingTaskDataList)
         {
-            SurveyStepGroupData.SurveyStepsData = new List<SurveyStepData>();
+            sortingTaskDataList = null;
             foreach (var surveyStep in steps)
             {
-                var stepData = surveyStep.GetSurveyStepData();
-                if (!stepData.isStarted)
+                if (!surveyStep.IsFinished)
                 {
                     break;
                 }
 
-                SurveyStepGroupData.SurveyStepsData.Add(stepData);
+                if (!surveyStep.GetSortingTaskData(out var taskDataList))
+                {
+                    continue;
+                }
+
+                if (sortingTaskDataList == null)
+                {
+                    sortingTaskDataList = new List<SortingTaskData>();
+                }
+
+                sortingTaskDataList.AddRange(taskDataList);
             }
 
-            return SurveyStepGroupData;
+            return sortingTaskDataList != null;
         }
 
         public override void DrawContent()
