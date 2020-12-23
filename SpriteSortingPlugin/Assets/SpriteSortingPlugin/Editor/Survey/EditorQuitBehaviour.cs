@@ -31,7 +31,7 @@ namespace SpriteSortingPlugin.Survey
             {
                 Directory.Delete(surveyDataPath, true);
             }
-            catch (Exception e)
+            catch
             {
                 // ignored
             }

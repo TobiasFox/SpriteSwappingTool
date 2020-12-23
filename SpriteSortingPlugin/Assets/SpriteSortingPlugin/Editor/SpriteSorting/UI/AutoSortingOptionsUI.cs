@@ -126,22 +126,18 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     }
 
                     var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
+
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         GUILayout.FlexibleSpace();
 
                         using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
                         {
-                            if (GUILayout.Button("Add Criterion", GUILayout.Width(103)))
+                            if (GUILayout.Button("+ Add Criterion", GUILayout.Width(103)))
                             {
                                 DrawSortingCriteriaMenu();
                             }
                         }
-                    }
-
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        GUILayout.FlexibleSpace();
 
                         using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
                         {

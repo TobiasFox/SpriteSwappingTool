@@ -91,19 +91,19 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             autoSortingOptionsUI.Init();
         }
 
-        private void SelectDefaultSpriteAlphaData()
-        {
-            try
-            {
-                var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
-                spriteData =
-                    AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
-            }
-            catch (Exception e)
-            {
-                Debug.Log("auto selection of SpriteAlphaData went wrong");
-            }
-        }
+        // private void SelectDefaultSpriteAlphaData()
+        // {
+        //     try
+        //     {
+        //         var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
+        //         spriteData =
+        //             AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
+        //     }    
+        //     catch (Exception e)
+        //     {
+        //         Debug.Log("auto selection of SpriteAlphaData went wrong");
+        //     }
+        // }
 
         private void OnInspectorUpdate()
         {
@@ -234,7 +234,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     var tempIsApplyingSortingCriteria = autoSortingOptionsUI.IsApplyingAutoSorting &&
                                                         autoSortingOptionsUI.HasActiveAutoSortingCriteria();
                     var buttonText = (wasAnalyzeButtonClicked ? "Ref" : "F") +
-                                     "ind overlapping and unsorted SpriteRenderers" +
+                                     "ind visual glitches" +
                                      (tempIsApplyingSortingCriteria ? " with Sorting Criteria" : "");
                     if (GUILayout.Button(buttonText, analyzeButtonStyle, GUILayout.MinHeight(LargerButtonHeight)))
                     {
@@ -363,6 +363,38 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EndScrollRect();
         }
+
+        // private void ResetAndResortOverlappingItems()
+        // {
+        //     var wrapResult = new OverlappingSpriteDetectionResult
+        //     {
+        //         overlappingSortingComponents = new List<SortingComponent>()
+        //     };
+        //
+        //     foreach (var overlappingItem in overlappingItems.Items)
+        //     {
+        //         if (!overlappingItem.IsBaseItem)
+        //         {
+        //             wrapResult.overlappingSortingComponents.Add(overlappingItem.SortingComponent);
+        //         }
+        //         else
+        //         {
+        //             wrapResult.baseItem = overlappingItem.SortingComponent;
+        //         }
+        //     }
+        //
+        //     var overlappingItemList = ApplyAutoSorting(wrapResult, out var overlappingBaseItem);
+        //
+        //     CleanUpReordableList();
+        //     skippedSortingCriteriaList = null;
+        //     preview.CleanUpPreview();
+        //     
+        //     overlappingItems = new OverlappingItems(overlappingBaseItem, overlappingItemList,
+        //         autoSortingOptionsUI.IsApplyingAutoSorting && isReplacingOverlappingItemsWithAutoSortedResult);
+        //     preview.UpdateOverlappingItems(overlappingItems);
+        //     preview.UpdateSpriteData(spriteData);
+        //     reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
+        // }
 
         private void ShowSkippedSortingCriteriaMessage()
         {
@@ -1027,7 +1059,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 for (var i = 0; i < overlappingItemList.Count; i++)
                 {
                     var overlappingItem = overlappingItemList[i];
-                    overlappingItem.originAutoSortingOrder = resultList[i].sortingOrder;
+                    overlappingItem.originAutoSortingOrder =
+                        Math.Abs(overlappingItem.originSortingOrder - resultList[i].sortingOrder);
                 }
             }
             else

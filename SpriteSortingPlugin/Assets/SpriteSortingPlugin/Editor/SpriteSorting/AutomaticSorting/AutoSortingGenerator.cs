@@ -139,6 +139,11 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 
         private void SortContainedComponents(List<AutoSortingComponent> containedComponents)
         {
+            if (containedComponents == null || containedComponents.Count == 0)
+            {
+                return;
+            }
+
             AddFirstComponentIfPossible(containedComponents);
 
             foreach (var containedComponent in containedComponents)

@@ -91,6 +91,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
                     }
                     catch (Exception e)
                     {
+                        Debug.Log($"Sprite {sprite.name} is skipped due to an error occured.");
+                        Debug.LogException(e);
                         continue;
                     }
                 }

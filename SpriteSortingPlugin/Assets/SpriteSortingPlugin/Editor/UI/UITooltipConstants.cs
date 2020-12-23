@@ -27,7 +27,7 @@
         public const string PrimaryColorTooltip =
             "Compares the primary color of given SpriteRenderers and sorts SpriteRenderer in the foreground which are closer to the foreground color.";
 
-        public const string PrimaryColorChannelsTooltip = "Specify which color channels should be used.";
+        public const string PrimaryColorChannelsTooltip = "Specify which color channel should be used. The alpha channel is ignored.";
 
         public const string PrimaryColorForegroundColorTooltip =
             "Specify the color of SpriteRenderers, which will be sorted in the foreground.";
@@ -177,7 +177,7 @@
             "This asset contains analyzed data of Sprites such as a more accurate outline or other data which is used to generate a sorting suggestion.";
 
         public const string SortingEditorUsingAutoSortingTooltip =
-            "Enable to generate an automatic sorting order suggestion of overlapping and unsorted SpriteRenderer based on given sorting criteria.";
+            "Enable to generate a sorting order suggestion of overlapping and unsorted SpriteRenderer based on given sorting criteria.";
 
         public const string SortingEditorSortingTypeTooltip =
             "Specify, if either a completely Sorting Layer or a single Sprite is used to identify overlapping SpriteRenderers.";

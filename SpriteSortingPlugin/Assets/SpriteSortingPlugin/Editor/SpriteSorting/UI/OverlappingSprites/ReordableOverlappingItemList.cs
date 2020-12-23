@@ -250,7 +250,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             var labelRect = rect;
             labelRect.xMax -= 135 + 45;
             EditorGUI.LabelField(labelRect,
-                new GUIContent("Overlapping Items", UITooltipConstants.OverlappingItemListTooltip));
+                new GUIContent("Overlapping Items of visual glitch", UITooltipConstants.OverlappingItemListTooltip));
 
             if (GUI.Button(new Rect(rect.width - 172.5f, rect.y, 135, EditorGUIUtility.singleLineHeight),
                 new GUIContent((isUsingRelativeSortingOrder ? "Total" : "Relative") + " Sorting Order",

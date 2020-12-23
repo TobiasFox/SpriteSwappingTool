@@ -91,7 +91,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                 spriteData =
                     AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
             }
-            catch (Exception e)
+            catch
             {
                 Debug.Log("auto selection of SpriteAlphaData went wrong");
             }
