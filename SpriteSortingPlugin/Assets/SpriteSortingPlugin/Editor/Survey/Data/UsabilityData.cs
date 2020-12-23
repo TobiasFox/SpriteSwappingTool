@@ -11,6 +11,7 @@ namespace SpriteSortingPlugin.Survey.Data
         public string lowlights = "";
 
         public int[] ratingAnswers = Array.ConvertAll(new int[3], i => 50);
+        public bool[] ratingAnswersChanged = new bool[3];
 
         public string missingCriteriaText = "";
 

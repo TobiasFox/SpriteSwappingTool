@@ -95,8 +95,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             using (new EditorGUI.IndentLevelScope())
             {
                 var entireQuestionRect = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false));
-                data.ratingAnswers[index] =
-                    (int) GUI.HorizontalSlider(entireQuestionRect, data.ratingAnswers[index], 0, 100);
+                using (var changeScope = new EditorGUI.ChangeCheckScope())
+                {
+                    data.ratingAnswers[index] =
+                        (int) GUI.HorizontalSlider(entireQuestionRect, data.ratingAnswers[index], 0, 100);
+                    if (changeScope.changed)
+                    {
+                        data.ratingAnswersChanged[index] = true;
+                    }
+                }
             }
         }
 
