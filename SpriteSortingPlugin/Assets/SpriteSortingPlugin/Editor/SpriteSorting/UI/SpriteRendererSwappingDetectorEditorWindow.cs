@@ -231,8 +231,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 {
                     var analyzeButtonStyle = wasAnalyzeButtonClicked ? Styling.ButtonStyle : Styling.ButtonStyleBold;
 
-                    if (GUILayout.Button("Find overlapping and unsorted SpriteRenderers", analyzeButtonStyle,
-                        GUILayout.MinHeight(LargerButtonHeight)))
+                    var tempIsApplyingSortingCriteria = autoSortingOptionsUI.IsApplyingAutoSorting &&
+                                                        autoSortingOptionsUI.HasActiveAutoSortingCriteria();
+                    var buttonText = (wasAnalyzeButtonClicked ? "Ref" : "F") +
+                                     "ind overlapping and unsorted SpriteRenderers" +
+                                     (tempIsApplyingSortingCriteria ? " with Sorting Criteria" : "");
+                    if (GUILayout.Button(buttonText, analyzeButtonStyle, GUILayout.MinHeight(LargerButtonHeight)))
                     {
                         Analyze();
                         isAnalyzedButtonClickedThisFrame = true;
