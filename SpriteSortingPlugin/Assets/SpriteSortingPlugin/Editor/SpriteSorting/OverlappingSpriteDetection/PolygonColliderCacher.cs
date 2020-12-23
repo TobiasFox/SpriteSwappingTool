@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SpriteSortingPlugin.SpriteSorting.UI.Preview;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
@@ -30,6 +31,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 
                 var polygonCollider = CreateNewPolygonColliderOnNewGameObject(spriteDataItem);
                 SetColliderPointsToCollider(spriteDataItem, transform, ref polygonCollider);
+                PreviewUtility.HideAndDontSaveGameObject(polygonCollider.gameObject);
 
                 polygonColliderArray[0] = polygonCollider;
                 spriteColliderDataDictionary[assetGuid] = polygonColliderArray;
@@ -44,6 +46,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                 {
                     polygonCollider = CreateNewPolygonColliderOnNewGameObject(spriteDataItem);
                     SetColliderPointsToCollider(spriteDataItem, transform, ref polygonCollider);
+                    PreviewUtility.HideAndDontSaveGameObject(polygonCollider.gameObject);
                     polygonColliderArray[i] = polygonCollider;
 
                     spriteColliderDataDictionary[assetGuid] = polygonColliderArray;
@@ -65,7 +68,8 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 
         private static PolygonCollider2D CreateNewPolygonColliderOnNewGameObject(SpriteDataItem spriteDataItem)
         {
-            var polyColliderGameObject = new GameObject("PolygonCollider " + spriteDataItem.AssetName);
+            var polyColliderGameObject =
+                PreviewUtility.CreateGameObject(null, $"PolygonCollider {spriteDataItem.AssetName}", true);
             return polyColliderGameObject.AddComponent<PolygonCollider2D>();
         }
 

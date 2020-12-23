@@ -224,6 +224,13 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             serializedObject.ApplyModifiedProperties();
             var isAnalyzedButtonClickedThisFrame = false;
 
+            if (wasAnalyzeButtonClicked && autoSortingOptionsUI.IsApplyingAutoSorting &&
+                autoSortingOptionsUI.HasActiveAutoSortingCriteria())
+            {
+                GUILayout.Label(
+                    "To refine Sorting Criteria: clear findings, adjust the criteria and find visual glitches again.");
+            }
+
             EditorGUILayout.Space();
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -233,8 +240,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                     var tempIsApplyingSortingCriteria = autoSortingOptionsUI.IsApplyingAutoSorting &&
                                                         autoSortingOptionsUI.HasActiveAutoSortingCriteria();
-                    var buttonText = (wasAnalyzeButtonClicked ? "Ref" : "F") +
-                                     "ind visual glitches" +
+                    var buttonText = "Find visual glitches" +
                                      (tempIsApplyingSortingCriteria ? " with Sorting Criteria" : "");
                     if (GUILayout.Button(buttonText, analyzeButtonStyle, GUILayout.MinHeight(LargerButtonHeight)))
                     {
