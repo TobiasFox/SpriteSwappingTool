@@ -268,12 +268,12 @@ namespace SpriteSortingPlugin.Survey.UI
                     surveyData.SaveFolder);
             }
 
-            var json = JsonUtility.ToJson(surveyData);
+            var surveyDataJson = JsonUtility.ToJson(surveyData);
 
             Directory.CreateDirectory(directory);
             var pathAndName = Path.Combine(directory, (isResult ? "Result" : "") + "SurveyData.json");
-            
-            File.WriteAllText(pathAndName, json);
+
+            File.WriteAllText(pathAndName, surveyDataJson);
 
             CopyCollectedFiles(directory);
 
