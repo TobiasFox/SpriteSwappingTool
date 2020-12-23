@@ -46,7 +46,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 sortingTaskData.SetSceneName(sceneName);
                 sortingTaskData.question = questionCounter.ToString();
                 SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
-                
+
                 questionCounter++;
             }
         }
@@ -54,6 +54,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public override bool IsSendingData()
         {
             return true;
+        }
+
+        public override void Start()
+        {
+            base.Start();
+            GeneralData.isLoggingActive = true;
         }
 
         public override List<string> CollectFilePathsToCopy()

@@ -383,13 +383,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     {
                         GeneralData.isSurveyActive = true;
                         GeneralData.isAutomaticSortingActive = false;
-                        GeneralData.isLoggingActive = true;
                     }
                     else
                     {
                         GeneralData.isSurveyActive = false;
                         GeneralData.isAutomaticSortingActive = true;
-                        GeneralData.isLoggingActive = false;
                     }
                 }
             }

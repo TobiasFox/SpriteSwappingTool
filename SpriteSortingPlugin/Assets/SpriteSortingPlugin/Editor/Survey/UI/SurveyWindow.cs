@@ -48,7 +48,6 @@ namespace SpriteSortingPlugin.Survey.UI
 
             GeneralData.isSurveyActive = true;
             GeneralData.isAutomaticSortingActive = false;
-            GeneralData.isLoggingActive = true;
         }
 
         private void OnGUI()

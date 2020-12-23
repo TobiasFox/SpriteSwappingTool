@@ -23,6 +23,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             surveyStepData.isStarted = true;
             surveyStepData.isFinished = false;
+            GeneralData.isLoggingActive = false;
         }
 
         public virtual void Commit()

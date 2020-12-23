@@ -48,6 +48,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
         }
 
+        public override void Start()
+        {
+            base.Start();
+            GeneralData.isLoggingActive = true;
+        }
+
         public override List<string> CollectFilePathsToCopy()
         {
             if (!IsFinished)
