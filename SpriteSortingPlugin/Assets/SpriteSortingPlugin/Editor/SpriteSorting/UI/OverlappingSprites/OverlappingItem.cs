@@ -31,6 +31,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
 
         public string SpriteAssetGuid => spriteAssetGuid;
 
+        public bool IsUsingRelativeSortingOrder => isUsingRelativeSortingOrder;
+
         public OverlappingItem(SpriteRenderer originSpriteRenderer)
         {
             var sortingGroup = originSpriteRenderer != null

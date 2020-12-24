@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using SpriteSortingPlugin.SpriteSorting.Logging;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.Survey.UI.Wizard;
 using SpriteSortingPlugin.UI;
@@ -48,6 +49,8 @@ namespace SpriteSortingPlugin.Survey.UI
 
             GeneralData.isSurveyActive = true;
             GeneralData.isAutomaticSortingActive = false;
+            
+            LoggingManager.GetInstance().Clear();
         }
 
         private void OnGUI()
@@ -246,6 +249,7 @@ namespace SpriteSortingPlugin.Survey.UI
             }
 
             currentStep = surveyWizard.GetCurrent();
+            contentScrollPosition = Vector2.zero;
         }
 
         private void PrepareAndSendData(bool isResult = false)

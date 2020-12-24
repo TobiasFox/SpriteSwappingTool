@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using SpriteSortingPlugin.SpriteAnalysis.UI;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
 using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.Logging;
 using SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection;
 using SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites;
 using SpriteSortingPlugin.SpriteSorting.UI.Preview;
@@ -20,6 +22,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private static readonly float LargerButtonHeight = EditorGUIUtility.singleLineHeight * 1.25f;
         private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
         private static readonly Array SortingTypes = Enum.GetValues(typeof(SortingType));
+
+        private static readonly string[] LogOutputPath = new string[]
+        {
+            "Assets", "SpriteSortingPlugin", "LoggingData"
+        };
 
         private Vector2 scrollPosition = Vector2.zero;
         private Vector2 gameObjectsParentScrollPosition = Vector2.zero;
@@ -261,11 +268,26 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                             skippedSortingCriteriaList = null;
 
                             EndScrollRect();
+
+                            ClearLastLog();
                             return;
                         }
                     }
                 }
             }
+
+            //TODO for debug only remove for build
+            if (GUILayout.Button("Save modification data"))
+            {
+                SaveLogFile();
+            }
+
+            if (GUILayout.Button("Clear loggingData"))
+            {
+                var loggingManager = LoggingManager.GetInstance();
+                loggingManager.Clear();
+            }
+            //end debug
 
             if (!wasAnalyzeButtonClicked)
             {
@@ -431,6 +453,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             ApplySortingOptions();
             isConfirmButtonPressed = true;
+
+            SaveLogFile();
 
             if (selectedConfirmButtonIndex == 1)
             {
@@ -1027,6 +1051,52 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             preview.UpdateOverlappingItems(overlappingItems);
             preview.UpdateSpriteData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
+
+            AddSortingSuggestionLoggingData();
+        }
+
+        private void AddSortingSuggestionLoggingData()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var sortingOrderSuggestionLoggingData = new SortingSuggestionLoggingData();
+            var validSortingCriteria = autoSortingOptionsUI.GenerateSortingCriteriaDataArray();
+            sortingOrderSuggestionLoggingData.Init(overlappingItems.Items, validSortingCriteria);
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.AddSortingOrderSuggestionLoggingData(sortingOrderSuggestionLoggingData);
+        }
+
+        private void ClearLastLog()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.ClearLastLoggingData();
+        }
+        
+        private static void SaveLogFile()
+        {
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.ConfirmSortingOrder();
+            var loggingDataJson = JsonUtility.ToJson(loggingData);
+
+            var directory = Path.Combine(LogOutputPath);
+            Directory.CreateDirectory(directory);
+            var pathAndName = Path.Combine(directory, "LoggingData.json");
+
+            File.WriteAllText(pathAndName, loggingDataJson);
         }
 
         private List<OverlappingItem> ApplyAutoSorting(
@@ -1164,6 +1234,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             preview.CleanUpPreview();
             PolygonColliderCacher.GetInstance().CleanUp();
             autoSortingOptionsUI.Cleanup();
+            ClearLastLog();
         }
     }
 }

@@ -25,9 +25,15 @@
         public const string ClipperLibLicense = "BSD license";
         public const string ClipperLibLink = "http://www.angusj.com/delphi/clipper.php";
 
-        public static bool isSurveyActive;
-        public static bool isAutomaticSortingActive;
-        public static bool isLoggingActive;
+        public static bool isSurveyActive = true;
+        public static bool isAutomaticSortingActive = true;
+        public static bool isLoggingActive = true;
+        public static int questionNumberForLogging;
+
+        //TODO for build
+        // public static bool isSurveyActive = true;
+        // public static bool isAutomaticSortingActive=true;
+        // public static bool isLoggingActive = true;
 
         public static string FullDetectorName => Name + " " + DetectorName;
         public static string FullDataAnalysisName => Name + " " + DataAnalysisName;

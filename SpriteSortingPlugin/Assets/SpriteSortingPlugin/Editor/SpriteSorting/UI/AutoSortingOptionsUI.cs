@@ -279,6 +279,25 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             return list;
         }
 
+        public SortingCriterionData[] GenerateSortingCriteriaDataArray()
+        {
+            var sortingCriterionDataList = new List<SortingCriterionData>();
+
+            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
+            {
+                var criterionData = sortingCriteriaComponents[i].sortingCriterionData;
+
+                if (!criterionData.isAddedToEditorList || !criterionData.isActive)
+                {
+                    continue;
+                }
+
+                sortingCriterionDataList.Add((SortingCriterionData) criterionData.Clone());
+            }
+
+            return sortingCriterionDataList.ToArray();
+        }
+
         public SortingCriteriaPreset GenerateSortingCriteriaPreset()
         {
             var preset = ScriptableObject.CreateInstance<SortingCriteriaPreset>();
