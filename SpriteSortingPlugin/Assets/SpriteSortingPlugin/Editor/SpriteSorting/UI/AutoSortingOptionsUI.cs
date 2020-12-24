@@ -20,7 +20,33 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
         private SortingCriteriaPresetSelector sortingCriteriaPresetSelector;
 
-        public bool IsApplyingAutoSorting => isApplyingAutoSorting;
+        public bool IsApplyingAutoSorting
+        {
+            get
+            {
+                if (!isApplyingAutoSorting)
+                {
+                    return false;
+                }
+
+                foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                {
+                    if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
+                    {
+                        continue;
+                    }
+
+                    if (!sortingCriteriaComponent.sortingCriterionData.isActive)
+                    {
+                        continue;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+        }
 
         public void Init()
         {
@@ -166,26 +192,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     }
                 }
             }
-        }
-
-        public bool HasActiveAutoSortingCriteria()
-        {
-            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
-            {
-                if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
-                {
-                    continue;
-                }
-
-                if (!sortingCriteriaComponent.sortingCriterionData.isActive)
-                {
-                    continue;
-                }
-
-                return true;
-            }
-
-            return false;
         }
 
         public bool IsCameraRequired(out string usedBy)

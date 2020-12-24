@@ -115,6 +115,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     taskLabelStyle);
 
                 EditorGUILayout.Space(10);
+                EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
+                    Styling.LabelWrapStyle);
 
                 EditorGUILayout.LabelField(
                     "You can optionally generate more accurate Sprite outlines by using a " + nameof(SpriteData) +

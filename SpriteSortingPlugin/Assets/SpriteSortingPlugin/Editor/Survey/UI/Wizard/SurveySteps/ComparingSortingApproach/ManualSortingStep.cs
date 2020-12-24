@@ -114,11 +114,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     taskLabelStyle);
 
                 EditorGUILayout.Space();
-                var largeLabel = new GUIStyle(EditorStyles.largeLabel) {wordWrap = true};
-                EditorGUILayout.LabelField("Please don't start the play mode.",
-                    largeLabel);
-                EditorGUILayout.LabelField("Instead, use the editor mode and move the SceneCamera.",
-                    largeLabel);
+                EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
+                    Styling.LabelWrapStyle);
+                EditorGUILayout.LabelField("Please do not start the play mode. Instead, use the editor mode and move the SceneCamera.",
+                    Styling.LabelWrapStyle);
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
                 var buttonLabel = $"{QuestionNumber}a Start by opening and focussing scene";

@@ -224,8 +224,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             serializedObject.ApplyModifiedProperties();
             var isAnalyzedButtonClickedThisFrame = false;
 
-            if (wasAnalyzeButtonClicked && autoSortingOptionsUI.IsApplyingAutoSorting &&
-                autoSortingOptionsUI.HasActiveAutoSortingCriteria())
+            if (wasAnalyzeButtonClicked && autoSortingOptionsUI.IsApplyingAutoSorting)
             {
                 GUILayout.Label(
                     "To refine Sorting Criteria: clear findings, adjust the criteria and find visual glitches again.");
@@ -238,10 +237,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 {
                     var analyzeButtonStyle = wasAnalyzeButtonClicked ? Styling.ButtonStyle : Styling.ButtonStyleBold;
 
-                    var tempIsApplyingSortingCriteria = autoSortingOptionsUI.IsApplyingAutoSorting &&
-                                                        autoSortingOptionsUI.HasActiveAutoSortingCriteria();
                     var buttonText = "Find visual glitches" +
-                                     (tempIsApplyingSortingCriteria ? " with Sorting Criteria" : "");
+                                     (autoSortingOptionsUI.IsApplyingAutoSorting ? " with Sorting Criteria" : "");
                     if (GUILayout.Button(buttonText, analyzeButtonStyle, GUILayout.MinHeight(LargerButtonHeight)))
                     {
                         Analyze();
@@ -1014,9 +1011,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             List<OverlappingItem> overlappingItemList;
             OverlappingItem overlappingBaseItem;
 
-            var isApplyingAutoSortingForAnalysis = autoSortingOptionsUI.IsApplyingAutoSorting &&
-                                                   autoSortingOptionsUI.HasActiveAutoSortingCriteria();
-            if (isApplyingAutoSortingForAnalysis)
+            if (autoSortingOptionsUI.IsApplyingAutoSorting)
             {
                 overlappingItemList = ApplyAutoSorting(overlappingSpriteDetectionResult, out overlappingBaseItem);
             }

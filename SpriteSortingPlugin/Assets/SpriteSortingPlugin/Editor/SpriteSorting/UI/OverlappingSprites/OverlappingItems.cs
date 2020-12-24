@@ -248,70 +248,70 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
         }
 
-        private int GetIndexToSwitch(int currentIndex)
-        {
-            int newSortingOrder = items[currentIndex].sortingOrder;
-            int itemsCount = items.Count;
+        // private int GetIndexToSwitch(int currentIndex)
+        // {
+        //     int newSortingOrder = items[currentIndex].sortingOrder;
+        //     int itemsCount = items.Count;
+        //
+        //     if (currentIndex > 0 && items[currentIndex - 1].sortingOrder <= newSortingOrder)
+        //     {
+        //         int tempIndex = currentIndex;
+        //         for (int i = currentIndex - 1; i >= 0; i--)
+        //         {
+        //             int order = items[i].sortingOrder;
+        //             if (newSortingOrder >= order)
+        //             {
+        //                 tempIndex--;
+        //             }
+        //             else
+        //             {
+        //                 break;
+        //             }
+        //         }
+        //
+        //         return tempIndex;
+        //     }
+        //
+        //     if (currentIndex + 1 < itemsCount && items[currentIndex + 1].sortingOrder > newSortingOrder)
+        //     {
+        //         int tempIndex = currentIndex;
+        //
+        //         for (int i = currentIndex + 1; i < itemsCount; i++)
+        //         {
+        //             int order = items[i].sortingOrder;
+        //             if (newSortingOrder < order)
+        //             {
+        //                 tempIndex++;
+        //             }
+        //             else
+        //             {
+        //                 break;
+        //             }
+        //         }
+        //
+        //         return tempIndex;
+        //     }
+        //
+        //     return -1;
+        // }
 
-            if (currentIndex > 0 && items[currentIndex - 1].sortingOrder <= newSortingOrder)
-            {
-                int tempIndex = currentIndex;
-                for (int i = currentIndex - 1; i >= 0; i--)
-                {
-                    int order = items[i].sortingOrder;
-                    if (newSortingOrder >= order)
-                    {
-                        tempIndex--;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                return tempIndex;
-            }
-
-            if (currentIndex + 1 < itemsCount && items[currentIndex + 1].sortingOrder > newSortingOrder)
-            {
-                int tempIndex = currentIndex;
-
-                for (int i = currentIndex + 1; i < itemsCount; i++)
-                {
-                    int order = items[i].sortingOrder;
-                    if (newSortingOrder < order)
-                    {
-                        tempIndex++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                return tempIndex;
-            }
-
-            return -1;
-        }
-
-        private void SwitchItems(int oldIndex, int newIndex)
-        {
-            var itemWithNewIndex = items[newIndex];
-            var itemWithOldIndex = items[oldIndex];
-
-            var tempSortingOrder = itemWithNewIndex.sortingOrder;
-            var tempLayerId = itemWithNewIndex.sortingLayerDropDownIndex;
-
-            itemWithNewIndex.sortingOrder = itemWithOldIndex.sortingOrder;
-            itemWithNewIndex.sortingLayerDropDownIndex = itemWithOldIndex.sortingLayerDropDownIndex;
-
-            itemWithOldIndex.sortingOrder = tempSortingOrder;
-            itemWithOldIndex.sortingLayerDropDownIndex = tempLayerId;
-
-            itemWithNewIndex.UpdatePreview();
-            itemWithOldIndex.UpdatePreview();
-        }
+        // private void SwitchItems(int oldIndex, int newIndex)
+        // {
+        //     var itemWithNewIndex = items[newIndex];
+        //     var itemWithOldIndex = items[oldIndex];
+        //
+        //     var tempSortingOrder = itemWithNewIndex.sortingOrder;
+        //     var tempLayerId = itemWithNewIndex.sortingLayerDropDownIndex;
+        //
+        //     itemWithNewIndex.sortingOrder = itemWithOldIndex.sortingOrder;
+        //     itemWithNewIndex.sortingLayerDropDownIndex = itemWithOldIndex.sortingLayerDropDownIndex;
+        //
+        //     itemWithOldIndex.sortingOrder = tempSortingOrder;
+        //     itemWithOldIndex.sortingLayerDropDownIndex = tempLayerId;
+        //
+        //     itemWithNewIndex.UpdatePreview();
+        //     itemWithOldIndex.UpdatePreview();
+        // }
 
         private void InitOverlappingItems(bool isReset)
         {

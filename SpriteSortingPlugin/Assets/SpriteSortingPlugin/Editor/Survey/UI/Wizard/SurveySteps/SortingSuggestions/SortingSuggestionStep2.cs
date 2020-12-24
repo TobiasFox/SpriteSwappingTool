@@ -60,6 +60,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             base.Start();
             GeneralData.isLoggingActive = true;
+            GeneralData.questionNumberForLogging = questionCounter + 1;
         }
 
         public override List<string> CollectFilePathsToCopy()
@@ -172,10 +173,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     EditorGUILayout.LabelField($"{questionCounter}{QuestionLabels[i]}",
                         taskLabelStyle);
 
+                    EditorGUILayout.Space(5);
+                    EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
+                        Styling.LabelWrapStyle);
                     if (i == 1)
                     {
-                        EditorGUILayout.Space(5);
-
                         EditorGUILayout.LabelField("The same SpriteRenderer setup as in 3. is used.",
                             Styling.LabelWrapStyle);
                     }
