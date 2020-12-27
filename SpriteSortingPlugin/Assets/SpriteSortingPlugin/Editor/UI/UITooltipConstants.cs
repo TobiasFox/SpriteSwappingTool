@@ -1,4 +1,26 @@
-﻿namespace SpriteSortingPlugin.UI
+﻿#region license
+
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//   under the License.
+//  -------------------------------------------------------------
+
+#endregion
+
+namespace SpriteSortingPlugin.UI
 {
     public static class UITooltipConstants
     {
@@ -13,7 +35,7 @@
 
         public const string ContainmentEncapsulatedSpriteInForegroundTooltip =
             "Control, whether completely enclosed SpriteRenderer will be sorted in the foreground or background. When choosing the background, the contained Sprite may be completely hidden.";
-        
+
         public const string ContainmentTooltip =
             "Compares if SpriteRenderers are completely enclosed by other SpriteRenderers.\n" +
             "When analyzing the alpha value, a " + nameof(SpriteData) + " asset is required.";
@@ -27,7 +49,8 @@
         public const string PrimaryColorTooltip =
             "Compares the primary color of given SpriteRenderers and sorts SpriteRenderer in the foreground which are closer to the foreground color.";
 
-        public const string PrimaryColorChannelsTooltip = "Specify which color channel should be used. The alpha channel is ignored.";
+        public const string PrimaryColorChannelsTooltip =
+            "Specify which color channel should be used. The alpha channel is ignored.";
 
         public const string PrimaryColorForegroundColorTooltip =
             "Specify the color of SpriteRenderers, which will be sorted in the foreground.";
@@ -55,12 +78,12 @@
 
         public const string SpriteSortPointForegroundSpriteTooltip =
             "Control, whether SpriteRenderers will be sorted in the foreground or background if a Sprite's Sort Point overlaps another Sprite.";
-        
+
         public const string ResolutionTooltip = "Compares Sprites resolutions in pixel.";
 
         public const string ResolutionForegroundSpriteTooltip =
             "Control, whether Sprites with higher resolution will be sorted in the foreground or background.";
-        
+
         public const string SharpnessTooltip =
             "Compares the sharpness of Sprites by analyzing their amount of edges (rapid intensity changes).\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
@@ -73,7 +96,7 @@
 
         public const string PerceivedLightnessForegroundSpriteTooltip =
             "Control, whether lighter Sprites will be sorted in the foreground or background.";
-        
+
         public const string SortingCriteriaWeightTooltip =
             "Controls the weight of this sorting criterion. The higher the value, the more affects this criterion the resulting order of Sprites.\n" +
             "Minimum: 0.0";
@@ -178,7 +201,7 @@
 
         public const string SortingEditorUsingAutoSortingTooltip =
             "Enable to generate a sorting order suggestion of overlapping and unsorted SpriteRenderer based on given sorting criteria.";
-        
+
         public const string SortingEditorSortingCriteriaListTooltip =
             "List of adjustable sorting criteria, which are used to generate sorting order suggestions.";
 
