@@ -3,6 +3,7 @@ using System.IO;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -20,7 +21,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         };
 
         private bool isSendingDataButtonPressed;
+        private bool isSendingDataButtonPressedThisFrame;
         private TransmitResult transmitResult;
+        private TransmitResult lastTransmitResult;
+        private string resultDataFolder;
+        private string resultDataName;
+        private float lastPathLabelHeight;
 
         private bool isEditorUpdateMethodAdded;
 
@@ -30,20 +36,29 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private bool isChangingFireWorkSprite;
         private float remainingTimeToChangeSprite;
-        private List<Sprite> fireWorkSprites = new List<Sprite>();
+        private List<Sprite> fireworkSprites = new List<Sprite>();
         private int currentSpriteIndex;
         private Sprite currentSprite;
         private Texture2D spriteTexture;
-
-        public bool IsSendingDataButtonPressedThisFrame { get; private set; }
+        private GUIStyle labelWrapStyle;
 
         public FinishingSurvey(string name) : base(name)
         {
+            labelWrapStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
+        }
+
+        public override void Start()
+        {
+            base.Start();
+            if (transmitResult == TransmitResult.NotFinished)
+            {
+                isUpdatingProgressbar = true;
+            }
         }
 
         public override void DrawContent()
         {
-            if (fireWorkSprites.Count == 0)
+            if (fireworkSprites.Count == 0)
             {
                 LoadFinishingSprite();
             }
@@ -77,42 +92,121 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.Space(30);
                 EditorGUILayout.LabelField(
                     "Please keep this window open and make sure the PC is connected to the internet.",
-                    Styling.LabelWrapStyle);
-            }
-
-            using (new EditorGUI.DisabledScope(isSendingDataButtonPressed))
-            {
-                IsSendingDataButtonPressedThisFrame = GUILayout.Button("Send data",
-                    GUILayout.Height(EditorGUIUtility.singleLineHeight * 2));
-                if (IsSendingDataButtonPressedThisFrame)
-                {
-                    StartSendingData();
-                }
+                    labelWrapStyle);
             }
 
             var progressbarRect = EditorGUILayout.GetControlRect();
             EditorGUI.ProgressBar(progressbarRect, progressValue, "");
 
-            switch (transmitResult)
+            if (Event.current.type == EventType.Layout)
             {
-                case TransmitResult.Succeeded:
-                    var labelWrapStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
-                    EditorGUILayout.LabelField("The data was successfully sent!", labelWrapStyle);
-                    EditorGUILayout.Space(15);
-                    EditorGUILayout.LabelField("You can now close this window.", labelWrapStyle);
-                    break;
-                case TransmitResult.Failed:
-                    var labelCenteredWrapStyle = new GUIStyle(Styling.LabelWrapStyle)
-                        {alignment = TextAnchor.MiddleCenter};
-                    EditorGUILayout.LabelField("Some error occured, while sending the data. Please try again. ",
-                        labelCenteredWrapStyle);
-                    break;
+                lastTransmitResult = transmitResult;
             }
 
-            // if (GUILayout.Button("Debug: successful send Data"))
-            // {
-            //     UpdateUIAfterSuccessfullySendData();
-            // }
+            switch (lastTransmitResult)
+            {
+                case TransmitResult.Succeeded:
+                    DrawSendingDataSucceeded();
+                    break;
+                case TransmitResult.Failed:
+                    DrawSendingDataFailed();
+                    break;
+            }
+        }
+
+        private void DrawSendingDataSucceeded()
+        {
+            GUILayout.Space(25);
+            var greenFinishStyle = new GUIStyle(labelWrapStyle)
+            {
+                normal = {background = Styling.SpriteSortingNoSortingOrderIssuesBackgroundTexture}
+            };
+            var successfullySentLabel =
+                new GUIContent("Data was successfully sent!", Styling.NoSortingOrderIssuesIcon);
+            EditorGUILayout.LabelField(successfullySentLabel, greenFinishStyle);
+            EditorGUILayout.Space(15);
+            EditorGUILayout.LabelField("You can close this window now.", labelWrapStyle);
+        }
+
+        string MyEscapeURL(string url)
+        {
+            return UnityWebRequest.EscapeURL(url).Replace("+", "%20");
+        }
+
+        private void DrawSendingDataFailed()
+        {
+            EditorGUILayout.LabelField(
+                "I am really sorry! Some error occured, while sending the data. Please try again and make sure this PC is connected to the internet. Otherwise, please send the data manually using the email and data below.",
+                labelWrapStyle);
+            GUILayout.Space(25);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (new EditorGUI.DisabledScope(isSendingDataButtonPressed))
+                {
+                    isSendingDataButtonPressedThisFrame = GUILayout.Button("Send data again",
+                        GUILayout.Height(EditorGUIUtility.singleLineHeight * 2), GUILayout.ExpandWidth(true));
+                    if (isSendingDataButtonPressedThisFrame)
+                    {
+                        StartSendingData();
+                        transmitResult = TransmitResult.NotFinished;
+                    }
+
+                    if (GUILayout.Button("Open System-Mail client\n(Attachment needs to be added)",
+                        GUILayout.Height(EditorGUIUtility.singleLineHeight * 2), GUILayout.ExpandWidth(false)))
+                    {
+                        var subject = MyEscapeURL($"[{GeneralData.Name} Tool] Survey result");
+                        var body = MyEscapeURL("Additional and optional message:\n");
+
+                        var mailUrl =
+                            $"mailto:{GeneralData.DeveloperMailAddress}?subject={subject}&body={body}";
+                        Application.OpenURL(mailUrl);
+                    }
+                }
+            }
+
+            GUILayout.Space(25);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("Email", GUILayout.ExpandWidth(false), GUILayout.Width(147));
+                EditorGUILayout.SelectableLabel(GeneralData.DeveloperMailAddress,
+                    GUILayout.Height(EditorGUIUtility.singleLineHeight), GUILayout.ExpandWidth(true));
+            }
+
+            using (var horizontalScope = new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("Folder", GUILayout.ExpandWidth(false), GUILayout.Width(147));
+
+                var guiStyle = Styling.LabelWrapStyle;
+                if (Event.current.type == EventType.Repaint)
+                {
+                    var pathLabelWidth = horizontalScope.rect.width - 147;
+                    lastPathLabelHeight =
+                        guiStyle.CalcHeight(new GUIContent(resultDataFolder), pathLabelWidth);
+                }
+
+                EditorGUILayout.SelectableLabel(resultDataFolder, guiStyle,
+                    GUILayout.Height(lastPathLabelHeight), GUILayout.ExpandWidth(true));
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Label("Zip name", GUILayout.ExpandWidth(false), GUILayout.Width(147));
+                EditorGUILayout.SelectableLabel(resultDataName,
+                    GUILayout.Height(EditorGUIUtility.singleLineHeight), GUILayout.ExpandWidth(true));
+            }
+
+            if (GUILayout.Button("Open data in System-Explorer"))
+            {
+                EditorUtility.RevealInFinder(Path.Combine(resultDataFolder, resultDataName));
+            }
+        }
+
+        public bool GetAndConsumeIsSendingDataButtonPressedThisFrame()
+        {
+            var returnBool = isSendingDataButtonPressedThisFrame;
+            isSendingDataButtonPressedThisFrame = false;
+            return returnBool;
         }
 
         public void UpdateWithSendResult(TransmitResult transmitResult)
@@ -143,6 +237,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return totalProgress;
         }
 
+        public void SetResultDataPath(string resultDataFolder, string resultDataName)
+        {
+            this.resultDataFolder = resultDataFolder;
+            this.resultDataName = resultDataName;
+        }
+
         private void StartSendingData()
         {
             isSendingDataButtonPressed = true;
@@ -169,12 +269,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             GUI.DrawTextureWithTexCoords(rect, spriteTexture, spriteRect);
         }
 
-        private void UpdateUIAfterSuccessfullySendData()
-        {
-            isUpdatingProgressbar = false;
-            progressValue = 1;
-        }
-
         private void EditorUpdate()
         {
             if (isChangingFireWorkSprite)
@@ -182,8 +276,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 if (EditorApplication.timeSinceStartup > remainingTimeToChangeSprite)
                 {
                     remainingTimeToChangeSprite = (float) (EditorApplication.timeSinceStartup + SpriteDisplayTime);
-                    currentSpriteIndex = (currentSpriteIndex + 1) % fireWorkSprites.Count;
-                    currentSprite = fireWorkSprites[currentSpriteIndex];
+                    currentSpriteIndex = (currentSpriteIndex + 1) % fireworkSprites.Count;
+                    currentSprite = fireworkSprites[currentSpriteIndex];
                 }
             }
 
@@ -211,7 +305,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 switch (asset)
                 {
                     case Sprite fireworkSprite:
-                        fireWorkSprites.Add(fireworkSprite);
+                        fireworkSprites.Add(fireworkSprite);
                         break;
                     case Texture2D texture:
                         spriteTexture = texture;
@@ -219,7 +313,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 }
             }
 
-            currentSprite = fireWorkSprites[currentSpriteIndex];
+            currentSprite = fireworkSprites[currentSpriteIndex];
             isChangingFireWorkSprite = true;
             remainingTimeToChangeSprite = (float) (EditorApplication.timeSinceStartup + SpriteDisplayTime);
 

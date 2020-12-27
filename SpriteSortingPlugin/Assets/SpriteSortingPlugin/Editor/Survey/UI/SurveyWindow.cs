@@ -28,6 +28,7 @@ namespace SpriteSortingPlugin.Survey.UI
         private float lastHeaderHeight;
         private float lastFooterHeight;
         private SurveyStep currentStep;
+        private string resultDataPath;
 
         [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/Survey %g", false, 2)]
         public static void ShowWindow()
@@ -49,7 +50,8 @@ namespace SpriteSortingPlugin.Survey.UI
 
             GeneralData.isSurveyActive = true;
             GeneralData.isAutomaticSortingActive = false;
-            
+            GeneralData.currentSurveyId = surveyData.UserId.ToString();
+
             LoggingManager.GetInstance().Clear();
         }
 
@@ -104,7 +106,7 @@ namespace SpriteSortingPlugin.Survey.UI
                 return;
             }
 
-            if (!finishingSurvey.IsSendingDataButtonPressedThisFrame)
+            if (!finishingSurvey.GetAndConsumeIsSendingDataButtonPressedThisFrame())
             {
                 return;
             }
@@ -200,6 +202,23 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void DrawNavigationButtons()
         {
+            var isSurveyFinished = surveyWizard.CurrentProgress == surveyWizard.TotalProgress;
+            if (isSurveyFinished)
+            {
+                return;
+            }
+
+            var isSendingData = surveyWizard.CurrentProgress == surveyWizard.TotalProgress - 1;
+
+            if (isSendingData)
+            {
+                var centeredStyle = new GUIStyle(Styling.CenteredStyle) {wordWrap = true};
+                EditorGUILayout.LabelField(
+                    new GUIContent("Please keep this window open and make sure the PC is connected to the internet.",
+                        Styling.InfoIcon),
+                    centeredStyle);
+            }
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 var buttonStyle = new GUIStyle(Styling.ButtonStyleBold);
@@ -209,31 +228,33 @@ namespace SpriteSortingPlugin.Survey.UI
 
                 var buttonText = "Continue";
 
-                if (surveyWizard.CurrentProgress == 1)
+                if (surveyWizard.CurrentProgress == 0)
                 {
                     buttonText = "Start";
                 }
-                else if (surveyWizard.CurrentProgress == surveyWizard.TotalProgress - 1)
+                else if (isSendingData)
                 {
                     buttonText = "Finish and Send data";
                 }
-                else if (surveyWizard.CurrentProgress == surveyWizard.TotalProgress)
-                {
-                    buttonText = "Already finished";
-                }
 
-                var isDisabled = (GeneralData.IsValidatingUserInput && !currentStep.IsFilledOut()) ||
-                                 surveyWizard.CurrentProgress == surveyWizard.TotalProgress;
+                var isDisabled = (GeneralData.IsValidatingUserInput && !currentStep.IsFilledOut());
 
                 using (new EditorGUI.DisabledScope(isDisabled))
                 {
                     if (GUILayout.Button(buttonText, buttonStyle, heightLayout))
                     {
                         NextSurveyStep();
+                        if (isSendingData)
+                        {
+                            PrepareAndSendData(true);
+
+                            if (currentStep is FinishingSurvey finishingSurvey)
+                            {
+                                finishingSurvey.SetResultDataPath(resultDataPath, "ResultData.zip");
+                            }
+                        }
                     }
                 }
-
-                GUILayout.Space(10);
             }
         }
 
@@ -272,15 +293,49 @@ namespace SpriteSortingPlugin.Survey.UI
             }
 
             var surveyDataJson = JsonUtility.ToJson(surveyData);
-
             Directory.CreateDirectory(directory);
             var pathAndName = Path.Combine(directory, (isResult ? "Result" : "") + "SurveyData.json");
-
             File.WriteAllText(pathAndName, surveyDataJson);
 
             CopyCollectedFiles(directory);
+            CopyLogFiles(directory);
 
             SendMail(isResult, directory);
+
+            if (isResult)
+            {
+                var dirInfo = new DirectoryInfo(directory);
+                resultDataPath = dirInfo.Parent?.FullName;
+            }
+        }
+
+        private void CopyLogFiles(string directory)
+        {
+            var logDirArray = new string[]
+            {
+                Application.temporaryCachePath, "SurveyData", surveyData.UserId.ToString(), "LogFiles"
+            };
+            var directoryInfo = new DirectoryInfo(Path.Combine(logDirArray));
+
+            if (!directoryInfo.Exists)
+            {
+                return;
+            }
+
+            var targetFolder = Path.Combine(directory, "LogFiles");
+            Directory.CreateDirectory(targetFolder);
+
+            foreach (var file in directoryInfo.GetFiles())
+            {
+                try
+                {
+                    file.CopyTo(Path.Combine(targetFolder, file.Name), true);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            }
         }
 
         private void SendMail(bool isResult, string directory)
@@ -309,7 +364,6 @@ namespace SpriteSortingPlugin.Survey.UI
             {
                 var fileName = Path.GetFileName(filePath);
                 var targetFilePath = Path.Combine(zipSaveFolder, fileName);
-                //TODO: exc after Skipped and therefore mail with data is not send
                 try
                 {
                     File.Copy(filePath, targetFilePath, true);
@@ -393,6 +447,8 @@ namespace SpriteSortingPlugin.Survey.UI
             GeneralData.isSurveyActive = false;
             GeneralData.isAutomaticSortingActive = true;
             GeneralData.isLoggingActive = false;
+            GeneralData.currentSurveyId = "";
+
             surveyWizard.CleanUp();
         }
 
