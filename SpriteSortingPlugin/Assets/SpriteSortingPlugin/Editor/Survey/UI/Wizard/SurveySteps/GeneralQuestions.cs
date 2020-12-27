@@ -1,4 +1,5 @@
-﻿using SpriteSortingPlugin.Survey.Data;
+﻿using SpriteSortingPlugin.SpriteSorting.UI;
+using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
@@ -24,26 +25,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             questionCounter = QuestionCounterStart;
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.LabelField(
-                "At the beginning of this survey some general questions are asked.", Styling.LabelWrapStyle);
+            EditorGUILayout.LabelField("General questions", Styling.LabelWrapStyle);
             EditorGUILayout.Space(20);
-            // using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
-            // {
-            //     DrawUnderstandingEnglishQuestion();
-            //     questionCounter++;
-            // }
 
-            //criterion of exclusion
-            // if (data.understandingEnglish == 1)
-            // {
-            //     DrawExclusion();
-            //     EditorGUI.indentLevel--;
-            //     return;
-            // }
-
-            // using (new EditorGUI.DisabledScope(data.understandingEnglish != 0))
-            // {
-            // EditorGUILayout.Space(space);
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 DrawIsDevelopingGamesQuestion();
@@ -89,7 +73,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     questionCounter++;
                 }
             }
-            // }
 
             EditorGUI.indentLevel--;
         }
@@ -184,12 +167,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             var excludeMessage =
                 "Thank you very much for your interest! However, this survey presumes";
-
-            if (data.understandingEnglish == 1)
-            {
-                excludeMessage += " that you can read and understand english";
-            }
-            else if (data.developing2dGames == 1)
+            if (data.developing2dGames == 1)
             {
                 excludeMessage += " experiences in developing 2d Unity applications";
             }
@@ -204,26 +182,22 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 " tool, which is located here:",
                 centeredStyle);
 
-            EditorGUILayout.LabelField(
-                GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name + " -> " +
-                GeneralData.DetectorName,
-                centeredStyle);
-        }
+            var openDetectorContent = new GUIContent(GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name +
+                                                     " -> " + GeneralData.DetectorName);
+            EditorGUILayout.LabelField("You can find the " + GeneralData.FullDetectorName + " here:",
+                Styling.LabelWrapStyle);
+            EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
 
-        private void DrawUnderstandingEnglishQuestion()
-        {
-            EditorGUILayout.LabelField(questionCounter + ". Can you reed and understand english?",
-                Styling.QuestionLabelStyle);
-            EditorGUI.indentLevel++;
-
-            var selectionGrid =
-                EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));
-
-            var answers = new[] {"Yes", "No"};
-
-            data.understandingEnglish = GUI.SelectionGrid(selectionGrid, data.understandingEnglish, answers, 2);
-
-            EditorGUI.indentLevel--;
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(20);
+                var width = Styling.ButtonStyle.CalcSize(openDetectorContent).x;
+                if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(width)))
+                {
+                    var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+                    detector.Show();
+                }
+            }
         }
 
         private void DrawGameDevelopmentRelation()
@@ -364,10 +338,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawIsDevelopingGamesQuestion()
         {
             EditorGUILayout.LabelField(questionCounter +
-                                       ". Are you familiar with developing 2D Unity applications and know how to adjust SpriteRenderer's sorting options (Sorting Layer and Sorting Layer)? (exclusion criterion)",
+                                       ". Are you familiar with developing 2D Unity applications and do you know how to adjust SpriteRenderers' sorting options (Sorting Layer and Sorting Order)? (exclusion criterion)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
-
 
             var developingGamesSelectionGridRect =
                 EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));

@@ -88,22 +88,25 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public override void DrawContent()
         {
             EditorGUI.indentLevel++;
-
+            
+            EditorGUILayout.LabelField("Manual approach", Styling.LabelWrapStyle);
+            EditorGUILayout.Space(5);
+            
             EditorGUILayout.LabelField("The setup of this task has slightly more Sprites.",
                 Styling.LabelWrapStyle);
             EditorGUILayout.Space(5);
 
             isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
-                "Short Description about what causes a visual glitch", true);
+                "Visual glitch description", true);
 
             if (isDescriptionVisible)
             {
                 var visualGlitchDescription =
-                    "Depending on the position of the camera which renders a scene, a visual glitch happens, when SpriteRenderers overlap and have identical sorting options.";
+                    "Depending on the position of a camera, visual glitches happen, when SpriteRenderers overlap and have identical sorting options (Sorting Layer and Sorting Order).";
                 EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField(
-                    "To detect potential SpriteRenderer the manual method can be used, by moving around the Unity SceneCamera in 3D perspective mode and watching out for Sprite swaps. To solve a detected glitch, change the sorting options.",
+                    "To detect such glitches, move the Unity SceneCamera in 3D perspective mode and watch out for Sprite swaps. To solve a glitch, change the sorting options.",
                     Styling.LabelWrapStyle);
             }
 
@@ -120,12 +123,17 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
-                EditorGUILayout.LabelField("Please do not start the play mode. Instead, use the editor mode and move the SceneCamera.",
+                EditorGUILayout.LabelField(
+                    "Please do not start the play mode. Instead, use the editor mode and move the SceneCamera.",
+                    Styling.LabelWrapStyle);
+                EditorGUILayout.LabelField(
+                    new GUIContent("The time needed will be measured.",
+                        "It starts when pressing the \"Start\" button and ends, when pressing the \"Finish\" button"),
                     Styling.LabelWrapStyle);
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
 
-                var buttonLabel = $"{QuestionNumber}a Start by opening and focussing scene";
+                var buttonLabel = "Start and open Scene";
                 var isDisable = currentSortingTaskData.taskState != TaskState.NotStarted;
                 using (new EditorGUI.DisabledScope(isDisable))
                 {
@@ -154,20 +162,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     }
                 }
 
-                EditorGUILayout.Space(10);
-                var wrapCenterStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
-                EditorGUILayout.LabelField("Time will be measured.", wrapCenterStyle);
-                EditorGUILayout.LabelField(
-                    "It starts when clicking the button above and ends when clicking the finish button.",
-                    wrapCenterStyle);
-                EditorGUILayout.Space(10);
+                EditorGUILayout.Space(20);
 
                 using (new EditorGUI.DisabledScope(currentSortingTaskData.taskState != TaskState.Started))
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
-                        if (GUILayout.Button($"{QuestionNumber}b Finish", GUILayout.Height(TaskButtonHeight)))
+                        if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
                         {
                             currentSortingTaskData.FinishTask();
 

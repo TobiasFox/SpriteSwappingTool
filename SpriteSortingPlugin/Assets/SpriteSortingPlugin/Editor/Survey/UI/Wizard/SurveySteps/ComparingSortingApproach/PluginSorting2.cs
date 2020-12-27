@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SpriteSortingPlugin.SpriteSorting.UI;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -94,25 +95,27 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.LabelField(
-                "To finalize Part 2, one more SpriteRenderer setup with slightly more SpriteRenderers is used.",
+            EditorGUILayout.LabelField("Plugin approach", Styling.LabelWrapStyle);
+            GUILayout.Space(5);
+
+            EditorGUILayout.LabelField("The setup of this task has slightly more Sprites.", Styling.LabelWrapStyle);
+
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("Please, open the " + GeneralData.FullDetectorName,
                 Styling.LabelWrapStyle);
+            var openDetectorContent = new GUIContent(GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name +
+                                                     " -> " + GeneralData.DetectorName);
+            EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
 
-            isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
-                "Information about the " + GeneralData.FullDetectorName, true);
-
-            if (isDescriptionVisible)
+            using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.LabelField(
-                    "The " + GeneralData.FullDetectorName +
-                    " automatically identifies overlapping and unsorted SpritesRenderers and helps to sort them.",
-                    Styling.LabelWrapStyle);
-
-                EditorGUILayout.Space(10);
-                EditorGUILayout.LabelField(
-                    "You can find the " + GeneralData.FullDetectorName + " here:\n" +
-                    GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name + " -> " + GeneralData.DetectorName,
-                    Styling.LabelWrapStyle);
+                GUILayout.Space(20);
+                var width = Styling.ButtonStyle.CalcSize(openDetectorContent).x;
+                if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(width)))
+                {
+                    var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+                    detector.Show();
+                }
             }
 
             EditorGUILayout.Space(20);
@@ -128,16 +131,19 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.Space(10);
                 EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
+                EditorGUILayout.LabelField(
+                    new GUIContent("The time needed will be measured.",
+                        "It starts when pressing the \"Start\" button and ends, when pressing the \"Finish\" button"),
+                    Styling.LabelWrapStyle);
 
                 EditorGUILayout.LabelField(
-                    "You can optionally generate more accurate Sprite outlines by using a " + nameof(SpriteData) +
-                    ". Such an asset can be created with the " + GeneralData.FullDataAnalysisName + " window.",
+                    "Optionally: Generate a SpriteData asset for a more accurate Sprite outline.",
                     Styling.LabelWrapStyle);
 
                 EditorGUILayout.Space(10);
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
-                var buttonLabel = $"{QuestionNumber}a Start by opening and focussing scene";
+                var buttonLabel = "Start and open Scene";
                 var isDisable = currentSortingTaskData.taskState != TaskState.NotStarted;
                 using (new EditorGUI.DisabledScope(isDisable))
                 {
@@ -165,20 +171,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     }
                 }
 
-                EditorGUILayout.Space(10);
-                var wrapCenterStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
-                EditorGUILayout.LabelField("Time will be measured.", wrapCenterStyle);
-                EditorGUILayout.LabelField(
-                    "It starts when clicking the button above and ends when clicking the finish button.",
-                    wrapCenterStyle);
-                EditorGUILayout.Space(10);
+                EditorGUILayout.Space(20);
 
                 using (new EditorGUI.DisabledScope(currentSortingTaskData.taskState != TaskState.Started))
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
-                        if (GUILayout.Button($"{QuestionNumber}b Finish", GUILayout.Height(TaskButtonHeight)))
+                        if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
                         {
                             currentSortingTaskData.FinishTask();
 

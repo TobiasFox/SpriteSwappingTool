@@ -7,15 +7,12 @@ namespace SpriteSortingPlugin.Survey.Data
     {
         public int[] susAnswers = Array.ConvertAll(new int[10], i => -1);
 
-        public string highlights = "";
-        public string lowlights = "";
-
-        public int[] ratingAnswers = Array.ConvertAll(new int[3], i => 50);
+        public float[] ratingAnswers = Array.ConvertAll(new float[3], i => 50f);
         public bool[] ratingAnswersChanged = new bool[3];
 
         public string missingCriteriaText = "";
 
-        public bool isOccuringError;
+        public int occuringError = -1;
         public string occuringErrorsText = "";
 
         public bool isMiscellaneous;

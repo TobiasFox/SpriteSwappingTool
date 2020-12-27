@@ -12,12 +12,13 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private GameObject previewGameObject;
         private Editor previewEditor;
-        private bool isPreviewVisible = true;
+        private bool isPreviewVisible;
         private string previewPrefabPathAndName;
 
-        public SurveyPreview(string assetPath)
+        public SurveyPreview(string assetPath, bool isPreviewVisible = true)
         {
             previewPrefabPathAndName = assetPath;
+            this.isPreviewVisible = isPreviewVisible;
         }
 
         private void GeneratePreview()
@@ -43,15 +44,17 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 GeneratePreview();
             }
 
-            isPreviewVisible = EditorGUILayout.Foldout(isPreviewVisible, "Preview (rotate by click and drag)", true);
+            isPreviewVisible = EditorGUILayout.Foldout(isPreviewVisible, "Visual glitch preview", true);
 
             if (!isPreviewVisible)
             {
+                previewGameObject.SetActive(false);
                 return;
             }
 
             using (new EditorGUILayout.HorizontalScope())
             {
+                GUILayout.Label("Rotate by click and drag");
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
                 {

@@ -10,7 +10,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private const int QuestionCounterStart = 11;
         private const float IntendWith = 10;
 
-        private static readonly float HighlightHeight = EditorGUIUtility.singleLineHeight * 3;
         private static readonly float TextAreaHeight = EditorGUIUtility.singleLineHeight * 3;
 
         private static readonly string[] RatingQuestions = new string[]
@@ -31,10 +30,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public override void DrawContent()
         {
             EditorGUI.indentLevel++;
+
+            EditorGUILayout.LabelField("Usability", Styling.LabelWrapStyle);
+            EditorGUILayout.Space(5);
+
             questionCounter = QuestionCounterStart;
 
             EditorGUILayout.LabelField(
-                "The following usability questions addresses specific parts of the " + GeneralData.Name + " tool.",
+                $"The following usability questions addresses specific parts of the {GeneralData.Name} tool.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(20);
@@ -53,7 +56,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.Space();
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                DrawHighLowlightQuestion();
+                DrawOccuringErrorsText();
                 questionCounter++;
             }
 
@@ -61,13 +64,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 DrawMissingCriteriaText();
-                questionCounter++;
-            }
-
-            EditorGUILayout.Space();
-            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
-            {
-                DrawOccuringErrorsText();
                 questionCounter++;
             }
 
@@ -82,15 +78,38 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel--;
         }
 
+        public override bool IsFilledOut()
+        {
+            return data.occuringError >= 0;
+        }
+
         public override int GetProgress(out int totalProgress)
         {
-            totalProgress = 0;
-            return totalProgress;
+            totalProgress = 1;
+
+            var currentProgress = 0;
+
+            if (!IsStarted)
+            {
+                return currentProgress;
+            }
+
+            if (IsFinished)
+            {
+                return totalProgress;
+            }
+
+            if (data.occuringError >= 0)
+            {
+                currentProgress++;
+            }
+
+            return currentProgress;
         }
 
         private void DrawRatingQuestion(int index)
         {
-            EditorGUILayout.LabelField(questionCounter + ". " + RatingQuestions[index], Styling.QuestionLabelStyle);
+            EditorGUILayout.LabelField($"{questionCounter}. {RatingQuestions[index]}", Styling.QuestionLabelStyle);
 
             using (new EditorGUI.IndentLevelScope())
             {
@@ -98,37 +117,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 using (var changeScope = new EditorGUI.ChangeCheckScope())
                 {
                     data.ratingAnswers[index] =
-                        (int) GUI.HorizontalSlider(entireQuestionRect, data.ratingAnswers[index], 0, 100);
+                        GUI.HorizontalSlider(entireQuestionRect, data.ratingAnswers[index], 0, 100);
                     if (changeScope.changed)
                     {
                         data.ratingAnswersChanged[index] = true;
-                    }
-                }
-            }
-        }
-
-        private void DrawHighLowlightQuestion()
-        {
-            EditorGUILayout.LabelField(
-                questionCounter + ". What are your highlights and lowlights of the " + GeneralData.Name +
-                " tool? (optional)",
-                Styling.QuestionLabelStyle);
-
-            using (new EditorGUI.IndentLevelScope())
-            {
-                using (new GUILayout.HorizontalScope())
-                {
-                    var heightOption = GUILayout.Height(HighlightHeight);
-                    using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(true)))
-                    {
-                        EditorGUILayout.LabelField("Highlights", Styling.CenteredStyle);
-                        data.highlights = EditorGUILayout.TextArea(data.highlights, heightOption);
-                    }
-
-                    using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(true)))
-                    {
-                        EditorGUILayout.LabelField("Lowlights", Styling.CenteredStyle);
-                        data.lowlights = EditorGUILayout.TextArea(data.lowlights, heightOption);
                     }
                 }
             }
@@ -138,7 +130,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUILayout.LabelField(
                 questionCounter +
-                ". Which criteria was missing when using the functionality to generate Sprite order suggestions? (optional)",
+                ". Which criteria were missing when using the functionality to generate sorting order suggestions? (optional)",
                 Styling.QuestionLabelStyle);
 
             using (new EditorGUI.IndentLevelScope())
@@ -151,10 +143,52 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawOccuringErrorsText()
         {
             EditorGUILayout.LabelField(
-                questionCounter + ". Did any errors occur while using the Sprite Swapping tool? (optional)",
+                $"{questionCounter}. Did any errors occur while using the {GeneralData.Name} tool?",
                 Styling.QuestionLabelStyle);
 
-            DrawOptionalTextInputWithBool(ref data.isOccuringError, ref data.occuringErrorsText);
+            using (new EditorGUI.IndentLevelScope())
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    using (new EditorGUILayout.VerticalScope(GUILayout.Height(TextAreaHeight),
+                        GUILayout.Width(150)))
+                    {
+                        GUILayout.FlexibleSpace();
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            var occuringErrorRect =
+                                EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false,
+                                    EditorGUIUtility.singleLineHeight));
+
+                            var answers = new[] {"Yes", "No"};
+                            data.occuringError =
+                                GUI.SelectionGrid(occuringErrorRect, data.occuringError, answers, 2);
+                        }
+
+                        GUILayout.FlexibleSpace();
+                    }
+
+                    using (new EditorGUILayout.VerticalScope(GUILayout.Height(TextAreaHeight),
+                        GUILayout.Width(150)))
+                    {
+                        GUILayout.FlexibleSpace();
+                        GUILayout.Label("If yes, which errors? (optional)", GUILayout.ExpandWidth(false));
+                        GUILayout.FlexibleSpace();
+                    }
+
+                    using (new EditorGUILayout.VerticalScope(GUILayout.Height(TextAreaHeight),
+                        GUILayout.ExpandWidth(true)))
+                    {
+                        using (new EditorGUI.DisabledScope(data.occuringError != 0))
+                        {
+                            data.occuringErrorsText = EditorGUILayout.TextArea(data.occuringErrorsText,
+                                GUILayout.Height(TextAreaHeight));
+                        }
+                    }
+                }
+            }
+
+            GUILayout.Space(3f);
         }
 
         private void DrawMiscellaneousText()

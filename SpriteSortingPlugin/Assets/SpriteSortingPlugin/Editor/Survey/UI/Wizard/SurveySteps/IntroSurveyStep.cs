@@ -23,7 +23,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public IntroSurveyStep(string name) : base(name)
         {
-            preview = new SurveyPreview(Path.Combine(PreviewPrefabPathAndName));
+            preview = new SurveyPreview(Path.Combine(PreviewPrefabPathAndName), false);
         }
 
         public override void Commit()
@@ -36,28 +36,30 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                GUILayout.Label("Thank you very much for taking the time to participate in this survey :) ",
+                GUILayout.Label("Thank you very much for taking the time to participate in this survey.",
                     Styling.CenteredStyleBold);
                 EditorGUILayout.Space(VerticalSpacing);
 
                 GUILayout.Label(
-                    "The topic of this survey is a visual glitch in 2D games, where the order of Sprites to be rendered can swap (see preview). As part of my master thesis at the HAW Hamburg, I developed a Unity tool, which identifies such Sprites and helps to sort them.",
+                    "This survey is about visual glitches in 2D games. As part of my master thesis, I developed an Unity tool, which identifies such glitches and helps to solve them.",
                     Styling.LabelWrapStyle);
-
                 EditorGUILayout.Space();
 
                 var wrappedCenterStyle = new GUIStyle(Styling.CenteredStyle) {wordWrap = true};
                 GUILayout.Label("I really appreciate your input!", wrappedCenterStyle);
+                preview?.DoPreview();
             }
 
-            preview?.DoPreview();
+
             EditorGUILayout.Space(VerticalSpacing);
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 EditorGUILayout.LabelField("Duration", "10 - 15 min");
-                EditorGUILayout.LabelField("Data",
-                    "Completely anonymous!\n" +
-                    "The data will only be used for the purpose of my master thesis and will be completely deleted after finishing the thesis. At the latest on 23.02.2021.",
+                var smallerLabelWrapStyle = new GUIStyle(Styling.LabelWrapStyle);
+                smallerLabelWrapStyle.fontSize--;
+                EditorGUILayout.LabelField(new GUIContent("Data"),
+                    new GUIContent("Completely anonymous and only for the purpose of the master thesis",
+                        "The data will only be used for the purpose of my master thesis and will be completely deleted after finishing the thesis. At the latest on 23.02.2021."),
                     Styling.LabelWrapStyle);
 
                 EditorGUILayout.LabelField("Developed by",
@@ -70,7 +72,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         GUILayout.Height(EditorGUIUtility.singleLineHeight), GUILayout.ExpandWidth(true));
                 }
             }
-
 
             EditorGUILayout.Space(VerticalSpacing);
             EditorGUILayout.Space(VerticalSpacing);
@@ -89,9 +90,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     "Also, please do not recompile any code while the survey window is open. If you do so, it will result in errors due to Unity`s serialization behaviour.",
                     Styling.InfoIcon), Styling.LabelWrapStyle);
             }
-
-            EditorGUILayout.Space(VerticalSpacing);
-            GUILayout.Label("And now, have fun while using the tool and let's start :)", Styling.CenteredStyleBold);
         }
 
         public override void CleanUp()

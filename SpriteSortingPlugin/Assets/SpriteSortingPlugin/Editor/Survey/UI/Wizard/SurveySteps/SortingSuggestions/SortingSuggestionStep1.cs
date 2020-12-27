@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SpriteSortingPlugin.SpriteSorting.UI;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -14,18 +15,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private static readonly string[] SceneNames = new string[]
         {
             "",
-            "SortingSuggestionExample1.unity"
+            "SortingSuggestionExample_01.unity"
         };
 
         private static readonly string[] QuestionLabels = new string[]
         {
-            ". Please find and solve all visual glitches in the given scene by using the " +
-            GeneralData.FullDetectorName + ".\n" +
-            "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
-            ". Please find and solve all visual glitches in the given scene by using the " +
-            GeneralData.FullDetectorName +
-            " with the sorting suggestion functionality.\n" +
-            "Please solve the task as quickly as possible. However, the result should make visual sense to you."
+            $". Please solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName} with the sorting suggestion functionality.\n" +
+            $"Please solve the task as quickly as possible. However, the result should make visual sense to you.",
+            $". Please solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName} with the sorting suggestion functionality.\n" +
+            $"Please solve the task as quickly as possible. However, the result should make visual sense to you."
         };
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
@@ -39,6 +37,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             questionCounter = QuestionCounterStart;
             foreach (var sceneName in SceneNames)
             {
+                if (string.IsNullOrEmpty(sceneName))
+                {
+                    continue;
+                }
+
                 var sortingTaskData = new SortingTaskData();
                 sortingTaskData.SetSceneName(sceneName);
                 sortingTaskData.question = questionCounter.ToString();
@@ -52,7 +55,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             base.Start();
             GeneralData.isLoggingActive = true;
-            GeneralData.questionNumberForLogging = questionCounter + 1;
+            GeneralData.questionNumberForLogging = questionCounter;
         }
 
         public override List<string> CollectFilePathsToCopy()
@@ -62,10 +65,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 return null;
             }
 
-            return new List<string>()
+            var collectFileList = new List<string>();
+
+            foreach (var sortingTaskData in SurveyStepSortingData.sortingTaskDataList)
             {
-                SurveyStepSortingData.sortingTaskDataList[1].FullModifiedScenePath
-            };
+                collectFileList.Add(sortingTaskData.FullModifiedScenePath);
+            }
+
+            return collectFileList;
         }
 
         public override int GetProgress(out int totalProgress)
@@ -120,32 +127,42 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         public override void DrawContent()
         {
+            
             questionCounter = QuestionCounterStart;
             GeneralData.isAutomaticSortingActive = true;
 
             EditorGUI.indentLevel++;
+            
+            EditorGUILayout.LabelField("Sorting order suggestions", Styling.LabelWrapStyle);
+            GUILayout.Space(5);
 
-            //neutral formulation
             EditorGUILayout.LabelField(
                 "The " + GeneralData.FullDetectorName +
-                " can also generate sorting order suggestions after SpriteRenderers are being identified.",
-                Styling.LabelWrapStyle);
-
-            EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField(
-                "These suggestions are based on several criteria which you can select and modify. You can find more information about each criterion directly in the " +
-                GeneralData.FullDetectorName,
+                " also generates sorting order suggestions after SpriteRenderers are being identified.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField(
-                "Some criteria need a Sprite Data asset. If you have not created such an asset yet, you might need to create one.",
+                "These suggestions are based on several criteria, which you can select and modify.",
                 Styling.LabelWrapStyle);
 
-            EditorGUILayout.Space(20);
+            // EditorGUILayout.LabelField(
+            //     "Some criteria need a Sprite Data asset. You might need to create one.",
+            //     Styling.LabelWrapStyle);
+            EditorGUILayout.Space(5);
             EditorGUILayout.LabelField(
-                "A two-step process is used to evaluate this functionality.",
+                $"Please, open the {GeneralData.DetectorName} and use this functionality located at the bottom of the {GeneralData.DetectorName}'s window.",
                 Styling.LabelWrapStyle);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(20);
+                if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(224)))
+                {
+                    var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+                    detector.Show();
+                }
+            }
 
             EditorGUILayout.Space(5);
 
@@ -159,17 +176,20 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         taskLabelStyle);
 
                     EditorGUILayout.Space(5);
+
                     EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                         Styling.LabelWrapStyle);
-                    if (i == 1)
-                    {
-                        EditorGUILayout.LabelField("The same SpriteRenderer setup as in 1. is used.",
-                            Styling.LabelWrapStyle);
-                    }
+                    EditorGUILayout.LabelField(
+                        new GUIContent("The time needed will be measured.",
+                            "It starts when pressing the \"Start\" button and ends, when pressing the \"Finish\" button"),
+                        Styling.LabelWrapStyle);
+                    EditorGUILayout.LabelField(
+                        "You might need to create a " + nameof(SpriteData) + " asset.",
+                        Styling.LabelWrapStyle);
 
                     EditorGUILayout.Space(10);
 
-                    var buttonLabel = $"{questionCounter}a Start by opening and focussing scene";
+                    var buttonLabel = "Start and open Scene";
                     var isDisable = currentTaskData.taskState != TaskState.NotStarted;
 
                     if (i == 1)
@@ -206,20 +226,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         }
                     }
 
-                    EditorGUILayout.Space(10);
-                    var wrapCenterStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
-                    EditorGUILayout.LabelField("Time will be measured.", wrapCenterStyle);
-                    EditorGUILayout.LabelField(
-                        "It starts when clicking the button above and ends when clicking the finish button.",
-                        wrapCenterStyle);
-                    EditorGUILayout.Space(10);
+                    EditorGUILayout.Space(20);
 
                     using (new EditorGUI.DisabledScope(currentTaskData.taskState != TaskState.Started))
                     {
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
-                            if (GUILayout.Button($"{questionCounter}b Finish", GUILayout.Height(TaskButtonHeight)))
+                            if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
                             {
                                 currentTaskData.FinishTask();
 

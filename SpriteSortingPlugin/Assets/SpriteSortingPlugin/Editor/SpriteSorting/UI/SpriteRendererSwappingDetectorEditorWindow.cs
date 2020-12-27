@@ -25,7 +25,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private static readonly string[] LogOutputPath = new string[]
         {
-            "Assets", "SpriteSortingPlugin", "LoggingData"
+            "SurveyData"
         };
 
         private Vector2 scrollPosition = Vector2.zero;
@@ -277,20 +277,21 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             //TODO for debug only remove for build
-            if (GUILayout.Button("Save modification data"))
-            {
-                SaveLogFile();
-            }
-
-            if (GUILayout.Button("Clear loggingData"))
-            {
-                var loggingManager = LoggingManager.GetInstance();
-                loggingManager.Clear();
-            }
+            // if (GUILayout.Button("Save modification data"))
+            // {
+            //     SaveLogFile();
+            // }
+            //
+            // if (GUILayout.Button("Clear loggingData"))
+            // {
+            //     var loggingManager = LoggingManager.GetInstance();
+            //     loggingManager.Clear();
+            // }
             //end debug
 
             if (!wasAnalyzeButtonClicked)
             {
+                EditorGUILayout.Space();
                 EndScrollRect();
                 return;
             }
@@ -1085,16 +1086,17 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             var loggingData = LoggingManager.GetInstance().loggingData;
             loggingData.ClearLastLoggingData();
         }
-        
+
         private static void SaveLogFile()
         {
             var loggingData = LoggingManager.GetInstance().loggingData;
             loggingData.ConfirmSortingOrder();
             var loggingDataJson = JsonUtility.ToJson(loggingData);
 
-            var directory = Path.Combine(LogOutputPath);
+            var tempCachePath = Path.Combine(Application.temporaryCachePath, Path.Combine(LogOutputPath));
+            var directory = Path.Combine(tempCachePath, GeneralData.currentSurveyId, "LogFiles");
             Directory.CreateDirectory(directory);
-            var pathAndName = Path.Combine(directory, "LoggingData.json");
+            var pathAndName = Path.Combine(directory, $"LoggingData_{Guid.NewGuid()}.json");
 
             File.WriteAllText(pathAndName, loggingDataJson);
         }

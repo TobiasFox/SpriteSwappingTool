@@ -1,5 +1,4 @@
-﻿using SpriteSortingPlugin.SpriteSorting.UI;
-using SpriteSortingPlugin.UI;
+﻿using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
 

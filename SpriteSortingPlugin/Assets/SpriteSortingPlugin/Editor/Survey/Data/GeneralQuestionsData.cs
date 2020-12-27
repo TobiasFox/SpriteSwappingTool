@@ -11,8 +11,6 @@ namespace SpriteSortingPlugin.Survey.Data
             "Animator", "Testing/QA", "Marketing"
         };
 
-        public int understandingEnglish = -1;
-
         public bool isStudent;
         public bool isProfessional;
         public bool isHobbyist;
