@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
 using UnityEngine;
 using MailMessage = System.Net.Mail.MailMessage;
+using Random = System.Random;
 
 namespace SpriteSortingPlugin.Survey
 {
     public class TransmitData
     {
+        private const int ShuffleThreshold = 5;
+
         private const string Password = "f3-A)zL[6*s57jW3";
         private const string MailAddress = "spriteswappingsurvey38@mail.de";
         private const string MailAddress2 = "spriteswappingsurvey38@gmail.com";
@@ -18,44 +23,100 @@ namespace SpriteSortingPlugin.Survey
         private const string Host2 = "smtp.gmail.com";
         private const int Port = 587;
 
+        private static readonly MailData[] MailDataArray = new MailData[]
+        {
+            // new MailData()
+            // {
+            //     mailAddress = "spriteswappingsurvey38@gmail.com", password = "f3-A)zL[6*s57jW3",
+            //     host = "smtp.gmail.com",
+            //     port = 587
+            // },
+
+            new MailData()
+            {
+                mailAddress = "spriteswappingsurvey38@mail.de", password = "f3-A)zL[6*s57jW3",
+                host = "smtp.mail.de",
+                port = 587
+            },
+            new MailData()
+            {
+                mailAddress = "spriteswappingsurvey39@mail.de", password = "7NnF*ftH44#SU32",
+                host = "smtp.mail.de",
+                port = 587
+            },
+            new MailData()
+            {
+                mailAddress = "spriteswappingsurvey40@mail.de", password = "Qz#+ZrZV6wv4N-p",
+                host = "smtp.mail.de",
+                port = 587
+            },
+        };
+
         public delegate void OnMailSendCompleted(TransmitResult transmitResult);
 
         public event OnMailSendCompleted onMailSendCompleted;
 
+        static TransmitData()
+        {
+            ShuffleCredentialArray();
+        }
+
         public void SendMail(Guid surveyId, int progress, string zipFilePath, bool isResult = false)
         {
-            var mail = new MailMessage {From = new MailAddress(MailAddress2)};
-            mail.To.Add(mail.From);
-            mail.Subject = "[" + surveyId + "] " + (isResult ? "Result" : progress.ToString());
-            mail.Body = (isResult ? "Result\n" : "") + $"userId: {surveyId}\nprogress: {progress}";
-
-            if (!string.IsNullOrEmpty(zipFilePath))
+            foreach (var credentialData in MailDataArray)
             {
-                // Create  the file attachment for this email message.
-                var data = new Attachment(zipFilePath, MediaTypeNames.Application.Octet);
+                var mail = new MailMessage
+                {
+                    From = new MailAddress(credentialData.mailAddress),
+                    Subject = $"[{surveyId}] {(isResult ? "Result" : progress.ToString())}",
+                    Body = $"{(isResult ? "Result\n" : "")}userId: {surveyId}\nprogress: {progress}",
+                };
+                mail.To.Add(mail.From);
 
-                var disposition = data.ContentDisposition;
-                disposition.CreationDate = File.GetCreationTime(zipFilePath);
-                disposition.ModificationDate = File.GetLastWriteTime(zipFilePath);
-                disposition.ReadDate = File.GetLastAccessTime(zipFilePath);
+                if (!string.IsNullOrEmpty(zipFilePath))
+                {
+                    // Create  the file attachment for this email message.
+                    var data = new Attachment(zipFilePath, MediaTypeNames.Application.Octet);
 
-                mail.Attachments.Add(data);
+                    var disposition = data.ContentDisposition;
+                    disposition.CreationDate = File.GetCreationTime(zipFilePath);
+                    disposition.ModificationDate = File.GetLastWriteTime(zipFilePath);
+                    disposition.ReadDate = File.GetLastAccessTime(zipFilePath);
+
+                    mail.Attachments.Add(data);
+                }
+
+
+                var smtpClient = new SmtpClient(credentialData.host)
+                {
+                    Port = credentialData.port,
+                    Credentials = new NetworkCredential(credentialData.mailAddress, credentialData.password),
+                    EnableSsl = true,
+                };
+
+                try
+                {
+                    smtpClient.Send(mail);
+                    // onMailSendCompleted?.Invoke(TransmitResult.Failed);
+
+                    // smtpClient.SendCompleted += SendCompletedEventHandler;
+                    // smtpClient.SendAsync(mail, "sendingData");
+
+                    onMailSendCompleted?.Invoke(TransmitResult.Succeeded);
+                    return;
+                }
+                catch (SmtpFailedRecipientException e)
+                {
+                    //next mail address
+                }
+                catch (Exception e)
+                {
+                    onMailSendCompleted?.Invoke(TransmitResult.Failed);
+                    throw;
+                }
             }
 
-            var smtpClient = new SmtpClient(Host2)
-            {
-                Port = Port,
-                Credentials = new NetworkCredential(MailAddress2, Password),
-                EnableSsl = true,
-            };
-
-            // smtpClient.Send(mail);
-            // Debug.Log("send data with id " + surveyId);
-
-            // smtpClient.SendCompleted += SendCompletedEventHandler;
-            // smtpClient.SendAsync(mail, "sendingData");
-
-            onMailSendCompleted?.Invoke(TransmitResult.Succeeded);
+            onMailSendCompleted?.Invoke(TransmitResult.Failed);
         }
 
         private void SendCompletedEventHandler(object sender, AsyncCompletedEventArgs e)
@@ -78,6 +139,50 @@ namespace SpriteSortingPlugin.Survey
             }
 
             onMailSendCompleted?.Invoke(transmitResult);
+        }
+
+        private static void ShuffleCredentialArray()
+        {
+            var size = MailDataArray.Length;
+            var random = new Random();
+            if (size < ShuffleThreshold)
+            {
+                for (var i = size; i > 1; i--)
+                {
+                    Swap(MailDataArray, i - 1, random.Next(i));
+                }
+
+                return;
+            }
+
+            var arr = MailDataArray.ToArray();
+
+            // Shuffle array
+            for (var i = size; i > 1; i--)
+            {
+                Swap(arr, i - 1, random.Next(i));
+            }
+
+            //Copy items back to list
+            for (var i = 0; i < arr.Length; i++)
+            {
+                MailDataArray[i] = arr[i];
+            }
+        }
+
+        private static void Swap(IList<MailData> arr, int i, int j)
+        {
+            var tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        }
+
+        private struct MailData
+        {
+            public string mailAddress;
+            public string password;
+            public string host;
+            public int port;
         }
     }
 }
