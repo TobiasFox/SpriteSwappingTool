@@ -178,6 +178,9 @@
 
         public const string SortingEditorUsingAutoSortingTooltip =
             "Enable to generate a sorting order suggestion of overlapping and unsorted SpriteRenderer based on given sorting criteria.";
+        
+        public const string SortingEditorSortingCriteriaListTooltip =
+            "List of adjustable sorting criteria, which are used to generate sorting order suggestions.";
 
         public const string SortingEditorSortingTypeTooltip =
             "Specify, if either a completely Sorting Layer or a single Sprite is used to identify overlapping SpriteRenderers.";

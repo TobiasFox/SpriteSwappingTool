@@ -1,8 +1,7 @@
-﻿using SpriteSortingPlugin.UI;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.UI
+namespace SpriteSortingPlugin.UI
 {
     public static class UIUtil
     {
