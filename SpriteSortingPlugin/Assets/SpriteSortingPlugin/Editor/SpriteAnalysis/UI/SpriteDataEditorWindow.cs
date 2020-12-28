@@ -100,26 +100,26 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             ResetSpriteList();
 
             //TODO: remove
-            SelectDefaultSpriteAlphaData();
+            // SelectDefaultSpriteAlphaData();
 
             spriteAnalyzerTypes = (SpriteDataAnalysisType[]) Enum.GetValues(typeof(SpriteDataAnalysisType));
         }
 
-        private void SelectDefaultSpriteAlphaData()
-        {
-            try
-            {
-                var guids = AssetDatabase.FindAssets("DefaultSpriteData");
-                spriteData =
-                    AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
-            }
-            catch
-            {
-                Debug.Log("auto selection of SpriteAlphaData went wrong");
-            }
-
-            LoadSpriteDataList();
-        }
+        // private void SelectDefaultSpriteAlphaData()
+        // {
+        //     try
+        //     {
+        //         var guids = AssetDatabase.FindAssets("DefaultSpriteData");
+        //         spriteData =
+        //             AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
+        //     }
+        //     catch
+        //     {
+        //         Debug.Log("auto selection of SpriteAlphaData went wrong");
+        //     }
+        //
+        //     LoadSpriteDataList();
+        // }
 
         private void ResetSpriteList()
         {

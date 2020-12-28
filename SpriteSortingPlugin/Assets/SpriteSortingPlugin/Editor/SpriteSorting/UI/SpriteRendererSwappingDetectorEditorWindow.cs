@@ -562,7 +562,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         using (new EditorGUI.IndentLevelScope())
                         {
                             EditorGUILayout.LabelField(
-                                new GUIContent("Sprite Data Asset is not used by Sprite Swapping Detector."));
+                                new GUIContent($"Is not used by {GeneralData.FullDetectorName}."));
                         }
                     }
                     else if (spriteData == null)
