@@ -26,21 +26,20 @@ using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard
+namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
 {
-    public class ManualSortingStep2 : SurveyStep
+    public class ManualSortingStep : SurveyStep
     {
-        private const string SceneName = "ManualSorting2.unity";
-        private const int QuestionNumber = 2;
+        private const string SceneName = "ManualSorting1.unity";
+        private const int QuestionNumber = 1;
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
-        private bool isDescriptionVisible;
-
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
-        public ManualSortingStep2(string name) : base(name)
+        public ManualSortingStep(string name) : base(name)
         {
             surveyStepData = new SurveyStepSortingData();
 
@@ -114,23 +113,13 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField("Manual approach", Styling.LabelWrapStyle);
             EditorGUILayout.Space(5);
 
-            EditorGUILayout.LabelField("The setup of this task has slightly more Sprites.",
+            var visualGlitchDescription =
+                "Depending on the position of a camera, visual glitches happen, when SpriteRenderers overlap and have identical sorting options (Sorting Layer and Sorting Order).";
+            EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField(
+                "To detect such glitches, move the Unity SceneCamera in 3D perspective mode and watch out for Sprite swaps. To solve a glitch, change the sorting options.",
                 Styling.LabelWrapStyle);
-            EditorGUILayout.Space(5);
-
-            isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
-                "Visual glitch description", true);
-
-            if (isDescriptionVisible)
-            {
-                var visualGlitchDescription =
-                    "Depending on the position of a camera, visual glitches happen, when SpriteRenderers overlap and have identical sorting options (Sorting Layer and Sorting Order).";
-                EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField(
-                    "To detect such glitches, move the Unity SceneCamera in 3D perspective mode and watch out for Sprite swaps. To solve a glitch, change the sorting options.",
-                    Styling.LabelWrapStyle);
-            }
 
             EditorGUILayout.Space(20);
 
@@ -143,10 +132,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     taskLabelStyle);
 
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
+                EditorGUILayout.LabelField("Please, do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
-                    "Please do not start the play mode. Instead, use the editor mode and move the SceneCamera.",
+                    "Please, do not start the play mode. Instead, move the SceneCamera.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
                     new GUIContent("The time needed will be measured.",
@@ -154,8 +143,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     Styling.LabelWrapStyle);
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
-
-                var buttonLabel = "Start and open Scene";
+                var buttonLabel = "Start and Open scene";
                 var isDisable = currentSortingTaskData.taskState != TaskState.NotStarted;
                 using (new EditorGUI.DisabledScope(isDisable))
                 {
@@ -191,12 +179,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
-                        if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
+                        if (GUILayout.Button("Finish and Save", GUILayout.Height(TaskButtonHeight)))
                         {
                             currentSortingTaskData.FinishTask();
 
-                            var combinedPath = currentSortingTaskData.FullModifiedScenePath;
-                            EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, combinedPath, true);
+                            var savePath = currentSortingTaskData.FullModifiedScenePath;
+                            EditorSceneManager.SaveScene(currentSortingTaskData.LoadedScene, savePath, true);
                         }
 
                         GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);

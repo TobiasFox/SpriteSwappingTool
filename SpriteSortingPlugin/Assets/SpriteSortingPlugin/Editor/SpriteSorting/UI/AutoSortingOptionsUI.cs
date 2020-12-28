@@ -88,7 +88,9 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             using (new EditorGUI.DisabledScope(isDisable))
             {
-                GUILayout.Label("Generation of Sorting order suggestion");
+                var labelText = "Generation of Sorting order suggestion" +
+                                (isDisable ? " - enabled in Part 3 of the survey" : "");
+                GUILayout.Label(labelText);
 
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {

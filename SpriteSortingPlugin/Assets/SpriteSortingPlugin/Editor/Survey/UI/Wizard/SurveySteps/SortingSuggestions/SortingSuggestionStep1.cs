@@ -210,7 +210,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                     EditorGUILayout.Space(10);
 
-                    var buttonLabel = "Start and open Scene";
+                    var buttonLabel = "Start and Open scene";
                     var isDisable = currentTaskData.taskState != TaskState.NotStarted;
 
                     if (i == 1)
@@ -254,7 +254,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
-                            if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
+                            if (GUILayout.Button("Finish and Save", GUILayout.Height(TaskButtonHeight)))
                             {
                                 currentTaskData.FinishTask();
 

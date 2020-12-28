@@ -28,18 +28,20 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard
+namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
 {
-    public class PluginSorting1 : SurveyStep
+    public class PluginSorting2 : SurveyStep
     {
-        private const string SceneName = "PluginSortingExample1.unity";
-        private const int QuestionNumber = 3;
+        private const string SceneName = "PluginSortingExample2.unity";
+        private const int QuestionNumber = 4;
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
+        private bool isDescriptionVisible;
+
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
-        public PluginSorting1(string name) : base(name)
+        public PluginSorting2(string name) : base(name)
         {
             surveyStepData = new SurveyStepSortingData();
 
@@ -47,6 +49,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             sortingTaskData.SetSceneName(SceneName);
             sortingTaskData.question = QuestionNumber.ToString();
             SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
+        }
+
+        public override bool IsSendingData()
+        {
+            return true;
         }
 
         public override List<string> CollectFilePathsToCopy()
@@ -111,17 +118,13 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUI.indentLevel++;
 
             EditorGUILayout.LabelField("Plugin approach", Styling.LabelWrapStyle);
-            EditorGUILayout.Space(5);
+            GUILayout.Space(5);
 
-            EditorGUILayout.LabelField(
-                "The " + GeneralData.FullDetectorName +
-                " automatically identifies visual glitches and helps to solve them.",
-                Styling.LabelWrapStyle);
+            EditorGUILayout.LabelField("The setup of this task has slightly more Sprites.", Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Please, open the " + GeneralData.FullDetectorName,
                 Styling.LabelWrapStyle);
-
             var openDetectorContent = new GUIContent(GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name +
                                                      " -> " + GeneralData.DetectorName);
             EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
@@ -143,8 +146,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    $"{QuestionNumber}. Please solve all visual glitches in the given scene by using the " +
-                    GeneralData.FullDetectorName + ".\n" +
+                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName}.\n" +
                     "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
                     taskLabelStyle);
 
@@ -163,8 +165,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.Space(10);
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];
-
-                var buttonLabel = "Start and open Scene";
+                var buttonLabel = "Start and Open scene";
                 var isDisable = currentSortingTaskData.taskState != TaskState.NotStarted;
                 using (new EditorGUI.DisabledScope(isDisable))
                 {
@@ -175,8 +176,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         {
                             currentSortingTaskData.StartTask();
                             currentSortingTaskData.LoadedScene = EditorSceneManager.OpenScene(
-                                currentSortingTaskData.FullScenePathAndName,
-                                OpenSceneMode.Single);
+                                currentSortingTaskData.FullScenePathAndName, OpenSceneMode.Single);
 
                             EditorWindow.FocusWindowIfItsOpen<SceneView>();
 
@@ -200,7 +200,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         GUILayout.Space(EditorGUIUtility.singleLineHeight * EditorGUI.indentLevel);
-                        if (GUILayout.Button("Finish", GUILayout.Height(TaskButtonHeight)))
+                        if (GUILayout.Button("Finish and Save", GUILayout.Height(TaskButtonHeight)))
                         {
                             currentSortingTaskData.FinishTask();
 
