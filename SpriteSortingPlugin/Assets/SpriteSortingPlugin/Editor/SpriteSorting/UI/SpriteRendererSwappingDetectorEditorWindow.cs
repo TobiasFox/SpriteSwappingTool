@@ -260,15 +260,20 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             EditorGUILayout.Space();
+
             var isCameraRequired = IsCameraRequired(out _);
             if (isCameraRequired)
             {
-                EditorGUILayout.LabelField(new GUIContent("Camera is required.", Styling.WarnIcon,
-                    UITooltipConstants.SortingEditorMissingCameraTooltip));
+                var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
+                if (cameraSerializedProp.objectReferenceValue == null)
+                {
+                    EditorGUILayout.LabelField(new GUIContent("Camera is required.", Styling.WarnIcon,
+                        UITooltipConstants.SortingEditorMissingCameraTooltip));
+                }
             }
 
             var isUsingSpriteData = IsUsingSpriteData(out _);
-            if (isUsingSpriteData)
+            if (isUsingSpriteData && spriteData == null)
             {
                 EditorGUILayout.LabelField(new GUIContent($"{nameof(SpriteData)} asset is required.",
                     Styling.WarnIcon));
