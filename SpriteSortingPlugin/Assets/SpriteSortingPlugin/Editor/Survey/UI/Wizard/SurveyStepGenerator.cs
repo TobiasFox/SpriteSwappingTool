@@ -132,8 +132,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var manualSortingStep2 = new ManualSortingStep2(manualSortingLabel);
                 var pluginSorting1 = new PluginSorting1(pluginSortingLabel);
                 var pluginSorting2 = new PluginSorting2(pluginSortingLabel);
+                var pluginSorting3 = new PluginSorting3(pluginSortingLabel);
 
-                var list = new List<SurveyStep> {manualSortingStep, manualSortingStep2, pluginSorting1, pluginSorting2};
+                var list = new List<SurveyStep>
+                    {manualSortingStep, manualSortingStep2, pluginSorting1, pluginSorting2, pluginSorting3};
 
                 var group = new SurveyStepGroup(list, "Part 2");
                 surveySteps.Add(group);

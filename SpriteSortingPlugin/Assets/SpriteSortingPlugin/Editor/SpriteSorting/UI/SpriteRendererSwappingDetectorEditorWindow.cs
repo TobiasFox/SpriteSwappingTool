@@ -787,6 +787,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 outlinePrecisionSliderValue = (int) Math.Round(outlinePrecisionSliderValue);
                 outlinePrecision = (OutlinePrecision) outlinePrecisionSliderValue;
+                preview?.UpdateOutlineType(outlinePrecision);
             }
 
             GUI.Label(toLabel,
