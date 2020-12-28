@@ -40,6 +40,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
         public SpriteSortPointSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
+            sortingCriterionType = SpriteSortCriterionData.sortingCriterionType;
         }
 
         public override bool IsUsingSpriteData()
