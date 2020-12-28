@@ -22,7 +22,6 @@
 
 using System.Collections.Generic;
 using SpriteSortingPlugin.Survey.Data;
-using SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
