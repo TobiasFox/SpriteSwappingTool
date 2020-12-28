@@ -128,7 +128,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             GUILayout.Space(5);
 
             EditorGUILayout.LabelField(
-                "The setup of this task is rather realistic and have way more Sprites than the previous setups.",
+                "The setup of this task is more realistic and has more Sprites then the previously setups.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
