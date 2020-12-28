@@ -31,7 +31,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
 {
     public class ManualSortingStep2 : SurveyStep
     {
-        private const string SceneName = "ManualSorting2.unity";
+        private const string SceneName = "ManualSorting_02.unity";
         private const int QuestionNumber = 2;
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;

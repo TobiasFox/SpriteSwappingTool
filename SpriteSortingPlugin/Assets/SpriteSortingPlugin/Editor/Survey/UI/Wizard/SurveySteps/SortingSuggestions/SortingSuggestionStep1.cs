@@ -36,8 +36,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private static readonly string[] SceneNames = new string[]
         {
-            "",
-            "SortingSuggestionExample_01.unity"
+            "SortingSuggestionExample_01.unity",
+            ""
         };
 
         private static readonly string[] QuestionLabels = new string[]
