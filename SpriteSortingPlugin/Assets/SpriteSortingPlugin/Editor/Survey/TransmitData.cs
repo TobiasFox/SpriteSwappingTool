@@ -127,11 +127,11 @@ namespace SpriteSortingPlugin.Survey
                     onMailSendCompleted?.Invoke(TransmitResult.Succeeded);
                     return;
                 }
-                catch (SmtpFailedRecipientException e)
+                catch (SmtpFailedRecipientException)
                 {
                     //next mail address
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     onMailSendCompleted?.Invoke(TransmitResult.Failed);
                     throw;

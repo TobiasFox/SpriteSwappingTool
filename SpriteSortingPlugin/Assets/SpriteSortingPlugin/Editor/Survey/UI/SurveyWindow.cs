@@ -29,6 +29,7 @@ using SpriteSortingPlugin.Survey.UI.Wizard;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace SpriteSortingPlugin.Survey.UI
 {
@@ -404,9 +405,30 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void DrawFooter()
         {
-            EditorGUILayout.SelectableLabel(
-                "Contact: " + GeneralData.DeveloperMailAddress + " (" + GeneralData.DevelopedBy + ")",
-                EditorStyles.miniLabel, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+            using (new GUILayout.HorizontalScope())
+            {
+                var buttonStyle = new GUIStyle(Styling.ButtonStyle);
+                buttonStyle.fontSize--;
+                if (GUILayout.Button("Contact Tobias", buttonStyle))
+                {
+                    var subject = MyEscapeURL($"[{GeneralData.Name} Tool] Feedback");
+
+                    var mailUrl =
+                        $"mailto:{GeneralData.DeveloperMailAddress}?subject={subject}";
+                    Application.OpenURL(mailUrl);
+                }
+
+
+                EditorGUILayout.SelectableLabel(
+                    $"Email: {GeneralData.DeveloperMailAddress}",
+                    EditorStyles.miniLabel, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                GUILayout.FlexibleSpace();
+            }
+        }
+
+        string MyEscapeURL(string url)
+        {
+            return UnityWebRequest.EscapeURL(url).Replace("+", "%20");
         }
 
         private void GenerateAndSendDataThreadFunction(object data)
