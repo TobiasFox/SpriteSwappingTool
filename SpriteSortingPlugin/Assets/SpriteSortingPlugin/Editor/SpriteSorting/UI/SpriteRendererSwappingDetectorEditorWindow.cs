@@ -260,12 +260,25 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             EditorGUILayout.Space();
+            var isCameraRequired = IsCameraRequired(out _);
+            if (isCameraRequired)
+            {
+                EditorGUILayout.LabelField(new GUIContent("Camera is required.", Styling.WarnIcon,
+                    UITooltipConstants.SortingEditorMissingCameraTooltip));
+            }
+
+            var isUsingSpriteData = IsUsingSpriteData(out _);
+            if (isUsingSpriteData)
+            {
+                EditorGUILayout.LabelField(new GUIContent($"{nameof(SpriteData)} asset is required.",
+                    Styling.WarnIcon));
+            }
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 using (new EditorGUI.DisabledScope(isAnalyzedButtonDisabled))
                 {
                     var analyzeButtonStyle = wasAnalyzeButtonClicked ? Styling.ButtonStyle : Styling.ButtonStyleBold;
-
                     var buttonText = "Find visual glitches" +
                                      (autoSortingOptionsUI.IsApplyingAutoSorting ? " with Sorting Criteria" : "");
                     if (GUILayout.Button(buttonText, analyzeButtonStyle, GUILayout.MinHeight(LargerButtonHeight)))
@@ -546,19 +559,21 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                     if (!isUsingSpriteData)
                     {
-                        EditorGUI.indentLevel++;
-                        EditorGUILayout.LabelField(
-                            new GUIContent("Sprite Data Asset is not used by Sprite Swapping Detector."));
-                        EditorGUI.indentLevel--;
+                        using (new EditorGUI.IndentLevelScope())
+                        {
+                            EditorGUILayout.LabelField(
+                                new GUIContent("Sprite Data Asset is not used by Sprite Swapping Detector."));
+                        }
                     }
                     else if (spriteData == null)
                     {
-                        EditorGUI.indentLevel++;
-                        EditorGUILayout.LabelField(
-                            new GUIContent("Please choose a Sprite Data Asset. It is used by " + errorMessage + ".",
-                                Styling.WarnIcon));
-                        isAnalyzedButtonDisabled = true;
-                        EditorGUI.indentLevel--;
+                        using (new EditorGUI.IndentLevelScope())
+                        {
+                            EditorGUILayout.LabelField(
+                                new GUIContent("Please select a Sprite Data Asset. It is used by " + errorMessage + ".",
+                                    Styling.InfoIcon));
+                            isAnalyzedButtonDisabled = true;
+                        }
                     }
                 }
             }
@@ -639,13 +654,13 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         }
                         else if (!spriteRendererRef.gameObject.scene.isLoaded)
                         {
-                            errorMessage = "Please choose a SpriteRenderer of a currently loaded scene.";
+                            errorMessage = "Please select a SpriteRenderer of a currently loaded scene.";
                         }
                         else if (!spriteRendererRef.gameObject.activeInHierarchy || !spriteRendererRef.enabled ||
                                  spriteRendererRef.sprite == null)
                         {
                             errorMessage =
-                                "The SpriteRenderer is not active in the scene or the sprite is null. Please choose another sprite.";
+                                "The SpriteRenderer is not active in the scene or the sprite is null. Please select another sprite.";
                         }
 
                         if (!string.IsNullOrEmpty(errorMessage))
@@ -710,7 +725,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     {
                         EditorGUI.indentLevel++;
                         EditorGUILayout.LabelField(new GUIContent(
-                            "Please choose a Camera. It is used to " + errorMessage + ".", Styling.WarnIcon,
+                            "Please select a Camera. It is used to " + errorMessage + ".", Styling.InfoIcon,
                             UITooltipConstants.SortingEditorMissingCameraTooltip));
                         isAnalyzedButtonDisabled = true;
                         EditorGUI.indentLevel--;

@@ -306,7 +306,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 if (sortingCriteriaComponent.sortingCriterion != null &&
                     sortingCriteriaComponent.sortingCriterion.IsUsingSpriteData())
                 {
-                    usedBy = "Automatic Sorting";
+                    usedBy = "Sorting order suggestion";
                     return true;
                 }
             }
