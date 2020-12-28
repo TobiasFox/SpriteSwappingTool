@@ -337,8 +337,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 modifiedLayerIndex = SortingLayerUtility.GetLayerNameIndex(modifiedLayerName)
             };
 
-            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentLoggingData();
-            sortingOrderSuggestionLoggingData.AddModification(modificationData);
+            var currentSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
+            currentSuggestionLoggingData?.AddModification(modificationData);
         }
 
         private void LogSortingOrderChangeModification(int currentIndex, int modifiedSortingOrder)
@@ -359,8 +359,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 modifiedOrder = modifiedSortingOrder,
             };
 
-            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentLoggingData();
-            sortingOrderSuggestionLoggingData.AddModification(modificationData);
+            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
+            sortingOrderSuggestionLoggingData?.AddModification(modificationData);
         }
 
         private void LogReorderChangeModification(int currentIndex, int modifiedIndex)
@@ -377,8 +377,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 modifiedItemIndex = modifiedIndex
             };
 
-            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentLoggingData();
-            sortingOrderSuggestionLoggingData.AddModification(modificationData);
+            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
+            sortingOrderSuggestionLoggingData?.AddModification(modificationData);
         }
 
         private bool IsLoggingActive(out LoggingData loggingData)

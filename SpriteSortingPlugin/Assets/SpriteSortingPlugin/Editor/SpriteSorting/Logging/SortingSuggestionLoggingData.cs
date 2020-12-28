@@ -45,7 +45,7 @@ namespace SpriteSortingPlugin.SpriteSorting.Logging
         public OverlappingItemLoggingData[] overlappingItems;
         public SortingLayerLoggingData[] sortingLayers;
 
-        public List<SortingSuggestionModificationData> modificationList = new List<SortingSuggestionModificationData>();
+        public List<SortingSuggestionModificationData> modifications = new List<SortingSuggestionModificationData>();
 
         public void Init(List<OverlappingItem> overlappingItems, SortingCriterionData[] sortingCriterionDataArray)
         {
@@ -95,7 +95,7 @@ namespace SpriteSortingPlugin.SpriteSorting.Logging
 
         public void AddModification(SortingSuggestionModificationData data)
         {
-            modificationList.Add(data);
+            modifications.Add(data);
         }
     }
 }

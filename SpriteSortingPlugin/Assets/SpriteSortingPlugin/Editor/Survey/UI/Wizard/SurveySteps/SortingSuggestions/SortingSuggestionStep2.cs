@@ -22,6 +22,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using SpriteSortingPlugin.SpriteSorting.Logging;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -86,6 +87,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             base.Start();
             GeneralData.isLoggingActive = true;
             GeneralData.questionNumberForLogging = QuestionCounterStart;
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.isFirstSortingQuestion = false;
+            loggingData.CurrentFoundGlitchStatistic.question = GeneralData.questionNumberForLogging;
         }
 
         public override List<string> CollectFilePathsToCopy()

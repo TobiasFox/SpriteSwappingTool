@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.Logging
 {
@@ -33,10 +34,23 @@ namespace SpriteSortingPlugin.SpriteSorting.Logging
 
         private int currentIndex = -1;
         private bool isCurrentLoggingDataActive;
+        public bool isFirstSortingQuestion = true;
+
+        [SerializeField] private FoundGlitchStatistic[] foundGlitchStatistics = new FoundGlitchStatistic[]
+        {
+            new FoundGlitchStatistic(),
+            new FoundGlitchStatistic()
+        };
+
+        public FoundGlitchStatistic CurrentFoundGlitchStatistic =>
+            foundGlitchStatistics[isFirstSortingQuestion ? 0 : 1];
+
+        private string guid = Guid.NewGuid().ToString();
+        public string UniqueFileName => $"LoggingData_{guid}.json";
 
         public bool IsCurrentLoggingDataActive => isCurrentLoggingDataActive;
 
-        public SortingSuggestionLoggingData GetCurrentLoggingData()
+        public SortingSuggestionLoggingData GetCurrentSuggestionLoggingData()
         {
             if (currentIndex < 0)
             {
@@ -80,5 +94,14 @@ namespace SpriteSortingPlugin.SpriteSorting.Logging
         {
             isCurrentLoggingDataActive = false;
         }
+    }
+
+    [Serializable]
+    public class FoundGlitchStatistic
+    {
+        public int totalFoundGlitches;
+        public int totalClearedGlitches;
+        public int totalConfirmedGlitches;
+        public int question;
     }
 }

@@ -309,6 +309,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                             EndScrollRect();
 
+                            IncrementClearedFoundItems();
                             ClearLastLog();
                             return;
                         }
@@ -472,9 +473,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             var skippedCriteria = string.Join(", ", skippedSortingCriteriaList);
             var adjustedSingularPluralText = skippedSortingCriteriaList.Count == 1 ? "Criterion was" : "Criteria were";
             var skippedCriteriaMessage =
-                $"The following Sorting {adjustedSingularPluralText} skipped on some identified SpriteRenderers due to missing entries in the given {nameof(SpriteData)} \"{spriteData.name}\":\n" +
+                $"Skipped Sorting criteria (missing entries in selected {nameof(SpriteData)} asset):\n" +
                 $"{skippedCriteria}";
-            GUILayout.Label(new GUIContent(skippedCriteriaMessage, Styling.InfoIcon), Styling.LabelWrapStyle);
+            var skippedTooltip =
+                $"Due to missing entries in the selected {nameof(SpriteData)} some Sorting criteria are skipped.";
+            // var skippedCriteriaMessage =
+            //     $"The following Sorting {adjustedSingularPluralText} skipped on some identified SpriteRenderers due to missing entries in the given {nameof(SpriteData)} \"{spriteData.name}\":\n" +
+            //     $"{skippedCriteria}";
+            GUILayout.Label(new GUIContent(skippedCriteriaMessage, Styling.WarnIcon, skippedTooltip),
+                Styling.LabelWrapStyle);
         }
 
         private void ShowConfirmButton(out bool isConfirmButtonPressed)
@@ -495,6 +502,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             ApplySortingOptions();
             isConfirmButtonPressed = true;
 
+            IncrementConfirmedSortingOrder();
             SaveLogFile();
 
             if (selectedConfirmButtonIndex == 1)
@@ -1096,6 +1104,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
 
             AddSortingSuggestionLoggingData();
+            IncrementFoundGlitch();
         }
 
         private void AddSortingSuggestionLoggingData()
@@ -1129,18 +1138,79 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             loggingData.ClearLastLoggingData();
         }
 
-        private static void SaveLogFile()
+        private void SaveLogFile()
         {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
             var loggingData = LoggingManager.GetInstance().loggingData;
             loggingData.ConfirmSortingOrder();
             var loggingDataJson = JsonUtility.ToJson(loggingData);
 
             var tempCachePath = Path.Combine(Application.temporaryCachePath, Path.Combine(LogOutputPath));
-            var directory = Path.Combine(tempCachePath, GeneralData.currentSurveyId, "LogFiles");
-            Directory.CreateDirectory(directory);
-            var pathAndName = Path.Combine(directory, $"LoggingData_{Guid.NewGuid()}.json");
+            var logDirectory = Path.Combine(tempCachePath, GeneralData.currentSurveyId, "LogFiles");
+            Directory.CreateDirectory(logDirectory);
+            var pathAndName = Path.Combine(logDirectory, loggingData.UniqueFileName);
 
             File.WriteAllText(pathAndName, loggingDataJson);
+        }
+
+        private void IncrementConfirmedSortingOrder()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.CurrentFoundGlitchStatistic.totalConfirmedGlitches++;
+            // loggingData.totalConfirmedGlitches++;
+        }
+
+        private void IncrementClearedFoundItems()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.CurrentFoundGlitchStatistic.totalClearedGlitches++;
+            // loggingData.totalClearedGlitches++;
+        }
+
+        private void IncrementFoundGlitch()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.CurrentFoundGlitchStatistic.totalFoundGlitches++;
+            // loggingData.totalFoundGlitches++;
         }
 
         private List<OverlappingItem> ApplyAutoSorting(
