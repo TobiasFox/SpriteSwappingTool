@@ -20,6 +20,7 @@
 
 #endregion
 
+using System.IO;
 using SpriteSortingPlugin.SpriteSorting.UI;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
@@ -188,10 +189,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var centeredStyle = new GUIStyle(Styling.CenteredStyle) {wordWrap = true};
 
             var excludeMessage =
-                "Thank you very much for your interest! However, this survey presumes";
+                "Thank you very much for your interest! However, this survey assumes";
             if (data.developing2dGames == 1)
             {
-                excludeMessage += " experiences in developing 2d Unity applications";
+                excludeMessage +=
+                    " experiences in developing 2D Unity applications as well as knowing how to adjust SpriteRenderers' sorting options";
             }
 
             excludeMessage += ".\nYou can close this window now.";
@@ -199,25 +201,40 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField(excludeMessage, centeredStyle);
 
             EditorGUILayout.Space(20);
-            EditorGUILayout.LabelField(
-                "However, if you want you can try using the " + GeneralData.Name +
-                " tool, which is located here:",
-                centeredStyle);
 
-            var openDetectorContent = new GUIContent(GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name +
-                                                     " -> " + GeneralData.DetectorName);
-            EditorGUILayout.LabelField("You can find the " + GeneralData.FullDetectorName + " here:",
+            EditorGUILayout.Space(15);
+            EditorGUILayout.LabelField(
+                $"If you want, you can test the {GeneralData.Name} tool within some example scenes.",
                 Styling.LabelWrapStyle);
-            EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                GUILayout.Space(20);
-                var width = Styling.ButtonStyle.CalcSize(openDetectorContent).x;
-                if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(width)))
+                using (new EditorGUILayout.VerticalScope())
                 {
-                    var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
-                    detector.Show();
+                    var openDetectorContent = new GUIContent(
+                        $"{GeneralData.UnityMenuMainCategory} -> {GeneralData.Name} -> {GeneralData.DetectorName}");
+                    EditorGUILayout.LabelField($"{GeneralData.FullDetectorName}",
+                        Styling.LabelWrapStyle);
+                    EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
+
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        GUILayout.Space(20);
+                        var width = Styling.ButtonStyle.CalcSize(openDetectorContent).x;
+                        if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(width)))
+                        {
+                            var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+                            detector.Show();
+                        }
+                    }
+                }
+
+                using (new EditorGUILayout.VerticalScope())
+                {
+                    EditorGUILayout.LabelField("Example scenes at",
+                        Styling.LabelWrapStyle);
+                    EditorGUILayout.LabelField(Path.Combine("Assets", "_Scenes"),
+                        Styling.LabelWrapStyle);
                 }
             }
         }
@@ -294,7 +311,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             EditorGUILayout.LabelField(
                 questionCounter +
-                ". If you develop games, what best describes your main field of work? (multi-choice)",
+                ". If you develop games, what best describes your main fields of work? (multi-choice)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
             using (var changeScope = new EditorGUI.ChangeCheckScope())

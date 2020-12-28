@@ -21,13 +21,14 @@
 #endregion
 
 using System.Collections.Generic;
+using System.IO;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
+namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class ManualSortingStep2 : SurveyStep
     {
@@ -57,9 +58,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
                 return null;
             }
 
+            var fullModifiedScenePath = SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath;
+            if (!File.Exists(fullModifiedScenePath))
+            {
+                return null;
+            }
+
             return new List<string>()
             {
-                SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath
+                fullModifiedScenePath
             };
         }
 
@@ -149,8 +156,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
                     "Please do not start the play mode. Instead, use the editor mode and move the SceneCamera.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
-                    new GUIContent("The time needed will be measured.",
-                        "It starts when pressing the \"Start\" button and ends, when pressing the \"Finish\" button"),
+                    new GUIContent("Time will be measured.",
+                        "Time will be measured between pressing the \"Start\" and \"Finish\" button."),
                     Styling.LabelWrapStyle);
 
                 var currentSortingTaskData = SurveyStepSortingData.sortingTaskDataList[0];

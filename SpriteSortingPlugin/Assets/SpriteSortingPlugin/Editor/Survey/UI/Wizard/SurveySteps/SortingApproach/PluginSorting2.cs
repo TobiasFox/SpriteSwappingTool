@@ -21,6 +21,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.IO;
 using SpriteSortingPlugin.SpriteSorting.UI;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
@@ -28,7 +29,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
+namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class PluginSorting2 : SurveyStep
     {
@@ -63,9 +64,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
                 return null;
             }
 
+            var fullModifiedScenePath = SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath;
+            if (!File.Exists(fullModifiedScenePath))
+            {
+                return null;
+            }
+
             return new List<string>()
             {
-                SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath
+                fullModifiedScenePath
             };
         }
 
@@ -123,10 +130,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
             EditorGUILayout.LabelField("The setup of this task has slightly more Sprites.", Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("Please, open the " + GeneralData.FullDetectorName,
+            EditorGUILayout.LabelField($"Please, open the {GeneralData.FullDetectorName}",
                 Styling.LabelWrapStyle);
-            var openDetectorContent = new GUIContent(GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name +
-                                                     " -> " + GeneralData.DetectorName);
+            var openDetectorContent = new GUIContent(
+                $"{GeneralData.UnityMenuMainCategory} -> {GeneralData.Name} -> {GeneralData.DetectorName}");
             EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
 
             using (new EditorGUILayout.HorizontalScope())
@@ -154,12 +161,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
                 EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
-                    new GUIContent("The time needed will be measured.",
-                        "It starts when pressing the \"Start\" button and ends, when pressing the \"Finish\" button"),
+                    new GUIContent("Time will be measured.",
+                        "Time will be measured between pressing the \"Start\" and \"Finish\" button."),
                     Styling.LabelWrapStyle);
 
                 EditorGUILayout.LabelField(
-                    "Optionally: Generate a SpriteData asset for a more accurate Sprite outline.",
+                    $"Optionally: Generate a {nameof(SpriteData)} asset for more accurate Sprite outlines.",
                     Styling.LabelWrapStyle);
 
                 EditorGUILayout.Space(10);

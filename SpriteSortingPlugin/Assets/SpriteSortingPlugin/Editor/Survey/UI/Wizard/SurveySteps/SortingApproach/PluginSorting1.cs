@@ -21,6 +21,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.IO;
 using SpriteSortingPlugin.SpriteSorting.UI;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
@@ -28,7 +29,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
+namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class PluginSorting1 : SurveyStep
     {
@@ -56,9 +57,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
                 return null;
             }
 
+            var fullModifiedScenePath = SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath;
+            if (!File.Exists(fullModifiedScenePath))
+            {
+                return null;
+            }
+
             return new List<string>()
             {
-                SurveyStepSortingData.sortingTaskDataList[0].FullModifiedScenePath
+                fullModifiedScenePath
             };
         }
 
@@ -114,12 +121,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
             EditorGUILayout.Space(5);
 
             EditorGUILayout.LabelField(
-                "The " + GeneralData.FullDetectorName +
-                " automatically identifies visual glitches and helps to solve them.",
+                $"The {GeneralData.FullDetectorName} automatically identifies visual glitches and helps to solve them.",
                 Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("Please, open the " + GeneralData.FullDetectorName,
+            EditorGUILayout.LabelField($"Please open the {GeneralData.FullDetectorName}",
                 Styling.LabelWrapStyle);
 
             var openDetectorContent = new GUIContent(GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name +
@@ -143,7 +149,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    $"{QuestionNumber}. Please solve all visual glitches in the given scene by using the " +
+                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the " +
                     GeneralData.FullDetectorName + ".\n" +
                     "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
                     taskLabelStyle);
@@ -152,12 +158,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard.SortingApproach
                 EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
-                    new GUIContent("The time needed will be measured.",
-                        "It starts when pressing the \"Start\" button and ends, when pressing the \"Finish\" button"),
+                    new GUIContent("Time will be measured.",
+                        "Time will be measured between pressing the \"Start\" and \"Finish\" button."),
                     Styling.LabelWrapStyle);
 
                 EditorGUILayout.LabelField(
-                    "Optionally: Generate a SpriteData asset for a more accurate Sprite outline.",
+                    $"Optionally: Generate a {nameof(SpriteData)} asset for more accurate Sprite outlines.",
                     Styling.LabelWrapStyle);
 
                 EditorGUILayout.Space(10);

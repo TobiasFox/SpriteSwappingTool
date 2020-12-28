@@ -21,6 +21,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.IO;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -41,7 +42,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private static readonly string[] QuestionLabels = new string[]
         {
-            $". Please solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName} with the sorting suggestion functionality.\n" +
+            $". Please find and solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName} with the sorting suggestion functionality.\n" +
             $"Please solve the task as quickly as possible. However, the result should make visual sense to you.",
             $". Please solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName} with the sorting suggestion functionality.\n" +
             $"Please solve the task as quickly as possible. However, the result should make visual sense to you."
@@ -98,10 +99,16 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             foreach (var sortingTaskData in SurveyStepSortingData.sortingTaskDataList)
             {
-                collectFileList.Add(sortingTaskData.FullModifiedScenePath);
+                var fullModifiedScenePath = sortingTaskData.FullModifiedScenePath;
+                if (!File.Exists(fullModifiedScenePath))
+                {
+                    continue;
+                }
+
+                collectFileList.Add(fullModifiedScenePath);
             }
 
-            return collectFileList;
+            return collectFileList.Count == 0 ? null : collectFileList;
         }
 
         public override int GetProgress(out int totalProgress)
@@ -171,8 +178,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             if (isDescriptionVisible)
             {
                 EditorGUILayout.LabelField(
-                    "The " + GeneralData.FullDetectorName +
-                    " also generates sorting order suggestions after SpriteRenderers are being identified.",
+                    $"The {GeneralData.FullDetectorName} also generates sorting order suggestions after SpriteRenderers are being identified.",
                     Styling.LabelWrapStyle);
 
                 EditorGUILayout.Space(5);
@@ -203,11 +209,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     EditorGUILayout.LabelField(
                         "You might need to create a " + nameof(SpriteData) + " asset.",
                         Styling.LabelWrapStyle);
-                    // if (i == 1)
-                    // {
-                    //     EditorGUILayout.LabelField("The same SpriteRenderer setup as in 3. is used.",
-                    //         Styling.LabelWrapStyle);
-                    // }
 
                     EditorGUILayout.Space(10);
 

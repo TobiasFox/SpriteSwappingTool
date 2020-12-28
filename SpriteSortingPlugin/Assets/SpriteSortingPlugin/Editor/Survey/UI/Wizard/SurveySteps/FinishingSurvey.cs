@@ -148,6 +148,32 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField(successfullySentLabel, greenFinishStyle);
             EditorGUILayout.Space(15);
             EditorGUILayout.LabelField("You can close this window now.", labelWrapStyle);
+
+            EditorGUILayout.Space(15);
+            var folderPath = Path.Combine("Assets", "_Scenes");
+            EditorGUILayout.LabelField(
+                $"If you want, you can test the {GeneralData.Name} tool with the ExampleScenes located at:\n" +
+                $"{folderPath}", labelWrapStyle);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Show Folder", GUILayout.Width(150)))
+                {
+                    var path = folderPath;
+
+                    if (folderPath[folderPath.Length - 1].Equals(Path.PathSeparator))
+                    {
+                        path = folderPath.Substring(0, folderPath.Length - 1);
+                    }
+
+                    var testExampleSceneFolder = AssetDatabase.LoadAssetAtPath<Object>(path);
+                    Selection.activeObject = testExampleSceneFolder;
+                    EditorGUIUtility.PingObject(testExampleSceneFolder);
+                }
+
+                GUILayout.FlexibleSpace();
+            }
         }
 
         string MyEscapeURL(string url)
@@ -158,7 +184,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawSendingDataFailed()
         {
             EditorGUILayout.LabelField(
-                "I am really sorry! Some error occured, while sending the data. Please try again and make sure this PC is connected to the internet. Otherwise, please send the data manually using the email and data below.",
+                "I am really sorry! Some error occurred, while sending the data. Please try again and make sure this PC is connected to the internet. Otherwise, please send the data manually using the email and data below.",
                 labelWrapStyle);
             GUILayout.Space(25);
             using (new EditorGUILayout.HorizontalScope())

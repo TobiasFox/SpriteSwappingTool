@@ -63,7 +63,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.Space(VerticalSpacing);
 
                 GUILayout.Label(
-                    "This survey is about visual glitches in 2D games. As part of my master thesis, I developed an Unity tool, which identifies such glitches and helps to solve them.",
+                    "This survey is about visual glitches in 2D games. As part of my master thesis, I developed a Unity tool, which identifies such glitches and helps to solve them.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.Space();
 
@@ -105,11 +105,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.Space(10);
 
                 EditorGUILayout.LabelField(new GUIContent(
-                    "Please let this window the whole time opened and make sure this PC is connected to the internet to send the generated data.",
+                    "Please let this window the whole time opened and make sure this PC is connected to the internet.",
                     Styling.InfoIcon), Styling.LabelWrapStyle);
                 EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2f);
                 EditorGUILayout.LabelField(new GUIContent(
-                    "Also, please do not recompile any code while the survey window is open. If you do so, it will result in errors due to Unity`s serialization behaviour.",
+                    "Also, please do not recompile any code while the survey window is open. If you do so, it will result in errors due to Unity's serialization behavior.",
                     Styling.InfoIcon), Styling.LabelWrapStyle);
             }
         }
