@@ -191,10 +191,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     }
 
                     using (new EditorGUILayout.VerticalScope(GUILayout.Height(TextAreaHeight),
-                        GUILayout.Width(150)))
+                        GUILayout.Width(80)))
                     {
                         GUILayout.FlexibleSpace();
-                        GUILayout.Label("If yes, which errors? (optional)", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("If yes, which errors?\n          (optional)", GUILayout.ExpandWidth(false));
                         GUILayout.FlexibleSpace();
                     }
 

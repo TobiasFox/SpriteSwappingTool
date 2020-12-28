@@ -102,12 +102,16 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.LabelField(
                     "This editor window guides you through the survey consisting of four short parts and sends the data back to me.",
                     Styling.LabelWrapStyle);
-                EditorGUILayout.Space(10);
+                EditorGUILayout.Space(7.5f);
 
                 EditorGUILayout.LabelField(new GUIContent(
-                    "Please let this window the whole time opened and make sure this PC is connected to the internet.",
+                    "Please let this window the whole time opened and make sure this PC has an active internet connection.",
                     Styling.InfoIcon), Styling.LabelWrapStyle);
-                EditorGUILayout.Space(EditorGUIUtility.singleLineHeight / 2f);
+                EditorGUILayout.Space(7.5f);
+                EditorGUILayout.LabelField(new GUIContent(
+                    "If anything unexpected happen whilst using the tool, close and reopen the corresponding window.",
+                    Styling.InfoIcon), Styling.LabelWrapStyle);
+                EditorGUILayout.Space(7.5f);
                 EditorGUILayout.LabelField(new GUIContent(
                     "Also, please do not recompile any code while the survey window is open. If you do so, it will result in errors due to Unity's serialization behavior.",
                     Styling.InfoIcon), Styling.LabelWrapStyle);

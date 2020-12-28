@@ -39,13 +39,25 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             "Assets", "_Scenes", "TestExamples"
         };
 
+        private static readonly string[] PreviewPrefabPathAndName = new string[]
+        {
+            "Assets",
+            "SpriteSortingPlugin",
+            "Editor",
+            "Survey",
+            "Prefabs",
+            "SurveyPreviewParent.prefab"
+        };
+
         private GeneralQuestionsData data;
         private float space = 17.5f;
         private int questionCounter;
+        private SurveyPreview preview;
 
         public GeneralQuestions(string name, GeneralQuestionsData data) : base(name)
         {
             this.data = data;
+            preview = new SurveyPreview(Path.Combine(PreviewPrefabPathAndName), false);
         }
 
         public override void DrawContent()
@@ -186,6 +198,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             return currentProgress;
+        }
+
+        public override void Commit()
+        {
+            base.Commit();
+            preview?.CleanUp();
+        }
+
+        public override void CleanUp()
+        {
+            base.CleanUp();
+            preview?.CleanUp();
         }
 
         private void DrawExclusion()
@@ -432,7 +456,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
 
-            var answers = new string[] {"1 - 3", "3 - 6", "6 - 9", "9 - 12", "> 12"};
+            var answers = new string[] {"1 - 5", "6 - 10", "11 - 15", "> 15"};
 
             var selectionGridRect =
                 EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));
@@ -466,9 +490,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawIsExperiencedVisualGlitchQuestion()
         {
             EditorGUILayout.LabelField(questionCounter +
-                                       ". Have you worked on Unity 2D applications, where you experienced visual glitches (the order of Sprites to be rendered swapped)?",
+                                       ". Have you worked on Unity 2D applications, where you experienced visual glitches (the order of Sprites to be rendered swapped)? (see preview)",
                 Styling.QuestionLabelStyle);
             EditorGUI.indentLevel++;
+
+            preview?.DoPreview();
 
             var selectionGrid =
                 EditorGUI.IndentedRect(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight));

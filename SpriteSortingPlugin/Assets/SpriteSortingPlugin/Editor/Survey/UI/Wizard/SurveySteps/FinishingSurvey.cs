@@ -41,7 +41,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Resources"
         };
-        
+
         private static readonly string[] TestExampleScenesFolderPath = new string[]
         {
             "Assets", "_Scenes", "TestExamples"
@@ -189,7 +189,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawSendingDataFailed()
         {
             EditorGUILayout.LabelField(
-                "I am really sorry! Some error occurred, while sending the data. Please try again and make sure this PC is connected to the internet. Otherwise, please send the data manually using the email and data below.",
+                "I am really sorry! Some error occurred, while sending the data. Please try again and make sure this PC has an active internet connection. Otherwise, please send the data manually using the email and data below.",
                 labelWrapStyle);
             GUILayout.Space(25);
             using (new EditorGUILayout.HorizontalScope())

@@ -236,9 +236,9 @@ namespace SpriteSortingPlugin.Survey.UI
             {
                 var centeredStyle = new GUIStyle(Styling.CenteredStyle) {wordWrap = true};
                 EditorGUILayout.LabelField(
-                    new GUIContent("Please keep this window open and make sure the PC is connected to the internet.",
-                        Styling.InfoIcon),
-                    centeredStyle);
+                    new GUIContent(
+                        "For sending data: Please keep this window open and make sure this PC has an active internet connection.",
+                        Styling.InfoIcon), centeredStyle);
             }
 
             using (new EditorGUILayout.HorizontalScope())

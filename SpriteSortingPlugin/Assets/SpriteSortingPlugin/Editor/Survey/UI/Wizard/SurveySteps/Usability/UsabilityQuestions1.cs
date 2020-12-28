@@ -123,7 +123,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUILayout.Space(15);
 
-            UsabilityQuestionsUtility.DrawRatingHeader(QuestionWidthPercentage, "Overall usability of the system",
+            UsabilityQuestionsUtility.DrawRatingHeader(QuestionWidthPercentage, $"Overall usability of the {GeneralData.Name} Tool (system)",
                 "Strongly\nDisagree", "Strongly\nAgree");
 
             for (var i = 0; i < SusQuestion.Length; i++)

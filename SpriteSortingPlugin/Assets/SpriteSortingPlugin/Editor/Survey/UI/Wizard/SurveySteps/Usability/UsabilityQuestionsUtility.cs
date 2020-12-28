@@ -38,7 +38,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             var questionLabelRect = rect;
             questionLabelRect.width *= questionWidthPercentage;
-            GUI.Label(questionLabelRect, label, isBold ? Styling.CenteredStyleBold : Styling.CenteredStyle);
+            var centeredStyleBold = isBold ? Styling.CenteredStyleBold : Styling.CenteredStyle;
+            centeredStyleBold = new GUIStyle(centeredStyleBold) {wordWrap = true};
+            GUI.Label(questionLabelRect, label, centeredStyleBold);
 
             rect.xMin = rect.x + questionLabelRect.xMax;
 
