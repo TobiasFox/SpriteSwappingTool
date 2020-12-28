@@ -34,6 +34,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private const int QuestionCounterStart = 1;
         private const float IndentLevelWidth = 10;
 
+        private static readonly string[] TestExampleScenesFolderPath = new string[]
+        {
+            "Assets", "_Scenes", "TestExamples"
+        };
+
         private GeneralQuestionsData data;
         private float space = 17.5f;
         private int questionCounter;
@@ -233,8 +238,21 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 {
                     EditorGUILayout.LabelField("Example scenes at",
                         Styling.LabelWrapStyle);
-                    EditorGUILayout.LabelField(Path.Combine("Assets", "_Scenes"),
-                        Styling.LabelWrapStyle);
+                    var folderPath = Path.Combine(TestExampleScenesFolderPath);
+                    EditorGUILayout.LabelField(folderPath, Styling.LabelWrapStyle);
+                    if (GUILayout.Button("Show Folder", GUILayout.Width(150)))
+                    {
+                        var path = folderPath;
+
+                        if (folderPath[folderPath.Length - 1].Equals(Path.PathSeparator))
+                        {
+                            path = folderPath.Substring(0, folderPath.Length - 1);
+                        }
+
+                        var testExampleSceneFolder = AssetDatabase.LoadAssetAtPath<Object>(path);
+                        Selection.activeObject = testExampleSceneFolder;
+                        EditorGUIUtility.PingObject(testExampleSceneFolder);
+                    }
                 }
             }
         }

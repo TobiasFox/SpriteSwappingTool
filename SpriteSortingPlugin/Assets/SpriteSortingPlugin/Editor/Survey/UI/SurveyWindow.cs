@@ -293,6 +293,11 @@ namespace SpriteSortingPlugin.Survey.UI
 
             currentStep = surveyWizard.GetCurrent();
             contentScrollPosition = Vector2.zero;
+
+            if (currentStep is FinishingSurvey)
+            {
+                ResetSurveyStateInGeneralData();
+            }
         }
 
         private void PrepareAndSendData(bool isResult = false)
@@ -466,12 +471,17 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private void OnDestroy()
         {
+            ResetSurveyStateInGeneralData();
+
+            surveyWizard.CleanUp();
+        }
+
+        private void ResetSurveyStateInGeneralData()
+        {
             GeneralData.isSurveyActive = false;
             GeneralData.isAutomaticSortingActive = true;
             GeneralData.isLoggingActive = false;
             GeneralData.currentSurveyId = "";
-
-            surveyWizard.CleanUp();
         }
 
         private void OnInspectorUpdate()

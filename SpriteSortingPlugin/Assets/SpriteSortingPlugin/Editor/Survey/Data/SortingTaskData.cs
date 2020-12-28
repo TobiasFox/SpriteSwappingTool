@@ -31,12 +31,12 @@ namespace SpriteSortingPlugin.Survey.Data
     {
         private static readonly string[] SceneFolderPath = new string[]
         {
-            "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Scenes"
+            "Assets", "_Scenes", "SurveyScenes"
         };
 
         public static readonly string[] ModifiedSceneFolderPath = new string[]
         {
-            "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Scenes", "ModifiedScenes__Dont_Change"
+            "Assets", "_Scenes", "SurveyScenes", "ModifiedScenes__Dont_Change"
         };
 
         public string sceneName;

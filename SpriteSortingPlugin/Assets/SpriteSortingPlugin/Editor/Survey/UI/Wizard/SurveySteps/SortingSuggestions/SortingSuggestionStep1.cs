@@ -78,7 +78,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             base.Start();
             GeneralData.isLoggingActive = true;
-            GeneralData.questionNumberForLogging = questionCounter;
+            GeneralData.questionNumberForLogging = QuestionCounterStart;
         }
 
         public override List<string> CollectFilePathsToCopy()

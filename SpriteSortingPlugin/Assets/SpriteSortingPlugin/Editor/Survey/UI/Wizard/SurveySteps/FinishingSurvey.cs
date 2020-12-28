@@ -41,6 +41,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         {
             "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Resources"
         };
+        
+        private static readonly string[] TestExampleScenesFolderPath = new string[]
+        {
+            "Assets", "_Scenes", "TestExamples"
+        };
 
         private bool isSendingDataButtonPressed;
         private bool isSendingDataButtonPressedThisFrame;
@@ -150,7 +155,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField("You can close this window now.", labelWrapStyle);
 
             EditorGUILayout.Space(15);
-            var folderPath = Path.Combine("Assets", "_Scenes");
+            var folderPath = Path.Combine(TestExampleScenesFolderPath);
             EditorGUILayout.LabelField(
                 $"If you want, you can test the {GeneralData.Name} tool with the ExampleScenes located at:\n" +
                 $"{folderPath}", labelWrapStyle);
