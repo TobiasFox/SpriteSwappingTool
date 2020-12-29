@@ -1034,6 +1034,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
 
                     var tempAssetPath =
                         Path.Combine(Path.Combine(DefaultSaveFolderPath), $"{nameof(SpriteData)}.asset");
+                    Directory.CreateDirectory(Path.Combine(DefaultSaveFolderPath));
+
                     assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(tempAssetPath);
                     forceReserializeAssetsOptions = ForceReserializeAssetsOptions.ReserializeAssetsAndMetadata;
                     break;
@@ -1043,13 +1045,14 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                 default:
                     var tempAssetPath2 =
                         Path.Combine(Path.Combine(DefaultSaveFolderPath), $"{nameof(SpriteData)}.asset");
+                    Directory.CreateDirectory(Path.Combine(DefaultSaveFolderPath));
+
                     assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(tempAssetPath2);
                     break;
             }
 
             if (spriteAnalyzedDataAddingChoice == SpriteAnalyzedDataAddingChoice.NewSpriteData)
             {
-                Directory.CreateDirectory(Path.Combine(DefaultSaveFolderPath));
                 AssetDatabase.CreateAsset(spriteData, assetPathAndName);
             }
 
