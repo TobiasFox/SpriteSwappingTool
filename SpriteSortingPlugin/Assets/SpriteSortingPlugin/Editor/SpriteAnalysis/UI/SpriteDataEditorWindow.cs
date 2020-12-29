@@ -40,10 +40,17 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
         private const float LineSpacing = 1.5f;
         private const float RightAreaOffset = 3f;
         private const float LoadingSpriteDataAssetPercentageWidth = 0.39f;
-        private const string DefaultSaveFolderPath = "Assets/SpriteSortingPlugin/SpriteAlphaData";
+
+        private static readonly string[] DefaultSaveFolderPath = new string[]
+        {
+            "Assets",
+            "SpriteSwappingPlugin",
+            "SpriteData"
+        };
+
         private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
 
-        private SerializedObject serializedObject;
+        // private SerializedObject serializedObject;
 
         [SerializeField] private SpriteData spriteData;
         [SerializeField] private Sprite spriteToAnalyze;
@@ -1024,24 +1031,25 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             switch (spriteAnalyzedDataAddingChoice)
             {
                 case SpriteAnalyzedDataAddingChoice.NewSpriteData:
-                    assetPathAndName =
-                        AssetDatabase.GenerateUniqueAssetPath(DefaultSaveFolderPath + "/" + nameof(SpriteData) +
-                                                              ".asset");
+
+                    var tempAssetPath =
+                        Path.Combine(Path.Combine(DefaultSaveFolderPath), $"{nameof(SpriteData)}.asset");
+                    assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(tempAssetPath);
                     forceReserializeAssetsOptions = ForceReserializeAssetsOptions.ReserializeAssetsAndMetadata;
                     break;
                 case SpriteAnalyzedDataAddingChoice.CurrentlyLoaded:
                     assetPathAndName = AssetDatabase.GetAssetPath(spriteAnalyzeInputData.spriteData.GetInstanceID());
                     break;
                 default:
-                    assetPathAndName =
-                        AssetDatabase.GenerateUniqueAssetPath(DefaultSaveFolderPath + "/" + nameof(SpriteData) +
-                                                              ".asset");
+                    var tempAssetPath2 =
+                        Path.Combine(Path.Combine(DefaultSaveFolderPath), $"{nameof(SpriteData)}.asset");
+                    assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(tempAssetPath2);
                     break;
             }
 
             if (spriteAnalyzedDataAddingChoice == SpriteAnalyzedDataAddingChoice.NewSpriteData)
             {
-                Directory.CreateDirectory(DefaultSaveFolderPath);
+                Directory.CreateDirectory(Path.Combine(DefaultSaveFolderPath));
                 AssetDatabase.CreateAsset(spriteData, assetPathAndName);
             }
 

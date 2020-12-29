@@ -178,9 +178,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 "These suggestions are based on several criteria, which you can select and modify.",
                 Styling.LabelWrapStyle);
 
-            // EditorGUILayout.LabelField(
-            //     "Some criteria need a Sprite Data asset. You might need to create one.",
-            //     Styling.LabelWrapStyle);
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField(
                 $"Please, open the {GeneralData.DetectorName} and use this functionality located at the bottom of the {GeneralData.DetectorName}'s window.",

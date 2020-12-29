@@ -28,7 +28,6 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
     public class SpriteSortPointSortingCriterion : SortingCriterion<SortingCriterionData>
     {
-        private PolygonIntersectionAreaAnalyzer polygonIntersectionAreaAnalyzer;
         private SpriteRenderer spriteRenderer;
         private SpriteRenderer otherSpriteRenderer;
         private Vector2 spriteSortPoint;

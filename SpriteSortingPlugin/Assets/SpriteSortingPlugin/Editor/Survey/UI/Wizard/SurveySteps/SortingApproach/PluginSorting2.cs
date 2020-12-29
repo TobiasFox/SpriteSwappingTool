@@ -38,8 +38,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
-        private bool isDescriptionVisible;
-
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
         public PluginSorting2(string name) : base(name)

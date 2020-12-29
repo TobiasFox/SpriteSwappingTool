@@ -23,6 +23,7 @@
 using System.Collections.Generic;
 using System.IO;
 using SpriteSortingPlugin.SpriteSorting.Logging;
+using SpriteSortingPlugin.SpriteSorting.UI;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -190,6 +191,21 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.LabelField(
                     "These suggestions are based on several criteria, which you can select and modify.",
                     Styling.LabelWrapStyle);
+            }
+
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField(
+                $"Please, open the {GeneralData.DetectorName} and use this functionality located at the bottom of the {GeneralData.DetectorName}'s window.",
+                Styling.LabelWrapStyle);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(20);
+                if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(224)))
+                {
+                    var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+                    detector.Show();
+                }
             }
 
             EditorGUILayout.Space(20);

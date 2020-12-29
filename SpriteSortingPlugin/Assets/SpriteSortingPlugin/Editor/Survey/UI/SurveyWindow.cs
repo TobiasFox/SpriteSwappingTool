@@ -46,7 +46,6 @@ namespace SpriteSortingPlugin.Survey.UI
 
         private SurveyWizard surveyWizard;
         private SurveyStepGenerator surveyStepGenerator;
-        private float currentProgress;
         private Vector2 contentScrollPosition = Vector2.zero;
         private float lastHeaderHeight;
         private float lastFooterHeight;
@@ -488,8 +487,6 @@ namespace SpriteSortingPlugin.Survey.UI
 
             finishingSurvey.UpdateWithSendResult(transmitResult);
         }
-
-        private bool isResultSendingFinished;
 
         private void OnDestroy()
         {
