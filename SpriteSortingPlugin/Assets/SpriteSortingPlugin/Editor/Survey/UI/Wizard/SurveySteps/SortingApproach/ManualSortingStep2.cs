@@ -152,11 +152,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     taskLabelStyle);
                 EditorGUILayout.Space(10);
                 
-                EditorGUILayout.LabelField("Please solve the task as quickly as possible.", Styling.LabelWrapStyle);
-                EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
+                EditorGUILayout.LabelField(
+                    "Please solve this task as quickly as possible and do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
-                    "Please do not start the play mode. Instead, use the editor mode and move the SceneCamera.",
+                    "Please do not start the play mode. Instead, move the SceneCamera.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
                     new GUIContent("Time will be measured.",

@@ -121,7 +121,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.Space(5);
 
             var visualGlitchDescription =
-                "Depending on the position of a camera, visual glitches happen, when SpriteRenderers overlap and have identical sorting options (Sorting Layer and Sorting Order).";
+                "Depending on the position of a camera, visual glitches happen when SpriteRenderers overlap and have identical sorting options (Sorting Layer and Sorting Order).";
             EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
             EditorGUILayout.Space();
             EditorGUILayout.LabelField(
@@ -138,10 +138,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     taskLabelStyle);
 
                 EditorGUILayout.Space(10);
-                EditorGUILayout.LabelField("Please solve the task as quickly as possible.", Styling.LabelWrapStyle);
-
-                EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
+                EditorGUILayout.LabelField(
+                    "Please solve this task as quickly as possible and do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
+
                 EditorGUILayout.LabelField(
                     "Please do not start the play mode. Instead, move the SceneCamera.",
                     Styling.LabelWrapStyle);

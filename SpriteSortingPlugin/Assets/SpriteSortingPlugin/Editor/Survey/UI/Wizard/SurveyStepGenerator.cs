@@ -29,6 +29,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         public List<SurveyStep> GenerateSurveySteps(SurveyData surveyData)
         {
+            return FinalSurveyStepList(surveyData);
+        }
+
+        public List<SurveyStep> GenerateSurveySteps2(SurveyData surveyData)
+        {
             var surveySteps = new List<SurveyStep>();
 
             var introStep = new IntroSurveyStep("Intro");
@@ -150,8 +155,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var pluginSortingIntro = new PluginSortingIntro(pluginSortingLabel);
                 // var pluginSorting1 = new PluginSorting1(pluginSortingLabel);
                 var pluginSorting2 = new PluginSorting2(pluginSortingLabel);
-                var pluginSorting3 = new PluginSorting3(pluginSortingLabel);
-                var list = new List<SurveyStep> {pluginSortingIntro, pluginSorting2, pluginSorting3};
+                // var pluginSorting3 = new PluginSorting3(pluginSortingLabel);
+                var list = new List<SurveyStep> {pluginSortingIntro, pluginSorting2};
 
                 var group = new SurveyStepGroup(list, $"Part {groupCounter}");
                 surveySteps.Add(group);
@@ -165,10 +170,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 var sortingSuggestionStepIntro = new SortingSuggestionStepIntro(evaluationAutoSortingSuggestionLabel);
                 var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel);
-                var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
+                // var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
 
-                var list = new List<SurveyStep>
-                    {sortingSuggestionStepIntro, sortingSuggestionStep1, sortingSuggestionStep2};
+                var list = new List<SurveyStep> {sortingSuggestionStepIntro, sortingSuggestionStep1};
                 var group = new SurveyStepGroup(list, $"Part {groupCounter}");
                 surveySteps.Add(group);
                 groupCounter++;

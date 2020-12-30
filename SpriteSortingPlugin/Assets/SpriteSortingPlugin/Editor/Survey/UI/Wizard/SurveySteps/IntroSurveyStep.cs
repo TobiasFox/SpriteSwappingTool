@@ -63,7 +63,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.Space(VerticalSpacing);
 
                 GUILayout.Label(
-                    "This survey is about visual glitches in 2D games. As part of my master thesis, I developed a Unity tool, which identifies such glitches and helps to solve them.",
+                    "This survey is about visual glitches in 2D games. As part of my master thesis I developed a Unity tool, which identifies such glitches and helps to solve them.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.Space();
 
@@ -100,12 +100,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 EditorGUILayout.LabelField(
-                    "This editor window guides you through the survey consisting of five short parts and sends the data back to me.",
+                    "This editor window guides you through the survey consisting of five short parts.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.Space(7.5f);
 
                 EditorGUILayout.LabelField(new GUIContent(
-                    "Please leave this window the whole time opened and make sure this PC has an active internet connection.",
+                    "Please leave this window the whole time opened and make sure this PC has an active internet connection to send the data.",
                     Styling.InfoIcon), Styling.LabelWrapStyle);
                 EditorGUILayout.Space(7.5f);
                 EditorGUILayout.LabelField(new GUIContent(

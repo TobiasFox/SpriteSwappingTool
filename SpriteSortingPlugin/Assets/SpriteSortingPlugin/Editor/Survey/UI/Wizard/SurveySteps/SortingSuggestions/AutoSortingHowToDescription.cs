@@ -69,22 +69,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                     UIUtil.DrawHorizontalLine(true);
 
-                    // for (var i = 0; i < criteriaInformation.Length; i++)
-                    // {
-                    //     var criterion = criteriaInformation[i];
-                    //     EditorGUILayout.LabelField(criterion.name, criterion.information, Styling.LabelWrapStyle);
-                    //     if (i < criteriaInformation.Length - 1)
-                    //     {
-                    //         UIUtil.DrawHorizontalLine();
-                    //     }
-                    // }
-
-                    // GUILayout.Space(20);
                     for (var i = 0; i < criteriaInformation.Length; i++)
                     {
                         var criterion = criteriaInformation[i];
-
-                        // EditorGUILayout.LabelField(criterion.name, Styling.LabelWrapStyle);
 
                         criteriaInformation[i].isExpanded =
                             EditorGUILayout.Foldout(criteriaInformation[i].isExpanded, criterion.name, true);
@@ -101,7 +88,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                         using (new EditorGUI.IndentLevelScope())
                         {
-                            EditorGUILayout.LabelField(criterion.information);
+                            EditorGUILayout.LabelField(criterion.information, Styling.LabelWrapStyle);
                         }
 
                         if (i < criteriaInformation.Length - 1)

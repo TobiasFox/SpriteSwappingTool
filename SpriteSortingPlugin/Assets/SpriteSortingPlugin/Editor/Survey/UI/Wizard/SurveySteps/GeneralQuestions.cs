@@ -229,13 +229,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     " experiences in developing 2D Unity applications as well as knowing how to adjust SpriteRenderers' sorting options";
             }
 
-            excludeMessage += ".\nYou can close this window now.";
+            excludeMessage += ".";
 
             EditorGUILayout.LabelField(excludeMessage, centeredStyle);
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("You can close this window now.", centeredStyle);
 
-            EditorGUILayout.Space(20);
+            EditorGUILayout.Space(100);
 
-            EditorGUILayout.Space(15);
             EditorGUILayout.LabelField(
                 $"If you want, you can test the {GeneralData.Name} tool within some example scenes.",
                 Styling.LabelWrapStyle);

@@ -41,7 +41,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         private int lastFocussedIndex = -1;
         private OverlappingItems overlappingItems;
         private SpriteSortingEditorPreview preview;
-        private bool isUsingRelativeSortingOrder = true;
+        private bool isUsingRelativeSortingOrder;
         private float lastElementRectWidth;
 
         public void InitReordableList(OverlappingItems overlappingItems, SpriteSortingEditorPreview preview)

@@ -75,8 +75,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 questionCounter++;
             }
 
-            howToDescription = new HowToDescription(){isBoldHeader = false};
-            autoSortingHowToDescription = new AutoSortingHowToDescription(){isBoldHeader = false};
+            howToDescription = new HowToDescription() {isBoldHeader = false};
+            autoSortingHowToDescription = new AutoSortingHowToDescription() {isBoldHeader = false};
         }
 
         public override void Start()
@@ -205,10 +205,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                         taskLabelStyle);
 
                     EditorGUILayout.Space(10);
-                
-                    EditorGUILayout.LabelField(
-                        "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
-                        Styling.LabelWrapStyle);
+
+                    EditorGUILayout.LabelField("The result should make visual sense to you.", Styling.LabelWrapStyle);
 
                     EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                         Styling.LabelWrapStyle);

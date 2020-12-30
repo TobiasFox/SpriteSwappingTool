@@ -472,7 +472,10 @@ namespace SpriteSortingPlugin.Survey.UI
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex);
+                if (threadData.isResult)
+                {
+                    Debug.LogException(ex);
+                }
             }
         }
 

@@ -36,7 +36,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
         private const float PreviewHeight = 256;
         private static readonly Quaternion DefaultPreviewRotation = Quaternion.Euler(0, 120f, 0);
 
-        private bool isPreviewExpanded;
+        private bool isPreviewExpanded = true;
         private bool isPreviewNeedsAnUpdate;
         private GameObject previewGameObject;
         private Editor previewEditor;
@@ -206,7 +206,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
                             }
 
                             isUpdatingSpriteRendererInScene = EditorGUILayout.ToggleLeft(new GUIContent(
-                                    "Update SpriteRenderers",
+                                    "Live Update of SpriteRenderers' sorting options",
                                     UITooltipConstants.SortingEditorScenePreviewReflectSortingOptionsInSceneTooltip),
                                 isUpdatingSpriteRendererInScene);
                         }

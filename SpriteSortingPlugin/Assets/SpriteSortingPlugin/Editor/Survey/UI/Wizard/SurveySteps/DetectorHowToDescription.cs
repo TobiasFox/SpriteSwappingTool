@@ -133,6 +133,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                             EditorGUILayout.LabelField(
                                 $"Both outlines require a {nameof(SpriteData)} asset. Generate it by open the {GeneralData.DataAnalysisName} window and click \"Analyze & generate new {nameof(SpriteData)}\".",
                                 Styling.LabelWrapStyle);
+                            EditorGUILayout.LabelField(
+                                $"After that you can optionally adjust the generated {nameof(SpriteData)} and close this window. Back in the {GeneralData.DetectorName} window, select the generated {nameof(SpriteData)}.",
+                                Styling.LabelWrapStyle);
                         }
                     }
                 }
@@ -143,7 +146,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 EditorGUILayout.LabelField("4. Adjust Sorting options");
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.LabelField(new GUIContent("Tip: Drag to reorder and use preview"));
+                    EditorGUILayout.LabelField(new GUIContent("Tip: Drag to reorder and use (Scene)preview"));
                 }
 
                 EditorGUILayout.Space(5);
@@ -151,7 +154,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUILayout.LabelField(new GUIContent(
-                            $"The {GeneralData.DetectorName} can determine, if new glitches on surrounding SpriteRenderers are produced through the adjusted sorting options and solves them directly."),
+                            $"The {GeneralData.DetectorName} can determine, if new glitches on surrounding SpriteRenderers are produced based on the confirmed sorting options and solves them directly."),
                         Styling.LabelWrapStyle);
                 }
             }

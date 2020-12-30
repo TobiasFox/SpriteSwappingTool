@@ -71,6 +71,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
         private OutlineAnalysisType outlineAnalysisType = OutlineAnalysisType.All;
         private SpriteDataAnalysisType spriteDataAnalysisType = SpriteDataAnalysisType.All;
         private OutlinePrecision outlinePrecision;
+        private float outlinePrecisionSliderValue;
         private SpriteDataAnalysisType[] spriteAnalyzerTypes;
         private bool isAnalyzingAllSprites = true;
         private bool isExpandingAnalyzeOptions;
@@ -247,40 +248,18 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
 
                             GUILayout.Label(new GUIContent("Preview Outline",
                                 UITooltipConstants.SpriteDataPreviewOutlineTooltip));
-                            foreach (OutlinePrecision outlinePrecisionType in OutlinePrecisionTypes)
+
+                            using (new EditorGUI.IndentLevelScope())
                             {
-                                EditorGUI.BeginChangeCheck();
-
-                                var outlinePrecisionTypeLabel =
-                                    new GUIContent(ObjectNames.NicifyVariableName(outlinePrecisionType.ToString()));
-
-                                switch (outlinePrecisionType)
-                                {
-                                    case OutlinePrecision.AxisAlignedBoundingBox:
-                                        outlinePrecisionTypeLabel.tooltip =
-                                            UITooltipConstants.SpriteDataOutlinePrecisionAABBTooltip;
-                                        break;
-                                    case OutlinePrecision.ObjectOrientedBoundingBox:
-                                        outlinePrecisionTypeLabel.tooltip =
-                                            UITooltipConstants.SpriteDataOutlinePrecisionOOBBTooltip;
-                                        break;
-                                    case OutlinePrecision.PixelPerfect:
-                                        outlinePrecisionTypeLabel.tooltip = UITooltipConstants
-                                            .SpriteDataOutlinePrecisionPixelPerfectTooltip;
-                                        break;
-                                }
-
-                                GUILayout.Toggle(outlinePrecision == outlinePrecisionType, outlinePrecisionTypeLabel,
-                                    Styling.ButtonStyle);
-                                if (EditorGUI.EndChangeCheck())
-                                {
-                                    outlinePrecision = outlinePrecisionType;
-                                }
+                                DrawOutlinePrecisionSlider();
                             }
 
                             GUILayout.Label(new GUIContent("Outline Color",
                                 UITooltipConstants.SpriteDataOutlineColorTooltip));
-                            outlineColor = EditorGUILayout.ColorField(outlineColor);
+                            using (new EditorGUI.IndentLevelScope())
+                            {
+                                outlineColor = EditorGUILayout.ColorField(outlineColor);
+                            }
                         }
                     }
 
@@ -309,6 +288,50 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             }
         }
 
+        private void DrawOutlinePrecisionSlider()
+        {
+            using (var verticalScope = new EditorGUILayout.VerticalScope())
+            {
+                var sliderContentRect =
+                    GUILayoutUtility.GetRect(verticalScope.rect.width, EditorGUIUtility.singleLineHeight);
+                sliderContentRect = EditorGUI.IndentedRect(sliderContentRect);
+
+                using (var changeScope = new EditorGUI.ChangeCheckScope())
+                {
+                    outlinePrecisionSliderValue = GUI.HorizontalSlider(sliderContentRect, outlinePrecisionSliderValue,
+                        0, OutlinePrecisionTypes.Length - 1);
+
+                    if (changeScope.changed)
+                    {
+                        outlinePrecisionSliderValue = (int) Math.Round(outlinePrecisionSliderValue);
+                        outlinePrecision = (OutlinePrecision) outlinePrecisionSliderValue;
+                    }
+                }
+
+
+                var selectedLabel =
+                    new GUIContent($"Selected: {ObjectNames.NicifyVariableName(outlinePrecision.ToString())}");
+
+                switch (outlinePrecision)
+                {
+                    case OutlinePrecision.AxisAlignedBoundingBox:
+                        selectedLabel.tooltip =
+                            UITooltipConstants.SpriteDataOutlinePrecisionAABBTooltip;
+                        break;
+                    case OutlinePrecision.ObjectOrientedBoundingBox:
+                        selectedLabel.tooltip =
+                            UITooltipConstants.SpriteDataOutlinePrecisionOOBBTooltip;
+                        break;
+                    case OutlinePrecision.PixelPerfect:
+                        selectedLabel.tooltip = UITooltipConstants
+                            .SpriteDataOutlinePrecisionPixelPerfectTooltip;
+                        break;
+                }
+
+                EditorGUILayout.LabelField(selectedLabel);
+            }
+        }
+
         private void DrawToolbar()
         {
             using (var toolbarScope = new EditorGUILayout.HorizontalScope())
@@ -329,7 +352,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                         typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
                     EditorGUIUtility.labelWidth = 0;
 
-                    if (GUILayout.Button("Load existing"))
+                    if (GUILayout.Button($"Load existing {nameof(SpriteData)}"))
                     {
                         LoadSpriteDataList();
                     }

@@ -22,7 +22,6 @@
 
 using SpriteSortingPlugin.UI;
 using UnityEditor;
-using UnityEngine;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -33,11 +32,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         public SortingSuggestionStepIntro(string name) : base(name)
         {
             autoSortingHowToDescription = new AutoSortingHowToDescription(false);
-        }
-
-        public override bool IsSendingData()
-        {
-            return true;
         }
 
         public override void Start()

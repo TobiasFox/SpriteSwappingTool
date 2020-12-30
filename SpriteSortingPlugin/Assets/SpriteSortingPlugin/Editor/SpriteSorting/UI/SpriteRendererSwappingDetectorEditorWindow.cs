@@ -78,6 +78,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private ReordableOverlappingItemList reordableOverlappingItemList;
 
         private bool isAnalyzingWithChangedLayerFirst;
+        private bool isContinueSearching = true;
 
         private bool isSearchingSurroundingSpriteRenderer = true;
         private OverlappingSpriteDetector overlappingSpriteDetector;
@@ -89,6 +90,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private AutoSortingOptionsUI autoSortingOptionsUI;
 
         private List<SortingCriterionType> skippedSortingCriteriaList;
+        private bool isShowingNoGlitchResult;
 
         //TODO remove bool, is only for debugging
         private bool isReplacingOverlappingItemsWithAutoSortedResult = true;
@@ -199,8 +201,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
         }
 
-        private float thickness = 3;
-
         private void OnEnable()
         {
             if (serializedObject == null)
@@ -245,17 +245,25 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 using (new EditorGUI.DisabledScope(wasAnalyzeButtonClicked))
                 {
-                    GUILayout.Label("General Options");
-                    DrawCameraOptions();
+                    using (var changeScope = new EditorGUI.ChangeCheckScope())
+                    {
+                        GUILayout.Label("General Options");
+                        DrawCameraOptions();
 
-                    EditorGUILayout.Space();
-                    DrawSpriteDataAssetOptions();
+                        EditorGUILayout.Space();
+                        DrawSpriteDataAssetOptions();
 
-                    EditorGUILayout.Space();
-                    DrawSortingOptions();
+                        EditorGUILayout.Space();
+                        DrawSortingOptions();
 
-                    EditorGUILayout.Space();
-                    autoSortingOptionsUI.DrawAutoSortingOptions(wasAnalyzeButtonClicked);
+                        EditorGUILayout.Space();
+                        autoSortingOptionsUI.DrawAutoSortingOptions(wasAnalyzeButtonClicked);
+
+                        if (isShowingNoGlitchResult && changeScope.changed)
+                        {
+                            isShowingNoGlitchResult = false;
+                        }
+                    }
                 }
             }
 
@@ -265,7 +273,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             if (wasAnalyzeButtonClicked && autoSortingOptionsUI.IsApplyingAutoSorting)
             {
                 GUILayout.Label(
-                    "To refine Sorting Criteria: clear findings, adjust the criteria and find visual glitches again.");
+                    "To refine Sorting Criteria: clear findings, adjust the criteria and find visual glitch again.");
             }
 
             EditorGUILayout.Space();
@@ -301,11 +309,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         isAnalyzedButtonClickedThisFrame = true;
                     }
 
-                    using (new EditorGUI.DisabledScope(!wasAnalyzeButtonClicked))
+                    using (new EditorGUI.DisabledScope(!wasAnalyzeButtonClicked && !isShowingNoGlitchResult))
                     {
                         if (GUILayout.Button("Clear Findings", analyzeButtonStyle,
                             GUILayout.MinHeight(LargerButtonHeight), GUILayout.ExpandWidth(false)))
                         {
+                            isShowingNoGlitchResult = false;
                             wasAnalyzeButtonClicked = false;
                             if (HasOverlappingItems() && preview.IsUpdatingSpriteRendererInScene)
                             {
@@ -339,6 +348,31 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             // }
             //end debug
 
+            if (isShowingNoGlitchResult)
+            {
+                EditorGUILayout.Space();
+                UIUtil.DrawHorizontalLine(3);
+                EditorGUILayout.Space();
+                EditorGUILayout.Space();
+                EditorGUILayout.Space();
+
+                if (!HasOverlappingItems())
+                {
+                    var centeredStyleBold = new GUIStyle(Styling.CenteredStyleBold)
+                    {
+                        normal = {background = Styling.SpriteSortingNoSortingOrderIssuesBackgroundTexture}
+                    };
+
+                    var message = "No visual glitches were found with the current glitch finding options.";
+
+                    GUILayout.Label(new GUIContent(message, Styling.NoSortingOrderIssuesIcon), centeredStyleBold,
+                        GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.5f));
+
+                    CleanUpReordableList();
+                    preview.DisableSceneVisualizations();
+                }
+            }
+
             if (!wasAnalyzeButtonClicked)
             {
                 EditorGUILayout.Space();
@@ -359,21 +393,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     normal = {background = Styling.SpriteSortingNoSortingOrderIssuesBackgroundTexture}
                 };
 
-                string message;
-                switch (sortingType)
-                {
-                    case SortingType.Layer:
-                        message = "No visual glitches were found in the layers " + string.Join(", ", selectedLayers)
-                            + " of all opened scenes.";
-                        break;
-                    case SortingType.Sprite:
-                        message = "No visual glitches were found on the SpriteRenderer " + spriteRenderer.name;
-                        break;
-                    default:
-                        message = "";
-                        break;
-                }
-
+                var message = "No visual glitches were found with the current glitch finding options.";
                 GUILayout.Label(new GUIContent(message, Styling.NoSortingOrderIssuesIcon), centeredStyleBold,
                     GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.5f));
 
@@ -419,7 +439,32 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EditorGUILayout.Space();
 
-            ShowConfirmButton(out var isConfirmButtonPressed);
+            var isConfirmButtonPressed = false;
+
+            using (new EditorGUILayout.HorizontalScope(Styling.HelpBoxStyle))
+            {
+                if (GUILayout.Button("Confirm", Styling.ButtonStyleBold, GUILayout.Height(LargerButtonHeight),
+                    GUILayout.ExpandWidth(true)))
+                {
+                    ApplySortingOptions();
+                    isConfirmButtonPressed = true;
+
+                    IncrementConfirmedSortingOrder();
+                    SaveLogFile();
+
+                    if (isContinueSearching)
+                    {
+                        //TODO: check isAnalyzingWithChangedLayerFirst
+                        Analyze();
+                    }
+                }
+
+                EditorGUIUtility.labelWidth = 200;
+                isContinueSearching =
+                    EditorGUILayout.ToggleLeft("And continue searching for next glitch?", isContinueSearching,
+                        GUILayout.ExpandWidth(false));
+                EditorGUIUtility.labelWidth = 0;
+            }
 
             autoSortingResultList?.DoLayoutList();
 
@@ -431,7 +476,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();
-            UIUtil.DrawHorizontalLine(thickness);
+            UIUtil.DrawHorizontalLine(3);
             preview.DoPreview(isAnalyzedButtonClickedThisFrame);
 
             if (preview.IsUpdatingSpriteRendererInScene)
@@ -1036,6 +1081,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void Analyze()
         {
+            isShowingNoGlitchResult = false;
             wasAnalyzeButtonClicked = true;
             skippedSortingCriteriaList = null;
 
@@ -1088,6 +1134,9 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 overlappingSpriteDetectionResult.baseItem == null)
             {
                 overlappingItems = null;
+                isShowingNoGlitchResult = true;
+                wasAnalyzeButtonClicked = false;
+
                 return;
             }
 
