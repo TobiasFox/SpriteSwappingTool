@@ -38,22 +38,8 @@ namespace SpriteSortingPlugin.Survey
     {
         private const int ShuffleThreshold = 5;
 
-        private const string Password = "f3-A)zL[6*s57jW3";
-        private const string MailAddress = "spriteswappingsurvey38@mail.de";
-        private const string MailAddress2 = "spriteswappingsurvey38@gmail.com";
-        private const string Host = "smtp.mail.de";
-        private const string Host2 = "smtp.gmail.com";
-        private const int Port = 587;
-
         private static readonly MailData[] MailDataArray = new MailData[]
         {
-            // new MailData()
-            // {
-            //     mailAddress = "spriteswappingsurvey38@gmail.com", password = "f3-A)zL[6*s57jW3",
-            //     host = "smtp.gmail.com",
-            //     port = 587
-            // },
-
             new MailData()
             {
                 mailAddress = "spriteswappingsurvey38@mail.de", password = "f3-A)zL[6*s57jW3",
@@ -69,6 +55,12 @@ namespace SpriteSortingPlugin.Survey
             new MailData()
             {
                 mailAddress = "spriteswappingsurvey40@mail.de", password = "Qz#+ZrZV6wv4N-p",
+                host = "smtp.mail.de",
+                port = 587
+            },
+            new MailData()
+            {
+                mailAddress = "spriteswapping42@mail.de", password = "T99#KD+FS*9-Hc",
                 host = "smtp.mail.de",
                 port = 587
             },

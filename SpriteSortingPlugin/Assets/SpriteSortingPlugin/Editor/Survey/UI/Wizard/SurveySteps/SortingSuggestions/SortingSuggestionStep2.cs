@@ -44,16 +44,18 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private static readonly string[] QuestionLabels = new string[]
         {
-            $". Please find and solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName} with the sorting suggestion functionality.\n" +
-            $"Please solve the task as quickly as possible. However, the result should make visual sense to you.",
+            $". Please find and solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName} with the sorting suggestion functionality."
+            // + $"Please solve the task as quickly as possible. However, the result should make visual sense to you."
+            ,
             $". Please solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName} with the sorting suggestion functionality.\n" +
             $"Please solve the task as quickly as possible. However, the result should make visual sense to you."
         };
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
-        private bool isDescriptionVisible;
         private int questionCounter;
+        private HowToDescription howToDescription;
+        private AutoSortingHowToDescription autoSortingHowToDescription;
 
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
@@ -76,6 +78,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 questionCounter++;
             }
+
+            howToDescription = new HowToDescription() {isBoldHeader = false};
+            autoSortingHowToDescription = new AutoSortingHowToDescription() {isBoldHeader = false};
         }
 
         public override bool IsSendingData()
@@ -178,35 +183,27 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.Space(5);
 
             EditorGUILayout.LabelField("The setup of this task has slightly more Sprites.", Styling.LabelWrapStyle);
-            isDescriptionVisible =
-                EditorGUILayout.Foldout(isDescriptionVisible, "Sorting order suggestion description", true);
 
-            if (isDescriptionVisible)
-            {
-                EditorGUILayout.LabelField(
-                    $"The {GeneralData.FullDetectorName} also generates sorting order suggestions after SpriteRenderers are being identified.",
-                    Styling.LabelWrapStyle);
-
-                EditorGUILayout.Space(5);
-                EditorGUILayout.LabelField(
-                    "These suggestions are based on several criteria, which you can select and modify.",
-                    Styling.LabelWrapStyle);
-            }
+            autoSortingHowToDescription.DrawHowTo();
 
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField(
-                $"Please, open the {GeneralData.DetectorName} and use this functionality located at the bottom of the {GeneralData.DetectorName}'s window.",
+                $"Please open the {GeneralData.DetectorName} and use this functionality located at the bottom of the {GeneralData.DetectorName}'s window.",
                 Styling.LabelWrapStyle);
 
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Space(20);
-                if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(224)))
+                if (GUILayout.Button($"Open {GeneralData.DetectorName}\nwith enabled sorting order suggestion",
+                    GUILayout.Width(224)))
                 {
                     var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
                     detector.Show();
+                    detector.ActivateAutoSorting();
                 }
             }
+
+            howToDescription.DrawHowTo();
 
             EditorGUILayout.Space(20);
 
@@ -219,7 +216,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     EditorGUILayout.LabelField($"{questionCounter}{QuestionLabels[i]}",
                         taskLabelStyle);
 
-                    EditorGUILayout.Space(5);
+                    EditorGUILayout.Space(10);
+                
+                    EditorGUILayout.LabelField(
+                        "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
+                        Styling.LabelWrapStyle);
+                    
                     EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                         Styling.LabelWrapStyle);
                     EditorGUILayout.LabelField(

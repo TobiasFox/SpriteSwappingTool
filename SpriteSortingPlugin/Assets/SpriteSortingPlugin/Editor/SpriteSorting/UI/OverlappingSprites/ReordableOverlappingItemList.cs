@@ -250,21 +250,21 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
 
             if (GUI.Button(
-                new Rect(rect.x + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
-                "+1"))
-            {
-                LogSortingOrderChangeModification(index, element.sortingOrder + 1);
-                element.sortingOrder++;
-                isPreviewUpdating = true;
-                overlappingItems.UpdateSortingOrder(index);
-            }
-
-            if (GUI.Button(
                 new Rect(rect.x + 135 + 10 + 120 + 10 + 25 + 10, rect.y, 25,
                     EditorGUIUtility.singleLineHeight), "-1"))
             {
                 LogSortingOrderChangeModification(index, element.sortingOrder - 1);
                 element.sortingOrder--;
+                isPreviewUpdating = true;
+                overlappingItems.UpdateSortingOrder(index);
+            }
+
+            if (GUI.Button(
+                new Rect(rect.x + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
+                "+1"))
+            {
+                LogSortingOrderChangeModification(index, element.sortingOrder + 1);
+                element.sortingOrder++;
                 isPreviewUpdating = true;
                 overlappingItems.UpdateSortingOrder(index);
             }

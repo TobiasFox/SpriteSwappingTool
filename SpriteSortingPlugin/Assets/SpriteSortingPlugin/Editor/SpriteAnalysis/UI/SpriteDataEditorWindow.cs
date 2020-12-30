@@ -329,7 +329,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                         typeof(SpriteData), false, GUILayout.MinWidth(290)) as SpriteData;
                     EditorGUIUtility.labelWidth = 0;
 
-                    if (GUILayout.Button("Load"))
+                    if (GUILayout.Button("Load existing"))
                     {
                         LoadSpriteDataList();
                     }
@@ -416,16 +416,16 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     }
 
                     var buttonTextBuilder = new StringBuilder("Analyze ");
-                    buttonTextBuilder.Append(isAnalyzingAllSprites ? "all Sprites " : " Sprite ");
-                    buttonTextBuilder.Append("+ add to ");
+                    // buttonTextBuilder.Append(isAnalyzingAllSprites ? "all Sprites " : " Sprite ");
+                    buttonTextBuilder.Append("& ");
 
                     switch (spriteAnalyzedDataAddingChoice)
                     {
                         case SpriteAnalyzedDataAddingChoice.NewSpriteData:
-                            buttonTextBuilder.Append("new ");
+                            buttonTextBuilder.Append("generate new ");
                             break;
                         case SpriteAnalyzedDataAddingChoice.CurrentlyLoaded:
-                            buttonTextBuilder.Append("existing ");
+                            buttonTextBuilder.Append("add to existing ");
                             break;
                     }
 
@@ -997,14 +997,22 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             SaveOrReSaveSpriteData();
 
             LoadSpriteDataList();
-            RestoreSpriteDataItemSelection(lastSelectedSpriteDataItemGuid);
+            if (string.IsNullOrEmpty(lastSelectedSpriteDataItemGuid))
+            {
+                reorderableSpriteList.index = 0;
+                OnSpriteSelected(reorderableSpriteList);
+            }
+            else
+            {
+                RestoreSpriteDataItemSelection(lastSelectedSpriteDataItemGuid);
+            }
 
             simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
         }
 
         private void RestoreSpriteDataItemSelection(string lastSelectedSpriteDataItemGuid)
         {
-            if (lastSelectedSpriteDataItemGuid == null || lastSelectedSpriteDataItemGuid.Length <= 0)
+            if (string.IsNullOrEmpty(lastSelectedSpriteDataItemGuid))
             {
                 return;
             }

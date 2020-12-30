@@ -33,11 +33,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
     public class PluginSorting1 : SurveyStep
     {
-        private const string SceneName = "PluginSortingExample_01.unity";
+        private const string SceneName = "PluginSortingExample_02.unity";
         private const int QuestionNumber = 3;
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
+        private HowToDescription howToDescription;
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
         public PluginSorting1(string name) : base(name)
@@ -48,6 +49,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             sortingTaskData.SetSceneName(SceneName);
             sortingTaskData.question = QuestionNumber.ToString();
             SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
+
+            howToDescription = new HowToDescription();
+            howToDescription.isBoldHeader = false;
         }
 
         public override List<string> CollectFilePathsToCopy()
@@ -143,18 +147,22 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 }
             }
 
+            howToDescription.DrawHowTo();
+
             EditorGUILayout.Space(20);
 
             using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the " +
-                    GeneralData.FullDetectorName + ".\n" +
-                    "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
+                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName}.",
                     taskLabelStyle);
-
                 EditorGUILayout.Space(10);
+
+                EditorGUILayout.LabelField(
+                    "Please solve the task as quickly as possible.",
+                    Styling.LabelWrapStyle);
+
                 EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(

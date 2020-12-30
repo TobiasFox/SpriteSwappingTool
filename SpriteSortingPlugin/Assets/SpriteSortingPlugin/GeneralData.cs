@@ -45,8 +45,8 @@ namespace SpriteSortingPlugin
         public const string ClipperLibLink = "http://www.angusj.com/delphi/clipper.php";
 
         //TODO set to true
-        // public const bool IsValidatingUserInput = true;
-        public const bool IsValidatingUserInput = false;
+        public const bool IsValidatingUserInput = true;
+        // public const bool IsValidatingUserInput = false;
 
         // public static bool isSurveyActive = true;
         // public static bool isAutomaticSortingActive = true;

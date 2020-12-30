@@ -29,7 +29,7 @@ namespace SpriteSortingPlugin.Survey.Data
     [Serializable]
     public class SortingTaskData
     {
-        private static readonly string[] SceneFolderPath = new string[]
+        public static readonly string[] SceneFolderPath = new string[]
         {
             "Assets", "_Scenes", "SurveyScenes"
         };

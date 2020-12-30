@@ -37,7 +37,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
-        private bool isDescriptionVisible;
+        private bool isDescriptionExpanded;
 
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
@@ -125,18 +125,21 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 Styling.LabelWrapStyle);
             EditorGUILayout.Space(5);
 
-            isDescriptionVisible = EditorGUILayout.Foldout(isDescriptionVisible,
+            isDescriptionExpanded = EditorGUILayout.Foldout(isDescriptionExpanded,
                 "Visual glitch description", true);
 
-            if (isDescriptionVisible)
+            if (isDescriptionExpanded)
             {
-                var visualGlitchDescription =
-                    "Depending on the position of a camera, visual glitches happen, when SpriteRenderers overlap and have identical sorting options (Sorting Layer and Sorting Order).";
-                EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField(
-                    "To detect such glitches, move the Unity SceneCamera in 3D perspective mode and watch out for Sprite swaps. To solve a glitch, change the sorting options.",
-                    Styling.LabelWrapStyle);
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    var visualGlitchDescription =
+                        "Depending on the position of a camera, visual glitches happen, when SpriteRenderers overlap and have identical sorting options (Sorting Layer and Sorting Order).";
+                    EditorGUILayout.LabelField(visualGlitchDescription, Styling.LabelWrapStyle);
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField(
+                        "To detect such glitches, move the Unity SceneCamera in 3D perspective mode and watch out for Sprite swaps. To solve a glitch, change the sorting options.",
+                        Styling.LabelWrapStyle);
+                }
             }
 
             EditorGUILayout.Space(20);
@@ -145,11 +148,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the manual approach.\n" +
-                    "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
+                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the manual approach.",
                     taskLabelStyle);
-
-                EditorGUILayout.Space();
+                EditorGUILayout.Space(10);
+                
+                EditorGUILayout.LabelField("Please solve the task as quickly as possible.", Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(

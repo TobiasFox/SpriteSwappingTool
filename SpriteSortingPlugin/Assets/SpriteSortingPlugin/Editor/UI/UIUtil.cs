@@ -65,5 +65,20 @@ namespace SpriteSortingPlugin.UI
 
             EditorGUI.DrawRect(rect, Styling.HorizontalLineColor);
         }
+        public static void DrawHorizontalLine(float thickness)
+        {
+            var rect = GUILayoutUtility.GetRect(1f, thickness);
+
+            // Splitter rect should be full-width
+            // rect.xMin = 0f;
+            // rect.width += 4f;
+
+            if (Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
+            EditorGUI.DrawRect(rect, Styling.HorizontalLineColor);
+        }
     }
 }

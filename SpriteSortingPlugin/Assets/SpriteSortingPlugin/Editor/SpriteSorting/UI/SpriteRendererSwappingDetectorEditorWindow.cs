@@ -65,6 +65,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private SerializedProperty gameObjectParentsSerializedProperty;
         private float outlinePrecisionSliderValue;
 
+        private bool isSortingOptionExpanded;
         private int selectedSortingLayers;
         private List<string> selectedLayers;
         private bool isUsingGameObjectParents;
@@ -111,6 +112,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             preview = new SpriteSortingEditorPreview();
             reordableOverlappingItemList = new ReordableOverlappingItemList();
             SortingLayerUtility.UpdateSortingLayerNames();
+            SelectDefaultLayer();
 
             //TODO: remove
             // SelectDefaultSpriteAlphaData();
@@ -133,6 +135,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         //         Debug.Log("auto selection of SpriteAlphaData went wrong");
         //     }
         // }
+
+        public void ActivateAutoSorting()
+        {
+            autoSortingOptionsUI.ActivateAutoSorting();
+        }
 
         private void OnInspectorUpdate()
         {
@@ -192,6 +199,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
         }
 
+        private float thickness = 3;
+
         private void OnEnable()
         {
             if (serializedObject == null)
@@ -227,7 +236,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 alignment = TextAnchor.MiddleCenter, wordWrap = true
             };
             var descriptionLabelContent = new GUIContent(
-                "This tool identifies and helps to sort overlapping and unsorted SpriteRenderers, since such renderers often lead to unwanted Sprite swaps.",
+                "This tool identifies and helps to sort overlapping and unsorted SpriteRenderers, since such renderers often lead to unwanted Sprite swaps (visual glitches).",
                 UITooltipConstants.SortingEditorSpriteSwapDescriptionTooltip);
 
             GUILayout.Label(descriptionLabelContent, descriptionLabelStyle, GUILayout.ExpandWidth(true));
@@ -338,6 +347,9 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             EditorGUILayout.Space();
+            UIUtil.DrawHorizontalLine(3);
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
             EditorGUILayout.Space();
 
             if (!HasOverlappingItems())
@@ -399,11 +411,13 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             if (isSearchingSurroundingSpriteRenderer)
             {
                 var surroundingAnalysisDurationInfoContent = new GUIContent(
-                    "The following option might take some time and can affect other surrounding SpriteRenderers of the ones listed above.",
+                    "This option might take some time and can affect other, not listed SpriteRenderers.",
                     Styling.InfoIcon, UITooltipConstants.SortingEditorAnalyzeSurroundingSpriteRendererDurationTooltip);
                 GUILayout.Label(surroundingAnalysisDurationInfoContent,
                     new GUIStyle(EditorStyles.label) {wordWrap = true});
             }
+
+            EditorGUILayout.Space();
 
             ShowConfirmButton(out var isConfirmButtonPressed);
 
@@ -417,6 +431,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();
+            UIUtil.DrawHorizontalLine(thickness);
             preview.DoPreview(isAnalyzedButtonClickedThisFrame);
 
             if (preview.IsUpdatingSpriteRendererInScene)
@@ -471,15 +486,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             var skippedCriteria = string.Join(", ", skippedSortingCriteriaList);
-            var adjustedSingularPluralText = skippedSortingCriteriaList.Count == 1 ? "Criterion was" : "Criteria were";
             var skippedCriteriaMessage =
                 $"Skipped Sorting criteria (missing entries in selected {nameof(SpriteData)} asset):\n" +
                 $"{skippedCriteria}";
             var skippedTooltip =
                 $"Due to missing entries in the selected {nameof(SpriteData)} some Sorting criteria are skipped.";
-            // var skippedCriteriaMessage =
-            //     $"The following Sorting {adjustedSingularPluralText} skipped on some identified SpriteRenderers due to missing entries in the given {nameof(SpriteData)} \"{spriteData.name}\":\n" +
-            //     $"{skippedCriteria}";
             GUILayout.Label(new GUIContent(skippedCriteriaMessage, Styling.WarnIcon, skippedTooltip),
                 Styling.LabelWrapStyle);
         }
@@ -488,8 +499,8 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         {
             isConfirmButtonPressed = false;
             var confirmButtonLabels = sortingType == SortingType.Layer
-                ? new[] {"Confirm", "Confirm and continue searching"}
-                : new[] {"Confirm"};
+                ? new[] {"Confirm sorting options", "Confirm and Find next glitch"}
+                : new[] {"Confirm sorting options"};
 
             var selectedConfirmButtonIndex =
                 GUILayout.SelectionGrid(-1, confirmButtonLabels, confirmButtonLabels.Length, Styling.ButtonStyleBold,
@@ -594,13 +605,19 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void DrawSortingOptions()
         {
-            GUILayout.Label("Sorting Options");
+            isSortingOptionExpanded = EditorGUILayout.Foldout(isSortingOptionExpanded, "Glitch Finding Options", true);
+            // GUILayout.Label("Sorting Options");
+            if (!isSortingOptionExpanded)
+            {
+                return;
+            }
+
             using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     GUILayout.Label(
-                        new GUIContent("Sorting Type", UITooltipConstants.SortingEditorSortingTypeTooltip),
+                        new GUIContent("Finding Type", UITooltipConstants.SortingEditorSortingTypeTooltip),
                         GUILayout.ExpandWidth(false));
 
                     GUILayout.Space(72.5f);
@@ -819,7 +836,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             if (GraphicsSettings.transparencySortMode == TransparencySortMode.Default)
             {
-                usedBy = "identify unsorted SpriteRenderers";
+                usedBy = "identify visual glitches";
                 isCameraRequired = true;
             }
 
@@ -974,11 +991,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void ShowSortingLayers()
         {
-            if (selectedLayers == null)
-            {
-                SelectDefaultLayer();
-            }
-
             EditorGUI.BeginChangeCheck();
             selectedSortingLayers = EditorGUILayout.MaskField(
                 new GUIContent("Sorting Layers", UITooltipConstants.SortingEditorSortingLayerTooltip),

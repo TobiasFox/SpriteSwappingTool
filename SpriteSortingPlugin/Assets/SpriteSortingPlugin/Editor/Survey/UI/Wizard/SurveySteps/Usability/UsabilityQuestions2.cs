@@ -165,7 +165,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private void DrawOccuringErrorsText()
         {
             EditorGUILayout.LabelField(
-                $"{questionCounter}. Did any errors occur while using the {GeneralData.Name} tool?",
+                $"{questionCounter}. Did any errors occur while using the {GeneralData.Name} tool? (required)",
                 Styling.QuestionLabelStyle);
 
             using (new EditorGUI.IndentLevelScope())

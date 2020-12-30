@@ -66,7 +66,7 @@ namespace SpriteSortingPlugin.UI
             "Control, whether large Sprites will be sorted in the foreground or background.";
 
         public const string IntersectionAreaTooltip =
-            "Calculates the intersection area of overlapping Sprites and sets these intersection area in ration to the area of these overlapping Sprites.\n" +
+            "Calculates the intersection area of overlapping Sprites and sets these intersection areas in relation to the areas of these overlapping Sprites.\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string IntersectionAreaForegroundSpriteTooltip =
@@ -79,13 +79,13 @@ namespace SpriteSortingPlugin.UI
         public const string SpriteSortPointForegroundSpriteTooltip =
             "Control, whether SpriteRenderers will be sorted in the foreground or background if a Sprite's Sort Point overlaps another Sprite.";
 
-        public const string ResolutionTooltip = "Compares Sprites resolutions in pixel.";
+        public const string ResolutionTooltip = "Compares Sprites resolutions in pixels.";
 
         public const string ResolutionForegroundSpriteTooltip =
             "Control, whether Sprites with higher resolution will be sorted in the foreground or background.";
 
         public const string SharpnessTooltip =
-            "Compares the sharpness of Sprites by analyzing their amount of edges (rapid intensity changes).\n" +
+            "Compares the sharpness of Sprites.\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SharpnessForegroundSpriteTooltip =
@@ -206,7 +206,7 @@ namespace SpriteSortingPlugin.UI
             "List of adjustable sorting criteria, which are used to generate sorting order suggestions.";
 
         public const string SortingEditorSortingTypeTooltip =
-            "Specify, if either a completely Sorting Layer or a single Sprite is used to identify overlapping SpriteRenderers.";
+            "Specify, if either an entire Sorting Layer or a single Sprite is used to identify overlapping SpriteRenderers.";
 
         public const string SortingEditorUsingGameObjectParentsTooltip =
             "When enabled, only the given GameObject parents are being considered for the analysis.\n" +

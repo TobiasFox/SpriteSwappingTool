@@ -53,11 +53,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private float space = 17.5f;
         private int questionCounter;
         private SurveyPreview preview;
+        private HowToDescription howToDescription;
+        private AutoSortingHowToDescription autoSortingHowToDescription;
 
         public GeneralQuestions(string name, GeneralQuestionsData data) : base(name)
         {
             this.data = data;
             preview = new SurveyPreview(Path.Combine(PreviewPrefabPathAndName), false);
+            howToDescription = new HowToDescription() {isBoldHeader = false};
+            autoSortingHowToDescription = new AutoSortingHowToDescription() {isBoldHeader = false};
         }
 
         public override void DrawContent()
@@ -279,6 +283,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     }
                 }
             }
+
+            howToDescription.DrawHowTo();
+            autoSortingHowToDescription.DrawHowTo();
         }
 
         private void DrawGameDevelopmentRelation()

@@ -37,7 +37,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private bool isPreviewVisible;
         private string previewPrefabPathAndName;
 
-        public SurveyPreview(string assetPath, bool isPreviewVisible = true)
+        public SurveyPreview(string assetPath, bool isPreviewVisible = false)
         {
             previewPrefabPathAndName = assetPath;
             this.isPreviewVisible = isPreviewVisible;

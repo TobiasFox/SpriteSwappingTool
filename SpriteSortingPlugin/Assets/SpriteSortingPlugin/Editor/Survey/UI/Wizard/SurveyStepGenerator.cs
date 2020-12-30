@@ -37,8 +37,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             var evaluationAutoSortingSuggestionLabel =
                 "Evaluation of the functionality to generate sorting order suggestions";
 
+            var sortingSuggestionStepIntro = new SortingSuggestionStepIntro(evaluationAutoSortingSuggestionLabel);
             var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel);
             var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
+            // surveySteps.Add(sortingSuggestionStepIntro);
             // surveySteps.Add(sortingSuggestionStep1);
             // surveySteps.Add(sortingSuggestionStep2);
 
@@ -55,6 +57,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                                                     GeneralData.FullDetectorName);
             var pluginSorting2 = new PluginSorting2("Automatically detect visual glitches with the " +
                                                     GeneralData.FullDetectorName);
+            var pluginSortingIntro = new PluginSortingIntro("Automatically detect visual glitches with the " +
+                                                            GeneralData.FullDetectorName);
+            // surveySteps.Add(pluginSortingIntro);
             // surveySteps.Add(pluginSorting1);
             // surveySteps.Add(pluginSorting2);
             // {
@@ -107,6 +112,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private List<SurveyStep> FinalSurveyStepList(SurveyData surveyData)
         {
             var surveySteps = new List<SurveyStep>();
+            var groupCounter = 1;
 
             //intro
             {
@@ -118,27 +124,38 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var generalQuestions1 = new GeneralQuestions("General Questions", surveyData.generalQuestionsData);
                 var list = new List<SurveyStep>() {generalQuestions1};
-                var group = new SurveyStepGroup(list, "Part 1");
+                var group = new SurveyStepGroup(list, $"Part {groupCounter}");
                 surveySteps.Add(group);
+                groupCounter++;
             }
 
             //Comparison manual sorting and plugin usage
             {
                 var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
-                var pluginSortingLabel = "Automatically detect visual glitches with the " +
-                                         GeneralData.FullDetectorName;
-
                 var manualSortingStep = new ManualSortingStep(manualSortingLabel);
                 var manualSortingStep2 = new ManualSortingStep2(manualSortingLabel);
-                var pluginSorting1 = new PluginSorting1(pluginSortingLabel);
-                var pluginSorting2 = new PluginSorting2(pluginSortingLabel);
-                var pluginSorting3 = new PluginSorting3(pluginSortingLabel);
 
                 var list = new List<SurveyStep>
-                    {manualSortingStep, manualSortingStep2, pluginSorting1, pluginSorting2, pluginSorting3};
+                    {manualSortingStep, manualSortingStep2};
 
-                var group = new SurveyStepGroup(list, "Part 2");
+                var group = new SurveyStepGroup(list, $"Part {groupCounter}");
                 surveySteps.Add(group);
+                groupCounter++;
+            }
+
+            //plugin usage
+            {
+                var pluginSortingLabel = "Automatically detect visual glitches with the " +
+                                         GeneralData.FullDetectorName;
+                var pluginSortingIntro = new PluginSortingIntro(pluginSortingLabel);
+                // var pluginSorting1 = new PluginSorting1(pluginSortingLabel);
+                var pluginSorting2 = new PluginSorting2(pluginSortingLabel);
+                var pluginSorting3 = new PluginSorting3(pluginSortingLabel);
+                var list = new List<SurveyStep> {pluginSortingIntro, pluginSorting2, pluginSorting3};
+
+                var group = new SurveyStepGroup(list, $"Part {groupCounter}");
+                surveySteps.Add(group);
+                groupCounter++;
             }
 
             //auto sorting
@@ -146,12 +163,15 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var evaluationAutoSortingSuggestionLabel =
                     "Evaluation of the functionality to generate sorting order suggestions";
 
+                var sortingSuggestionStepIntro = new SortingSuggestionStepIntro(evaluationAutoSortingSuggestionLabel);
                 var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel);
                 var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
 
-                var list = new List<SurveyStep> {sortingSuggestionStep1, sortingSuggestionStep2};
-                var group = new SurveyStepGroup(list, "Part 3");
+                var list = new List<SurveyStep>
+                    {sortingSuggestionStepIntro, sortingSuggestionStep1, sortingSuggestionStep2};
+                var group = new SurveyStepGroup(list, $"Part {groupCounter}");
                 surveySteps.Add(group);
+                groupCounter++;
             }
 
             //Usability
@@ -159,8 +179,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var usabilityQuestions1 = new UsabilityQuestions1("Usability", surveyData.usabilityData);
                 var usabilityQuestions2 = new UsabilityQuestions2("Usability", surveyData.usabilityData);
                 var list = new List<SurveyStep>() {usabilityQuestions1, usabilityQuestions2};
-                var group = new SurveyStepGroup(list, "Part 4");
+                var group = new SurveyStepGroup(list, $"Part {groupCounter}");
                 surveySteps.Add(group);
+                groupCounter++;
             }
 
             var finishingStep = new FinishingSurvey("Finalizing");

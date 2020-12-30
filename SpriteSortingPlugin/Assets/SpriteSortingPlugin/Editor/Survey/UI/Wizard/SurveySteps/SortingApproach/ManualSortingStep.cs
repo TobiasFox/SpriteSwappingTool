@@ -134,15 +134,16 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the manual approach.\n" +
-                    "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
+                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the manual approach.",
                     taskLabelStyle);
 
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField("Please, do not modify the positions of the SpriteRenderers.",
+                EditorGUILayout.Space(10);
+                EditorGUILayout.LabelField("Please solve the task as quickly as possible.", Styling.LabelWrapStyle);
+
+                EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
-                    "Please, do not start the play mode. Instead, move the SceneCamera.",
+                    "Please do not start the play mode. Instead, move the SceneCamera.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(
                     new GUIContent("Time will be measured.",

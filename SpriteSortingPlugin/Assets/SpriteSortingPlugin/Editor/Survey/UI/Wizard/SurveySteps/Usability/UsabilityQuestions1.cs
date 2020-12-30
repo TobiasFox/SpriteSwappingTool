@@ -117,13 +117,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     richTextStyle);
                 EditorGUILayout.Space(5);
                 EditorGUILayout.LabelField(
-                    "It consists of ten questions and the system to which all questions refer is the " +
-                    GeneralData.Name + " tool.", Styling.LabelWrapStyle);
+                    $"The system to which all questions refer to is the {GeneralData.Name} tool.",
+                    Styling.LabelWrapStyle);
             }
 
             EditorGUILayout.Space(15);
 
-            UsabilityQuestionsUtility.DrawRatingHeader(QuestionWidthPercentage, $"Overall usability of the {GeneralData.Name} Tool (system)",
+            UsabilityQuestionsUtility.DrawRatingHeader(QuestionWidthPercentage,
+                $"Overall usability of the {GeneralData.Name} Tool (system)",
                 "Strongly\nDisagree", "Strongly\nAgree");
 
             for (var i = 0; i < SusQuestion.Length; i++)

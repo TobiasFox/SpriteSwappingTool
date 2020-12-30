@@ -38,6 +38,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private static readonly float TaskButtonHeight = EditorGUIUtility.singleLineHeight * 1.5f;
 
+        private HowToDescription howToDescription;
         private SurveyStepSortingData SurveyStepSortingData => (SurveyStepSortingData) surveyStepData;
 
         public PluginSorting2(string name) : base(name)
@@ -48,11 +49,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             sortingTaskData.SetSceneName(SceneName);
             sortingTaskData.question = QuestionNumber.ToString();
             SurveyStepSortingData.sortingTaskDataList.Add(sortingTaskData);
-        }
 
-        public override bool IsSendingData()
-        {
-            return true;
+            howToDescription = new HowToDescription() {isBoldHeader = false};
         }
 
         public override List<string> CollectFilePathsToCopy()
@@ -128,7 +126,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField("The setup of this task has slightly more Sprites.", Styling.LabelWrapStyle);
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField($"Please, open the {GeneralData.FullDetectorName}",
+            EditorGUILayout.LabelField($"Please open the {GeneralData.FullDetectorName}",
                 Styling.LabelWrapStyle);
             var openDetectorContent = new GUIContent(
                 $"{GeneralData.UnityMenuMainCategory} -> {GeneralData.Name} -> {GeneralData.DetectorName}");
@@ -145,17 +143,23 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 }
             }
 
+            howToDescription.DrawHowTo();
+
             EditorGUILayout.Space(20);
 
             using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
                 var taskLabelStyle = new GUIStyle(Styling.QuestionLabelStyle) {fontStyle = FontStyle.Bold};
                 EditorGUILayout.LabelField(
-                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName}.\n" +
-                    "Please solve the task as quickly as possible. However, the result should make visual sense to you.",
+                    $"{QuestionNumber}. Please find and solve all visual glitches in the given scene by using the {GeneralData.FullDetectorName}.",
                     taskLabelStyle);
 
                 EditorGUILayout.Space(10);
+                
+                EditorGUILayout.LabelField(
+                    "Please solve the task as quickly as possible.",
+                    Styling.LabelWrapStyle);
+
                 EditorGUILayout.LabelField("Please do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
                 EditorGUILayout.LabelField(

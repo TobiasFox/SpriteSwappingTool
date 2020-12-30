@@ -69,9 +69,14 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private Texture2D spriteTexture;
         private GUIStyle labelWrapStyle;
 
+        private HowToDescription howToDescription;
+        private AutoSortingHowToDescription autoSortingHowToDescription;
+
         public FinishingSurvey(string name) : base(name)
         {
             labelWrapStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
+            howToDescription = new HowToDescription() {isBoldHeader = false};
+            autoSortingHowToDescription = new AutoSortingHowToDescription(){isBoldHeader = false};
         }
 
         public override void Start()
@@ -179,6 +184,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 GUILayout.FlexibleSpace();
             }
+
+            howToDescription.DrawHowTo();
+            autoSortingHowToDescription.DrawHowTo();
         }
 
         string MyEscapeURL(string url)

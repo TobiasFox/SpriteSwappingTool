@@ -41,6 +41,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         //TODO list will be reset, when scripts are recompiling. Add serialization of it?
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
         private SortingCriteriaPresetSelector sortingCriteriaPresetSelector;
+        private bool isAutoSortingOptionExpanded;
 
         public bool IsApplyingAutoSorting
         {
@@ -77,6 +78,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             InitializeSortingCriteriaDataAndEditors();
         }
 
+        public void ActivateAutoSorting()
+        {
+            isAutoSortingOptionExpanded = true;
+            isApplyingAutoSorting = true;
+        }
+
         public void DrawAutoSortingOptions(bool wasAnalyzeButtonClicked)
         {
             var isDisable = false;
@@ -90,7 +97,14 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             {
                 var labelText = "Generation of Sorting order suggestion" +
                                 (isDisable ? " - enabled in Part 3 of the survey" : "");
-                GUILayout.Label(labelText);
+                // GUILayout.Label(labelText);
+
+                isAutoSortingOptionExpanded = EditorGUILayout.Foldout(isAutoSortingOptionExpanded, labelText, true);
+                // GUILayout.Label("Sorting Options");
+                if (!isAutoSortingOptionExpanded)
+                {
+                    return;
+                }
 
                 using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
