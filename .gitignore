@@ -4,6 +4,7 @@
 [Bb]uild/
 [Bb]uilds/
 Assets/AssetStoreTools*
+SpriteSortingPlugin/Assets/_Scenes/SurveyScenes/ModifiedScenes__Dont_Change/
 
 # Visual Studio cache directory
 .vs/
