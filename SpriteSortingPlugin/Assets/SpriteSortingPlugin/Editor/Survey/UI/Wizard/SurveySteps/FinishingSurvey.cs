@@ -186,6 +186,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             howToDescription.DrawHowTo();
+            howToDescription.HowToGenerateSpriteData();
             autoSortingHowToDescription.DrawHowTo();
         }
 

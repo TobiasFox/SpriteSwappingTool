@@ -99,9 +99,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private ReorderableList autoSortingResultList;
         //end remove debug variables
 
-        [MenuItem(
-            GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/" + GeneralData.DetectorName + " " +
-            GeneralData.DetectorShortcut, false, 0)]
+        [MenuItem(GeneralData.Name + "/" + GeneralData.DetectorName + " " + GeneralData.DetectorShortcut, false, 0)]
         public static void ShowWindow()
         {
             var window = GetWindow<SpriteRendererSwappingDetectorEditorWindow>();

@@ -27,7 +27,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin
 {
-    public class HowToWindow : EditorWindow
+    public class HelpWindow : EditorWindow
     {
         private bool isDetectorDescriptionExpanded = true;
         private bool isAnalyzeDescriptionExpanded;
@@ -35,17 +35,17 @@ namespace SpriteSortingPlugin
         private AutoSortingHowToDescription autoSortingHowToDescription;
 
 
-        [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/How to", false, 3)]
+        [MenuItem(GeneralData.Name + "/Help", false, 3)]
         public static void ShowWindow()
         {
-            var window = GetWindow<HowToWindow>();
+            var window = GetWindow<HelpWindow>();
             window.Show();
         }
 
         private void Awake()
         {
-            titleContent = new GUIContent("Sprite Swapping How to");
-            howToDescription = new HowToDescription(true, true) {};
+            titleContent = new GUIContent("Sprite Swapping Tool Help");
+            howToDescription = new HowToDescription(true, true) { };
             autoSortingHowToDescription = new AutoSortingHowToDescription() {isBoldHeader = false};
         }
 

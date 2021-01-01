@@ -204,6 +204,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             howToDescription.DrawHowTo();
+            EditorGUILayout.Space(5);
+            howToDescription.HowToGenerateSpriteData();
 
             EditorGUILayout.Space(20);
 

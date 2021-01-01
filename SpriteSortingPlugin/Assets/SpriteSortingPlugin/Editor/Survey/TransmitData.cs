@@ -110,7 +110,7 @@ namespace SpriteSortingPlugin.Survey
 
                 try
                 {
-                    smtpClient.Send(mail);
+                    // smtpClient.Send(mail);
                     // onMailSendCompleted?.Invoke(TransmitResult.Failed);
 
                     // smtpClient.SendCompleted += SendCompletedEventHandler;

@@ -8,6 +8,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
     {
         private bool isFoldable;
         private bool isExpanded;
+        private bool isSpriteDataGenerationExpanded;
         private bool isCameraInformationExpanded;
         private bool isOutlinePrecisionInformationExpanded;
         private bool isSpriteDataInformationExpanded;
@@ -32,7 +33,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 if (isFoldable)
                 {
-                    DrawHeaderFoldout();
+                    isExpanded = DrawHeaderFoldout(isExpanded);
 
                     if (!isExpanded)
                     {
@@ -160,23 +161,53 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
         }
 
-        private void DrawHeaderFoldout()
+        public void HowToGenerateSpriteData()
+        {
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            {
+                GUILayout.Label($"How to generate a {nameof(SpriteData)}",
+                    Styling.CenteredStyle);
+
+                isSpriteDataGenerationExpanded = DrawHeaderFoldout(isSpriteDataGenerationExpanded);
+
+                if (!isSpriteDataGenerationExpanded)
+                {
+                    return;
+                }
+
+                EditorGUILayout.LabelField($"1. Open the {GeneralData.FullDataAnalysisName} window");
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField(
+                    $"2. Generate a {nameof(SpriteData)} by clicking \"Analyze & generate new {nameof(SpriteData)}\" on the top right side");
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField(
+                    $"3. Optionally: Adjust generated {nameof(SpriteData)}");
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField(
+                    $"4. Close {GeneralData.DataAnalysisName} and select reference to generated {nameof(SpriteData)} in the {GeneralData.DetectorName}");
+                EditorGUILayout.Space(5);
+            }
+        }
+
+        private bool DrawHeaderFoldout(bool currentExpandBool)
         {
             var lastRect = GUILayoutUtility.GetLastRect();
             var foldoutRect = new Rect(0, lastRect.y, 12, lastRect.height);
 
-            isExpanded = EditorGUI.Foldout(foldoutRect, isExpanded, GUIContent.none, true);
+            currentExpandBool = EditorGUI.Foldout(foldoutRect, currentExpandBool, GUIContent.none, true);
 
             var currentEvent = Event.current;
             if (currentEvent.type == EventType.MouseDown && lastRect.Contains(currentEvent.mousePosition))
             {
                 if (currentEvent.button == 0)
                 {
-                    isExpanded = !isExpanded;
+                    currentExpandBool = !currentExpandBool;
                 }
 
                 currentEvent.Use();
             }
+
+            return currentExpandBool;
         }
     }
 }

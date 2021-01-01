@@ -93,7 +93,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
         private SimplifiedOutlineToleranceErrorAppearance simplifiedOutlineToleranceErrorAppearance;
 
 
-        [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/" + GeneralData.DataAnalysisName +
+        [MenuItem(GeneralData.Name + "/" + GeneralData.DataAnalysisName +
                   " " + GeneralData.DataAnalysisShortcut, false, 1)]
         public static void ShowWindow()
         {

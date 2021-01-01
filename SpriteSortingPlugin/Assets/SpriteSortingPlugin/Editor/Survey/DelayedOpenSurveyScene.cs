@@ -15,7 +15,7 @@ namespace SpriteSortingPlugin.Survey
 
         private const string IsSurveySceneShowedSessionStateName = "DelayedOpenSurveyScene.showedSurveyScene";
 
-        private const string SurveyScene = "Survey.unity";
+        private const string SurveyScene = "START.unity";
 
         static DelayedOpenSurveyScene()
         {

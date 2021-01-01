@@ -132,7 +132,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField($"Please open the {GeneralData.FullDetectorName}",
                 Styling.LabelWrapStyle);
 
-            var openDetectorContent = new GUIContent(GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name +
+            var openDetectorContent = new GUIContent(GeneralData.Name +
                                                      " -> " + GeneralData.DetectorName);
             EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
 
@@ -149,6 +149,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             howToDescription.DrawHowTo();
 
+            EditorGUILayout.Space(5);
+
+            howToDescription.HowToGenerateSpriteData();
             EditorGUILayout.Space(20);
 
             using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))

@@ -52,7 +52,7 @@ namespace SpriteSortingPlugin.Survey.UI
         private SurveyStep currentStep;
         private string resultDataPath;
 
-        [MenuItem(GeneralData.UnityMenuMainCategory + "/" + GeneralData.Name + "/Survey %g", false, 2)]
+        [MenuItem(GeneralData.Name + "/Survey %g", false, 2)]
         public static void ShowWindow()
         {
             var window = GetWindow<SurveyWindow>();

@@ -71,7 +71,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField($"Please open the {GeneralData.FullDetectorName}",
                 Styling.LabelWrapStyle);
 
-            var openDetectorContent = new GUIContent(GeneralData.UnityMenuMainCategory + " -> " + GeneralData.Name +
+            var openDetectorContent = new GUIContent(GeneralData.Name +
                                                      " -> " + GeneralData.DetectorName);
             EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
 
@@ -79,7 +79,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 GUILayout.Space(20);
                 var width = Styling.ButtonStyle.CalcSize(openDetectorContent).x;
-                if (GUILayout.Button($"Open Scene and {GeneralData.DetectorName}", GUILayout.Width(width)))
+                if (GUILayout.Button($"Open Scene and {GeneralData.DetectorName}",
+                    GUILayout.Height(EditorGUIUtility.singleLineHeight * 1.25f)))
                 {
                     var path = Path.Combine(Path.Combine(SortingTaskData.SceneFolderPath), SceneName);
                     EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
@@ -109,6 +110,9 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
             EditorGUILayout.Space(20);
             howToDescription.DrawHowTo();
+
+            EditorGUILayout.Space(5);
+            howToDescription.HowToGenerateSpriteData();
 
             EditorGUI.indentLevel--;
         }

@@ -246,7 +246,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 using (new EditorGUILayout.VerticalScope())
                 {
                     var openDetectorContent = new GUIContent(
-                        $"{GeneralData.UnityMenuMainCategory} -> {GeneralData.Name} -> {GeneralData.DetectorName}");
+                        $"{GeneralData.Name} -> {GeneralData.DetectorName}");
                     EditorGUILayout.LabelField($"{GeneralData.FullDetectorName}",
                         Styling.LabelWrapStyle);
                     EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
@@ -286,6 +286,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             howToDescription.DrawHowTo();
+            howToDescription.HowToGenerateSpriteData();
             autoSortingHowToDescription.DrawHowTo();
         }
 

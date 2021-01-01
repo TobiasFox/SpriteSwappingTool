@@ -53,6 +53,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             howToDescription = new HowToDescription() {isBoldHeader = false};
         }
 
+        public override bool IsSendingData()
+        {
+            return true;
+        }
+
         public override List<string> CollectFilePathsToCopy()
         {
             if (!IsFinished)
@@ -129,7 +134,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             EditorGUILayout.LabelField($"Please open the {GeneralData.FullDetectorName}",
                 Styling.LabelWrapStyle);
             var openDetectorContent = new GUIContent(
-                $"{GeneralData.UnityMenuMainCategory} -> {GeneralData.Name} -> {GeneralData.DetectorName}");
+                $"{GeneralData.Name} -> {GeneralData.DetectorName}");
             EditorGUILayout.LabelField(openDetectorContent, Styling.LabelWrapStyle);
 
             using (new EditorGUILayout.HorizontalScope())
@@ -144,6 +149,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             }
 
             howToDescription.DrawHowTo();
+            EditorGUILayout.Space(5);
+            howToDescription.HowToGenerateSpriteData();
 
             EditorGUILayout.Space(20);
 
@@ -155,11 +162,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     taskLabelStyle);
 
                 EditorGUILayout.Space(10);
-                
+
                 EditorGUILayout.LabelField(
                     "Please solve this task as quickly as possible and do not modify the positions of the SpriteRenderers.",
                     Styling.LabelWrapStyle);
-                
+
                 EditorGUILayout.LabelField(
                     new GUIContent("Time will be measured.",
                         "Time will be measured between pressing the \"Start\" and \"Finish\" button."),
