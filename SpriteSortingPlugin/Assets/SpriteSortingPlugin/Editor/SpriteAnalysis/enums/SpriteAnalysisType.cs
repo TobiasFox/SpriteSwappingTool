@@ -22,7 +22,7 @@
 
 namespace SpriteSortingPlugin.SpriteAnalysis
 {
-    public enum SpriteAnalyzerType
+    public enum SpriteAnalysisType
     {
         Outline,
         Sharpness,

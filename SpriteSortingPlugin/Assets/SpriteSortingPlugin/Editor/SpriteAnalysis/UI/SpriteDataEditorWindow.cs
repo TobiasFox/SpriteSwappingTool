@@ -562,7 +562,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
                         FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
-                        AnalyzeSprite(SpriteAnalyzerType.Sharpness);
+                        AnalyzeSprite(SpriteAnalysisType.Sharpness);
                     }
                 }
 
@@ -583,7 +583,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
                         FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
-                        AnalyzeSprite(SpriteAnalyzerType.Lightness);
+                        AnalyzeSprite(SpriteAnalysisType.Lightness);
                     }
                 }
 
@@ -604,7 +604,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
                         FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
-                        AnalyzeSprite(SpriteAnalyzerType.AverageAlpha);
+                        AnalyzeSprite(SpriteAnalysisType.AverageAlpha);
                     }
                 }
 
@@ -625,7 +625,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     if (GUILayout.Button("Analyze", analyzeButtonWidth))
                     {
                         FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
-                        AnalyzeSprite(SpriteAnalyzerType.PrimaryColor);
+                        AnalyzeSprite(SpriteAnalysisType.PrimaryColor);
                     }
                 }
 
@@ -635,24 +635,24 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     if (GUILayout.Button("Analyze All", analyzeButtonWidth))
                     {
                         FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
-                        AnalyzeSprite(SpriteAnalyzerType.Lightness, SpriteAnalyzerType.Sharpness,
-                            SpriteAnalyzerType.PrimaryColor, SpriteAnalyzerType.AverageAlpha);
+                        AnalyzeSprite(SpriteAnalysisType.Lightness, SpriteAnalysisType.Sharpness,
+                            SpriteAnalysisType.PrimaryColor, SpriteAnalysisType.AverageAlpha);
                     }
                 }
             }
         }
 
-        private void AnalyzeSprite(params SpriteAnalyzerType[] currentSpriteAnalyzerTypes)
+        private void AnalyzeSprite(params SpriteAnalysisType[] currentSpriteAnalyzerTypes)
         {
             if (spriteDataAnalyzerContext == null)
             {
                 spriteDataAnalyzerContext = new SpriteDataAnalyzerContext();
             }
 
-            spriteDataAnalyzerContext.ClearSpriteDataAnalyzers();
+            spriteDataAnalyzerContext.ClearSpriteAnalyzeActions();
             foreach (var spriteAnalyzerType in currentSpriteAnalyzerTypes)
             {
-                spriteDataAnalyzerContext.AddSpriteDataAnalyzer(spriteAnalyzerType);
+                spriteDataAnalyzerContext.AddSpriteAnalyzeAction(spriteAnalyzerType);
             }
 
             spriteData = spriteDataAnalyzerContext.Analyze(spriteAnalyzeInputData);
@@ -739,7 +739,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     Undo.RegisterCompleteObjectUndo(spriteData, "reanalyzed outline");
                     FillSpriteAnalyzeDataForUpdating(selectedSpriteDataItem.AssetGuid);
                     spriteAnalyzeInputData.outlineAnalysisType = OutlineAnalysisType.PixelPerfect;
-                    AnalyzeSprite(SpriteAnalyzerType.Outline);
+                    AnalyzeSprite(SpriteAnalysisType.Outline);
 
                     simplifiedOutlineToleranceErrorAppearance = SimplifiedOutlineToleranceErrorAppearance.Nothing;
                 }
@@ -1115,9 +1115,9 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             spriteAnalyzeInputData.spriteData = spriteData;
         }
 
-        private SpriteAnalyzerType[] CreateSpriteAnalyzerTypeArray()
+        private SpriteAnalysisType[] CreateSpriteAnalyzerTypeArray()
         {
-            var typeList = new List<SpriteAnalyzerType>();
+            var typeList = new List<SpriteAnalysisType>();
             if (spriteDataAnalysisType == SpriteDataAnalysisType.Nothing)
             {
                 return typeList.ToArray();
@@ -1132,21 +1132,21 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                     continue;
                 }
 
-                var type = SpriteAnalyzerType.Outline;
+                var type = SpriteAnalysisType.Outline;
 
                 switch (spriteAnalyzerType)
                 {
                     case SpriteDataAnalysisType.Sharpness:
-                        type = SpriteAnalyzerType.Sharpness;
+                        type = SpriteAnalysisType.Sharpness;
                         break;
                     case SpriteDataAnalysisType.Lightness:
-                        type = SpriteAnalyzerType.Lightness;
+                        type = SpriteAnalysisType.Lightness;
                         break;
                     case SpriteDataAnalysisType.PrimaryColor:
-                        type = SpriteAnalyzerType.PrimaryColor;
+                        type = SpriteAnalysisType.PrimaryColor;
                         break;
                     case SpriteDataAnalysisType.AverageAlpha:
-                        type = SpriteAnalyzerType.AverageAlpha;
+                        type = SpriteAnalysisType.AverageAlpha;
                         break;
                 }
 

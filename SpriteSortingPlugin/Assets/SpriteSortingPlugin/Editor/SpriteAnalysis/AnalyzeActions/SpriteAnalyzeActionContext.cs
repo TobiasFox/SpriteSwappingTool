@@ -39,42 +39,42 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
 
         private readonly HashSet<ISpriteDataAnalyzer> spriteDataAnalyzerSet = new HashSet<ISpriteDataAnalyzer>();
 
-        private readonly Dictionary<SpriteAnalyzerType, ISpriteDataAnalyzer> spriteDataAnalyzers =
-            new Dictionary<SpriteAnalyzerType, ISpriteDataAnalyzer>();
+        private readonly Dictionary<SpriteAnalysisType, ISpriteDataAnalyzer> spriteDataAnalyzers =
+            new Dictionary<SpriteAnalysisType, ISpriteDataAnalyzer>();
 
         private SpriteAnalyzeInputData spriteAnalyzeInputData;
 
-        public void AddSpriteDataAnalyzer(SpriteAnalyzerType spriteAnalyzerType)
+        public void AddSpriteAnalyzeAction(SpriteAnalysisType spriteAnalysisType)
         {
-            var isContained = spriteDataAnalyzers.TryGetValue(spriteAnalyzerType, out var spriteDataAnalyzer);
+            var isContained = spriteDataAnalyzers.TryGetValue(spriteAnalysisType, out var spriteDataAnalyzer);
             if (!isContained)
             {
-                switch (spriteAnalyzerType)
+                switch (spriteAnalysisType)
                 {
-                    case SpriteAnalyzerType.Outline:
+                    case SpriteAnalysisType.Outline:
                         spriteDataAnalyzer = new SpriteOutlineAnalyzeAction();
                         break;
-                    case SpriteAnalyzerType.Sharpness:
+                    case SpriteAnalysisType.Sharpness:
                         spriteDataAnalyzer = new SpriteSharpnessAnalyzer();
                         break;
-                    case SpriteAnalyzerType.Lightness:
+                    case SpriteAnalysisType.Lightness:
                         spriteDataAnalyzer = new SpriteBrightnessAnalyzeAction();
                         break;
-                    case SpriteAnalyzerType.PrimaryColor:
+                    case SpriteAnalysisType.PrimaryColor:
                         spriteDataAnalyzer = new SpritePrimaryColorAnalyzer();
                         break;
-                    case SpriteAnalyzerType.AverageAlpha:
+                    case SpriteAnalysisType.AverageAlpha:
                         spriteDataAnalyzer = new SpriteAverageAlphaAnalyzer();
                         break;
                 }
 
-                spriteDataAnalyzers.Add(spriteAnalyzerType, spriteDataAnalyzer);
+                spriteDataAnalyzers.Add(spriteAnalysisType, spriteDataAnalyzer);
             }
 
             spriteDataAnalyzerSet.Add(spriteDataAnalyzer);
         }
 
-        public void ClearSpriteDataAnalyzers()
+        public void ClearSpriteAnalyzeActions()
         {
             spriteDataAnalyzerSet.Clear();
         }
@@ -113,7 +113,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
                     }
                     catch (Exception e)
                     {
-                        Debug.Log($"Sprite {sprite.name} is skipped due to an error occured.");
+                        Debug.Log($"Sprite {sprite.name} is skipped due to an error occurred.");
                         Debug.LogException(e);
                         continue;
                     }
@@ -121,7 +121,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
 
                 foreach (var spriteDataAnalyzer in spriteDataAnalyzerSet)
                 {
-                    spriteDataAnalyzer.Analyse(ref spriteDataItem, sprite, spriteAnalyzeInputData);
+                    spriteDataAnalyzer.Analyze(ref spriteDataItem, sprite, spriteAnalyzeInputData);
                 }
 
                 spriteAnalyzeInputData.spriteData.spriteDataDictionary[tempAssetGuid] = spriteDataItem;

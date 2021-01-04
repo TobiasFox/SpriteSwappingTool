@@ -419,49 +419,53 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             //     }
             // }
 
-            var surroundingAnalysisToggleContent = new GUIContent(
-                "Is analyzing surrounding SpriteRenderers (recommended)",
-                UITooltipConstants.SortingEditorAnalyzeSurroundingSpriteRendererTooltip);
-
-            isSearchingSurroundingSpriteRenderer = EditorGUILayout.ToggleLeft(surroundingAnalysisToggleContent,
-                isSearchingSurroundingSpriteRenderer);
-
-            if (isSearchingSurroundingSpriteRenderer)
-            {
-                var surroundingAnalysisDurationInfoContent = new GUIContent(
-                    "This option might take some time and can affect other, not listed SpriteRenderers.",
-                    Styling.InfoIcon, UITooltipConstants.SortingEditorAnalyzeSurroundingSpriteRendererDurationTooltip);
-                GUILayout.Label(surroundingAnalysisDurationInfoContent,
-                    new GUIStyle(EditorStyles.label) {wordWrap = true});
-            }
-
-            EditorGUILayout.Space();
-
             var isConfirmButtonPressed = false;
 
-            using (new EditorGUILayout.HorizontalScope(Styling.HelpBoxStyle))
+            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
             {
-                if (GUILayout.Button("Confirm", Styling.ButtonStyleBold, GUILayout.Height(LargerButtonHeight),
-                    GUILayout.ExpandWidth(true)))
+                var surroundingAnalysisToggleContent = new GUIContent(
+                    "Is analyzing surrounding SpriteRenderers (recommended)",
+                    UITooltipConstants.SortingEditorAnalyzeSurroundingSpriteRendererTooltip);
+
+                isSearchingSurroundingSpriteRenderer = EditorGUILayout.ToggleLeft(surroundingAnalysisToggleContent,
+                    isSearchingSurroundingSpriteRenderer);
+
+                if (isSearchingSurroundingSpriteRenderer)
                 {
-                    ApplySortingOptions();
-                    isConfirmButtonPressed = true;
-
-                    IncrementConfirmedSortingOrder();
-                    SaveLogFile();
-
-                    if (isContinueSearching)
-                    {
-                        //TODO: check isAnalyzingWithChangedLayerFirst
-                        Analyze();
-                    }
+                    var surroundingAnalysisDurationInfoContent = new GUIContent(
+                        "This option might take some time and can affect other, not listed SpriteRenderers.",
+                        Styling.InfoIcon,
+                        UITooltipConstants.SortingEditorAnalyzeSurroundingSpriteRendererDurationTooltip);
+                    GUILayout.Label(surroundingAnalysisDurationInfoContent,
+                        new GUIStyle(EditorStyles.label) {wordWrap = true});
                 }
 
-                EditorGUIUtility.labelWidth = 200;
-                isContinueSearching =
-                    EditorGUILayout.ToggleLeft("And continue searching for next glitch?", isContinueSearching,
-                        GUILayout.ExpandWidth(false));
-                EditorGUIUtility.labelWidth = 0;
+                EditorGUILayout.Space();
+
+                using (new EditorGUILayout.HorizontalScope(Styling.HelpBoxStyle))
+                {
+                    if (GUILayout.Button("Confirm", Styling.ButtonStyleBold, GUILayout.Height(LargerButtonHeight),
+                        GUILayout.ExpandWidth(true)))
+                    {
+                        ApplySortingOptions();
+                        isConfirmButtonPressed = true;
+
+                        IncrementConfirmedSortingOrder();
+                        SaveLogFile();
+
+                        if (isContinueSearching)
+                        {
+                            //TODO: check isAnalyzingWithChangedLayerFirst
+                            Analyze();
+                        }
+                    }
+
+                    EditorGUIUtility.labelWidth = 200;
+                    isContinueSearching =
+                        EditorGUILayout.ToggleLeft("And continue searching for next glitch?", isContinueSearching,
+                            GUILayout.ExpandWidth(false));
+                    EditorGUIUtility.labelWidth = 0;
+                }
             }
 
             autoSortingResultList?.DoLayoutList();

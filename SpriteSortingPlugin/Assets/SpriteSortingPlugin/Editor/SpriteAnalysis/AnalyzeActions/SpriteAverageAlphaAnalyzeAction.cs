@@ -29,7 +29,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
     {
         private AverageAlphaAnalyzer averageAlphaAnalyzer;
 
-        public void Analyse(ref SpriteDataItem spriteDataItem, Sprite sprite,
+        public void Analyze(ref SpriteDataItem spriteDataItem, Sprite sprite,
             SpriteAnalyzeInputData spriteAnalyzeInputData)
         {
             if (averageAlphaAnalyzer == null)
