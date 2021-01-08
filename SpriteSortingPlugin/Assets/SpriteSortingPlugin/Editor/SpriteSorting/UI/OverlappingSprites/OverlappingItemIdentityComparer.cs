@@ -33,10 +33,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             if (ReferenceEquals(null, y)) return 1;
             if (ReferenceEquals(null, x)) return -1;
 
-            var sortingLayerComparison = SortingLayer.GetLayerValueFromName(x.sortingLayerName)
-                .CompareTo(SortingLayer.GetLayerValueFromName(y.sortingLayerName));
+            var sortingLayerComparison = SortingLayer.GetLayerValueFromName(y.sortingLayerName)
+                .CompareTo(SortingLayer.GetLayerValueFromName(x.sortingLayerName));
 
-            if (sortingLayerComparison < 0 || sortingLayerComparison > 0)
+            if (sortingLayerComparison != 0)
             {
                 return sortingLayerComparison;
             }

@@ -446,6 +446,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     continue;
                 }
 
+                //TODO validates against wrong layer
                 if (ValidateSortingComponent(spriteRenderer, out var sortingComponent))
                 {
                     filteredSortingComponents.Add(sortingComponent);

@@ -39,14 +39,14 @@ namespace SpriteSortingPlugin
         public const string DataAnalysisName = "Data Analysis";
         public const string DataAnalysisShortcut = "%e";
 
-        public const string ClipperLibName = "clipper";
+        public const string ClipperLibName = "Clipper";
         public const string ClipperLibVersion = "6.4.2";
-        public const string ClipperLibLicense = "BSD license";
+        public const string ClipperLibLicense = "Boost Software License (BSL 1.0)";
         public const string ClipperLibLink = "http://www.angusj.com/delphi/clipper.php";
 
         //TODO set to true
-        public const bool IsValidatingUserInput = true;
-        // public const bool IsValidatingUserInput = false;
+        // public const bool IsValidatingUserInput = true;
+        public const bool IsValidatingUserInput = false;
 
         // public static bool isSurveyActive = true;
         // public static bool isAutomaticSortingActive = true;

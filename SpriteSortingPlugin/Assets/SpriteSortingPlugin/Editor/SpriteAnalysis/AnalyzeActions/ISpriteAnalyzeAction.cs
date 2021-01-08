@@ -24,8 +24,8 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
 {
-public interface ISpriteDataAnalyzer
-{
-    void Analyze(ref SpriteDataItem spriteDataItem, Sprite sprite, SpriteAnalyzeInputData spriteAnalyzeInputData);
-}
+    public interface ISpriteDataAnalyzer
+    {
+        void Analyze(ref SpriteDataItem spriteDataItem, Sprite sprite, SpriteAnalyzeInputData spriteAnalyzeInputData);
+    }
 }
