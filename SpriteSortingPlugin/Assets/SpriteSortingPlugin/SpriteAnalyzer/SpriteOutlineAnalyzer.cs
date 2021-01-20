@@ -251,6 +251,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                                                   pixelDirectionToCheck == PixelDirection.Southwest);
                 if (isOutsideOfLeftImageBorder)
                 {
+                    pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
                     continue;
                 }
 
@@ -260,6 +261,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
                                                    pixelDirectionToCheck == PixelDirection.Southeast);
                 if (isOutsideOfRightImageBorder)
                 {
+                    pixelDirectionToCheck = PixelDirectionUtility.GetNextPixelDirectionClockWise(pixelDirectionToCheck);
                     continue;
                 }
 
