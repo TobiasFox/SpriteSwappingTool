@@ -114,7 +114,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             SortingLayerUtility.UpdateSortingLayerNames();
             SelectDefaultLayer();
 
-            //TODO: remove
             // SelectDefaultSpriteAlphaData();
 
             overlappingSpriteDetector = new OverlappingSpriteDetector();
@@ -333,19 +332,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 }
             }
 
-            //TODO for debug only remove for build
-            // if (GUILayout.Button("Save modification data"))
-            // {
-            //     SaveLogFile();
-            // }
-            //
-            // if (GUILayout.Button("Clear loggingData"))
-            // {
-            //     var loggingManager = LoggingManager.GetInstance();
-            //     loggingManager.Clear();
-            // }
-            //end debug
-
             if (isShowingNoGlitchResult)
             {
                 EditorGUILayout.Space();
@@ -492,6 +478,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EndScrollRect();
         }
+        
+        private void EndScrollRect()
+        {
+            EditorGUILayout.EndScrollView();
+        }
 
         // private void ResetAndResortOverlappingItems()
         // {
@@ -540,66 +531,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 $"Due to missing entries in the selected {nameof(SpriteData)} some Sorting criteria are skipped.";
             GUILayout.Label(new GUIContent(skippedCriteriaMessage, Styling.WarnIcon, skippedTooltip),
                 Styling.LabelWrapStyle);
-        }
-
-        private void ShowConfirmButton(out bool isConfirmButtonPressed)
-        {
-            isConfirmButtonPressed = false;
-            var confirmButtonLabels = sortingType == SortingType.Layer
-                ? new[] {"Confirm sorting options", "Confirm and Find next glitch"}
-                : new[] {"Confirm sorting options"};
-
-            var selectedConfirmButtonIndex =
-                GUILayout.SelectionGrid(-1, confirmButtonLabels, confirmButtonLabels.Length, Styling.ButtonStyleBold,
-                    GUILayout.Height(LargerButtonHeight));
-            if (selectedConfirmButtonIndex < 0)
-            {
-                return;
-            }
-
-            ApplySortingOptions();
-            isConfirmButtonPressed = true;
-
-            IncrementConfirmedSortingOrder();
-            SaveLogFile();
-
-            if (selectedConfirmButtonIndex == 1)
-            {
-                //TODO: check isAnalyzingWithChangedLayerFirst
-                Analyze();
-            }
-        }
-
-        private bool IsUsingSpriteData(out string usedBy)
-        {
-            usedBy = "";
-            var isUsingSpriteData = false;
-
-            switch (outlinePrecision)
-            {
-                case OutlinePrecision.ObjectOrientedBoundingBox:
-                case OutlinePrecision.PixelPerfect:
-                    isUsingSpriteData = true;
-                    usedBy = "Outline Precision";
-                    break;
-            }
-
-            var isSpriteDataRequiredForAutoSorting =
-                autoSortingOptionsUI.IsSpriteDataRequired(out var usedByExplanation);
-
-            if (isSpriteDataRequiredForAutoSorting)
-            {
-                if (usedBy.Length > 0)
-                {
-                    usedBy += " and ";
-                }
-
-                usedBy += usedByExplanation;
-            }
-
-            isUsingSpriteData |= isSpriteDataRequiredForAutoSorting;
-
-            return isUsingSpriteData;
         }
 
         private void DrawSpriteDataAssetOptions()
@@ -653,7 +584,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private void DrawSortingOptions()
         {
             isSortingOptionExpanded = EditorGUILayout.Foldout(isSortingOptionExpanded, "Glitch Finding Options", true);
-            // GUILayout.Label("Sorting Options");
             if (!isSortingOptionExpanded)
             {
                 return;
@@ -876,35 +806,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             EditorGUILayout.LabelField(new GUIContent(" "), selectedLabel);
         }
 
-        private bool IsCameraRequired(out string usedBy)
-        {
-            usedBy = "";
-            var isCameraRequired = false;
-
-            if (GraphicsSettings.transparencySortMode == TransparencySortMode.Default)
-            {
-                usedBy = "identify visual glitches";
-                isCameraRequired = true;
-            }
-
-            var isCameraRequiredForAutoSortingOptions =
-                autoSortingOptionsUI.IsCameraRequired(out var usedByExplanation);
-
-            if (isCameraRequiredForAutoSortingOptions)
-            {
-                if (usedBy.Length > 0)
-                {
-                    usedBy += " and ";
-                }
-
-                usedBy += usedByExplanation;
-            }
-
-            isCameraRequired |= isCameraRequiredForAutoSortingOptions;
-
-            return isCameraRequired;
-        }
-
         private void ApplySortingOptions()
         {
             if (preview.IsUpdatingSpriteRendererInScene)
@@ -1018,11 +919,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             spriteDetectionData.outlinePrecision = outlinePrecision;
             spriteDetectionData.spriteData = spriteData;
             spriteDetectionData.cameraProjectionType = cameraProjectionType;
-        }
-
-        private void EndScrollRect()
-        {
-            EditorGUILayout.EndScrollView();
         }
 
         private void CleanUpReordableList()
@@ -1171,112 +1067,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             IncrementFoundGlitch();
         }
 
-        private void AddSortingSuggestionLoggingData()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var sortingOrderSuggestionLoggingData = new SortingSuggestionLoggingData();
-            var validSortingCriteria = autoSortingOptionsUI.GenerateSortingCriteriaDataArray();
-            sortingOrderSuggestionLoggingData.Init(overlappingItems.Items, validSortingCriteria);
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.AddSortingOrderSuggestionLoggingData(sortingOrderSuggestionLoggingData);
-        }
-
-        private void ClearLastLog()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.ClearLastLoggingData();
-        }
-
-        private void SaveLogFile()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.ConfirmSortingOrder();
-            var loggingDataJson = JsonUtility.ToJson(loggingData);
-
-            var tempCachePath = Path.Combine(Application.temporaryCachePath, Path.Combine(LogOutputPath));
-            var logDirectory = Path.Combine(tempCachePath, GeneralData.currentSurveyId, "LogFiles");
-            Directory.CreateDirectory(logDirectory);
-            var pathAndName = Path.Combine(logDirectory, loggingData.UniqueFileName);
-
-            File.WriteAllText(pathAndName, loggingDataJson);
-        }
-
-        private void IncrementConfirmedSortingOrder()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.CurrentFoundGlitchStatistic.totalConfirmedGlitches++;
-            // loggingData.totalConfirmedGlitches++;
-        }
-
-        private void IncrementClearedFoundItems()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.CurrentFoundGlitchStatistic.totalClearedGlitches++;
-            // loggingData.totalClearedGlitches++;
-        }
-
-        private void IncrementFoundGlitch()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.CurrentFoundGlitchStatistic.totalFoundGlitches++;
-            // loggingData.totalFoundGlitches++;
-        }
-
         private List<OverlappingItem> ApplyAutoSorting(
             OverlappingSpriteDetectionResult overlappingSpriteDetectionResult, out OverlappingItem overlappingBaseItem)
         {
@@ -1414,5 +1204,177 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             autoSortingOptionsUI.Cleanup();
             ClearLastLog();
         }
+
+        #region validation
+
+        private bool IsCameraRequired(out string usedBy)
+        {
+            usedBy = "";
+            var isCameraRequired = false;
+
+            if (GraphicsSettings.transparencySortMode == TransparencySortMode.Default)
+            {
+                usedBy = "identify visual glitches";
+                isCameraRequired = true;
+            }
+
+            var isCameraRequiredForAutoSortingOptions =
+                autoSortingOptionsUI.IsCameraRequired(out var usedByExplanation);
+
+            if (isCameraRequiredForAutoSortingOptions)
+            {
+                if (usedBy.Length > 0)
+                {
+                    usedBy += " and ";
+                }
+
+                usedBy += usedByExplanation;
+            }
+
+            isCameraRequired |= isCameraRequiredForAutoSortingOptions;
+
+            return isCameraRequired;
+        }
+
+        private bool IsUsingSpriteData(out string usedBy)
+        {
+            usedBy = "";
+            var isUsingSpriteData = false;
+
+            switch (outlinePrecision)
+            {
+                case OutlinePrecision.ObjectOrientedBoundingBox:
+                case OutlinePrecision.PixelPerfect:
+                    isUsingSpriteData = true;
+                    usedBy = "Outline Precision";
+                    break;
+            }
+
+            var isSpriteDataRequiredForAutoSorting =
+                autoSortingOptionsUI.IsSpriteDataRequired(out var usedByExplanation);
+
+            if (isSpriteDataRequiredForAutoSorting)
+            {
+                if (usedBy.Length > 0)
+                {
+                    usedBy += " and ";
+                }
+
+                usedBy += usedByExplanation;
+            }
+
+            isUsingSpriteData |= isSpriteDataRequiredForAutoSorting;
+
+            return isUsingSpriteData;
+        }
+
+        #endregion
+
+        #region logging
+
+        private void AddSortingSuggestionLoggingData()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var sortingOrderSuggestionLoggingData = new SortingSuggestionLoggingData();
+            var validSortingCriteria = autoSortingOptionsUI.GenerateSortingCriteriaDataArray();
+            sortingOrderSuggestionLoggingData.Init(overlappingItems.Items, validSortingCriteria);
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.AddSortingOrderSuggestionLoggingData(sortingOrderSuggestionLoggingData);
+        }
+
+        private void ClearLastLog()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.ClearLastLoggingData();
+        }
+
+        private void SaveLogFile()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.ConfirmSortingOrder();
+            var loggingDataJson = JsonUtility.ToJson(loggingData);
+
+            var tempCachePath = Path.Combine(Application.temporaryCachePath, Path.Combine(LogOutputPath));
+            var logDirectory = Path.Combine(tempCachePath, GeneralData.currentSurveyId, "LogFiles");
+            Directory.CreateDirectory(logDirectory);
+            var pathAndName = Path.Combine(logDirectory, loggingData.UniqueFileName);
+
+            File.WriteAllText(pathAndName, loggingDataJson);
+        }
+
+        private void IncrementConfirmedSortingOrder()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.CurrentFoundGlitchStatistic.totalConfirmedGlitches++;
+        }
+
+        private void IncrementClearedFoundItems()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.CurrentFoundGlitchStatistic.totalClearedGlitches++;
+        }
+
+        private void IncrementFoundGlitch()
+        {
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return;
+            }
+
+            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
+            {
+                return;
+            }
+
+            var loggingData = LoggingManager.GetInstance().loggingData;
+            loggingData.CurrentFoundGlitchStatistic.totalFoundGlitches++;
+        }
+
+        #endregion
     }
 }
