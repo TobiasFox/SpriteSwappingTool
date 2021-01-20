@@ -71,6 +71,11 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 
             FilterSortingComponents();
 
+            if (filteredSortingComponents.Count < 2)
+            {
+                return result;
+            }
+
             // Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Count +
             // " to " + filteredSortingComponents.Count);
 
@@ -116,6 +121,11 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             }
 
             FilterSortingComponents();
+            
+            if (filteredSortingComponents.Count < 2)
+            {
+                return result;
+            }
             // Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Count +
             // " to " + filteredSortingComponents.Count);
 
@@ -200,6 +210,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 
             var excludingSpriteRendererList = new List<SpriteRenderer>();
             var baseSortingComponents = new List<SortingComponent>();
+            var isSelectedLayersSet = false;
 
             foreach (var overlappingItem in overlappingItems)
             {
@@ -214,14 +225,18 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                 var sortingComponent = overlappingItem.SortingComponent;
                 baseSortingComponents.Add(sortingComponent);
                 sortingOptions.Add(sortingComponent.GetInstanceId(), newSortingOrder);
+
+                if (!isSelectedLayersSet)
+                {
+                    isSelectedLayersSet = true;
+                    this.selectedLayers = new List<int>() {SortingLayer.NameToID(overlappingItem.sortingLayerName)};
+                }
             }
 
             if (baseSortingComponents.Count <= 0)
             {
                 return sortingOptions;
             }
-
-            this.selectedLayers = new List<int> {baseSortingComponents[0].OriginSortingLayer};
 
             var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
             spriteDataItemValidatorCache.UpdateSpriteData(spriteDetectionData.spriteData);
@@ -446,7 +461,6 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     continue;
                 }
 
-                //TODO validates against wrong layer
                 if (ValidateSortingComponent(spriteRenderer, out var sortingComponent))
                 {
                     filteredSortingComponents.Add(sortingComponent);
@@ -465,18 +479,18 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             }
 
             var sortingGroupArray = spriteRenderer.GetComponentsInParent<SortingGroup>();
-            var outmostSortingGroup = SortingGroupUtility.GetOutmostActiveSortingGroup(sortingGroupArray);
+            var outermostSortingGroup = SortingGroupUtility.GetOutmostActiveSortingGroup(sortingGroupArray);
 
-            var layerId = outmostSortingGroup == null
+            var layerId = outermostSortingGroup == null
                 ? spriteRenderer.sortingLayerID
-                : outmostSortingGroup.sortingLayerID;
+                : outermostSortingGroup.sortingLayerID;
 
             if (!selectedLayers.Contains(layerId))
             {
                 return false;
             }
 
-            sortingComponent = new SortingComponent(spriteRenderer, outmostSortingGroup);
+            sortingComponent = new SortingComponent(spriteRenderer, outermostSortingGroup);
             return true;
         }
 
