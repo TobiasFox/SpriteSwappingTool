@@ -24,7 +24,7 @@ using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
-    public class SharpnessSortingCriterion : SortingCriterion<SortingCriterionData>
+    public class SharpnessSortingCriterion : SortingCriterion
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;

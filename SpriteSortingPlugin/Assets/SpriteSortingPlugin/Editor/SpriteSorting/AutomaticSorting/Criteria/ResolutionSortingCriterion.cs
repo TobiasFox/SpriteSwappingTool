@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
-    public class ResolutionSortingCriterion : SortingCriterion<SortingCriterionData>
+    public class ResolutionSortingCriterion : SortingCriterion
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;

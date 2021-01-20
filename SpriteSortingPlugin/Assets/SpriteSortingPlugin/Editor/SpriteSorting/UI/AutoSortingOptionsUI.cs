@@ -328,9 +328,9 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             return false;
         }
 
-        public List<SortingCriterion<SortingCriterionData>> GetActiveSortingCriteria()
+        public List<SortingCriterion> GetActiveSortingCriteria()
         {
-            var list = new List<SortingCriterion<SortingCriterionData>>();
+            var list = new List<SortingCriterion>();
 
             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
             {

@@ -89,6 +89,11 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             loggingData.isFirstSortingQuestion = true;
             loggingData.CurrentFoundGlitchStatistic.question = GeneralData.questionNumberForLogging;
         }
+        
+        public override bool IsSendingData()
+        {
+            return true;
+        }
 
         public override List<string> CollectFilePathsToCopy()
         {

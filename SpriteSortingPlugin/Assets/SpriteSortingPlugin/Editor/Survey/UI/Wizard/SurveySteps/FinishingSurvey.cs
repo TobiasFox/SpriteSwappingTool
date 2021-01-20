@@ -26,6 +26,7 @@ using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Object = UnityEngine.Object;
 
 namespace SpriteSortingPlugin.Survey.UI.Wizard
 {
@@ -72,11 +73,17 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
         private HowToDescription howToDescription;
         private AutoSortingHowToDescription autoSortingHowToDescription;
 
+        private string mailAddress = null;
+        private TransmitData transmitData;
+        private TransmitResult lastContestTransmitResult;
+        private TransmitResult contestTransmitResult;
+        private bool isSendingContestMail;
+
         public FinishingSurvey(string name) : base(name)
         {
             labelWrapStyle = new GUIStyle(Styling.LabelWrapStyle) {alignment = TextAnchor.MiddleCenter};
             howToDescription = new HowToDescription() {isBoldHeader = false};
-            autoSortingHowToDescription = new AutoSortingHowToDescription(){isBoldHeader = false};
+            autoSortingHowToDescription = new AutoSortingHowToDescription() {isBoldHeader = false};
         }
 
         public override void Start()
@@ -86,6 +93,8 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             {
                 isUpdatingProgressbar = true;
             }
+
+            transmitData = new TransmitData();
         }
 
         public override void DrawContent()
@@ -110,13 +119,62 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
                 GUILayout.FlexibleSpace();
 
-                using (new EditorGUILayout.VerticalScope(GUILayout.Height(FireworkLabelHeight)
-                ))
+                using (new EditorGUILayout.VerticalScope(GUILayout.Height(FireworkLabelHeight)))
                 {
                     GUILayout.FlexibleSpace();
                     DrawCurrentSprite();
                     GUILayout.FlexibleSpace();
                 }
+            }
+
+            var wrapStyle = new GUIStyle(labelWrapStyle) {richText = true};
+            EditorGUILayout.LabelField(
+                "Optional:\n" +
+                "Enter your mail address to participate in a contest to win\n" +
+                "<b>1x Steam voucher worth 20€</b>.",
+                wrapStyle);
+            using (new EditorGUI.DisabledScope(isSendingContestMail ||
+                                               lastContestTransmitResult == TransmitResult.Succeeded))
+            {
+                mailAddress = EditorGUILayout.TextField("Mail address", mailAddress);
+            }
+          
+            var isDisable = isSendingContestMail || lastContestTransmitResult == TransmitResult.Succeeded ||
+                            string.IsNullOrEmpty(mailAddress) || !mailAddress.Contains("@");
+            using (new EditorGUI.DisabledScope(isDisable))
+            {
+                if (GUILayout.Button("Submit mail for contest"))
+                {
+                    isSendingContestMail = true;
+                    transmitData.onContestAddMailSendCompleted += OnContestAddMailSendCompleted;
+                    transmitData.AddMailToContest(mailAddress);
+                }
+            }
+
+            if (Event.current.type == EventType.Layout)
+            {
+                lastContestTransmitResult = contestTransmitResult;
+            }
+            
+            switch (lastContestTransmitResult)
+            {
+                case TransmitResult.Succeeded:
+                    EditorGUILayout.LabelField("You participate in the Contest! Good Luck", labelWrapStyle);
+
+                    break;
+                case TransmitResult.Failed:
+                    EditorGUILayout.LabelField(
+                        "Sorry, some error occurred, please try sending again or write me manually by pressing the button below",
+                        labelWrapStyle);
+                    if (GUILayout.Button("Open System mail client to participate in contest"))
+                    {
+                        var subject = MyEscapeURL("[Sprite Swapping Survey Contest] add mail");
+
+                        var mailUrl = $"mailto:{GeneralData.DeveloperMailAddress}?subject={subject}";
+                        Application.OpenURL(mailUrl);
+                    }
+
+                    break;
             }
 
             using (new EditorGUI.IndentLevelScope())
@@ -144,6 +202,12 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     DrawSendingDataFailed();
                     break;
             }
+        }
+
+        private void OnContestAddMailSendCompleted(TransmitResult transmitResult)
+        {
+            isSendingContestMail = false;
+            contestTransmitResult = transmitResult;
         }
 
         private void DrawSendingDataSucceeded()

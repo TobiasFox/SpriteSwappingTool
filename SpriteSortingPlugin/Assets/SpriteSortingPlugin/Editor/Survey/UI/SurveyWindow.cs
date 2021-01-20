@@ -66,6 +66,7 @@ namespace SpriteSortingPlugin.Survey.UI
             surveyStepGenerator = new SurveyStepGenerator();
 
             surveyData = new SurveyData();
+            surveyData.LoadGuid();
             surveyWizard = new SurveyWizard();
             surveyWizard.SetSurveySteps(surveyStepGenerator.GenerateSurveySteps(surveyData));
             currentStep = surveyWizard.GetCurrent();
@@ -470,12 +471,12 @@ namespace SpriteSortingPlugin.Survey.UI
                 // Debug.Log("start sending mail");
                 transmitData.SendMail(surveyData.UserId, threadData.progress, adjustedOutputPath, threadData.isResult);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                if (threadData.isResult)
-                {
-                    Debug.LogException(ex);
-                }
+                // if (threadData.isResult)
+                // {
+                //     Debug.LogException(ex);
+                // }
             }
         }
 

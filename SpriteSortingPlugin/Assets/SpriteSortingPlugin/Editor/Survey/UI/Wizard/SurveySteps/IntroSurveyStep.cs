@@ -93,6 +93,10 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                     EditorGUILayout.SelectableLabel(GeneralData.DeveloperMailAddress,
                         GUILayout.Height(EditorGUIUtility.singleLineHeight), GUILayout.ExpandWidth(true));
                 }
+
+                EditorGUILayout.LabelField("Optional contest",
+                    "1x Steam voucher worth 20€ will be given away among all participants. (submit your mail at the end).",
+                    Styling.LabelWrapStyle);
             }
 
             EditorGUILayout.Space(VerticalSpacing);

@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
-    public class CameraDistanceSortingCriterion : SortingCriterion<SortingCriterionData>
+    public class CameraDistanceSortingCriterion : SortingCriterion
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;

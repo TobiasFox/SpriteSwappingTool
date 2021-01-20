@@ -24,7 +24,7 @@ using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
-    public class ContainmentSortingCriterion : SortingCriterion<SortingCriterionData>
+    public class ContainmentSortingCriterion : SortingCriterion
     {
         private ContainmentSortingCriterionData ContainmentSortingCriterionData =>
             (ContainmentSortingCriterionData) sortingCriterionData;

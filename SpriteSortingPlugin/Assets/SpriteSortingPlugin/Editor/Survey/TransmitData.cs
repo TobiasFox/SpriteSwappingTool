@@ -70,9 +70,57 @@ namespace SpriteSortingPlugin.Survey
 
         public event OnMailSendCompleted onMailSendCompleted;
 
+        public delegate void OnContestAddMailSendCompleted(TransmitResult transmitResult);
+
+        public event OnContestAddMailSendCompleted onContestAddMailSendCompleted;
+
         static TransmitData()
         {
             ShuffleCredentialArray();
+        }
+
+        public void AddMailToContest(string mailAddress)
+        {
+            foreach (var credentialData in MailDataArray)
+            {
+                var mail = new MailMessage
+                {
+                    From = new MailAddress(credentialData.mailAddress),
+                    Subject = "[Sprite Swapping Survey Contest] add mail",
+                    Body = "" + mailAddress,
+                };
+                mail.To.Add(mail.From);
+
+                var smtpClient = new SmtpClient(credentialData.host)
+                {
+                    Port = credentialData.port,
+                    Credentials = new NetworkCredential(credentialData.mailAddress, credentialData.password),
+                    EnableSsl = true,
+                };
+
+                try
+                {
+                    // smtpClient.Send(mail);
+                    // onMailSendCompleted?.Invoke(TransmitResult.Failed);
+
+                    // smtpClient.SendCompleted += SendCompletedEventHandler;
+                    // smtpClient.SendAsync(mail, "addingMailToContest");
+
+                    onContestAddMailSendCompleted?.Invoke(TransmitResult.Succeeded);
+                    return;
+                }
+                catch (SmtpFailedRecipientException)
+                {
+                    //next mail address
+                }
+                catch (Exception)
+                {
+                    onContestAddMailSendCompleted?.Invoke(TransmitResult.Failed);
+                    throw;
+                }
+            }
+
+            onContestAddMailSendCompleted?.Invoke(TransmitResult.Failed);
         }
 
         public void SendMail(Guid surveyId, int progress, string zipFilePath, bool isResult = false)
@@ -141,10 +189,15 @@ namespace SpriteSortingPlugin.Survey
             }
 
             var transmitResult = TransmitResult.Succeeded;
+            var isContestMail = ((string) e.UserState).Equals("addingMailToContest");
 
             if (e.Error != null)
             {
-                Debug.LogException(e.Error);
+                if (!isContestMail)
+                {
+                    Debug.LogException(e.Error);
+                }
+
                 transmitResult = TransmitResult.Failed;
             }
             else
@@ -152,7 +205,14 @@ namespace SpriteSortingPlugin.Survey
                 // Debug.Log("Message sent.");
             }
 
-            onMailSendCompleted?.Invoke(transmitResult);
+            if (isContestMail)
+            {
+                onContestAddMailSendCompleted?.Invoke(transmitResult);
+            }
+            else
+            {
+                onMailSendCompleted?.Invoke(transmitResult);
+            }
         }
 
         private static void ShuffleCredentialArray()

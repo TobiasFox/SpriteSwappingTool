@@ -24,9 +24,9 @@ using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
-    public abstract class SortingCriterion<T> where T : SortingCriterionData
+    public abstract class SortingCriterion
     {
-        protected readonly T sortingCriterionData;
+        protected readonly SortingCriterionData sortingCriterionData;
         protected SpriteDataItemValidator spriteDataItemValidator;
         protected SpriteDataItemValidator otherSpriteDataItemValidator;
         protected AutoSortingCalculationData autoSortingCalculationData;
@@ -35,7 +35,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
         public SortingCriterionType SortingCriterionType => sortingCriterionType;
 
-        protected SortingCriterion(T sortingCriterionData)
+        protected SortingCriterion(SortingCriterionData sortingCriterionData)
         {
             this.sortingCriterionData = sortingCriterionData;
         }

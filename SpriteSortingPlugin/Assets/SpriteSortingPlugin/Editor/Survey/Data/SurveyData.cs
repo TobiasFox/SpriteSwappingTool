@@ -41,15 +41,21 @@ namespace SpriteSortingPlugin.Survey.Data
 
         public string ResultSaveFolder => Path.Combine(userId, "result");
 
-        public Guid UserId { get; } = Guid.NewGuid();
+        public Guid UserId => ownGuid;
 
+        private Guid ownGuid;
         [SerializeField] private string userId;
 
         public SurveyData()
         {
             generalQuestionsData = new GeneralQuestionsData();
             usabilityData = new UsabilityData();
-            userId = UserId.ToString();
+        }
+
+        public void LoadGuid()
+        {
+            ownGuid = string.IsNullOrEmpty(userId) ? Guid.NewGuid() : Guid.Parse(userId);
+            userId = ownGuid.ToString();
         }
     }
 }

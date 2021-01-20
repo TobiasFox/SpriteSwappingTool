@@ -26,7 +26,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
-    public class SpriteSortPointSortingCriterion : SortingCriterion<SortingCriterionData>
+    public class SpriteSortPointSortingCriterion : SortingCriterion
     {
         private SpriteRenderer spriteRenderer;
         private SpriteRenderer otherSpriteRenderer;

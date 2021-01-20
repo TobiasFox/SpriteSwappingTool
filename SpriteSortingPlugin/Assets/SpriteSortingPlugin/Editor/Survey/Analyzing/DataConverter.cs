@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
 using SpriteSortingPlugin.SpriteSorting.Logging;
 using SpriteSortingPlugin.Survey.Data;
+using UnityEditor;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.Survey.Analyzing
 {
     public class DataConverter
     {
+        private static readonly string[] UsabilityHeaders = new string[]
+        {
+            "Easiness Detector", "Easiness Data Analysis", "Helpfulness Generation Of Sorting Order Suggestions"
+        };
+
         private List<string> headerList;
         private List<string> valueList;
 
@@ -59,12 +66,9 @@ namespace SpriteSortingPlugin.Survey.Analyzing
             headerList = new List<string>();
             valueList = new List<string>();
 
-            var isValid = LoadDataFromFolder(resultFolderPath);
-            if (!isValid)
-            {
-                Debug.Log($"Skipped data at {resultFolderPath}");
-                return;
-            }
+            LoadDataFromFolder(resultFolderPath);
+
+            AddEntry("SurveyId", surveyData?.UserId.ToString() ?? "");
 
             ExtractGeneralData();
             ExtractUsabilityData();
@@ -78,56 +82,56 @@ namespace SpriteSortingPlugin.Survey.Analyzing
             valueList.Clear();
         }
 
-        private bool LoadDataFromFolder(string resultFolderPath)
+        private void LoadDataFromFolder(string resultFolderPath)
         {
             var surveyDataPath = Path.Combine(resultFolderPath, "ResultSurveyData.json");
-            if (!File.Exists(surveyDataPath))
+            if (File.Exists(surveyDataPath))
             {
-                return false;
+                try
+                {
+                    var surveyDataContent = File.ReadAllText(surveyDataPath);
+                    surveyData = JsonUtility.FromJson<SurveyData>(surveyDataContent);
+                    surveyData.LoadGuid();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    surveyData = null;
+                }
             }
 
-            try
-            {
-                var surveyDataContent = File.ReadAllText(surveyDataPath);
-                surveyData = JsonUtility.FromJson<SurveyData>(surveyDataContent);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                return false;
-            }
 
             var loggingDataFolderPath = Path.Combine(resultFolderPath, "LogFiles");
             if (!Directory.Exists(loggingDataFolderPath))
             {
-                return false;
+                loggingDataList = null;
             }
-
-            loggingDataList = new List<LoggingData>();
-
-            try
+            else
             {
-                var dirInfo = new DirectoryInfo(loggingDataFolderPath);
+                loggingDataList = new List<LoggingData>();
 
-                foreach (var fileInfo in dirInfo.GetFiles())
+                try
                 {
-                    if (!fileInfo.Extension.Equals(".json"))
-                    {
-                        continue;
-                    }
+                    var dirInfo = new DirectoryInfo(loggingDataFolderPath);
 
-                    var loggingDataContent = File.ReadAllText(fileInfo.FullName);
-                    var loggingData = JsonUtility.FromJson<LoggingData>(loggingDataContent);
-                    loggingDataList.Add(loggingData);
+                    foreach (var fileInfo in dirInfo.GetFiles())
+                    {
+                        if (!fileInfo.Extension.Equals(".json"))
+                        {
+                            continue;
+                        }
+
+                        var loggingDataContent = File.ReadAllText(fileInfo.FullName);
+                        var loggingData = JsonUtility.FromJson<LoggingData>(loggingDataContent);
+                        loggingDataList.Add(loggingData);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    loggingDataList = null;
                 }
             }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                return false;
-            }
-
-            return true;
         }
 
         public void ConvertAndSave(string surveyDataPath, string loggingDataPath, string outputPathAndName)
@@ -173,37 +177,92 @@ namespace SpriteSortingPlugin.Survey.Analyzing
         {
             var sortingSuggestionPrefix = "SortingSuggestion_";
 
+            AddEntry($"{sortingSuggestionPrefix}Created logical sorting order", "");
+
             var totalFoundGlitches = 0;
             var totalClearedGlitches = 0;
             var totalConfirmedGlitches = 0;
 
-            foreach (var loggingData in loggingDataList)
-            {
-                var currentGlitchStatistic = loggingData.CurrentFoundGlitchStatistic;
-                totalFoundGlitches += currentGlitchStatistic.totalFoundGlitches;
-                totalClearedGlitches += currentGlitchStatistic.totalClearedGlitches;
-                totalConfirmedGlitches += currentGlitchStatistic.totalConfirmedGlitches;
-            }
+            var isLoggingDataExisting = loggingDataList != null && loggingDataList.Count > 0;
+            AddEntry($"{sortingSuggestionPrefix}Used Sorting order suggestion generation", isLoggingDataExisting);
 
-            AddEntry($"{sortingSuggestionPrefix}Number Of Total Found Glitches", totalFoundGlitches);
-            AddEntry($"{sortingSuggestionPrefix}Number Of Total Cleared Glitches", totalClearedGlitches);
-            AddEntry($"{sortingSuggestionPrefix}Number Of Total Confirmed Glitches", totalConfirmedGlitches);
-
-            var totalModifications = 0;
-            foreach (var loggingData in loggingDataList)
+            if (isLoggingDataExisting)
             {
-                foreach (var sortingSuggestionLoggingData in loggingData.sortingSuggestionLoggingDataList)
+                foreach (var loggingData in loggingDataList)
                 {
-                    if (sortingSuggestionLoggingData.modifications == null)
-                    {
-                        continue;
-                    }
-
-                    totalModifications += sortingSuggestionLoggingData.modifications.Count;
+                    var currentGlitchStatistic = loggingData.CurrentFoundGlitchStatistic;
+                    totalFoundGlitches += currentGlitchStatistic.totalFoundGlitches;
+                    totalClearedGlitches += currentGlitchStatistic.totalClearedGlitches;
+                    totalConfirmedGlitches += currentGlitchStatistic.totalConfirmedGlitches;
                 }
             }
 
-            AddEntry($"{sortingSuggestionPrefix}_Number Of Total Modifications", totalModifications);
+            AddEntry($"{sortingSuggestionPrefix}Total Found Glitches", totalFoundGlitches);
+            AddEntry($"{sortingSuggestionPrefix}Total Cleared Glitches", totalClearedGlitches);
+            AddEntry($"{sortingSuggestionPrefix}Total Confirmed Glitches", totalConfirmedGlitches);
+
+            var totalModifications = 0;
+            if (isLoggingDataExisting)
+            {
+                foreach (var loggingData in loggingDataList)
+                {
+                    foreach (var sortingSuggestionLoggingData in loggingData.sortingSuggestionLoggingDataList)
+                    {
+                        if (sortingSuggestionLoggingData.modifications == null)
+                        {
+                            continue;
+                        }
+
+                        totalModifications += sortingSuggestionLoggingData.modifications.Count;
+                    }
+                }
+            }
+
+            AddEntry($"{sortingSuggestionPrefix}Total Modifications", totalModifications);
+
+
+            var criteriaDictionary = new Dictionary<SortingCriterionType, int>();
+            foreach (SortingCriterionType criterionType in Enum.GetValues(typeof(SortingCriterionType)))
+            {
+                criteriaDictionary.Add(criterionType, 0);
+            }
+
+            if (isLoggingDataExisting)
+            {
+                foreach (var loggingData in loggingDataList)
+                {
+                    foreach (var sortingSuggestionLoggingData in loggingData.sortingSuggestionLoggingDataList)
+                    {
+                        if (sortingSuggestionLoggingData.containmentCriterionDataList != null &&
+                            sortingSuggestionLoggingData.containmentCriterionDataList.Count == 1)
+                        {
+                            criteriaDictionary[SortingCriterionType.Containment]++;
+                        }
+
+                        if (sortingSuggestionLoggingData.primaryColorCriterionDataList != null &&
+                            sortingSuggestionLoggingData.primaryColorCriterionDataList.Count == 1)
+                        {
+                            criteriaDictionary[SortingCriterionType.PrimaryColor]++;
+                        }
+
+                        if (sortingSuggestionLoggingData.defaultCriterionDataList != null)
+                        {
+                            foreach (var defaultSortingCriterionData in sortingSuggestionLoggingData
+                                .defaultCriterionDataList)
+                            {
+                                criteriaDictionary[defaultSortingCriterionData.sortingCriterionType]++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach (var criterionPair in criteriaDictionary)
+            {
+                var header =
+                    $"{sortingSuggestionPrefix}Total used criterion {ObjectNames.NicifyVariableName(criterionPair.Key.ToString())}";
+                AddEntry(header, criterionPair.Value);
+            }
         }
 
         private void LoadData(string surveyDataPath, string loggingDataPath)
@@ -239,8 +298,16 @@ namespace SpriteSortingPlugin.Survey.Analyzing
             {
                 var taskName = sortingTaskData.sceneName.Replace(".unity", "");
 
-                AddEntry($"{taskName}_Time Needed", sortingTaskData.timeNeeded.ToString(CultureInfo.CurrentCulture));
+                var neededMs = Math.Round(sortingTaskData.timeNeeded, 2).ToString(CultureInfo.CurrentCulture);
+                var neededS = Math.Round(sortingTaskData.timeNeeded / 1000.0f, 2).ToString(CultureInfo.CurrentCulture);
+                var neededMin = Math.Round(sortingTaskData.timeNeeded / 1000f / 60f, 2)
+                    .ToString(CultureInfo.CurrentCulture);
+
+                AddEntry($"{taskName}_Time Needed in ms", neededMs);
+                AddEntry($"{taskName}_Time Needed in s", neededS);
+                AddEntry($"{taskName}_Time Needed in min", neededMin);
                 AddEntry($"{taskName}_Error Rate", "");
+                AddEntry($"{taskName}_Modified Positions", 0);
             }
         }
 
@@ -249,11 +316,6 @@ namespace SpriteSortingPlugin.Survey.Analyzing
             var usabilityData = surveyData.usabilityData;
 
             AddEntry("System Usability Score", CalculateSystemUsabilityScore().ToString(CultureInfo.CurrentCulture));
-
-            var headers = new string[]
-            {
-                "Easiness Detector", "Easiness Data Analysis", "Helpfulness Generation Of Sorting Order Suggestions"
-            };
 
             for (var i = 0; i < usabilityData.ratingAnswers.Length; i++)
             {
@@ -264,7 +326,7 @@ namespace SpriteSortingPlugin.Survey.Analyzing
                     ratingValue = roundedValue.ToString(CultureInfo.CurrentCulture);
                 }
 
-                AddEntry(headers[i], ratingValue);
+                AddEntry(UsabilityHeaders[i], ratingValue);
             }
 
             var occuringErrorValue = "";
@@ -273,11 +335,13 @@ namespace SpriteSortingPlugin.Survey.Analyzing
                 occuringErrorValue = (usabilityData.occuringError == 0 ? 1 : 0).ToString();
             }
 
+            AddEntry("Missing Criteria Text", RemoveLineBreaks(usabilityData.missingCriteriaText));
+
             AddEntry("Occurring Error", occuringErrorValue);
-            AddEntry("Occurring Error Text", usabilityData.occuringErrorsText);
+            AddEntry("Occurring Error Text", RemoveLineBreaks(usabilityData.occuringErrorsText));
 
             AddEntry("Miscellaneous", usabilityData.isMiscellaneous);
-            AddEntry("Miscellaneous Text", usabilityData.miscellaneous);
+            AddEntry("Miscellaneous Text", RemoveLineBreaks(usabilityData.miscellaneous));
         }
 
         private float CalculateSystemUsabilityScore()
@@ -288,13 +352,13 @@ namespace SpriteSortingPlugin.Survey.Analyzing
             for (var i = 0; i < usabilityData.susAnswers.Length; i++)
             {
                 var susAnswer = usabilityData.susAnswers[i];
-                if ((i + 1) % 2 == 0)
+                if (i % 2 == 0)
                 {
-                    sus += 5 - (susAnswer + 1);
+                    sus += susAnswer - 1;
                 }
                 else
                 {
-                    sus += susAnswer;
+                    sus += 5 - susAnswer;
                 }
             }
 
@@ -346,7 +410,7 @@ namespace SpriteSortingPlugin.Survey.Analyzing
             AddEntry("Hobbyist", generalData.isHobbyist);
             AddEntry("Not Developing Games", generalData.isNotDevelopingGames);
             AddEntry("Game Dev Relation Other", generalData.isGameDevelopmentRelationOther);
-            AddEntry("Game Dev Relation Other Text", generalData.gameDevelopmentRelationOther);
+            AddEntry("Game Dev Relation Other Text", RemoveLineBreaks(generalData.gameDevelopmentRelationOther));
             AddEntry("Game Dev Relation No Answer", generalData.isGameDevelopmentRelationNoAnswer);
         }
 
@@ -360,8 +424,13 @@ namespace SpriteSortingPlugin.Survey.Analyzing
             }
 
             AddEntry("MainField_Other", generalData.isMainFieldOfWorkOther);
-            AddEntry("MainField_Other Text", generalData.mainFieldOfWorkOther);
+            AddEntry("MainField_Other Text", RemoveLineBreaks(generalData.mainFieldOfWorkOther));
             AddEntry("MainField_No Answer", generalData.isMainFieldOfWorkNoAnswer);
+        }
+
+        private string RemoveLineBreaks(string text)
+        {
+            return text.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
         }
     }
 }

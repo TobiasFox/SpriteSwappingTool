@@ -29,8 +29,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
 {
     public class AutoSortingGenerator
     {
-        private readonly List<SortingCriterion<SortingCriterionData>> sortingCriteria =
-            new List<SortingCriterion<SortingCriterionData>>();
+        private readonly List<SortingCriterion> sortingCriteria = new List<SortingCriterion>();
 
         private AutoSortingCalculationData autoSortingCalculationData;
         private List<AutoSortingComponent> resultList;
@@ -38,7 +37,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
         private SortingComponent baseItem;
         private ContainmentSortingCriterion containmentSortingCriterion;
 
-        public void AddSortingCriterion(SortingCriterion<SortingCriterionData> sortingCriterion)
+        public void AddSortingCriterion(SortingCriterion sortingCriterion)
         {
             sortingCriteria.Add(sortingCriterion);
         }
@@ -64,7 +63,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             this.baseItem = baseItem;
             this.autoSortingCalculationData = autoSortingCalculationData;
             this.overlappingSortingComponents.Insert(0, baseItem);
-            var autoSortingComponents = InitSortingDataList();
+            var autoSortingComponents = InitAutoSortingComponents();
 
             var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
             spriteDataItemValidatorCache.UpdateSpriteData(this.autoSortingCalculationData.spriteData);
@@ -413,7 +412,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             return -1;
         }
 
-        private List<AutoSortingComponent> InitSortingDataList()
+        private List<AutoSortingComponent> InitAutoSortingComponents()
         {
             var autoSortingComponents = new List<AutoSortingComponent>();
 

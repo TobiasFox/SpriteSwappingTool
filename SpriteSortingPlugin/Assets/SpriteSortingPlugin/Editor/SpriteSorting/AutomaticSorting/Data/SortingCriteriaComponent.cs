@@ -28,7 +28,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
     public struct SortingCriteriaComponent
     {
         public SortingCriterionData sortingCriterionData;
-        public SortingCriterion<SortingCriterionData> sortingCriterion;
+        public SortingCriterion sortingCriterion;
         public CriterionDataBaseUIRepresentation<SortingCriterionData> criterionDataBaseUIRepresentation;
     }
 }

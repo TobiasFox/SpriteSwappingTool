@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 {
-    public class IntersectionAreaCriterion : SortingCriterion<SortingCriterionData>
+    public class IntersectionAreaCriterion : SortingCriterion
     {
         private PolygonIntersectionAreaAnalyzer polygonIntersectionAreaAnalyzer;
 
