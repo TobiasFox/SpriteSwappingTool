@@ -34,7 +34,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.UI
 {
-    public class SpriteDataEditorWindow : EditorWindow, ISerializationCallbackReceiver
+    public class SpriteSwappingDataAnalysis : EditorWindow, ISerializationCallbackReceiver
     {
         private const int MinWidthRightContentBar = 200;
         private const float LineSpacing = 1.5f;
@@ -97,7 +97,7 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                   " " + GeneralData.DataAnalysisShortcut, false, 1)]
         public static void ShowWindow()
         {
-            var window = GetWindow<SpriteDataEditorWindow>();
+            var window = GetWindow<SpriteSwappingDataAnalysis>();
             window.Show();
         }
 

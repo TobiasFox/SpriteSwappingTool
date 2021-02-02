@@ -39,7 +39,7 @@ using UnityEngine.Rendering;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI
 {
-    public class SpriteRendererSwappingDetectorEditorWindow : EditorWindow
+    public class SpriteSwappingDetector : EditorWindow
     {
         private static readonly float LargerButtonHeight = EditorGUIUtility.singleLineHeight * 1.25f;
         private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
@@ -102,7 +102,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         [MenuItem(GeneralData.Name + "/" + GeneralData.DetectorName + " " + GeneralData.DetectorShortcut, false, 0)]
         public static void ShowWindow()
         {
-            var window = GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+            var window = GetWindow<SpriteSwappingDetector>();
             window.Show();
         }
 
@@ -522,7 +522,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                         if (GUILayout.Button("Open Sprite Analysis window", GUILayout.ExpandWidth(false)))
                         {
-                            var spriteAlphaEditorWindow = GetWindow<SpriteDataEditorWindow>();
+                            var spriteAlphaEditorWindow = GetWindow<SpriteSwappingDataAnalysis>();
                             spriteAlphaEditorWindow.Show();
                         }
                     }
