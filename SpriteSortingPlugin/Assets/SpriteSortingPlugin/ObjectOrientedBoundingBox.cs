@@ -135,8 +135,8 @@ namespace SpriteSortingPlugin
                 }
             }
 
-            var proj = new Projection(min, max);
-            return proj;
+            var projection = new Projection(min, max);
+            return projection;
         }
 
         public void UpdateBox(Transform transform)

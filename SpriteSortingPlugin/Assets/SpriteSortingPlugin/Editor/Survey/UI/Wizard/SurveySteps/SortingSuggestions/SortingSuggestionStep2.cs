@@ -197,7 +197,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 if (GUILayout.Button($"Open {GeneralData.DetectorName}\nwith enabled sorting order suggestion",
                     GUILayout.Width(224)))
                 {
-                    var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+                    var detector = EditorWindow.GetWindow<SpriteSwappingDetector>();
                     detector.Show();
                     detector.ActivateAutoSorting();
                 }

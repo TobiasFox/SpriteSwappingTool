@@ -119,7 +119,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void OpenDetector()
         {
-            var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+            var detector = EditorWindow.GetWindow<SpriteSwappingDetector>();
             detector.Show();
         }
     }

@@ -145,7 +145,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var width = Styling.ButtonStyle.CalcSize(openDetectorContent).x;
                 if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(width)))
                 {
-                    var detector = EditorWindow.GetWindow<SpriteRendererSwappingDetectorEditorWindow>();
+                    var detector = EditorWindow.GetWindow<SpriteSwappingDetector>();
                     detector.Show();
                 }
             }
