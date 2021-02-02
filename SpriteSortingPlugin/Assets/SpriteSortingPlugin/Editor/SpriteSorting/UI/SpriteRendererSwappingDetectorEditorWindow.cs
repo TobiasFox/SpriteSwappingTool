@@ -484,38 +484,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             EditorGUILayout.EndScrollView();
         }
 
-        // private void ResetAndResortOverlappingItems()
-        // {
-        //     var wrapResult = new OverlappingSpriteDetectionResult
-        //     {
-        //         overlappingSortingComponents = new List<SortingComponent>()
-        //     };
-        //
-        //     foreach (var overlappingItem in overlappingItems.Items)
-        //     {
-        //         if (!overlappingItem.IsBaseItem)
-        //         {
-        //             wrapResult.overlappingSortingComponents.Add(overlappingItem.SortingComponent);
-        //         }
-        //         else
-        //         {
-        //             wrapResult.baseItem = overlappingItem.SortingComponent;
-        //         }
-        //     }
-        //
-        //     var overlappingItemList = ApplyAutoSorting(wrapResult, out var overlappingBaseItem);
-        //
-        //     CleanUpReordableList();
-        //     skippedSortingCriteriaList = null;
-        //     preview.CleanUpPreview();
-        //     
-        //     overlappingItems = new OverlappingItems(overlappingBaseItem, overlappingItemList,
-        //         autoSortingOptionsUI.IsApplyingAutoSorting && isReplacingOverlappingItemsWithAutoSortedResult);
-        //     preview.UpdateOverlappingItems(overlappingItems);
-        //     preview.UpdateSpriteData(spriteData);
-        //     reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
-        // }
-
         private void ShowSkippedSortingCriteriaMessage()
         {
             if (skippedSortingCriteriaList == null || skippedSortingCriteriaList.Count <= 0)
@@ -1400,5 +1368,37 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         }
 
         #endregion
+        
+        // private void ResetAndResortOverlappingItems()
+        // {
+        //     var wrapResult = new OverlappingSpriteDetectionResult
+        //     {
+        //         overlappingSortingComponents = new List<SortingComponent>()
+        //     };
+        //
+        //     foreach (var overlappingItem in overlappingItems.Items)
+        //     {
+        //         if (!overlappingItem.IsBaseItem)
+        //         {
+        //             wrapResult.overlappingSortingComponents.Add(overlappingItem.SortingComponent);
+        //         }
+        //         else
+        //         {
+        //             wrapResult.baseItem = overlappingItem.SortingComponent;
+        //         }
+        //     }
+        //
+        //     var overlappingItemList = ApplyAutoSorting(wrapResult, out var overlappingBaseItem);
+        //
+        //     CleanUpReordableList();
+        //     skippedSortingCriteriaList = null;
+        //     preview.CleanUpPreview();
+        //     
+        //     overlappingItems = new OverlappingItems(overlappingBaseItem, overlappingItemList,
+        //         autoSortingOptionsUI.IsApplyingAutoSorting && isReplacingOverlappingItemsWithAutoSortedResult);
+        //     preview.UpdateOverlappingItems(overlappingItems);
+        //     preview.UpdateSpriteData(spriteData);
+        //     reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
+        // }
     }
 }
