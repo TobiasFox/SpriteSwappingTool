@@ -1,4 +1,4 @@
-﻿#region license
+#region license
 
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -20,30 +20,40 @@
 
 #endregion
 
-using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEditor;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
+namespace SpriteSortingPlugin.Helper
 {
-    [Serializable]
-    public class ContainmentSortingCriterionData : SortingCriterionData
+    public class RandomMailPicker : MonoBehaviour
     {
-        public bool isCheckingAlpha;
-        public float alphaThreshold = 0.2f;
-        public bool isSortingEnclosedSpriteInForeground = true;
-
-        public ContainmentSortingCriterionData()
+        private readonly List<string> mailAddresses = new List<string>()
         {
-            sortingCriterionType = SortingCriterionType.Containment;
+
+        };
+
+        public void PickRandomMail()
+        {
+            var mailAddress = mailAddresses[Random.Range(0, mailAddresses.Count)];
+            Debug.Log(mailAddress);
         }
+    }
 
-        public override object Clone()
+    [CustomEditor(typeof(RandomMailPicker))]
+    public class RandomMailPickerEditor : Editor
+    {
+        public override void OnInspectorGUI()
         {
-            var clone = new ContainmentSortingCriterionData();
-            CopyDataTo(clone);
-            clone.isSortingEnclosedSpriteInForeground = isSortingEnclosedSpriteInForeground;
-            clone.isCheckingAlpha = isCheckingAlpha;
-            clone.alphaThreshold = alphaThreshold;
-            return clone;
+            base.OnInspectorGUI();
+
+            if (GUILayout.Button("Pick Random Mail"))
+            {
+                var randomMailPicker = (RandomMailPicker) target;
+                randomMailPicker.PickRandomMail();
+            }
         }
     }
 }

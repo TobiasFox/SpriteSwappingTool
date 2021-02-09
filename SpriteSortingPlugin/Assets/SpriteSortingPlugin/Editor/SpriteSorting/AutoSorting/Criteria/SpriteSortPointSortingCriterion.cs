@@ -20,11 +20,11 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
 {
     public class SpriteSortPointSortingCriterion : SortingCriterion
     {

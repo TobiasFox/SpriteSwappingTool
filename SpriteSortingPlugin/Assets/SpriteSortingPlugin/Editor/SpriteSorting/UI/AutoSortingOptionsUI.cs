@@ -22,9 +22,9 @@
 
 using System;
 using System.Collections.Generic;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using SpriteSortingPlugin.SpriteSorting.UI.AutoSorting;
 using SpriteSortingPlugin.UI;
 using UnityEditor;

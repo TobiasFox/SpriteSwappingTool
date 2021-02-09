@@ -28,8 +28,20 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
     public class SpriteOutlineAnalyzer
     {
         private const float Tolerance = 0.0001f;
-        private const int MinPointsOfOutline = 16;
 
+        public int MinPointsOfOutline
+        {
+            get => minPointsOfOutline;
+            set
+            {
+                if (value > 0)
+                {
+                    minPointsOfOutline = value;
+                }
+            }
+        }
+
+        private int minPointsOfOutline = 16;
         private Color[] pixels;
         private int spriteWidth;
         private float spritePixelsPerUnit;

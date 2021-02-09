@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
 {
-    public class SpriteSharpnessAnalyzer : ISpriteDataAnalyzer
+    public class SpriteSharpnessAnalyzeAction : ISpriteDataAnalyzer
     {
         private SharpnessAnalyzer sharpnessAnalyzer;
 

@@ -20,13 +20,19 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection;
-using UnityEngine;
-
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting
 {
-    public class AutoSortingCalculationData : SpriteDetectionData
+    public class AutoSortingComponent
     {
-        public Transform cameraTransform;
+        public readonly SortingComponent sortingComponent;
+
+        public int sortingOrder;
+        public SortingComponent containedByAutoSortingComponent;
+
+        public AutoSortingComponent(SortingComponent sortingComponent)
+        {
+            this.sortingComponent = sortingComponent;
+            sortingOrder = sortingComponent.OriginSortingOrder;
+        }
     }
 }

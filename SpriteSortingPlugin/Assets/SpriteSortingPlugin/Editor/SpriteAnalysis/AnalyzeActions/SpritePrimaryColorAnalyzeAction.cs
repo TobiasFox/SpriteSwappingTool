@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
 {
-    public class SpritePrimaryColorAnalyzer : ISpriteDataAnalyzer
+    public class SpritePrimaryColorAnalyzeAction : ISpriteDataAnalyzer
     {
         private PrimaryColorAnalyzer primaryColorAnalyzer;
 

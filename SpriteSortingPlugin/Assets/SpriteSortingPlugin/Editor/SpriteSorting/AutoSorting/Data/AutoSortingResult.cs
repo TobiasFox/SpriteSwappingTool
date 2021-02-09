@@ -20,18 +20,11 @@
 
 #endregion
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Data
 {
-    public enum SortingCriterionType
+    public struct AutoSortingResult
     {
-        Containment,
-        Size,
-        IntersectionArea,
-        CameraDistance,
-        SortPoint,
-        Resolution,
-        Sharpness,
-        Lightness,
-        PrimaryColor,
+        public bool isOverlapping;
+        public int order;
     }
 }

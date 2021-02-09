@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
 {
-    public class SpriteAverageAlphaAnalyzer : ISpriteDataAnalyzer
+    public class SpriteAverageAlphaAnalyzeAction : ISpriteDataAnalyzer
     {
         private AverageAlphaAnalyzer averageAlphaAnalyzer;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting;
 using SpriteSortingPlugin.SpriteSorting.Logging;
 using SpriteSortingPlugin.Survey.Data;
 using UnityEditor;

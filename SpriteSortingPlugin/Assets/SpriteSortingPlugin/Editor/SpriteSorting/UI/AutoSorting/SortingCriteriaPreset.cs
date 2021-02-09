@@ -21,8 +21,8 @@
 #endregion
 
 using System;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting

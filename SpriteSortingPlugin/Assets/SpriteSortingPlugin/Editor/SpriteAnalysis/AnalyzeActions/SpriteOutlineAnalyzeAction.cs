@@ -43,14 +43,12 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
             {
                 var oobb = GenerateOOBB(sprite);
                 spriteDataItem.objectOrientedBoundingBox = oobb;
-                // currentProgress++;
             }
 
             if (outlineType.HasFlag(OutlineAnalysisType.PixelPerfect))
             {
                 var colliderPoints = GenerateAlphaOutline(sprite);
                 spriteDataItem.outlinePoints = colliderPoints;
-                // currentProgress++;
             }
         }
 

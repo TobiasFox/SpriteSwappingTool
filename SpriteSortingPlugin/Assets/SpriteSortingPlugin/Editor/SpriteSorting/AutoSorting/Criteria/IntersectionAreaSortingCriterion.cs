@@ -20,10 +20,10 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
 {
     public class IntersectionAreaCriterion : SortingCriterion
     {

@@ -21,11 +21,11 @@
 #endregion
 
 using System.Collections.Generic;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting
 {
     public class AutoSortingGenerator
     {
@@ -79,8 +79,8 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
             {
                 AnalyzeContainment(ref autoSortingComponents);
 
-                SplitAutoSortingComponentsByContainment(autoSortingComponents, out var notContainedComponents,
-                    out var containedComponents);
+                SplitAutoSortingComponentsByContainment(autoSortingComponents, out List<AutoSortingComponent> notContainedComponents,
+                    out List<AutoSortingComponent> containedComponents);
 
                 SortNotContainedComponents(notContainedComponents);
                 SortContainedComponents(containedComponents);

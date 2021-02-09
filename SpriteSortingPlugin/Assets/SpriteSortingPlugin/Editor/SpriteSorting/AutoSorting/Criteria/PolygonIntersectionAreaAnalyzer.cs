@@ -54,7 +54,7 @@ using System.Collections.Generic;
 using ClipperLib;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
 {
     public class PolygonIntersectionAreaAnalyzer
     {

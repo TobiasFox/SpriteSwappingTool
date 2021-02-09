@@ -33,12 +33,12 @@ namespace SpriteSortingPlugin
         [SerializeField, HideInInspector] private Vector2[] localWorldPoints = new Vector2[4];
         [SerializeField, HideInInspector] private Vector2[] originLocalWorldPoints = new Vector2[4];
 
-        [SerializeField] public float zRotation;
-        private Quaternion rotation;
-        private Bounds ownBounds;
-        [SerializeField] private Vector2 boundsCenter;
         [SerializeField] private Vector2 boundsSize;
         [SerializeField, HideInInspector] private Vector2 boundsCenterOffset;
+        private float zRotation;
+        private Quaternion rotation;
+        private Bounds ownBounds;
+        private Vector2 boundsCenter;
 
         private Vector2 lastGlobalScale;
         private Vector2[] axes;

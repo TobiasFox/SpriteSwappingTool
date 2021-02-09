@@ -706,11 +706,6 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
                 Handles.DrawLine(lastPoint, nextPoint);
                 Handles.DrawLine(lastPoint + lineDifferenceFactors, nextPoint + lineDifferenceFactors);
                 Handles.DrawLine(lastPoint - lineDifferenceFactors, nextPoint - lineDifferenceFactors);
-                Handles.DrawLine(lastPoint + 2*lineDifferenceFactors, nextPoint + 2*lineDifferenceFactors);
-                Handles.DrawLine(lastPoint - 2*lineDifferenceFactors, nextPoint - 2*lineDifferenceFactors);
-                Handles.DrawLine(lastPoint + 3*lineDifferenceFactors, nextPoint + 3*lineDifferenceFactors);
-                Handles.DrawLine(lastPoint - 3*lineDifferenceFactors, nextPoint - 3*lineDifferenceFactors);
-
                 lastPoint = nextPoint;
             }
 

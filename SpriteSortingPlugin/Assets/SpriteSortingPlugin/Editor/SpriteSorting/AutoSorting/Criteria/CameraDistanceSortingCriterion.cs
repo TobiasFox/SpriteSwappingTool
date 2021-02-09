@@ -20,19 +20,17 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteAnalyzer;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
+using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
 {
-    public class LightnessSortingCriterion : SortingCriterion
+    public class CameraDistanceSortingCriterion : SortingCriterion
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;
 
-        private LightnessAnalyzer lightnessAnalyzer;
-
-        public LightnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
+        public CameraDistanceSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
             sortingCriterionType = DefaultSortingCriterionData.sortingCriterionType;
@@ -40,40 +38,38 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
-            var perceivedLightness = autoSortingCalculationData.spriteData
-                .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
-                .spriteAnalysisData.perceivedLightness;
-
-            var otherPerceivedLightness = autoSortingCalculationData.spriteData
-                .spriteDataDictionary[otherSpriteDataItemValidator.AssetGuid]
-                .spriteAnalysisData.perceivedLightness;
-
-            if (lightnessAnalyzer == null)
+            if (autoSortingCalculationData.cameraProjectionType == CameraProjectionType.Orthographic)
             {
-                lightnessAnalyzer = new LightnessAnalyzer();
+                return;
             }
 
-            perceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(perceivedLightness,
-                sortingComponent.SpriteRenderer.color);
+            var spriteRendererTransform = sortingComponent.SpriteRenderer.transform;
+            var otherSpriteRendererTransform = otherSortingComponent.SpriteRenderer.transform;
+            var cameraTransform = autoSortingCalculationData.cameraTransform;
 
-            otherPerceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(otherPerceivedLightness,
-                otherSortingComponent.SpriteRenderer.color);
-
-            var isAutoSortingComponentIsLighter = perceivedLightness >= otherPerceivedLightness;
+            var perspectiveDistance = CalculatePerspectiveDistance(spriteRendererTransform, cameraTransform);
+            var otherPerspectiveDistance = CalculatePerspectiveDistance(otherSpriteRendererTransform, cameraTransform);
+            var isSortingComponentCloser = perspectiveDistance <= otherPerspectiveDistance;
 
             if (DefaultSortingCriterionData.isSortingInForeground)
             {
-                sortingResults[isAutoSortingComponentIsLighter ? 0 : 1]++;
+                sortingResults[isSortingComponentCloser ? 0 : 1]++;
             }
             else
             {
-                sortingResults[!isAutoSortingComponentIsLighter ? 0 : 1]++;
+                sortingResults[!isSortingComponentCloser ? 0 : 1]++;
             }
         }
 
         public override bool IsUsingSpriteData()
         {
-            return true;
+            return false;
+        }
+
+        private float CalculatePerspectiveDistance(Transform spriteRendererTransform, Transform cameraTransform)
+        {
+            var distance = spriteRendererTransform.position - cameraTransform.position;
+            return distance.magnitude;
         }
     }
 }

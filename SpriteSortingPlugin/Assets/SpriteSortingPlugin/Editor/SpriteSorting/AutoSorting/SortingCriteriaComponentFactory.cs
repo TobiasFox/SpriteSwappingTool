@@ -20,11 +20,11 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using SpriteSortingPlugin.SpriteSorting.UI.AutoSorting;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting
 {
     public static class SortingCriteriaComponentFactory
     {

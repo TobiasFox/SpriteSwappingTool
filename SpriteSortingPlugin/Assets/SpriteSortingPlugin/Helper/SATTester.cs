@@ -21,11 +21,12 @@
 #endregion
 
 using System;
+using SpriteSortingPlugin.SAT;
 using SpriteSortingPlugin.SpriteAnalyzer;
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Helper
 {
     public class SATTester : MonoBehaviour
     {
@@ -80,6 +81,8 @@ namespace SpriteSortingPlugin
 
             Debug.Log(spriteRenderers[1].name + " in " + spriteRenderers[0] + oobbs[0].Contains(oobbs[1]));
             Debug.Log(spriteRenderers[0].name + " in " + spriteRenderers[1] + oobbs[1].Contains(oobbs[0]));
+
+            Debug.Log("intersection: "+SATCollisionDetection.IsOverlapping(oobbs[0], oobbs[1]));
         }
 
         public void Test2()

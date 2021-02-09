@@ -20,8 +20,8 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;

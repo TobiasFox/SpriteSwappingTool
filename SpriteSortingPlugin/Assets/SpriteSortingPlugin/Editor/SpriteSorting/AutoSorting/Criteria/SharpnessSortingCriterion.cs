@@ -20,17 +20,16 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
-using UnityEngine;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
 {
-    public class CameraDistanceSortingCriterion : SortingCriterion
+    public class SharpnessSortingCriterion : SortingCriterion
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;
 
-        public CameraDistanceSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
+        public SharpnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
             sortingCriterionType = DefaultSortingCriterionData.sortingCriterionType;
@@ -38,38 +37,30 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
-            if (autoSortingCalculationData.cameraProjectionType == CameraProjectionType.Orthographic)
-            {
-                return;
-            }
+            var sharpness = autoSortingCalculationData.spriteData
+                .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
+                .spriteAnalysisData.sharpness;
 
-            var spriteRendererTransform = sortingComponent.SpriteRenderer.transform;
-            var otherSpriteRendererTransform = otherSortingComponent.SpriteRenderer.transform;
-            var cameraTransform = autoSortingCalculationData.cameraTransform;
+            var otherSharpness = autoSortingCalculationData.spriteData
+                .spriteDataDictionary[otherSpriteDataItemValidator.AssetGuid]
+                .spriteAnalysisData.sharpness;
 
-            var perspectiveDistance = CalculatePerspectiveDistance(spriteRendererTransform, cameraTransform);
-            var otherPerspectiveDistance = CalculatePerspectiveDistance(otherSpriteRendererTransform, cameraTransform);
-            var isSortingComponentCloser = perspectiveDistance <= otherPerspectiveDistance;
+
+            var isAutoSortingComponentIsSharper = sharpness >= otherSharpness;
 
             if (DefaultSortingCriterionData.isSortingInForeground)
             {
-                sortingResults[isSortingComponentCloser ? 0 : 1]++;
+                sortingResults[isAutoSortingComponentIsSharper ? 0 : 1]++;
             }
             else
             {
-                sortingResults[!isSortingComponentCloser ? 0 : 1]++;
+                sortingResults[!isAutoSortingComponentIsSharper ? 0 : 1]++;
             }
         }
 
         public override bool IsUsingSpriteData()
         {
-            return false;
-        }
-
-        private float CalculatePerspectiveDistance(Transform spriteRendererTransform, Transform cameraTransform)
-        {
-            var distance = spriteRendererTransform.position - cameraTransform.position;
-            return distance.magnitude;
+            return true;
         }
     }
 }

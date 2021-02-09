@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using SpriteSortingPlugin.SAT;
 using SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites;
 using UnityEditor;
@@ -121,7 +122,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             }
 
             FilterSortingComponents();
-            
+
             if (filteredSortingComponents.Count < 2)
             {
                 return result;
@@ -724,6 +725,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
                     polygonColliderCacher.DisableCachedCollider(otherValidator.AssetGuid,
                         otherPolygonColliderToCheck.GetInstanceID());
+                    Debug.Log(distance.isValid);
 
                     return distance.isOverlapped;
             }

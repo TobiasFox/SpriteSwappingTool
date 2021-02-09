@@ -20,11 +20,15 @@
 
 #endregion
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria;
+using SpriteSortingPlugin.SpriteSorting.UI.AutoSorting;
+
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Data
 {
-    public struct AutoSortingResult
+    public struct SortingCriteriaComponent
     {
-        public bool isOverlapping;
-        public int order;
+        public SortingCriterionData sortingCriterionData;
+        public SortingCriterion sortingCriterion;
+        public CriterionDataBaseUIRepresentation<SortingCriterionData> criterionDataBaseUIRepresentation;
     }
 }

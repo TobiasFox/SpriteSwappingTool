@@ -20,20 +20,20 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
 {
     public class ResolutionSortingCriterion : SortingCriterion
     {
-        private DefaultSortingCriterionData DefaultSortingCriterionData =>
+        private DefaultSortingCriterionData ResolutionSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;
 
         public ResolutionSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
-            sortingCriterionType = DefaultSortingCriterionData.sortingCriterionType;
+            sortingCriterionType = ResolutionSortingCriterionData.sortingCriterionType;
         }
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
@@ -45,7 +45,7 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
             var hasAutoSortingComponentHigherResolution = spriteResolution >= otherSpriteResolution;
 
-            if (DefaultSortingCriterionData.isSortingInForeground)
+            if (ResolutionSortingCriterionData.isSortingInForeground)
             {
                 sortingResults[hasAutoSortingComponentHigherResolution ? 0 : 1]++;
             }

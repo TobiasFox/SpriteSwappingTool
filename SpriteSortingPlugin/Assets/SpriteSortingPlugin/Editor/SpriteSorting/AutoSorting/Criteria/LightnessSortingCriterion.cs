@@ -20,16 +20,19 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteAnalyzer;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
 {
-    public class SharpnessSortingCriterion : SortingCriterion
+    public class LightnessSortingCriterion : SortingCriterion
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;
 
-        public SharpnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
+        private LightnessAnalyzer lightnessAnalyzer;
+
+        public LightnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
             sortingCriterionType = DefaultSortingCriterionData.sortingCriterionType;
@@ -37,24 +40,34 @@ namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
-            var sharpness = autoSortingCalculationData.spriteData
+            var perceivedLightness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
-                .spriteAnalysisData.sharpness;
+                .spriteAnalysisData.perceivedLightness;
 
-            var otherSharpness = autoSortingCalculationData.spriteData
+            var otherPerceivedLightness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[otherSpriteDataItemValidator.AssetGuid]
-                .spriteAnalysisData.sharpness;
+                .spriteAnalysisData.perceivedLightness;
 
+            if (lightnessAnalyzer == null)
+            {
+                lightnessAnalyzer = new LightnessAnalyzer();
+            }
 
-            var isAutoSortingComponentIsSharper = sharpness >= otherSharpness;
+            perceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(perceivedLightness,
+                sortingComponent.SpriteRenderer.color);
+
+            otherPerceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(otherPerceivedLightness,
+                otherSortingComponent.SpriteRenderer.color);
+
+            var isAutoSortingComponentIsLighter = perceivedLightness >= otherPerceivedLightness;
 
             if (DefaultSortingCriterionData.isSortingInForeground)
             {
-                sortingResults[isAutoSortingComponentIsSharper ? 0 : 1]++;
+                sortingResults[isAutoSortingComponentIsLighter ? 0 : 1]++;
             }
             else
             {
-                sortingResults[!isAutoSortingComponentIsSharper ? 0 : 1]++;
+                sortingResults[!isAutoSortingComponentIsLighter ? 0 : 1]++;
             }
         }
 

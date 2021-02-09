@@ -20,15 +20,30 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
-using SpriteSortingPlugin.SpriteSorting.UI.AutoSorting;
+using System;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Data
 {
-    public struct SortingCriteriaComponent
+    [Serializable]
+    public class ContainmentSortingCriterionData : SortingCriterionData
     {
-        public SortingCriterionData sortingCriterionData;
-        public SortingCriterion sortingCriterion;
-        public CriterionDataBaseUIRepresentation<SortingCriterionData> criterionDataBaseUIRepresentation;
+        public bool isCheckingAlpha;
+        public float alphaThreshold = 0.2f;
+        public bool isSortingEnclosedSpriteInForeground = true;
+
+        public ContainmentSortingCriterionData()
+        {
+            sortingCriterionType = SortingCriterionType.Containment;
+        }
+
+        public override object Clone()
+        {
+            var clone = new ContainmentSortingCriterionData();
+            CopyDataTo(clone);
+            clone.isSortingEnclosedSpriteInForeground = isSortingEnclosedSpriteInForeground;
+            clone.isCheckingAlpha = isCheckingAlpha;
+            clone.alphaThreshold = alphaThreshold;
+            return clone;
+        }
     }
 }

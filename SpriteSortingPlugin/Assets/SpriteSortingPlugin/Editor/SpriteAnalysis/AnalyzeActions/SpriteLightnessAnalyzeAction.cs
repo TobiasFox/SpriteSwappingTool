@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
 {
-    public class SpriteBrightnessAnalyzeAction : ISpriteDataAnalyzer
+    public class SpriteLightnessAnalyzeAction : ISpriteDataAnalyzer
     {
         private LightnessAnalyzer lightnessAnalyzer;
 

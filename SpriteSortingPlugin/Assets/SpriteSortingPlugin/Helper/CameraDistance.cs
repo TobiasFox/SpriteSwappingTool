@@ -32,7 +32,10 @@ namespace SpriteSortingPlugin
         public SpriteRenderer ownRenderer;
         public bool isDisplayingDistanceToCamera = true;
         public Vector3 offset;
-
+        public Color color= Color.blue;
+        public Color textColor=Color.white;
+        public int fontSize = 0;
+        
         private void OnDrawGizmos()
         {
             if (!isDisplayingDistanceToCamera || camera == null)
@@ -46,8 +49,9 @@ namespace SpriteSortingPlugin
             }
 
             Handles.BeginGUI();
-            Handles.color = Color.blue;
-            var style = new GUIStyle {normal = {textColor = Color.white}};
+            Handles.color = color;
+            var style = new GUIStyle {normal = {textColor = textColor}, fontSize = fontSize};
+            
             if (camera.orthographic)
             {
                 var positionOnCameraPlane =
@@ -58,6 +62,7 @@ namespace SpriteSortingPlugin
 
                 Handles.Label(distance, dist.ToString("#.00"), style);
                 Handles.DrawLine(transform.position, positionOnCameraPlane);
+                Handles.DrawLine(transform.position, new Vector3(positionOnCameraPlane.x, positionOnCameraPlane.y, positionOnCameraPlane.z+0.005f));
             }
             else
             {
@@ -66,6 +71,7 @@ namespace SpriteSortingPlugin
                 distance = distance * -0.5f + transform.position + offset;
                 Handles.Label(distance, dist.ToString("#.00"), style);
                 Handles.DrawLine(transform.position, camera.transform.position);
+                Handles.DrawLine(transform.position, new Vector3(camera.transform.position.x, camera.transform.position.y, camera.transform.position.z+0.005f));
             }
 
             Handles.EndGUI();

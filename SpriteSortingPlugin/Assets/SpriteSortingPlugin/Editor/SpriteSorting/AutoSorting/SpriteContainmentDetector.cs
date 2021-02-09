@@ -25,7 +25,7 @@ using SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection;
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting
 {
     public class SpriteContainmentDetector
     {

@@ -43,11 +43,11 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
         public double Analyze(Sprite sprite)
         {
             var spriteTexture = sprite.texture;
-            var pixels = spriteTexture.GetPixels();
             spriteHeight = spriteTexture.height;
             spriteWidth = spriteTexture.width;
             PixelDirectionUtility.spriteWidth = spriteWidth;
-
+            
+            var pixels = spriteTexture.GetPixels();
             var modifiedPixelArray = ConvertToGreyScale(pixels);
 
             modifiedPixelArray = ApplyLaplacian(modifiedPixelArray);

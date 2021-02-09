@@ -23,35 +23,30 @@
 using System;
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Data
 {
     [Serializable]
-    public class PrimaryColorSortingCriterionData : SortingCriterionData
+    public class SortingCriterionData : ICloneable
     {
-        public bool[] activeChannels = new bool[] {true, true, true};
-        public Color backgroundColor;
-        public Color foregroundColor;
+        public bool isActive;
+        public float priority = 1;
+        [HideInInspector] public bool isExpanded;
+        [HideInInspector] public bool isAddedToEditorList;
+        public SortingCriterionType sortingCriterionType;
 
-        public PrimaryColorSortingCriterionData()
+        protected void CopyDataTo(SortingCriterionData copy)
         {
-            sortingCriterionType = SortingCriterionType.PrimaryColor;
+            copy.isActive = isActive;
+            copy.priority = priority;
+            copy.isExpanded = isExpanded;
+            copy.isAddedToEditorList = isAddedToEditorList;
+            copy.sortingCriterionType = sortingCriterionType;
         }
 
-        public override object Clone()
+        public virtual object Clone()
         {
-            var clone = new PrimaryColorSortingCriterionData();
+            var clone = new SortingCriterionData();
             CopyDataTo(clone);
-            clone.activeChannels = new bool[3];
-            for (var i = 0; i < activeChannels.Length; i++)
-            {
-                clone.activeChannels[i] = activeChannels[i];
-            }
-
-            clone.backgroundColor =
-                new Color(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
-            clone.foregroundColor =
-                new Color(foregroundColor.r, foregroundColor.g, foregroundColor.b, foregroundColor.a);
-
             return clone;
         }
     }

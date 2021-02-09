@@ -20,19 +20,21 @@
 
 #endregion
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting
+using System;
+
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Data
 {
-    public class AutoSortingComponent
+    [Serializable]
+    public class DefaultSortingCriterionData : SortingCriterionData
     {
-        public readonly SortingComponent sortingComponent;
+        public bool isSortingInForeground;
 
-        public int sortingOrder;
-        public SortingComponent containedByAutoSortingComponent;
-
-        public AutoSortingComponent(SortingComponent sortingComponent)
+        public override object Clone()
         {
-            this.sortingComponent = sortingComponent;
-            sortingOrder = sortingComponent.OriginSortingOrder;
+            var clone = new DefaultSortingCriterionData();
+            CopyDataTo(clone);
+            clone.isSortingInForeground = isSortingInForeground;
+            return clone;
         }
     }
 }

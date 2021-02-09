@@ -20,21 +20,13 @@
 
 #endregion
 
-using System;
+using SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection;
+using UnityEngine;
 
-namespace SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data
+namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Data
 {
-    [Serializable]
-    public class DefaultSortingCriterionData : SortingCriterionData
+    public class AutoSortingCalculationData : SpriteDetectionData
     {
-        public bool isSortingInForeground;
-
-        public override object Clone()
-        {
-            var clone = new DefaultSortingCriterionData();
-            CopyDataTo(clone);
-            clone.isSortingInForeground = isSortingInForeground;
-            return clone;
-        }
+        public Transform cameraTransform;
     }
 }

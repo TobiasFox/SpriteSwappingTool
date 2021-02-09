@@ -55,16 +55,16 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
                         spriteDataAnalyzer = new SpriteOutlineAnalyzeAction();
                         break;
                     case SpriteAnalysisType.Sharpness:
-                        spriteDataAnalyzer = new SpriteSharpnessAnalyzer();
+                        spriteDataAnalyzer = new SpriteSharpnessAnalyzeAction();
                         break;
                     case SpriteAnalysisType.Lightness:
-                        spriteDataAnalyzer = new SpriteBrightnessAnalyzeAction();
+                        spriteDataAnalyzer = new SpriteLightnessAnalyzeAction();
                         break;
                     case SpriteAnalysisType.PrimaryColor:
-                        spriteDataAnalyzer = new SpritePrimaryColorAnalyzer();
+                        spriteDataAnalyzer = new SpritePrimaryColorAnalyzeAction();
                         break;
                     case SpriteAnalysisType.AverageAlpha:
-                        spriteDataAnalyzer = new SpriteAverageAlphaAnalyzer();
+                        spriteDataAnalyzer = new SpriteAverageAlphaAnalyzeAction();
                         break;
                 }
 

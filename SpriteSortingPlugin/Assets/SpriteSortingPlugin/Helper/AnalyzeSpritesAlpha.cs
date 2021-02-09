@@ -26,7 +26,7 @@ using SpriteSortingPlugin.SpriteAnalyzer;
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Helper
 {
     public class AnalyzeSpritesAlpha : MonoBehaviour
     {
