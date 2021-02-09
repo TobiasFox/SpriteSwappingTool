@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using SpriteSortingPlugin.OOBB;
 using SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites;
 using UnityEditor;
@@ -589,10 +588,10 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     continue;
                 }
 
+                // works for distance check on z-axis only. If custom axis is selected, this needs to be updated.
                 if (spriteDetectionData.cameraProjectionType == CameraProjectionType.Orthographic && Math.Abs(
                     sortingComponent.SpriteRenderer.transform.position.z - boundsToCheck.center.z) > Tolerance)
                 {
-                    //TODO: is z the distance to the camera? if not maybe create something to choose for the user
                     continue;
                 }
 

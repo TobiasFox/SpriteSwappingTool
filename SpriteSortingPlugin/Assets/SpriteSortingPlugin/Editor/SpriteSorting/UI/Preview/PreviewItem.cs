@@ -104,7 +104,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
             child.transform.rotation = spriteRendererTransform.rotation;
             child.transform.localScale = spriteRendererTransform.lossyScale;
 
-            //TODO check if this solves the undo / redo bug (gameobjects were recreated due to undo)
             var childSpriteRenderer = child.AddComponent<SpriteRenderer>();
             EditorUtility.CopySerialized(spriteRenderer, childSpriteRenderer);
 

@@ -107,27 +107,8 @@ namespace SpriteSortingPlugin.SpriteAnalysis.UI
             minSize = new Vector2(720, minSize.y);
             ResetSpriteList();
 
-            //TODO: remove
-            // SelectDefaultSpriteAlphaData();
-
             spriteAnalyzerTypes = (SpriteDataAnalysisType[]) Enum.GetValues(typeof(SpriteDataAnalysisType));
         }
-
-        // private void SelectDefaultSpriteAlphaData()
-        // {
-        //     try
-        //     {
-        //         var guids = AssetDatabase.FindAssets("DefaultSpriteData");
-        //         spriteData =
-        //             AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
-        //     }
-        //     catch
-        //     {
-        //         Debug.Log("auto selection of SpriteAlphaData went wrong");
-        //     }
-        //
-        //     LoadSpriteDataList();
-        // }
 
         private void ResetSpriteList()
         {

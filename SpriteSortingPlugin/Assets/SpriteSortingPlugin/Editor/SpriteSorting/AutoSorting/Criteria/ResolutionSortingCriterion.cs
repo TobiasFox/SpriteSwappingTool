@@ -38,8 +38,6 @@ namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
-            // var spriteResolution = CalculateCurrentSpriteResolution(autoSortingComponent.OriginSpriteRenderer);
-            // var otherSpriteResolution = CalculateCurrentSpriteResolution(otherAutoSortingComponent.OriginSpriteRenderer);
             var spriteResolution = CalculatePixelResolution(sortingComponent.SpriteRenderer);
             var otherSpriteResolution = CalculatePixelResolution(otherSortingComponent.SpriteRenderer);
 
@@ -64,24 +62,6 @@ namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria
         {
             var spriteTexture = spriteRenderer.sprite.texture;
             return spriteTexture.width * spriteTexture.height;
-        }
-
-        private float CalculateCurrentSpriteResolution(SpriteRenderer spriteRenderer)
-        {
-            //TODO only width x height in pixels?
-            //rotate sprite to identity to use correct bounds
-            var spriteRendererTransform = spriteRenderer.transform;
-            var previousRotation = spriteRendererTransform.rotation;
-            spriteRendererTransform.rotation = Quaternion.identity;
-            var boundsSize = spriteRenderer.bounds.size;
-            spriteRendererTransform.rotation = previousRotation;
-
-
-            var pixelsPerUnit = spriteRenderer.sprite.pixelsPerUnit;
-            var currentSpriteWidth = boundsSize.x * pixelsPerUnit;
-            var currentSpriteHeight = boundsSize.y * pixelsPerUnit;
-
-            return currentSpriteHeight * currentSpriteWidth;
         }
     }
 }

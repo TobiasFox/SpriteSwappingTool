@@ -90,7 +90,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             LogReorderChangeModification(oldIndex, newIndex);
         }
 
-        //TODO: remember last focussed element before recompilation is active
+        //TODO: remember last focussed element before solution gets recompiled
         private void DrawElementBackgroundCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
             Color color;

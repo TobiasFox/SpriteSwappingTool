@@ -33,7 +33,6 @@ using SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites;
 using SpriteSortingPlugin.SpriteSorting.UI.Preview;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -92,13 +91,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private List<SortingCriterionType> skippedSortingCriteriaList;
         private bool isShowingNoGlitchResult;
 
-        //TODO remove bool, is only for debugging
-        private bool isReplacingOverlappingItemsWithAutoSortedResult = true;
-        private List<string> autoSortingResultNames;
-
-        private ReorderableList autoSortingResultList;
-        //end remove debug variables
-
         [MenuItem(GeneralData.Name + "/" + GeneralData.DetectorName + " " + GeneralData.DetectorShortcut, false, 0)]
         public static void ShowWindow()
         {
@@ -147,7 +139,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 CheckSortingLayerOrder();
             }
 
-            //TODO: could be more performant by comparing the name each frame instead of redrawing everything
+            //redraws completely UI. If performance need to be improved, check each name and redraw only if they differ. 
             Repaint();
         }
 
@@ -393,7 +385,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EditorGUILayout.Space();
 
-            //TODO analyze renderers or sorting groups with changed sorting layers first
+            //TODO: analyze renderers or sorting groups with changed sorting layers first?
             // if (overlappingItems.HasChangedLayer)
             // {
             //     using (new EditorGUI.DisabledScope(true))
@@ -441,7 +433,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                         if (isContinueSearching)
                         {
-                            //TODO: check isAnalyzingWithChangedLayerFirst
                             Analyze();
                         }
                     }
@@ -453,8 +444,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     EditorGUIUtility.labelWidth = 0;
                 }
             }
-
-            autoSortingResultList?.DoLayoutList();
 
             if (isConfirmButtonPressed)
             {
@@ -478,7 +467,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             EndScrollRect();
         }
-        
+
         private void EndScrollRect()
         {
             EditorGUILayout.EndScrollView();
@@ -619,7 +608,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                             new GUIContent(serializedSpriteRenderer.displayName,
                                 UITooltipConstants.SortingEditorSingleSpriteRendererTooltip), true);
 
-                        //TODO: will not work for prefab scene
+                        // will not work for prefab scene
                         var spriteRendererRef = (SpriteRenderer) serializedSpriteRenderer.objectReferenceValue;
 
                         string errorMessage = null;
@@ -685,7 +674,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                         cameraProjectionType = CameraProjectionType.Orthographic;
                         break;
                     case TransparencySortMode.CustomAxis:
-                        // TODO add functionality for custom axis
+                        //TODO: add functionality for custom axis
                         break;
                 }
 
@@ -916,7 +905,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         private void CleanUpReordableList()
         {
             reordableOverlappingItemList?.CleanUp();
-            autoSortingResultList = null;
         }
 
         private bool HasOverlappingItems()
@@ -1050,7 +1038,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             overlappingItems = new OverlappingItems(overlappingBaseItem, overlappingItemList,
-                autoSortingOptionsUI.IsApplyingAutoSorting && isReplacingOverlappingItemsWithAutoSortedResult);
+                autoSortingOptionsUI.IsApplyingAutoSorting);
             preview.UpdateOverlappingItems(overlappingItems);
             preview.UpdateSpriteData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
@@ -1074,32 +1062,22 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
             skippedSortingCriteriaList = skippedSortingCriteria;
 
-            if (isReplacingOverlappingItemsWithAutoSortedResult)
+            var sortingComponentList = new List<SortingComponent>();
+            foreach (var autoSortingComponent in resultList)
             {
-                var sortingComponentList = new List<SortingComponent>();
-                foreach (var autoSortingComponent in resultList)
-                {
-                    sortingComponentList.Add(autoSortingComponent.sortingComponent);
-                }
-
-                overlappingSpriteDetectionResult.overlappingSortingComponents = sortingComponentList;
-
-                ConvertToOverlappingItems(overlappingSpriteDetectionResult, out overlappingItemList,
-                    out overlappingBaseItem);
-
-                for (var i = 0; i < overlappingItemList.Count; i++)
-                {
-                    var overlappingItem = overlappingItemList[i];
-                    overlappingItem.originAutoSortingOrder =
-                        Math.Abs(overlappingItem.originSortingOrder - resultList[i].sortingOrder);
-                }
+                sortingComponentList.Add(autoSortingComponent.sortingComponent);
             }
-            else
+
+            overlappingSpriteDetectionResult.overlappingSortingComponents = sortingComponentList;
+
+            ConvertToOverlappingItems(overlappingSpriteDetectionResult, out overlappingItemList,
+                out overlappingBaseItem);
+
+            for (var i = 0; i < overlappingItemList.Count; i++)
             {
-                DrawAdditionalListOfAutoSortingResult(resultList);
-                ConvertToOverlappingItems(overlappingSpriteDetectionResult, out overlappingItemList,
-                    out overlappingBaseItem);
-                overlappingItemList.Insert(0, overlappingBaseItem);
+                var overlappingItem = overlappingItemList[i];
+                overlappingItem.originAutoSortingOrder =
+                    Math.Abs(overlappingItem.originSortingOrder - resultList[i].sortingOrder);
             }
 
             return overlappingItemList;
@@ -1132,20 +1110,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     overlappingItems.Add(new OverlappingItem(overlappingSortingComponent));
                 }
             }
-        }
-
-        private void DrawAdditionalListOfAutoSortingResult(List<AutoSortingComponent> resultList)
-        {
-            autoSortingResultNames = new List<string>();
-            for (var i = 0; i < resultList.Count; i++)
-            {
-                var autoSortingComponent = resultList[i];
-                autoSortingResultNames.Add((i + 1) + ". new sortingOrder: " + autoSortingComponent.sortingOrder + ", " +
-                                           autoSortingComponent);
-            }
-
-            autoSortingResultList =
-                new ReorderableList(autoSortingResultNames, typeof(string), false, false, false, false);
         }
 
         private void CreateAndInitOverlappingItemSortingOrderAnalyzer()
@@ -1368,7 +1332,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         }
 
         #endregion
-        
+
         // private void ResetAndResortOverlappingItems()
         // {
         //     var wrapResult = new OverlappingSpriteDetectionResult

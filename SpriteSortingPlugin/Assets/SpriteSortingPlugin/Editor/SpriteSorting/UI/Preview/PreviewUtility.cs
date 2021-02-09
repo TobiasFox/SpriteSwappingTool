@@ -26,7 +26,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 {
     public static class PreviewUtility
     {
-        //TODO: maybe a pool?
+        //TODO: convert to a pool?
         public static GameObject CreateGameObject(Transform parent, string name, bool isDontSave)
         {
             var previewItem = new GameObject(name)
