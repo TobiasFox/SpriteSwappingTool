@@ -106,26 +106,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             SortingLayerUtility.UpdateSortingLayerNames();
             SelectDefaultLayer();
 
-            // SelectDefaultSpriteAlphaData();
-
             overlappingSpriteDetector = new OverlappingSpriteDetector();
             autoSortingOptionsUI = new AutoSortingOptionsUI();
             autoSortingOptionsUI.Init();
         }
-
-        // private void SelectDefaultSpriteAlphaData()
-        // {
-        //     try
-        //     {
-        //         var guids = AssetDatabase.FindAssets("DefaultSpriteAlphaData");
-        //         spriteData =
-        //             AssetDatabase.LoadAssetAtPath<SpriteData>(AssetDatabase.GUIDToAssetPath(guids[0]));
-        //     }    
-        //     catch (Exception e)
-        //     {
-        //         Debug.Log("auto selection of SpriteAlphaData went wrong");
-        //     }
-        // }
 
         public void ActivateAutoSorting()
         {
@@ -500,13 +484,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        EditorGUI.BeginChangeCheck();
-                        spriteData = EditorGUILayout.ObjectField(
-                            new GUIContent("Sprite Data Asset", UITooltipConstants.SortingEditorSpriteDataAssetTooltip),
-                            spriteData, typeof(SpriteData), false) as SpriteData;
-                        if (EditorGUI.EndChangeCheck())
+                        using (var changeScope = new EditorGUI.ChangeCheckScope())
                         {
-                            preview.UpdateSpriteData(spriteData);
+                            spriteData = EditorGUILayout.ObjectField(new GUIContent("Sprite Data Asset",
+                                    UITooltipConstants.SortingEditorSpriteDataAssetTooltip), spriteData,
+                                typeof(SpriteData), false) as SpriteData;
+                            if (changeScope.changed)
+                            {
+                                preview.UpdateSpriteData(spriteData);
+                            }
                         }
 
                         if (GUILayout.Button("Open Sprite Analysis window", GUILayout.ExpandWidth(false)))
@@ -558,13 +544,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                     foreach (SortingType currentSortingType in SortingTypes)
                     {
-                        EditorGUI.BeginChangeCheck();
-                        GUILayout.Toggle(currentSortingType == sortingType,
-                            ObjectNames.NicifyVariableName(currentSortingType.ToString()), Styling.ButtonStyle,
-                            GUILayout.ExpandWidth(true));
-                        if (EditorGUI.EndChangeCheck())
+                        using (var changeScope = new EditorGUI.ChangeCheckScope())
                         {
-                            sortingType = currentSortingType;
+                            GUILayout.Toggle(currentSortingType == sortingType,
+                                ObjectNames.NicifyVariableName(currentSortingType.ToString()), Styling.ButtonStyle,
+                                GUILayout.ExpandWidth(true));
+                            if (changeScope.changed)
+                            {
+                                sortingType = currentSortingType;
+                            }
                         }
                     }
                 }
@@ -581,24 +569,23 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                         if (isUsingGameObjectParents)
                         {
-                            EditorGUI.indentLevel++;
-
-                            if (gameObjectParentsSerializedProperty.isExpanded)
+                            using (new EditorGUI.IndentLevelScope())
                             {
-                                using (var scrollScope = new EditorGUILayout.ScrollViewScope(
-                                    gameObjectsParentScrollPosition, false, true,
-                                    GUILayout.MaxHeight(80)))
+                                if (gameObjectParentsSerializedProperty.isExpanded)
                                 {
-                                    gameObjectsParentScrollPosition = scrollScope.scrollPosition;
+                                    using (var scrollScope = new EditorGUILayout.ScrollViewScope(
+                                        gameObjectsParentScrollPosition, false, true,
+                                        GUILayout.MaxHeight(80)))
+                                    {
+                                        gameObjectsParentScrollPosition = scrollScope.scrollPosition;
+                                        EditorGUILayout.PropertyField(gameObjectParentsSerializedProperty, true);
+                                    }
+                                }
+                                else
+                                {
                                     EditorGUILayout.PropertyField(gameObjectParentsSerializedProperty, true);
                                 }
                             }
-                            else
-                            {
-                                EditorGUILayout.PropertyField(gameObjectParentsSerializedProperty, true);
-                            }
-
-                            EditorGUI.indentLevel--;
                         }
 
                         break;
@@ -629,10 +616,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
                         if (!string.IsNullOrEmpty(errorMessage))
                         {
-                            EditorGUI.indentLevel++;
-                            EditorGUILayout.LabelField(new GUIContent(errorMessage, Styling.WarnIcon));
-                            isAnalyzedButtonDisabled = true;
-                            EditorGUI.indentLevel--;
+                            using (new EditorGUI.IndentLevelScope())
+                            {
+                                EditorGUILayout.LabelField(new GUIContent(errorMessage, Styling.WarnIcon));
+                                isAnalyzedButtonDisabled = true;
+                            }
                         }
 
                         break;
@@ -664,47 +652,48 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     }
                 }
 
-                EditorGUI.indentLevel++;
-                switch (lastConfiguredTransparencySortMode)
+                using (new EditorGUI.IndentLevelScope())
                 {
-                    case TransparencySortMode.Perspective:
-                        cameraProjectionType = CameraProjectionType.Perspective;
-                        break;
-                    case TransparencySortMode.Orthographic:
-                        cameraProjectionType = CameraProjectionType.Orthographic;
-                        break;
-                    case TransparencySortMode.CustomAxis:
-                        //TODO: add functionality for custom axis
-                        break;
-                }
-
-                var isCameraNeeded = IsCameraRequired(out var errorMessage);
-                if (isCameraNeeded && !wasAnalyzeButtonClicked)
-                {
-                    var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
-                    EditorGUILayout.PropertyField(cameraSerializedProp,
-                        new GUIContent("Camera", UITooltipConstants.SortingEditorCameraTooltip));
-
-                    if (cameraSerializedProp.objectReferenceValue == null)
+                    switch (lastConfiguredTransparencySortMode)
                     {
-                        EditorGUI.indentLevel++;
-                        EditorGUILayout.LabelField(new GUIContent(
-                            "Please select a Camera. It is used to " + errorMessage + ".", Styling.InfoIcon,
-                            UITooltipConstants.SortingEditorMissingCameraTooltip));
-                        isAnalyzedButtonDisabled = true;
-                        EditorGUI.indentLevel--;
+                        case TransparencySortMode.Perspective:
+                            cameraProjectionType = CameraProjectionType.Perspective;
+                            break;
+                        case TransparencySortMode.Orthographic:
+                            cameraProjectionType = CameraProjectionType.Orthographic;
+                            break;
+                        case TransparencySortMode.CustomAxis:
+                            //TODO: add functionality for custom axis
+                            break;
                     }
-                    else
+
+                    var isCameraNeeded = IsCameraRequired(out var errorMessage);
+                    if (isCameraNeeded && !wasAnalyzeButtonClicked)
                     {
-                        cameraProjectionType = ((Camera) cameraSerializedProp.objectReferenceValue).orthographic
-                            ? CameraProjectionType.Orthographic
-                            : CameraProjectionType.Perspective;
+                        var cameraSerializedProp = serializedObject.FindProperty(nameof(camera));
+                        EditorGUILayout.PropertyField(cameraSerializedProp,
+                            new GUIContent("Camera", UITooltipConstants.SortingEditorCameraTooltip));
+
+                        if (cameraSerializedProp.objectReferenceValue == null)
+                        {
+                            using (new EditorGUI.IndentLevelScope())
+                            {
+                                EditorGUILayout.LabelField(new GUIContent(
+                                    "Please select a Camera. It is used to " + errorMessage + ".", Styling.InfoIcon,
+                                    UITooltipConstants.SortingEditorMissingCameraTooltip));
+                                isAnalyzedButtonDisabled = true;
+                            }
+                        }
+                        else
+                        {
+                            cameraProjectionType = ((Camera) cameraSerializedProp.objectReferenceValue).orthographic
+                                ? CameraProjectionType.Orthographic
+                                : CameraProjectionType.Perspective;
+                        }
                     }
+
+                    DrawOutlinePrecisionSlider(verticalScope.rect.width);
                 }
-
-                DrawOutlinePrecisionSlider(verticalScope.rect.width);
-
-                EditorGUI.indentLevel--;
             }
         }
 
@@ -731,14 +720,16 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 new GUIContent("Outline Precision", UITooltipConstants.SortingEditorOutlinePrecisionTooltip));
             GUI.Label(fromLabel,
                 new GUIContent("Fast", UITooltipConstants.SortingEditorOutlinePrecisionFast));
-            EditorGUI.BeginChangeCheck();
-            outlinePrecisionSliderValue = GUI.HorizontalSlider(sliderRect, outlinePrecisionSliderValue, 0,
-                OutlinePrecisionTypes.Length - 1);
-            if (EditorGUI.EndChangeCheck())
+            using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                outlinePrecisionSliderValue = (int) Math.Round(outlinePrecisionSliderValue);
-                outlinePrecision = (OutlinePrecision) outlinePrecisionSliderValue;
-                preview?.UpdateOutlineType(outlinePrecision);
+                outlinePrecisionSliderValue = GUI.HorizontalSlider(sliderRect, outlinePrecisionSliderValue, 0,
+                    OutlinePrecisionTypes.Length - 1);
+                if (changeScope.changed)
+                {
+                    outlinePrecisionSliderValue = (int) Math.Round(outlinePrecisionSliderValue);
+                    outlinePrecision = (OutlinePrecision) outlinePrecisionSliderValue;
+                    preview?.UpdateOutlineType(outlinePrecision);
+                }
             }
 
             GUI.Label(toLabel,
@@ -914,13 +905,15 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
 
         private void ShowSortingLayers()
         {
-            EditorGUI.BeginChangeCheck();
-            selectedSortingLayers = EditorGUILayout.MaskField(
-                new GUIContent("Sorting Layers", UITooltipConstants.SortingEditorSortingLayerTooltip),
-                selectedSortingLayers, SortingLayerUtility.SortingLayerNames);
-            if (EditorGUI.EndChangeCheck())
+            using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                UpdateSelectedLayers();
+                selectedSortingLayers = EditorGUILayout.MaskField(
+                    new GUIContent("Sorting Layers", UITooltipConstants.SortingEditorSortingLayerTooltip),
+                    selectedSortingLayers, SortingLayerUtility.SortingLayerNames);
+                if (changeScope.changed)
+                {
+                    UpdateSelectedLayers();
+                }
             }
         }
 
@@ -928,7 +921,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         {
             selectedLayers.Clear();
 
-            for (int i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
+            for (var i = 0; i < SortingLayerUtility.SortingLayerNames.Length; i++)
             {
                 //bitmask moving check if bit is set
                 var layer = 1 << i;

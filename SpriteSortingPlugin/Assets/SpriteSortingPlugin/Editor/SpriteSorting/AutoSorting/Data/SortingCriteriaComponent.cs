@@ -29,6 +29,6 @@ namespace SpriteSortingPlugin.SpriteSorting.AutoSorting.Data
     {
         public SortingCriterionData sortingCriterionData;
         public SortingCriterion sortingCriterion;
-        public CriterionDataBaseUIRepresentation<SortingCriterionData> criterionDataBaseUIRepresentation;
+        public CriterionDataBaseUIRepresentation criterionDataBaseUIRepresentation;
     }
 }

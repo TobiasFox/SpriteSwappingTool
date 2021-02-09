@@ -26,11 +26,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
     public static class SortingCriterionDataUIRepresentationFactory
     {
-        public static CriterionDataBaseUIRepresentation<SortingCriterionData> CreateUIRepresentation(
+        public static CriterionDataBaseUIRepresentation CreateUIRepresentation(
             SortingCriterionData data,
             bool isShowingInInspector = false)
         {
-            CriterionDataBaseUIRepresentation<SortingCriterionData> uiRepresentation = null;
+            CriterionDataBaseUIRepresentation uiRepresentation = null;
             switch (data)
             {
                 case DefaultSortingCriterionData _:

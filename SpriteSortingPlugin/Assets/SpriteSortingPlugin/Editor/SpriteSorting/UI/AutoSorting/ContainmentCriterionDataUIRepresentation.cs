@@ -27,7 +27,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    public class ContainmentCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation<SortingCriterionData>
+    public class ContainmentCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation
     {
         private ContainmentSortingCriterionData ContainmentSortingCriterionData =>
             (ContainmentSortingCriterionData) sortingCriterionData;
@@ -75,15 +75,17 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
                 using (new EditorGUI.DisabledScope(!ContainmentSortingCriterionData.isCheckingAlpha))
                 {
-                    EditorGUI.BeginChangeCheck();
-                    ContainmentSortingCriterionData.alphaThreshold =
-                        EditorGUILayout.FloatField(
-                            new GUIContent("Alpha threshold", UITooltipConstants.ContainmentAlphaThresholdTooltip),
-                            ContainmentSortingCriterionData.alphaThreshold);
-                    if (EditorGUI.EndChangeCheck())
+                    using (var changeScope = new EditorGUI.ChangeCheckScope())
                     {
                         ContainmentSortingCriterionData.alphaThreshold =
-                            Mathf.Clamp01(ContainmentSortingCriterionData.alphaThreshold);
+                            EditorGUILayout.FloatField(
+                                new GUIContent("Alpha threshold", UITooltipConstants.ContainmentAlphaThresholdTooltip),
+                                ContainmentSortingCriterionData.alphaThreshold);
+                        if (changeScope.changed)
+                        {
+                            ContainmentSortingCriterionData.alphaThreshold =
+                                Mathf.Clamp01(ContainmentSortingCriterionData.alphaThreshold);
+                        }
                     }
                 }
             }

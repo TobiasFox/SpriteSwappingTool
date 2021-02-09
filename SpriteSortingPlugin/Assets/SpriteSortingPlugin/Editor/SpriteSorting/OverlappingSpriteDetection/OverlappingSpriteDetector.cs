@@ -169,26 +169,6 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             }
         }
 
-        public List<SortingComponent> DetectOverlappingSortingComponents(SortingComponent baseItem,
-            List<SortingComponent> sortingComponentsToCheck, SpriteDetectionData spriteDetectionData)
-        {
-            if (baseItem == null || sortingComponentsToCheck == null)
-            {
-                return null;
-            }
-
-            this.spriteDetectionData = spriteDetectionData;
-            isCheckingForIdenticalSortingOptions = false;
-            filteredSortingComponents = sortingComponentsToCheck;
-            var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
-            spriteDataItemValidatorCache.UpdateSpriteData(spriteDetectionData.spriteData);
-
-            DetectOverlappingSortingComponents(baseItem, out var resultList);
-
-            spriteDataItemValidatorCache.Clear();
-            return resultList;
-        }
-
         public Dictionary<int, int> AnalyzeSurroundingSpritesAndGetAdjustedSortingOptions(
             List<OverlappingItem> overlappingItems, SpriteDetectionData spriteDetectionData)
         {
@@ -556,8 +536,6 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                 return false;
             }
 
-            // Debug.Log("start search in " + filteredSortingComponents.Count + " sprite renderers for an overlap with " +
-            // sortingComponentToCheck.SpriteRenderer.name);
             if (polygonColliderToCheck == null)
             {
                 polygonColliderCacher = PolygonColliderCacher.GetInstance();
@@ -588,6 +566,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     continue;
                 }
 
+                // check distance when using an orthographic camera
                 // works for distance check on z-axis only. If custom axis is selected, this needs to be updated.
                 if (spriteDetectionData.cameraProjectionType == CameraProjectionType.Orthographic && Math.Abs(
                     sortingComponent.SpriteRenderer.transform.position.z - boundsToCheck.center.z) > Tolerance)
@@ -618,7 +597,6 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                 return false;
             }
 
-            // Debug.Log("found " + (overlappingComponents.Count + 1) + " overlapping sprites");
             return true;
         }
 
@@ -724,7 +702,6 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     var distance = polygonColliderToCheck.Distance(otherPolygonColliderToCheck);
                     polygonColliderCacher.DisableCachedCollider(otherValidator.AssetGuid,
                         otherPolygonColliderToCheck.GetInstanceID());
-                    Debug.Log(distance.isValid);
 
                     return distance.isOverlapped;
             }

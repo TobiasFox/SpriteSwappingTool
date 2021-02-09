@@ -27,9 +27,9 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    public abstract class CriterionDataBaseUIRepresentation<T> where T : SortingCriterionData
+    public abstract class CriterionDataBaseUIRepresentation
     {
-        protected T sortingCriterionData;
+        protected SortingCriterionData sortingCriterionData;
         protected string title = "Criteria";
         protected string tooltip = "";
 
@@ -40,7 +40,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
         protected float CalculateIndentSpace => (EditorGUI.indentLevel * EditorGUIUtility.singleLineHeight) * 0.8f;
 
-        public void Initialize(T sortingCriterionData, bool isShowingInInspector = false)
+        public void Initialize(SortingCriterionData sortingCriterionData, bool isShowingInInspector = false)
         {
             this.isShowingInInspector = isShowingInInspector;
             this.sortingCriterionData = sortingCriterionData;
@@ -51,7 +51,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
         {
         }
 
-        public void UpdateSortingCriterionData(T sortingCriterionData)
+        public void UpdateSortingCriterionData(SortingCriterionData sortingCriterionData)
         {
             this.sortingCriterionData = sortingCriterionData;
         }
@@ -67,9 +67,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 
             using (new EditorGUI.DisabledScope(!sortingCriterionData.isActive))
             {
-                EditorGUI.indentLevel++;
-                OnInspectorGuiInternal();
-                EditorGUI.indentLevel--;
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    OnInspectorGuiInternal();
+                }
             }
         }
 

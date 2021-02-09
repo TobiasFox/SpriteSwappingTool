@@ -205,48 +205,52 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             rect.y += EditorGUIUtility.singleLineHeight + LineSpacing;
 
             EditorGUIUtility.labelWidth = 35;
-            EditorGUI.BeginChangeCheck();
-
-            element.sortingLayerDropDownIndex =
-                EditorGUI.Popup(new Rect(rect.x, rect.y, 135, EditorGUIUtility.singleLineHeight),
-                    new GUIContent("Layer", UITooltipConstants.OverlappingItemListSortingLayerTooltip),
-                    element.sortingLayerDropDownIndex, SortingLayerUtility.SortingLayerGuiContents);
-
-            if (EditorGUI.EndChangeCheck())
+            using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                var modifiedLayerName = SortingLayerUtility.SortingLayerNames[element.sortingLayerDropDownIndex];
+                element.sortingLayerDropDownIndex =
+                    EditorGUI.Popup(new Rect(rect.x, rect.y, 135, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Layer", UITooltipConstants.OverlappingItemListSortingLayerTooltip),
+                        element.sortingLayerDropDownIndex, SortingLayerUtility.SortingLayerGuiContents);
 
-                LogSortingLayerChangeModification(index, element.sortingLayerName, modifiedLayerName);
+                if (changeScope.changed)
+                {
+                    var modifiedLayerName = SortingLayerUtility.SortingLayerNames[element.sortingLayerDropDownIndex];
 
-                element.sortingLayerName = modifiedLayerName;
-                overlappingItems.UpdateSortingLayer(index, out var newIndexInList);
-                reordableSpriteSortingList.index = newIndexInList;
-                isPreviewUpdating = true;
+                    LogSortingLayerChangeModification(index, element.sortingLayerName, modifiedLayerName);
 
-                overlappingItems.CheckChangedLayers();
+                    element.sortingLayerName = modifiedLayerName;
+                    overlappingItems.UpdateSortingLayer(index, out var newIndexInList);
+                    reordableSpriteSortingList.index = newIndexInList;
+                    isPreviewUpdating = true;
+
+                    overlappingItems.CheckChangedLayers();
+                }
             }
 
             //TODO: dynamic spacing depending on number of digits of sorting order
             EditorGUIUtility.labelWidth = 70;
 
-            EditorGUI.BeginChangeCheck();
-            var sortingOrderGUIContent = new GUIContent
+            using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                text = "Order " + (isUsingRelativeSortingOrder ? element.originSortingOrder + " +" : ""),
-                tooltip = isUsingRelativeSortingOrder
-                    ? UITooltipConstants.OverlappingItemListRelativeSortingOrderTooltip
-                    : UITooltipConstants.OverlappingItemListTotalSortingOrderTooltip
-            };
-            var modifiedSortingOrder =
-                EditorGUI.DelayedIntField(new Rect(rect.x + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
-                    sortingOrderGUIContent, element.sortingOrder);
+                var sortingOrderGUIContent = new GUIContent
+                {
+                    text = "Order " + (isUsingRelativeSortingOrder ? element.originSortingOrder + " +" : ""),
+                    tooltip = isUsingRelativeSortingOrder
+                        ? UITooltipConstants.OverlappingItemListRelativeSortingOrderTooltip
+                        : UITooltipConstants.OverlappingItemListTotalSortingOrderTooltip
+                };
+                var modifiedSortingOrder =
+                    EditorGUI.DelayedIntField(
+                        new Rect(rect.x + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
+                        sortingOrderGUIContent, element.sortingOrder);
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                LogSortingOrderChangeModification(index, modifiedSortingOrder);
-                element.sortingOrder = modifiedSortingOrder;
-                isPreviewUpdating = true;
-                overlappingItems.UpdateSortingOrder(index);
+                if (changeScope.changed)
+                {
+                    LogSortingOrderChangeModification(index, modifiedSortingOrder);
+                    element.sortingOrder = modifiedSortingOrder;
+                    isPreviewUpdating = true;
+                    overlappingItems.UpdateSortingOrder(index);
+                }
             }
 
             if (GUI.Button(

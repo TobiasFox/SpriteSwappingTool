@@ -23,7 +23,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Helper
 {
     public class ColliderTest : MonoBehaviour
     {

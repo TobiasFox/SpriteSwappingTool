@@ -28,14 +28,14 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
     [CustomEditor(typeof(SortingCriteriaPreset))]
     public class SortingCriteriaPresetEditor : Editor
     {
-        private CriterionDataBaseUIRepresentation<SortingCriterionData>[] criterionDataBaseUIRepresentations;
+        private CriterionDataBaseUIRepresentation[] criterionDataBaseUIRepresentations;
 
         private void Awake()
         {
             var preset = (SortingCriteriaPreset) target;
 
             criterionDataBaseUIRepresentations =
-                new CriterionDataBaseUIRepresentation<SortingCriterionData>[preset.sortingCriterionData.Length];
+                new CriterionDataBaseUIRepresentation[preset.sortingCriterionData.Length];
             for (var i = 0; i < preset.sortingCriterionData.Length; i++)
             {
                 var sortingCriterionData = preset.sortingCriterionData[i];

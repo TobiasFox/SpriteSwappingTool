@@ -42,35 +42,37 @@ namespace SpriteSortingPlugin.UI
                 return;
             }
 
-            EditorGUI.indentLevel++;
-
-            EditorGUI.BeginChangeCheck();
-            var sharpnessProperty = property.FindPropertyRelative("sharpness");
-            sharpnessProperty.doubleValue = EditorGUILayout.DoubleField(new GUIContent(sharpnessProperty.displayName,
-                UITooltipConstants.SpriteDataSharpnessTooltip), sharpnessProperty.doubleValue);
-            if (EditorGUI.EndChangeCheck())
+            using (new EditorGUI.IndentLevelScope())
             {
-                sharpnessProperty.doubleValue = Math.Max(0, sharpnessProperty.doubleValue);
+                using (var changeScope = new EditorGUI.ChangeCheckScope())
+                {
+                    var sharpnessProperty = property.FindPropertyRelative("sharpness");
+                    sharpnessProperty.doubleValue = EditorGUILayout.DoubleField(new GUIContent(
+                        sharpnessProperty.displayName,
+                        UITooltipConstants.SpriteDataSharpnessTooltip), sharpnessProperty.doubleValue);
+                    if (changeScope.changed)
+                    {
+                        sharpnessProperty.doubleValue = Math.Max(0, sharpnessProperty.doubleValue);
+                    }
+                }
+
+                var perceivedLightnessProperty = property.FindPropertyRelative("perceivedLightness");
+                perceivedLightnessProperty.floatValue = EditorGUILayout.Slider(
+                    new GUIContent(perceivedLightnessProperty.displayName,
+                        UITooltipConstants.SpriteDataPerceivedLightnessTooltip),
+                    perceivedLightnessProperty.floatValue, 0, 100);
+
+                var averageAlphaProperty = property.FindPropertyRelative("averageAlpha");
+                averageAlphaProperty.floatValue = EditorGUILayout.Slider(
+                    new GUIContent("Average alpha", UITooltipConstants.SpriteDataAverageAlphaTooltip),
+                    averageAlphaProperty.floatValue, 0, 1);
+
+
+                var primaryColorProperty = property.FindPropertyRelative("primaryColor");
+                EditorGUILayout.PropertyField(primaryColorProperty,
+                    new GUIContent(primaryColorProperty.displayName, UITooltipConstants.SpriteDataPrimaryColorTooltip));
             }
 
-            var perceivedLightnessProperty = property.FindPropertyRelative("perceivedLightness");
-            perceivedLightnessProperty.floatValue = EditorGUILayout.Slider(
-                new GUIContent(perceivedLightnessProperty.displayName,
-                    UITooltipConstants.SpriteDataPerceivedLightnessTooltip),
-                perceivedLightnessProperty.floatValue, 0, 100);
-
-            EditorGUI.BeginChangeCheck();
-            var averageAlphaProperty = property.FindPropertyRelative("averageAlpha");
-            averageAlphaProperty.floatValue = EditorGUILayout.Slider(
-                new GUIContent("Average alpha", UITooltipConstants.SpriteDataAverageAlphaTooltip),
-                averageAlphaProperty.floatValue, 0, 1);
-
-
-            var primaryColorProperty = property.FindPropertyRelative("primaryColor");
-            EditorGUILayout.PropertyField(primaryColorProperty,
-                new GUIContent(primaryColorProperty.displayName, UITooltipConstants.SpriteDataPrimaryColorTooltip));
-
-            EditorGUI.indentLevel--;
             property.serializedObject.ApplyModifiedProperties();
             EditorGUI.EndProperty();
         }

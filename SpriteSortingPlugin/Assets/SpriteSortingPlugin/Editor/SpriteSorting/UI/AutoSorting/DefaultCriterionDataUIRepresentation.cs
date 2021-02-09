@@ -28,7 +28,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    public class DefaultCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation<SortingCriterionData>
+    public class DefaultCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation
     {
         private string foregroundSortingName;
         private string foregroundSortingTooltip;

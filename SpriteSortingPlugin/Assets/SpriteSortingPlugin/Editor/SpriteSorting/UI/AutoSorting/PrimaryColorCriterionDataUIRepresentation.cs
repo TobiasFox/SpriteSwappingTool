@@ -27,7 +27,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSorting.UI.AutoSorting
 {
-    public class PrimaryColorCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation<SortingCriterionData>
+    public class PrimaryColorCriterionDataUIRepresentation : CriterionDataBaseUIRepresentation
     {
         private static readonly string[] ChannelNames = new string[] {"Red", "Green", "Blue"};
 

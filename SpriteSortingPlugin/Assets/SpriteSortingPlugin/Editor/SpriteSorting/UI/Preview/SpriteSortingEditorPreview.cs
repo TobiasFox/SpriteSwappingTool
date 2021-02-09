@@ -77,7 +77,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
                 GUILayout.ExpandWidth(true),
                 GUILayout.Height(isPreviewExpanded ? EditorGUIUtility.singleLineHeight : 25)
             };
-            // GUILayout.Label("Preview", Styling.CenteredStyle, guiLayoutOptionArray);
 
             DrawScenePreview();
 
@@ -116,14 +115,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
 
             using (var horizontalScope = new EditorGUILayout.HorizontalScope())
             {
-                // using (new GUILayout.HorizontalScope())
-                // {
-                //     EditorGUILayout.Space();
-                //     EditorGUILayout.Space();
-                //     DrawSpriteDataSceneVisualizationToggles();
-                // }
-                // using (new EditorGUILayout.HorizontalScope())
-                // {
                 GUILayout.Label("Rotate by click and drag");
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
@@ -132,7 +123,6 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
                     Object.DestroyImmediate(previewEditor);
                     previewEditor = Editor.CreateEditor(previewGameObject);
                 }
-                // }
 
                 if (Event.current.type == EventType.Repaint)
                 {
@@ -240,114 +230,10 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.Preview
                     }
                 }
 
-                // using (new GUILayout.HorizontalScope())
-                // {
-                //     EditorGUI.BeginChangeCheck();
-                //     var buttonStyle = new GUIStyle(Styling.ButtonStyle);
-                //     buttonStyle.fontSize--;
-                //     isVisualizingBoundsInScene = GUILayout.Toggle(isVisualizingBoundsInScene,
-                //         new GUIContent("Outline", UITooltipConstants.SortingEditorScenePreviewSpriteOutlineTooltip),
-                //         buttonStyle);
-                //     if (EditorGUI.EndChangeCheck())
-                //     {
-                //         EnableSceneVisualization(isVisualizingBoundsInScene);
-                //     }
-                //
-                //     EditorGUI.BeginChangeCheck();
-                //     isVisualizingSortingOrder = GUILayout.Toggle(isVisualizingSortingOrder, new GUIContent(
-                //             "Label: Sorting Order",
-                //             UITooltipConstants.SortingEditorScenePreviewDisplaySortingOrderTooltip),
-                //         buttonStyle);
-                //     if (EditorGUI.EndChangeCheck())
-                //     {
-                //         EnableSceneVisualization(isVisualizingSortingOrder);
-                //     }
-                //
-                //     EditorGUI.BeginChangeCheck();
-                //     isVisualizingSortingLayer = GUILayout.Toggle(isVisualizingSortingLayer, new GUIContent(
-                //             "Label: Sorting Layer",
-                //             UITooltipConstants.SortingEditorScenePreviewDisplaySortingLayerTooltip),
-                //         buttonStyle);
-                //     if (EditorGUI.EndChangeCheck())
-                //     {
-                //         EnableSceneVisualization(isVisualizingSortingLayer);
-                //     }
-                //
-                //     isUpdatingSpriteRendererInScene = GUILayout.Toggle(isUpdatingSpriteRendererInScene, new GUIContent(
-                //             "Update SpriteRenderers",
-                //             UITooltipConstants.SortingEditorScenePreviewReflectSortingOptionsInSceneTooltip),
-                //         buttonStyle);
-                // }
-
                 if (!isSceneVisualizingDelegateIsAdded &&
                     (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
                 {
                     EnableSceneVisualization(true);
-                }
-            }
-        }
-
-        private void DrawSpriteDataSceneVisualizationToggles()
-        {
-            // using (new GUILayout.VerticalScope(Styling.HelpBoxStyle))
-            // {
-            //     GUILayout.Label("Visualization in the scene", Styling.CenteredStyle, GUILayout.ExpandWidth(true));
-            //     using (new GUILayout.HorizontalScope())
-            //     {
-            //         EditorGUI.BeginChangeCheck();
-            //         isVisualizingBoundsInScene = GUILayout.Toggle(isVisualizingBoundsInScene,
-            //             new GUIContent("Outline", UITooltipConstants.SortingEditorScenePreviewSpriteOutlineTooltip),
-            //             Styling.ButtonStyle, GUILayout.ExpandWidth(true));
-            //         if (EditorGUI.EndChangeCheck())
-            //         {
-            //             EnableSceneVisualization(isVisualizingBoundsInScene);
-            //         }
-            //
-            //         EditorGUI.BeginChangeCheck();
-            //         isVisualizingSortingOrder = GUILayout.Toggle(isVisualizingSortingOrder, new GUIContent(
-            //                 "Label: Sorting Order",
-            //                 UITooltipConstants.SortingEditorScenePreviewDisplaySortingOrderTooltip),
-            //             Styling.ButtonStyle, GUILayout.ExpandWidth(true));
-            //         if (EditorGUI.EndChangeCheck())
-            //         {
-            //             EnableSceneVisualization(isVisualizingSortingOrder);
-            //         }
-            //
-            //         EditorGUI.BeginChangeCheck();
-            //         isVisualizingSortingLayer = GUILayout.Toggle(isVisualizingSortingLayer, new GUIContent(
-            //                 "Label: Sorting Layer",
-            //                 UITooltipConstants.SortingEditorScenePreviewDisplaySortingLayerTooltip),
-            //             Styling.ButtonStyle, GUILayout.ExpandWidth(true));
-            //         if (EditorGUI.EndChangeCheck())
-            //         {
-            //             EnableSceneVisualization(isVisualizingSortingLayer);
-            //         }
-            //
-            //         isUpdatingSpriteRendererInScene = GUILayout.Toggle(isUpdatingSpriteRendererInScene, new GUIContent(
-            //                 "Update SpriteRenderers",
-            //                 UITooltipConstants.SortingEditorScenePreviewReflectSortingOptionsInSceneTooltip),
-            //             Styling.ButtonStyle, GUILayout.ExpandWidth(true));
-            //     }
-            //
-            //     if (!isSceneVisualizingDelegateIsAdded &&
-            //         (isVisualizingBoundsInScene || isVisualizingSortingLayer || isVisualizingSortingOrder))
-            //     {
-            //         EnableSceneVisualization(true);
-            //     }
-            // }
-
-            using (new EditorGUILayout.VerticalScope())
-            {
-                GUILayout.Space(22.5f);
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("Reset Rotation", GUILayout.Width(95)))
-                    {
-                        previewGameObject.transform.rotation = DefaultPreviewRotation;
-                        Object.DestroyImmediate(previewEditor);
-                        previewEditor = Editor.CreateEditor(previewGameObject);
-                    }
                 }
             }
         }

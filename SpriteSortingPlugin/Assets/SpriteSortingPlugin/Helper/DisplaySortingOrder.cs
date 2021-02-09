@@ -23,7 +23,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Helper
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class DisplaySortingOrder : MonoBehaviour

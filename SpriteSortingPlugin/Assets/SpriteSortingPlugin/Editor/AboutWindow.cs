@@ -48,17 +48,18 @@ namespace SpriteSortingPlugin
 
         private void OnGUI()
         {
-            EditorGUI.indentLevel++;
-            var boldLabelStyle = new GUIStyle(EditorStyles.largeLabel) {fontStyle = FontStyle.Bold};
+            using (new EditorGUI.IndentLevelScope())
+            {
+                var boldLabelStyle = new GUIStyle(EditorStyles.largeLabel) {fontStyle = FontStyle.Bold};
 
-            GUILayout.Label(GeneralData.Name + " Tool", boldLabelStyle);
-            UIUtil.DrawHorizontalLine(true);
+                GUILayout.Label(GeneralData.Name + " Tool", boldLabelStyle);
+                UIUtil.DrawHorizontalLine(true);
 
-            EditorGUILayout.LabelField("Version number", GeneralData.GetFullVersionNumber());
-            EditorGUILayout.LabelField("Developed By", GeneralData.DevelopedBy);
-            EditorGUILayout.LabelField("Contact", GeneralData.DeveloperMailAddress);
-            EditorGUILayout.LabelField("", "All rights reserved");
-            EditorGUI.indentLevel--;
+                EditorGUILayout.LabelField("Version number", GeneralData.GetFullVersionNumber());
+                EditorGUILayout.LabelField("Developed By", GeneralData.DevelopedBy);
+                EditorGUILayout.LabelField("Contact", GeneralData.DeveloperMailAddress);
+                EditorGUILayout.LabelField("", "All rights reserved");
+            }
 
 
             EditorGUILayout.Space();
@@ -67,13 +68,13 @@ namespace SpriteSortingPlugin
             EditorGUILayout.LabelField("Third-party libraries");
             UIUtil.DrawHorizontalLine();
 
-            EditorGUI.indentLevel++;
 
-            EditorGUILayout.LabelField(GeneralData.ClipperLibName + " " + GeneralData.ClipperLibVersion,
-                GeneralData.ClipperLibLicense);
-            LinkButton(GeneralData.ClipperLibLink, GeneralData.ClipperLibLink);
-
-            EditorGUI.indentLevel--;
+            using (new EditorGUI.IndentLevelScope())
+            {
+                EditorGUILayout.LabelField(GeneralData.ClipperLibName + " " + GeneralData.ClipperLibVersion,
+                    GeneralData.ClipperLibLicense);
+                LinkButton(GeneralData.ClipperLibLink, GeneralData.ClipperLibLink);
+            }
         }
 
         private void LinkButton(string buttonName, string url)

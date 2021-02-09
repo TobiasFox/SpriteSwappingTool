@@ -23,7 +23,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Helper
 {
     public class DisplaySortingOrderParent : MonoBehaviour
     {
@@ -48,15 +48,17 @@ namespace SpriteSortingPlugin
 
             var serializedProperty = serializedObject.FindProperty("isDisplayingSortingOrder");
 
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(serializedProperty);
-            if (EditorGUI.EndChangeCheck())
+            using (var changeScope = new EditorGUI.ChangeCheckScope())
             {
-                if (displaySortingOrderChildren != null)
+                EditorGUILayout.PropertyField(serializedProperty);
+                if (changeScope.changed)
                 {
-                    foreach (var displaySortingOrderChild in displaySortingOrderChildren)
+                    if (displaySortingOrderChildren != null)
                     {
-                        displaySortingOrderChild.isDisplayingSortingOrder = serializedProperty.boolValue;
+                        foreach (var displaySortingOrderChild in displaySortingOrderChildren)
+                        {
+                            displaySortingOrderChild.isDisplayingSortingOrder = serializedProperty.boolValue;
+                        }
                     }
                 }
             }

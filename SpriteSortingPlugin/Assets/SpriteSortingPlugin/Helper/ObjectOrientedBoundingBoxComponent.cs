@@ -24,7 +24,7 @@ using SpriteSortingPlugin.OOBB;
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.Helper
 {
     public class ObjectOrientedBoundingBoxComponent : MonoBehaviour
     {
