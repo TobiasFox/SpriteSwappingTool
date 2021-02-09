@@ -4,6 +4,7 @@
 [Bb]uild/
 [Bb]uilds/
 Assets/AssetStoreTools*
+SpriteSortingPlugin/Assets/_Scenes/SurveyScenes/ModifiedScenes__Dont_Change/
 
 # Visual Studio cache directory
 .vs/
@@ -41,3 +42,4 @@ SpriteSortingPlugin/Assets/Plugins/Sirenix/Demos/
 SpriteSortingPlugin/Assets/Plugins/Sirenix/Demos.meta
 SpriteSortingPlugin/Assets/Plugins/Sirenix/Odin Inspector/Config/Resources/Sirenix/GlobalSerializationConfig.asset
 SpriteSortingPlugin/Assets/Plugins/Sirenix/Odin Inspector/Config/Resources/Sirenix/GlobalSerializationConfig.asset.meta
+SpriteSortingPlugin/Assets/_ScenesNotUsed/SurveyResults/

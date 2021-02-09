@@ -1,8 +1,30 @@
-﻿using System;
+﻿#region license
+
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//   under the License.
+//  -------------------------------------------------------------
+
+#endregion
+
+using System;
 using System.Collections.Generic;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Criteria;
-using SpriteSortingPlugin.SpriteSorting.AutomaticSorting.Data;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Criteria;
+using SpriteSortingPlugin.SpriteSorting.AutoSorting.Data;
 using SpriteSortingPlugin.SpriteSorting.UI.AutoSorting;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -19,8 +41,35 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         //TODO list will be reset, when scripts are recompiling. Add serialization of it?
         private List<SortingCriteriaComponent> sortingCriteriaComponents;
         private SortingCriteriaPresetSelector sortingCriteriaPresetSelector;
+        private bool isAutoSortingOptionExpanded;
 
-        public bool IsApplyingAutoSorting => isApplyingAutoSorting;
+        public bool IsApplyingAutoSorting
+        {
+            get
+            {
+                if (!isApplyingAutoSorting)
+                {
+                    return false;
+                }
+
+                foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                {
+                    if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
+                    {
+                        continue;
+                    }
+
+                    if (!sortingCriteriaComponent.sortingCriterionData.isActive)
+                    {
+                        continue;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+        }
 
         public void Init()
         {
@@ -29,157 +78,191 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             InitializeSortingCriteriaDataAndEditors();
         }
 
+        public void ActivateAutoSorting()
+        {
+            isAutoSortingOptionExpanded = true;
+            isApplyingAutoSorting = true;
+        }
+
         public void DrawAutoSortingOptions(bool wasAnalyzeButtonClicked)
         {
-            GUILayout.Label("Automatic Sorting");
+            var isDisable = false;
 
-            using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
+            if (GeneralData.isSurveyActive)
             {
-                var labelContent = new GUIContent("Apply auto sorting?",
-                    UITooltipConstants.SortingEditorUsingAutoSortingTooltip);
-                isApplyingAutoSorting = UIUtil.DrawFoldoutBoolContent(isApplyingAutoSorting, labelContent);
+                isDisable = !GeneralData.isAutomaticSortingActive;
+            }
 
-                if (!isApplyingAutoSorting)
+            using (new EditorGUI.DisabledScope(isDisable))
+            {
+                var labelText = "Generation of Sorting order suggestion" +
+                                (isDisable ? " - enabled in Part 3 of the survey" : "");
+                // GUILayout.Label(labelText);
+
+                isAutoSortingOptionExpanded = EditorGUILayout.Foldout(isAutoSortingOptionExpanded, labelText, true);
+                // GUILayout.Label("Sorting Options");
+                if (!isAutoSortingOptionExpanded)
                 {
                     return;
                 }
 
-                EditorGUILayout.Space();
-
-                if (sortingCriteriaComponents == null)
+                using (new EditorGUILayout.VerticalScope(Styling.HelpBoxStyle))
                 {
-                    InitializeSortingCriteriaDataAndEditors();
-                }
+                    var labelContent = new GUIContent("Generate sorting order?",
+                        UITooltipConstants.SortingEditorUsingAutoSortingTooltip);
+                    isApplyingAutoSorting = UIUtil.DrawFoldoutBoolContent(isApplyingAutoSorting, labelContent);
 
-                using (var headerScope = new EditorGUILayout.HorizontalScope())
-                {
-                    EditorGUI.DrawRect(headerScope.rect, Styling.SortingCriteriaHeaderBackgroundColor);
-                    GUILayout.Label("Sorting Criteria");
-                    GUILayout.FlexibleSpace();
+                    DrawSortingCriteriaHeader(wasAnalyzeButtonClicked);
 
-                    var isGUIEnabled = GUI.enabled;
-                    GUI.enabled = true;
-
-                    if (GUILayout.Button(
-                        wasAnalyzeButtonClicked ? "Save Criteria Preset" : "Save / Load Criteria Preset",
-                        GUILayout.Width(wasAnalyzeButtonClicked ? 135 : 170)))
+                    if (!isApplyingAutoSorting)
                     {
-                        if (!wasAnalyzeButtonClicked)
-                        {
-                            sortingCriteriaPresetSelector.ShowPresetSelector();
-                        }
-                        else
-                        {
-                            var pathWithinProject = EditorUtility.SaveFilePanelInProject(
-                                "Save " + nameof(SortingCriteriaPreset),
-                                nameof(SortingCriteriaPreset),
-                                "preset",
-                                "Please enter a file name to save the " +
-                                ObjectNames.NicifyVariableName(nameof(SortingCriteriaPreset)));
-
-                            if (pathWithinProject.Length != 0)
-                            {
-                                var preset = GenerateSortingCriteriaPreset();
-
-                                AssetDatabase.CreateAsset(preset, pathWithinProject);
-                                AssetDatabase.ForceReserializeAssets(new string[] {pathWithinProject});
-                                AssetDatabase.Refresh();
-                                Debug.Log("Preset saved to " + pathWithinProject);
-                            }
-                        }
+                        return;
                     }
 
-                    GUI.enabled = isGUIEnabled;
-                }
+                    EditorGUILayout.Space();
 
-                UIUtil.DrawHorizontalLine(true);
-                var isMinOneSortingCriterionEditorDrawn = false;
-
-                for (var i = 0; i < sortingCriteriaComponents.Count; i++)
-                {
-                    var sortingCriteriaComponent = sortingCriteriaComponents[i];
-                    if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
+                    if (sortingCriteriaComponents == null)
                     {
-                        continue;
+                        InitializeSortingCriteriaDataAndEditors();
                     }
 
-                    sortingCriteriaComponent.criterionDataBaseUIRepresentation.OnInspectorGUI();
-                    isMinOneSortingCriterionEditorDrawn = true;
-                    if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
-                    {
-                        UIUtil.DrawHorizontalLine();
-                    }
-                }
+                    DrawSortingCriteria();
 
-                if (isMinOneSortingCriterionEditorDrawn)
-                {
-                    UIUtil.DrawHorizontalLine(true);
-                }
-
-                var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-
-                    using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
-                    {
-                        if (GUILayout.Button("Add Criterion", GUILayout.Width(103)))
-                        {
-                            DrawSortingCriteriaMenu();
-                        }
-                    }
-                }
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-
-                    using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
-                    {
-                        if (GUILayout.Button("All", GUILayout.Width(50)))
-                        {
-                            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
-                            {
-                                sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
-                                sortingCriteriaComponent.sortingCriterionData.isActive = true;
-                            }
-                        }
-                    }
-
-                    var isMinOneSortingCriteriaIsUsed = IsMinOneSortingCriteriaIsUsed();
-                    using (new EditorGUI.DisabledScope(!isMinOneSortingCriteriaIsUsed))
-                    {
-                        if (GUILayout.Button("None", GUILayout.Width(50)))
-                        {
-                            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
-                            {
-                                sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = false;
-                                sortingCriteriaComponent.sortingCriterionData.isActive = false;
-                            }
-                        }
-                    }
+                    DrawFooter();
                 }
             }
         }
 
-        public bool HasActiveAutoSortingCriteria()
+        private void DrawSortingCriteriaHeader(bool wasAnalyzeButtonClicked)
         {
-            foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+            using (new EditorGUI.DisabledScope(!isApplyingAutoSorting))
             {
+                using (var headerScope = new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUI.DrawRect(headerScope.rect, Styling.SortingCriteriaHeaderBackgroundColor);
+                    GUILayout.Label(new GUIContent("Sorting Criteria",
+                        UITooltipConstants.SortingEditorSortingCriteriaListTooltip));
+                    GUILayout.FlexibleSpace();
+
+                    var isGUIEnabled = GUI.enabled;
+                    if (isApplyingAutoSorting)
+                    {
+                        GUI.enabled = true;
+                    }
+
+                    var saveButtonText = wasAnalyzeButtonClicked
+                        ? "Save Criteria Preset"
+                        : "Save / Load Criteria Preset";
+                    if (GUILayout.Button(saveButtonText, GUILayout.Width(wasAnalyzeButtonClicked ? 135 : 170)))
+                    {
+                        SaveCriteriaPreset(wasAnalyzeButtonClicked);
+                    }
+
+                    if (isApplyingAutoSorting)
+                    {
+                        GUI.enabled = isGUIEnabled;
+                    }
+                }
+
+                UIUtil.DrawHorizontalLine(true);
+            }
+        }
+
+        private void SaveCriteriaPreset(bool wasAnalyzeButtonClicked)
+        {
+            if (!wasAnalyzeButtonClicked)
+            {
+                sortingCriteriaPresetSelector.ShowPresetSelector();
+                return;
+            }
+
+            var pathWithinProject = EditorUtility.SaveFilePanelInProject(
+                "Save " + nameof(SortingCriteriaPreset),
+                nameof(SortingCriteriaPreset),
+                "preset",
+                "Please enter a file name to save the " +
+                ObjectNames.NicifyVariableName(nameof(SortingCriteriaPreset)));
+
+            if (pathWithinProject.Length == 0)
+            {
+                return;
+            }
+
+            var preset = GenerateSortingCriteriaPreset();
+
+            AssetDatabase.CreateAsset(preset, pathWithinProject);
+            AssetDatabase.ForceReserializeAssets(new string[] {pathWithinProject});
+            AssetDatabase.Refresh();
+            Debug.Log("Preset saved to " + pathWithinProject);
+        }
+
+        private void DrawSortingCriteria()
+        {
+            var isMinOneSortingCriterionEditorDrawn = false;
+
+            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
+            {
+                var sortingCriteriaComponent = sortingCriteriaComponents[i];
                 if (!sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList)
                 {
                     continue;
                 }
 
-                if (!sortingCriteriaComponent.sortingCriterionData.isActive)
+                sortingCriteriaComponent.criterionDataBaseUIRepresentation.OnInspectorGUI();
+                isMinOneSortingCriterionEditorDrawn = true;
+                if (sortingCriteriaComponents.Count > 0 && i < sortingCriteriaComponents.Count - 1)
                 {
-                    continue;
+                    UIUtil.DrawHorizontalLine();
                 }
-
-                return true;
             }
 
-            return false;
+            if (isMinOneSortingCriterionEditorDrawn)
+            {
+                UIUtil.DrawHorizontalLine(true);
+            }
+        }
+
+        private void DrawFooter()
+        {
+            var isEverySortingCriteriaIsUsed = IsEverySortingCriteriaIsUsed();
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+
+                using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
+                {
+                    if (GUILayout.Button("+ Add Criterion", GUILayout.Width(103)))
+                    {
+                        DrawSortingCriteriaMenu();
+                    }
+                }
+
+                using (new EditorGUI.DisabledScope(isEverySortingCriteriaIsUsed))
+                {
+                    if (GUILayout.Button("All", GUILayout.Width(50)))
+                    {
+                        foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                        {
+                            sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
+                            sortingCriteriaComponent.sortingCriterionData.isActive = true;
+                        }
+                    }
+                }
+
+                var isMinOneSortingCriteriaIsUsed = IsMinOneSortingCriteriaIsUsed();
+                using (new EditorGUI.DisabledScope(!isMinOneSortingCriteriaIsUsed))
+                {
+                    if (GUILayout.Button("None", GUILayout.Width(50)))
+                    {
+                        foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
+                        {
+                            sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = false;
+                            sortingCriteriaComponent.sortingCriterionData.isActive = false;
+                        }
+                    }
+                }
+            }
         }
 
         public bool IsCameraRequired(out string usedBy)
@@ -237,7 +320,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 if (sortingCriteriaComponent.sortingCriterion != null &&
                     sortingCriteriaComponent.sortingCriterion.IsUsingSpriteData())
                 {
-                    usedBy = "Automatic Sorting";
+                    usedBy = "Sorting order suggestion";
                     return true;
                 }
             }
@@ -245,9 +328,9 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             return false;
         }
 
-        public List<SortingCriterion<SortingCriterionData>> GetActiveSortingCriteria()
+        public List<SortingCriterion> GetActiveSortingCriteria()
         {
-            var list = new List<SortingCriterion<SortingCriterionData>>();
+            var list = new List<SortingCriterion>();
 
             foreach (var sortingCriteriaComponent in sortingCriteriaComponents)
             {
@@ -265,6 +348,25 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             }
 
             return list;
+        }
+
+        public SortingCriterionData[] GenerateSortingCriteriaDataArray()
+        {
+            var sortingCriterionDataList = new List<SortingCriterionData>();
+
+            for (var i = 0; i < sortingCriteriaComponents.Count; i++)
+            {
+                var criterionData = sortingCriteriaComponents[i].sortingCriterionData;
+
+                if (!criterionData.isAddedToEditorList || !criterionData.isActive)
+                {
+                    continue;
+                }
+
+                sortingCriterionDataList.Add((SortingCriterionData) criterionData.Clone());
+            }
+
+            return sortingCriterionDataList.ToArray();
         }
 
         public SortingCriteriaPreset GenerateSortingCriteriaPreset()
@@ -310,10 +412,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                     SortingCriteriaComponentFactory.CreateSortingCriteriaComponent(sortingCriterionType);
                 sortingCriteriaComponents.Add(sortingCriteriaComponent);
 
+                sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
+
                 //default value
                 if (sortingCriterionType == SortingCriterionType.Containment)
                 {
-                    sortingCriteriaComponent.sortingCriterionData.isAddedToEditorList = true;
                     sortingCriteriaComponent.sortingCriterionData.isActive = true;
                 }
             }

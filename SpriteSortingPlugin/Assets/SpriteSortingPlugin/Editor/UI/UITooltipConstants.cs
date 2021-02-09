@@ -1,4 +1,26 @@
-﻿namespace SpriteSortingPlugin.UI
+﻿#region license
+
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//   under the License.
+//  -------------------------------------------------------------
+
+#endregion
+
+namespace SpriteSortingPlugin.UI
 {
     public static class UITooltipConstants
     {
@@ -12,7 +34,7 @@
             "Range: 0.0 - 1.0";
 
         public const string ContainmentEncapsulatedSpriteInForegroundTooltip =
-            "When enabled, completely enclosed SpriteRenderers will be sorted in the foreground. Otherwise, the enclosed SpriteRenderer will be sorted in the background and may be completely hidden.";
+            "Control, whether completely enclosed SpriteRenderer will be sorted in the foreground or background. When choosing the background, the contained Sprite may be completely hidden.";
 
         public const string ContainmentTooltip =
             "Compares if SpriteRenderers are completely enclosed by other SpriteRenderers.\n" +
@@ -22,12 +44,13 @@
             "Compares the distance to the camera. Will be ignored when using orthographic Transparency Sort mode or Default Transparency Sort mode and orthographic camera project.";
 
         public const string CameraDistanceForegroundSpriteTooltip =
-            "When enabled, SpriteRenderer with a shorter distance to the camera will be sorted in the foreground.";
+            "Control, whether SpriteRenderers with a shorter distance to the camera will be sorted in the foreground or background.";
 
         public const string PrimaryColorTooltip =
             "Compares the primary color of given SpriteRenderers and sorts SpriteRenderer in the foreground which are closer to the foreground color.";
 
-        public const string PrimaryColorChannelsTooltip = "Specify which color channels should be used.";
+        public const string PrimaryColorChannelsTooltip =
+            "Specify which color channel should be used. The alpha channel is ignored.";
 
         public const string PrimaryColorForegroundColorTooltip =
             "Specify the color of SpriteRenderers, which will be sorted in the foreground.";
@@ -40,39 +63,39 @@
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SizeForegroundSpriteTooltip =
-            "When enabled, larger Sprites will be sorted in the foreground.";
+            "Control, whether large Sprites will be sorted in the foreground or background.";
 
         public const string IntersectionAreaTooltip =
-            "Calculates the intersection area of overlapping Sprites and sets these intersection area in ration to the area of these overlapping Sprites.\n" +
+            "Calculates the intersection area of overlapping Sprites and sets these intersection areas in relation to the areas of these overlapping Sprites.\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string IntersectionAreaForegroundSpriteTooltip =
-            "When enabled, Sprites with a smaller ratio of their own area to the intersection area will be sorted in the foreground.";
+            "Control, whether Sprites with a smaller ratio of their own area to the intersection area will be sorted in the foreground or background.";
 
         public const string SpriteSortPointTooltip =
-            "Compares the Sort Points of Sprites by testing if they overlap another Sprite.\n"+
+            "Compares the Sort Points of Sprites by testing if they overlap another Sprite.\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SpriteSortPointForegroundSpriteTooltip =
-            "When enabled, a Sprite will be sorted in the foreground if a Sprite's Sort Point overlaps another Sprite.";
+            "Control, whether SpriteRenderers will be sorted in the foreground or background if a Sprite's Sort Point overlaps another Sprite.";
 
-        public const string ResolutionTooltip = "Compares Sprites resolutions in pixel.";
+        public const string ResolutionTooltip = "Compares Sprites resolutions in pixels.";
 
         public const string ResolutionForegroundSpriteTooltip =
-            "When enabled, Sprites with higher resolutions will be sorted in the foreground.";
+            "Control, whether Sprites with higher resolution will be sorted in the foreground or background.";
 
         public const string SharpnessTooltip =
-            "Compares the sharpness of Sprites by analyzing their amount of edges (rapid intensity changes).\n" +
+            "Compares the sharpness of Sprites.\n" +
             "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string SharpnessForegroundSpriteTooltip =
-            "When enabled, sharper Sprites will be sorted in the foreground.";
+            "Control, whether sharper Sprites will be sorted in the foreground or background.";
 
         public const string PerceivedLightnessTooltip = "Compares only the perceived lightness of Sprites.\n" +
                                                         "Requires a " + nameof(SpriteData) + " asset.";
 
         public const string PerceivedLightnessForegroundSpriteTooltip =
-            "When enabled, lighter Sprites will be sorted in the foreground.";
+            "Control, whether lighter Sprites will be sorted in the foreground or background.";
 
         public const string SortingCriteriaWeightTooltip =
             "Controls the weight of this sorting criterion. The higher the value, the more affects this criterion the resulting order of Sprites.\n" +
@@ -177,10 +200,13 @@
             "This asset contains analyzed data of Sprites such as a more accurate outline or other data which is used to generate a sorting suggestion.";
 
         public const string SortingEditorUsingAutoSortingTooltip =
-            "Enable to generate an automatic sorting order suggestion of overlapping and unsorted SpriteRenderer based on given sorting criteria.";
+            "Enable to generate a sorting order suggestion of overlapping and unsorted SpriteRenderer based on given sorting criteria.";
+
+        public const string SortingEditorSortingCriteriaListTooltip =
+            "List of adjustable sorting criteria, which are used to generate sorting order suggestions.";
 
         public const string SortingEditorSortingTypeTooltip =
-            "Specify, if either a completely Sorting Layer or a single Sprite is used to identify overlapping SpriteRenderers.";
+            "Specify, if either an entire Sorting Layer or a single Sprite is used to identify overlapping SpriteRenderers.";
 
         public const string SortingEditorUsingGameObjectParentsTooltip =
             "When enabled, only the given GameObject parents are being considered for the analysis.\n" +
@@ -228,6 +254,10 @@
         public const string SortingEditorScenePreviewDisplaySortingLayerTooltip =
             "When enabled, the current sorting layer and the modified sorting layer will be displayed in the scene as text.";
 
+        public const string SortingEditorScenePreviewReflectSortingOptionsInSceneTooltip =
+            "When enabled, changed sorting options will be reflected directly in the scene.\n" +
+            "Any not confirmed sorting option adjustments will be reverted, when closing this window.";
+
         public const string SortingEditorScenePreviewSpriteOutlineTooltip =
             "When enabled, SpriteRenderer outlines will be drawn in the scene.";
 
@@ -242,12 +272,16 @@
         public const string SortingEditorSpriteSwapDescriptionTooltip =
             "The order of rendering overlapping and unsorted SpriteRenderer might differ per frame depending on several criteria. " +
             "The resulting effect is an abrupt swap of the SpriteRenderer in the foreground from such a group of renderers.";
-        
+
         public const string SortingEditorAnalyzeSurroundingSpriteRendererTooltip =
             "When enabled, it will be searched iteratively in surrounding SpriteRenderer for Sprite swapping issues based on the previously found overlapping items and their adjusted sorting options. Newfound Sprite swapping issues will be solved by incrementing the sorting order of correspondent SpriteRenderers.\n\n" +
             "Although it might take some time this option is recommended as it finds and solves resulting Sprite swapping issues automatically.";
 
         public const string SortingEditorAnalyzeSurroundingSpriteRendererDurationTooltip =
             "As this check analyzes surrounding SpriteRenderers it can affect many SpriteRenderers depending on the setups of opened scenes.";
+
+        public const string SortingEditorAnalyzeSRorSGWithChangedLayerFirstTooltip =
+            "When enabled, SpriteRenderers or Sorting Groups with changed Sorting Layers will be analyzed regarding Sprite sorting issues first.\n" +
+            "Functionality is not implemented yet.";
     }
 }

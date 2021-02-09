@@ -1,4 +1,26 @@
-﻿using System;
+﻿#region license
+
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//   under the License.
+//  -------------------------------------------------------------
+
+#endregion
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -14,10 +36,12 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         private OverlappingItemIndexComparer originIndexComparer;
         private OverlappingItemIdentityComparer overlappingItemIdentityComparer;
         private bool isAlreadySorted;
+        private bool isContinuouslyReflectingSortingOptionsInScene;
 
         public List<OverlappingItem> Items => items;
         public OverlappingItem BaseItem => baseItem;
         public bool HasChangedLayer => hasChangedLayer;
+        public bool IsContinuouslyReflectingSortingOptionsInScene => isContinuouslyReflectingSortingOptionsInScene;
 
         public OverlappingItems(OverlappingItem baseItem, List<OverlappingItem> items, bool isAlreadySorted = false)
         {
@@ -35,7 +59,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 originIndexComparer = new OverlappingItemIndexComparer();
             }
 
-            ArrayList.Adapter(items).Sort(originIndexComparer);
+            items.Sort(originIndexComparer);
 
             InitOverlappingItems(true);
         }
@@ -137,10 +161,23 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 overlappingItemIdentityComparer = new OverlappingItemIdentityComparer();
             }
 
-            ArrayList.Adapter(items).Sort(overlappingItemIdentityComparer);
+            items.Sort(overlappingItemIdentityComparer);
 
             newIndexInList = items.IndexOf(element);
             UpdateSurroundingItems(newIndexInList);
+        }
+
+        public bool ContainsSortingGroupsOrSpriteRenderersInstanceId(int instanceId)
+        {
+            foreach (var overlappingItem in items)
+            {
+                if (overlappingItem.SortingComponent.GetInstanceId() == instanceId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void UpdateSurroundingItems(int currentIndex)
@@ -177,11 +214,31 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
         }
 
-        public void ApplySortingOption()
+        public void ApplySortingOption(bool isContinuous = false)
         {
             foreach (var overlappingItem in items)
             {
-                overlappingItem.ApplySortingOption();
+                overlappingItem.ApplySortingOption(isContinuous);
+            }
+
+            if (isContinuous)
+            {
+                isContinuouslyReflectingSortingOptionsInScene = true;
+            }
+        }
+
+        public void RestoreSpriteRendererSortingOptions()
+        {
+            if (!isContinuouslyReflectingSortingOptionsInScene)
+            {
+                return;
+            }
+
+            isContinuouslyReflectingSortingOptionsInScene = false;
+
+            foreach (var overlappingItem in items)
+            {
+                overlappingItem.RestoreSpriteRendererSortingOptions();
             }
         }
 
@@ -213,70 +270,70 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
         }
 
-        private int GetIndexToSwitch(int currentIndex)
-        {
-            int newSortingOrder = items[currentIndex].sortingOrder;
-            int itemsCount = items.Count;
+        // private int GetIndexToSwitch(int currentIndex)
+        // {
+        //     int newSortingOrder = items[currentIndex].sortingOrder;
+        //     int itemsCount = items.Count;
+        //
+        //     if (currentIndex > 0 && items[currentIndex - 1].sortingOrder <= newSortingOrder)
+        //     {
+        //         int tempIndex = currentIndex;
+        //         for (int i = currentIndex - 1; i >= 0; i--)
+        //         {
+        //             int order = items[i].sortingOrder;
+        //             if (newSortingOrder >= order)
+        //             {
+        //                 tempIndex--;
+        //             }
+        //             else
+        //             {
+        //                 break;
+        //             }
+        //         }
+        //
+        //         return tempIndex;
+        //     }
+        //
+        //     if (currentIndex + 1 < itemsCount && items[currentIndex + 1].sortingOrder > newSortingOrder)
+        //     {
+        //         int tempIndex = currentIndex;
+        //
+        //         for (int i = currentIndex + 1; i < itemsCount; i++)
+        //         {
+        //             int order = items[i].sortingOrder;
+        //             if (newSortingOrder < order)
+        //             {
+        //                 tempIndex++;
+        //             }
+        //             else
+        //             {
+        //                 break;
+        //             }
+        //         }
+        //
+        //         return tempIndex;
+        //     }
+        //
+        //     return -1;
+        // }
 
-            if (currentIndex > 0 && items[currentIndex - 1].sortingOrder <= newSortingOrder)
-            {
-                int tempIndex = currentIndex;
-                for (int i = currentIndex - 1; i >= 0; i--)
-                {
-                    int order = items[i].sortingOrder;
-                    if (newSortingOrder >= order)
-                    {
-                        tempIndex--;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                return tempIndex;
-            }
-
-            if (currentIndex + 1 < itemsCount && items[currentIndex + 1].sortingOrder > newSortingOrder)
-            {
-                int tempIndex = currentIndex;
-
-                for (int i = currentIndex + 1; i < itemsCount; i++)
-                {
-                    int order = items[i].sortingOrder;
-                    if (newSortingOrder < order)
-                    {
-                        tempIndex++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                return tempIndex;
-            }
-
-            return -1;
-        }
-
-        private void SwitchItems(int oldIndex, int newIndex)
-        {
-            var itemWithNewIndex = items[newIndex];
-            var itemWithOldIndex = items[oldIndex];
-
-            var tempSortingOrder = itemWithNewIndex.sortingOrder;
-            var tempLayerId = itemWithNewIndex.sortingLayerDropDownIndex;
-
-            itemWithNewIndex.sortingOrder = itemWithOldIndex.sortingOrder;
-            itemWithNewIndex.sortingLayerDropDownIndex = itemWithOldIndex.sortingLayerDropDownIndex;
-
-            itemWithOldIndex.sortingOrder = tempSortingOrder;
-            itemWithOldIndex.sortingLayerDropDownIndex = tempLayerId;
-
-            itemWithNewIndex.UpdatePreview();
-            itemWithOldIndex.UpdatePreview();
-        }
+        // private void SwitchItems(int oldIndex, int newIndex)
+        // {
+        //     var itemWithNewIndex = items[newIndex];
+        //     var itemWithOldIndex = items[oldIndex];
+        //
+        //     var tempSortingOrder = itemWithNewIndex.sortingOrder;
+        //     var tempLayerId = itemWithNewIndex.sortingLayerDropDownIndex;
+        //
+        //     itemWithNewIndex.sortingOrder = itemWithOldIndex.sortingOrder;
+        //     itemWithNewIndex.sortingLayerDropDownIndex = itemWithOldIndex.sortingLayerDropDownIndex;
+        //
+        //     itemWithOldIndex.sortingOrder = tempSortingOrder;
+        //     itemWithOldIndex.sortingLayerDropDownIndex = tempLayerId;
+        //
+        //     itemWithNewIndex.UpdatePreview();
+        //     itemWithOldIndex.UpdatePreview();
+        // }
 
         private void InitOverlappingItems(bool isReset)
         {
@@ -309,5 +366,4 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             }
         }
     }
-    
 }
