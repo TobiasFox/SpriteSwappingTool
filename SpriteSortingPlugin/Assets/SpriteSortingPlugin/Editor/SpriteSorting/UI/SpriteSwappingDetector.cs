@@ -1357,5 +1357,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
         //     preview.UpdateSpriteData(spriteData);
         //     reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
         // }
+
+        private enum SortingType
+        {
+            Layer,
+            Sprite,
+        }
     }
 }
