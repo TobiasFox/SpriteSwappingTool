@@ -44,17 +44,11 @@ namespace SpriteSortingPlugin
         public const string ClipperLibLicense = "Boost Software License (BSL 1.0)";
         public const string ClipperLibLink = "http://www.angusj.com/delphi/clipper.php";
 
-        //TODO set to true
-        // public const bool IsValidatingUserInput = true;
         public const bool IsValidatingUserInput = false;
 
-        // public static bool isSurveyActive = true;
-        // public static bool isAutomaticSortingActive = true;
-        // public static bool isLoggingActive = true;
         public static int questionNumberForLogging;
         public static string currentSurveyId;
 
-        //TODO for build
         public static bool isSurveyActive;
         public static bool isAutomaticSortingActive;
         public static bool isLoggingActive;
