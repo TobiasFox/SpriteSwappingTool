@@ -23,7 +23,7 @@
 using System;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.OOBB
 {
     public class OOBBGenerator
     {

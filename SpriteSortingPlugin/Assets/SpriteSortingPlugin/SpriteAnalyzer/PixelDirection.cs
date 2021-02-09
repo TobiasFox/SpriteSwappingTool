@@ -20,34 +20,17 @@
 
 #endregion
 
-using System;
-
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.SpriteAnalyzer
 {
-    [Serializable]
-    public struct AlphaRectangleBorder : ICloneable
+    public enum PixelDirection
     {
-        public int topBorder;
-        public int leftBorder;
-        public int bottomBorder;
-        public int rightBorder;
-
-        public int spriteWidth;
-        public int spriteHeight;
-        public float pixelPerUnit;
-
-        public object Clone()
-        {
-            return new AlphaRectangleBorder
-            {
-                topBorder = this.topBorder,
-                leftBorder = this.leftBorder,
-                bottomBorder = this.bottomBorder,
-                rightBorder = this.rightBorder,
-                spriteHeight = this.spriteHeight,
-                spriteWidth = this.spriteWidth,
-                pixelPerUnit = this.pixelPerUnit
-            };
-        }
+        South,
+        Southeast,
+        East,
+        Northeast,
+        North,
+        Northwest,
+        West,
+        Southwest
     }
 }

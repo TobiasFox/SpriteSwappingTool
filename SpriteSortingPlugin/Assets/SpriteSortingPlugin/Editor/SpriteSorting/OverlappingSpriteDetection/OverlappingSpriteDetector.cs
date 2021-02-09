@@ -23,7 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using SpriteSortingPlugin.SAT;
+using SpriteSortingPlugin.OOBB;
 using SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites;
 using UnityEditor;
 using UnityEngine;

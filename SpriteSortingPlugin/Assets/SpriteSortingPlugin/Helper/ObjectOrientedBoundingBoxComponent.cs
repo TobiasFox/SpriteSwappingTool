@@ -20,6 +20,7 @@
 
 #endregion
 
+using SpriteSortingPlugin.OOBB;
 using UnityEditor;
 using UnityEngine;
 

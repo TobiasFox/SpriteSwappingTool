@@ -21,10 +21,9 @@
 #endregion
 
 using System;
-using SpriteSortingPlugin.SAT;
 using UnityEngine;
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.OOBB
 {
     [Serializable]
     public class ObjectOrientedBoundingBox : ISerializationCallbackReceiver, ICloneable

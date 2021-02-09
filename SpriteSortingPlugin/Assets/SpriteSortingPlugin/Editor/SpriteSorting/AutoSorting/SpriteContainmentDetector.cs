@@ -21,6 +21,7 @@
 #endregion
 
 using System.Collections.Generic;
+using SpriteSortingPlugin.OOBB;
 using SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection;
 using UnityEditor;
 using UnityEngine;

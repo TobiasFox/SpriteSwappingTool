@@ -22,7 +22,7 @@
 
 using UnityEngine;
 
-namespace SpriteSortingPlugin.SAT
+namespace SpriteSortingPlugin.OOBB
 {
     public static class SATCollisionDetection
     {

@@ -21,7 +21,7 @@
 #endregion
 
 using System;
-using SpriteSortingPlugin.SAT;
+using SpriteSortingPlugin.OOBB;
 using SpriteSortingPlugin.SpriteAnalyzer;
 using UnityEditor;
 using UnityEngine;

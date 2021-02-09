@@ -21,6 +21,7 @@
 #endregion
 
 using System;
+using SpriteSortingPlugin.OOBB;
 using UnityEngine;
 
 namespace SpriteSortingPlugin

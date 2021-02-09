@@ -20,7 +20,7 @@
 
 #endregion
 
-namespace SpriteSortingPlugin.SAT
+namespace SpriteSortingPlugin.OOBB
 {
     public readonly struct Projection
     {

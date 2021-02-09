@@ -20,7 +20,7 @@
 
 #endregion
 
-namespace SpriteSortingPlugin
+namespace SpriteSortingPlugin.SpriteAnalyzer
 {
     public static class PixelDirectionUtility
     {

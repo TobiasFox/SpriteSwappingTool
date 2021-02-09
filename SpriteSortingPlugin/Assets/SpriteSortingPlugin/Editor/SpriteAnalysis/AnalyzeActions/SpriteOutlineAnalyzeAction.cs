@@ -20,6 +20,7 @@
 
 #endregion
 
+using SpriteSortingPlugin.OOBB;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
