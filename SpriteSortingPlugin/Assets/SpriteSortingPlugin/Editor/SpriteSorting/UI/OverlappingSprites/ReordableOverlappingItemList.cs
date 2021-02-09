@@ -1,4 +1,27 @@
-﻿using System;
+﻿#region license
+
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//   under the License.
+//  -------------------------------------------------------------
+
+#endregion
+
+using System;
+using SpriteSortingPlugin.SpriteSorting.Logging;
 using SpriteSortingPlugin.SpriteSorting.UI.Preview;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -18,7 +41,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         private int lastFocussedIndex = -1;
         private OverlappingItems overlappingItems;
         private SpriteSortingEditorPreview preview;
-        private bool isUsingRelativeSortingOrder = true;
+        private bool isUsingRelativeSortingOrder;
         private float lastElementRectWidth;
 
         public void InitReordableList(OverlappingItems overlappingItems, SpriteSortingEditorPreview preview)
@@ -64,6 +87,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
         {
             overlappingItems.ReOrderItem(newIndex);
             preview.UpdatePreviewEditor();
+            LogReorderChangeModification(oldIndex, newIndex);
         }
 
         //TODO: remember last focussed element before recompilation is active
@@ -190,7 +214,11 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
 
             if (EditorGUI.EndChangeCheck())
             {
-                element.sortingLayerName = SortingLayerUtility.SortingLayerNames[element.sortingLayerDropDownIndex];
+                var modifiedLayerName = SortingLayerUtility.SortingLayerNames[element.sortingLayerDropDownIndex];
+
+                LogSortingLayerChangeModification(index, element.sortingLayerName, modifiedLayerName);
+
+                element.sortingLayerName = modifiedLayerName;
                 overlappingItems.UpdateSortingLayer(index, out var newIndexInList);
                 reordableSpriteSortingList.index = newIndexInList;
                 isPreviewUpdating = true;
@@ -209,21 +237,14 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                     ? UITooltipConstants.OverlappingItemListRelativeSortingOrderTooltip
                     : UITooltipConstants.OverlappingItemListTotalSortingOrderTooltip
             };
-            element.sortingOrder =
+            var modifiedSortingOrder =
                 EditorGUI.DelayedIntField(new Rect(rect.x + 135 + 10, rect.y, 120, EditorGUIUtility.singleLineHeight),
                     sortingOrderGUIContent, element.sortingOrder);
 
             if (EditorGUI.EndChangeCheck())
             {
-                isPreviewUpdating = true;
-                overlappingItems.UpdateSortingOrder(index);
-            }
-
-            if (GUI.Button(
-                new Rect(rect.x + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
-                "+1"))
-            {
-                element.sortingOrder++;
+                LogSortingOrderChangeModification(index, modifiedSortingOrder);
+                element.sortingOrder = modifiedSortingOrder;
                 isPreviewUpdating = true;
                 overlappingItems.UpdateSortingOrder(index);
             }
@@ -232,7 +253,18 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
                 new Rect(rect.x + 135 + 10 + 120 + 10 + 25 + 10, rect.y, 25,
                     EditorGUIUtility.singleLineHeight), "-1"))
             {
+                LogSortingOrderChangeModification(index, element.sortingOrder - 1);
                 element.sortingOrder--;
+                isPreviewUpdating = true;
+                overlappingItems.UpdateSortingOrder(index);
+            }
+
+            if (GUI.Button(
+                new Rect(rect.x + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
+                "+1"))
+            {
+                LogSortingOrderChangeModification(index, element.sortingOrder + 1);
+                element.sortingOrder++;
                 isPreviewUpdating = true;
                 overlappingItems.UpdateSortingOrder(index);
             }
@@ -250,7 +282,7 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             var labelRect = rect;
             labelRect.xMax -= 135 + 45;
             EditorGUI.LabelField(labelRect,
-                new GUIContent("Overlapping Items", UITooltipConstants.OverlappingItemListTooltip));
+                new GUIContent("Overlapping Items of visual glitch", UITooltipConstants.OverlappingItemListTooltip));
 
             if (GUI.Button(new Rect(rect.width - 172.5f, rect.y, 135, EditorGUIUtility.singleLineHeight),
                 new GUIContent((isUsingRelativeSortingOrder ? "Total" : "Relative") + " Sorting Order",
@@ -286,6 +318,80 @@ namespace SpriteSortingPlugin.SpriteSorting.UI.OverlappingSprites
             reordableSpriteSortingList.drawElementBackgroundCallback = null;
             reordableSpriteSortingList.onReorderCallbackWithDetails = null;
             reordableSpriteSortingList = null;
+        }
+
+
+        private void LogSortingLayerChangeModification(int currentIndex, string previousLayerName,
+            string modifiedLayerName)
+        {
+            if (!IsLoggingActive(out var loggingData))
+            {
+                return;
+            }
+
+            var modificationData = new SortingSuggestionModificationData()
+            {
+                type = ModificationType.ChangeSortingLayer,
+                itemIndex = currentIndex,
+                layerIndex = SortingLayerUtility.GetLayerNameIndex(previousLayerName),
+                modifiedLayerIndex = SortingLayerUtility.GetLayerNameIndex(modifiedLayerName)
+            };
+
+            var currentSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
+            currentSuggestionLoggingData?.AddModification(modificationData);
+        }
+
+        private void LogSortingOrderChangeModification(int currentIndex, int modifiedSortingOrder)
+        {
+            if (!IsLoggingActive(out var loggingData))
+            {
+                return;
+            }
+
+            var item = overlappingItems.Items[currentIndex];
+
+            var modificationData = new SortingSuggestionModificationData()
+            {
+                type = ModificationType.ChangeSortingOrder,
+                itemIndex = currentIndex,
+                order = item.sortingOrder,
+                isRelative = item.IsUsingRelativeSortingOrder,
+                modifiedOrder = modifiedSortingOrder,
+            };
+
+            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
+            sortingOrderSuggestionLoggingData?.AddModification(modificationData);
+        }
+
+        private void LogReorderChangeModification(int currentIndex, int modifiedIndex)
+        {
+            if (!IsLoggingActive(out var loggingData))
+            {
+                return;
+            }
+
+            var modificationData = new SortingSuggestionModificationData()
+            {
+                type = ModificationType.Reorder,
+                itemIndex = currentIndex,
+                modifiedItemIndex = modifiedIndex
+            };
+
+            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
+            sortingOrderSuggestionLoggingData?.AddModification(modificationData);
+        }
+
+        private bool IsLoggingActive(out LoggingData loggingData)
+        {
+            loggingData = null;
+            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
+            {
+                return false;
+            }
+
+            loggingData = LoggingManager.GetInstance().loggingData;
+
+            return loggingData.IsCurrentLoggingDataActive;
         }
     }
 }

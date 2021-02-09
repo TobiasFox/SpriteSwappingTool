@@ -1,4 +1,27 @@
-﻿using UnityEditor;
+﻿#region license
+
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//   under the License.
+//  -------------------------------------------------------------
+
+#endregion
+
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace SpriteSortingPlugin.UI
@@ -19,7 +42,15 @@ namespace SpriteSortingPlugin.UI
         public static readonly GUIStyle CenteredStyle;
         public static readonly GUIStyle ButtonStyle;
         public static readonly GUIStyle ButtonStyleBold;
-        public static readonly GUIStyle linkStyle;
+        public static readonly GUIStyle LinkStyle;
+        public static readonly GUIStyle LabelWrapStyle;
+        public static readonly GUIStyle QuestionLabelStyle;
+
+        //IconFolderPath
+        private static readonly string[] IconFolderPath = new string[]
+        {
+            "Assets", "SpriteSortingPlugin", "UnityEditorIcons"
+        };
 
         //light
         private static readonly Color ListElementBackground1Light = new Color(0.83f, 0.83f, 0.83f);
@@ -200,16 +231,17 @@ namespace SpriteSortingPlugin.UI
                 ? SpriteSortingNoSortingOrderIssuesBackgroundTextureDark
                 : SpriteSortingNoSortingOrderIssuesBackgroundTextureLight;
 
+
         static Styling()
         {
-            MoveIcon = EditorGUIUtility.IconContent("MoveTool@2x").image;
-            WarnIcon = EditorGUIUtility.IconContent("console.warnicon.sml").image;
-            RemoveIcon = EditorGUIUtility.IconContent("Toolbar Minus@2x").image;
-            SpriteIcon = EditorGUIUtility.IconContent("Sprite Icon").image;
-            BaseItemIcon = EditorGUIUtility.IconContent("PreMatCylinder@2x").image;
-            SortingGroupIcon = EditorGUIUtility.IconContent("BlendTree Icon").image;
-            InfoIcon = EditorGUIUtility.IconContent("console.infoicon.sml").image;
-            NoSortingOrderIssuesIcon = EditorGUIUtility.IconContent("FilterSelectedOnly").image;
+            MoveIcon = LoadIcon("MoveTool@2x.png");
+            WarnIcon = LoadIcon("console.warnicon.sml.png");
+            RemoveIcon = LoadIcon("Toolbar Minus@2x.png");
+            SpriteIcon = LoadIcon("Sprite Icon.png");
+            BaseItemIcon = LoadIcon("PreMatCylinder@2x.png");
+            SortingGroupIcon = LoadIcon("BlendTree Icon.png");
+            InfoIcon = LoadIcon("console.infoicon.sml.png");
+            NoSortingOrderIssuesIcon = LoadIcon("FilterSelectedOnly.png");
 
             HelpBoxStyle = new GUIStyle("HelpBox");
             ButtonStyle = new GUIStyle("Button");
@@ -217,13 +249,21 @@ namespace SpriteSortingPlugin.UI
             CenteredStyleBold = new GUIStyle(EditorStyles.boldLabel) {alignment = TextAnchor.MiddleCenter};
             CenteredStyle = new GUIStyle(EditorStyles.boldLabel)
                 {alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Normal};
-            linkStyle = new GUIStyle(EditorStyles.label)
+            LinkStyle = new GUIStyle(EditorStyles.label)
             {
                 normal = {textColor = LinkHighlightingColor},
                 hover = {textColor = LinkHighlightingColor},
                 wordWrap = false,
                 stretchWidth = false
             };
+            LabelWrapStyle = new GUIStyle(EditorStyles.label) {wordWrap = true};
+            QuestionLabelStyle = new GUIStyle(EditorStyles.largeLabel) {wordWrap = true};
+        }
+
+        private static Texture LoadIcon(string iconName)
+        {
+            return AssetDatabase.LoadAssetAtPath<Texture>(Path.Combine(Path.Combine(IconFolderPath),
+                iconName));
         }
     }
 }

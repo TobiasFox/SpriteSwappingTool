@@ -1,4 +1,26 @@
-﻿using System;
+﻿#region license
+
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//   under the License.
+//  -------------------------------------------------------------
+
+#endregion
+
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -17,42 +39,42 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
 
         private readonly HashSet<ISpriteDataAnalyzer> spriteDataAnalyzerSet = new HashSet<ISpriteDataAnalyzer>();
 
-        private readonly Dictionary<SpriteAnalyzerType, ISpriteDataAnalyzer> spriteDataAnalyzers =
-            new Dictionary<SpriteAnalyzerType, ISpriteDataAnalyzer>();
+        private readonly Dictionary<SpriteAnalysisType, ISpriteDataAnalyzer> spriteDataAnalyzers =
+            new Dictionary<SpriteAnalysisType, ISpriteDataAnalyzer>();
 
         private SpriteAnalyzeInputData spriteAnalyzeInputData;
 
-        public void AddSpriteDataAnalyzer(SpriteAnalyzerType spriteAnalyzerType)
+        public void AddSpriteAnalyzeAction(SpriteAnalysisType spriteAnalysisType)
         {
-            var isContained = spriteDataAnalyzers.TryGetValue(spriteAnalyzerType, out var spriteDataAnalyzer);
+            var isContained = spriteDataAnalyzers.TryGetValue(spriteAnalysisType, out var spriteDataAnalyzer);
             if (!isContained)
             {
-                switch (spriteAnalyzerType)
+                switch (spriteAnalysisType)
                 {
-                    case SpriteAnalyzerType.Outline:
+                    case SpriteAnalysisType.Outline:
                         spriteDataAnalyzer = new SpriteOutlineAnalyzeAction();
                         break;
-                    case SpriteAnalyzerType.Sharpness:
-                        spriteDataAnalyzer = new SpriteSharpnessAnalyzer();
+                    case SpriteAnalysisType.Sharpness:
+                        spriteDataAnalyzer = new SpriteSharpnessAnalyzeAction();
                         break;
-                    case SpriteAnalyzerType.Lightness:
-                        spriteDataAnalyzer = new SpriteBrightnessAnalyzeAction();
+                    case SpriteAnalysisType.Lightness:
+                        spriteDataAnalyzer = new SpriteLightnessAnalyzeAction();
                         break;
-                    case SpriteAnalyzerType.PrimaryColor:
-                        spriteDataAnalyzer = new SpritePrimaryColorAnalyzer();
+                    case SpriteAnalysisType.PrimaryColor:
+                        spriteDataAnalyzer = new SpritePrimaryColorAnalyzeAction();
                         break;
-                    case SpriteAnalyzerType.AverageAlpha:
-                        spriteDataAnalyzer = new SpriteAverageAlphaAnalyzer();
+                    case SpriteAnalysisType.AverageAlpha:
+                        spriteDataAnalyzer = new SpriteAverageAlphaAnalyzeAction();
                         break;
                 }
 
-                spriteDataAnalyzers.Add(spriteAnalyzerType, spriteDataAnalyzer);
+                spriteDataAnalyzers.Add(spriteAnalysisType, spriteDataAnalyzer);
             }
 
             spriteDataAnalyzerSet.Add(spriteDataAnalyzer);
         }
 
-        public void ClearSpriteDataAnalyzers()
+        public void ClearSpriteAnalyzeActions()
         {
             spriteDataAnalyzerSet.Clear();
         }
@@ -91,13 +113,15 @@ namespace SpriteSortingPlugin.SpriteAnalysis.AnalyzeActions
                     }
                     catch (Exception e)
                     {
+                        Debug.Log($"Sprite {sprite.name} is skipped due to an error occurred.");
+                        Debug.LogException(e);
                         continue;
                     }
                 }
 
                 foreach (var spriteDataAnalyzer in spriteDataAnalyzerSet)
                 {
-                    spriteDataAnalyzer.Analyse(ref spriteDataItem, sprite, spriteAnalyzeInputData);
+                    spriteDataAnalyzer.Analyze(ref spriteDataItem, sprite, spriteAnalyzeInputData);
                 }
 
                 spriteAnalyzeInputData.spriteData.spriteDataDictionary[tempAssetGuid] = spriteDataItem;
