@@ -777,26 +777,27 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
             skippedSortingCriteriaList = null;
         }
 
+       //TODO (fixed but reverted): iterative visual glitches are not checked on overlappingItems with a different layer to the origin identified visual glitch
+       //This issue is already fixed but was reverted due to no modifications are allowed after the survey was published for the master thesis.
         private void ApplySortingOptionsIterative()
         {
+            var counter = 0;
+            while (counter < overlappingItems.Items.Count)
+            {
+                var overlappingItem = overlappingItems.Items[counter];
+                if (!overlappingItem.HasSortingLayerChanged())
+                {
+                    counter++;
+                    continue;
+                }
+
+                overlappingItems.Items.RemoveAt(counter);
+                overlappingItem.ApplySortingOption(false);
+            }
+
             if (overlappingItems.Items.Count <= 0)
             {
                 return;
-            }
-
-            var layerOverlappingItemDictionary = new Dictionary<string, List<OverlappingItem>>();
-
-            foreach (var overlappingItem in overlappingItems.Items)
-            {
-                var currentLayer = overlappingItem.sortingLayerName;
-
-                if (!layerOverlappingItemDictionary.TryGetValue(currentLayer, out var overlappingItemList))
-                {
-                    overlappingItemList = new List<OverlappingItem>();
-                    layerOverlappingItemDictionary.Add(currentLayer, overlappingItemList);
-                }
-
-                overlappingItemList.Add(overlappingItem);
             }
 
             FillSpriteDetectionData();
@@ -806,77 +807,53 @@ namespace SpriteSortingPlugin.SpriteSorting.UI
                 overlappingSpriteDetector = new OverlappingSpriteDetector();
             }
 
-            foreach (var overlappingItemLayerPair in layerOverlappingItemDictionary)
+            var sortingOptions = overlappingSpriteDetector.AnalyzeSurroundingSpritesAndGetAdjustedSortingOptions(
+                overlappingItems.Items, spriteDetectionData);
+
+            foreach (var sortingOption in sortingOptions)
             {
-                var sortingOptions = overlappingSpriteDetector.AnalyzeSurroundingSpritesAndGetAdjustedSortingOptions(
-                    overlappingItemLayerPair.Value, spriteDetectionData);
-
-                foreach (var sortingOption in sortingOptions)
+                var sortingComponent = EditorUtility.InstanceIDToObject(sortingOption.Key);
+                var sortingGroupComponent = sortingComponent as SortingGroup;
+                if (sortingGroupComponent != null)
                 {
-                    var sortingComponent = EditorUtility.InstanceIDToObject(sortingOption.Key);
-                    var sortingGroupComponent = sortingComponent as SortingGroup;
-                    if (sortingGroupComponent != null)
+                    if (sortingGroupComponent.sortingOrder == sortingOption.Value)
                     {
-                        var currentSortingLayerName = sortingGroupComponent.sortingLayerName;
-
-                        if (sortingGroupComponent.sortingOrder == sortingOption.Value &&
-                            currentSortingLayerName.Equals(overlappingItemLayerPair.Key))
-                        {
-                            continue;
-                        }
-
-                        var isChangedOverlappingItem =
-                            overlappingItems.ContainsSortingGroupsOrSpriteRenderersInstanceId(
-                                sortingComponent.GetInstanceID());
-
-                        var changedLayerLog = currentSortingLayerName.Equals(overlappingItemLayerPair
-                            .Key)
-                            ? ""
-                            : $", Sorting Layer {currentSortingLayerName} -> {overlappingItemLayerPair.Key}";
-
-                        Debug.LogFormat("Changed sorting options on " +
-                                        (isChangedOverlappingItem ? "previously" : "iterative ") +
-                                        " found Sorting Group {0} Sorting Order: {1} -> {2}{3}",
-                            sortingGroupComponent.name, sortingGroupComponent.sortingOrder, sortingOption.Value,
-                            changedLayerLog);
-
-                        Undo.RecordObject(sortingGroupComponent, "apply sorting options");
-                        sortingGroupComponent.sortingOrder = sortingOption.Value;
-                        sortingGroupComponent.sortingLayerName = overlappingItemLayerPair.Key;
-                        EditorUtility.SetDirty(sortingGroupComponent);
                         continue;
                     }
 
-                    var spriteRendererComponent = sortingComponent as SpriteRenderer;
-                    if (spriteRendererComponent != null)
+                    var isChangedOverlappingItem = overlappingItems.ContainsSortingGroupsOrSpriteRenderersInstanceId(
+                        sortingComponent.GetInstanceID());
+
+                    Debug.LogFormat("Changed sorting options on " +
+                                    (isChangedOverlappingItem ? "previously" : "iterative ") +
+                                    " found Sorting Group {0} Sorting Order: {1} -> {2}", sortingGroupComponent.name,
+                        sortingGroupComponent.sortingOrder, sortingOption.Value);
+
+                    Undo.RecordObject(sortingGroupComponent, "apply sorting options");
+                    sortingGroupComponent.sortingOrder = sortingOption.Value;
+                    EditorUtility.SetDirty(sortingGroupComponent);
+                    continue;
+                }
+
+                var spriteRendererComponent = sortingComponent as SpriteRenderer;
+                if (spriteRendererComponent != null)
+                {
+                    if (spriteRendererComponent.sortingOrder == sortingOption.Value)
                     {
-                        var currentSortingLayerName = spriteRendererComponent.sortingLayerName;
-                        if (spriteRendererComponent.sortingOrder == sortingOption.Value &&
-                            currentSortingLayerName.Equals(overlappingItemLayerPair.Key))
-                        {
-                            continue;
-                        }
-
-                        var isChangedOverlappingItem =
-                            overlappingItems.ContainsSortingGroupsOrSpriteRenderersInstanceId(
-                                sortingComponent.GetInstanceID());
-
-                        var changedLayerLog = currentSortingLayerName.Equals(overlappingItemLayerPair
-                            .Key)
-                            ? ""
-                            : $", Sorting Layer {currentSortingLayerName} -> {overlappingItemLayerPair.Key}";
-
-                        Debug.LogFormat("Changed sorting options on " +
-                                        (isChangedOverlappingItem ? "previously" : "iterative ") +
-                                        " found SpriteRenderer {0}: Sorting Order: {1} -> {2}{3}",
-                            spriteRendererComponent.name, spriteRendererComponent.sortingOrder, sortingOption.Value,
-                            changedLayerLog);
-
-                        Undo.RecordObject(spriteRendererComponent, "apply sorting options");
-                        spriteRendererComponent.sortingOrder = sortingOption.Value;
-                        spriteRendererComponent.sortingLayerName = overlappingItemLayerPair.Key;
-                        EditorUtility.SetDirty(spriteRendererComponent);
+                        continue;
                     }
+
+                    var isChangedOverlappingItem = overlappingItems.ContainsSortingGroupsOrSpriteRenderersInstanceId(
+                        sortingComponent.GetInstanceID());
+
+                    Debug.LogFormat("Changed sorting options on " +
+                                    (isChangedOverlappingItem ? "previously" : "iterative ") +
+                                    " found SpriteRenderer {0}: Sorting Order: {1} -> {2}",
+                        spriteRendererComponent.name, spriteRendererComponent.sortingOrder, sortingOption.Value);
+
+                    Undo.RecordObject(spriteRendererComponent, "apply sorting options");
+                    spriteRendererComponent.sortingOrder = sortingOption.Value;
+                    EditorUtility.SetDirty(spriteRendererComponent);
                 }
             }
         }
