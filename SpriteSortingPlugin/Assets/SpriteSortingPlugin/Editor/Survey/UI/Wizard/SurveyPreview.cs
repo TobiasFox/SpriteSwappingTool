@@ -20,7 +20,7 @@
 
 #endregion
 
-using SpriteSortingPlugin.SpriteSorting.UI.Preview;
+using SpriteSortingPlugin.SpriteSwappingDetector.UI.Preview;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
 using UnityEngine;

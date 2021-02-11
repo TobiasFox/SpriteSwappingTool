@@ -22,7 +22,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using SpriteSortingPlugin.SpriteSorting.UI;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -142,7 +141,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var width = Styling.ButtonStyle.CalcSize(openDetectorContent).x;
                 if (GUILayout.Button("Open " + GeneralData.DetectorName, GUILayout.Width(width)))
                 {
-                    var detector = EditorWindow.GetWindow<SpriteSwappingDetector>();
+                    var detector = EditorWindow.GetWindow<SpriteSwappingDetector.SpriteSwappingDetector>();
                     detector.Show();
                 }
             }

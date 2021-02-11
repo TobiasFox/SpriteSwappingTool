@@ -22,8 +22,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-using SpriteSortingPlugin.SpriteSorting.Logging;
-using SpriteSortingPlugin.SpriteSorting.UI;
+using SpriteSortingPlugin.SpriteSwappingDetector.Logging;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -190,7 +189,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 if (GUILayout.Button($"Open {GeneralData.DetectorName}\nwith enabled sorting order suggestion",
                     GUILayout.Width(224)))
                 {
-                    var detector = EditorWindow.GetWindow<SpriteSwappingDetector>();
+                    var detector = EditorWindow.GetWindow<SpriteSwappingDetector.SpriteSwappingDetector>();
                     detector.Show();
                     detector.ActivateAutoSorting();
                 }

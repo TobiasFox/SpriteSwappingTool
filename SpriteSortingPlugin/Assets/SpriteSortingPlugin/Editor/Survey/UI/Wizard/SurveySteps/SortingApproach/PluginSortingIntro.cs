@@ -21,7 +21,6 @@
 #endregion
 
 using System.IO;
-using SpriteSortingPlugin.SpriteSorting.UI;
 using SpriteSortingPlugin.Survey.Data;
 using SpriteSortingPlugin.UI;
 using UnityEditor;
@@ -119,7 +118,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
 
         private void OpenDetector()
         {
-            var detector = EditorWindow.GetWindow<SpriteSwappingDetector>();
+            var detector = EditorWindow.GetWindow<SpriteSwappingDetector.SpriteSwappingDetector>();
             detector.Show();
         }
     }
