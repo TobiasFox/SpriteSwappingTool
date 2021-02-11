@@ -327,6 +327,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
 
                     if (currentBaseSortingOrder == currentSortingOrder)
                     {
+                        //sortingComponents are sorted as base sorting components have updated sorting options
                         continue;
                     }
 
@@ -357,7 +358,7 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     }
                     else
                     {
-                        //sorting order doesnt need to adjust. Therefore no need to add a recursive check
+                        //sorting order doesnt need to adjust. Therefore no need to do a recursive check
                         continue;
                     }
 
@@ -552,16 +553,15 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
                     continue;
                 }
 
-                if (sortingComponentToCheck.SortingGroup != null &&
-                    sortingComponent.SortingGroup != null &&
-                    sortingComponentToCheck.SortingGroup == sortingComponent.SortingGroup)
+                if (HasSameSortingGroup(sortingComponentToCheck, sortingComponent))
                 {
                     continue;
                 }
 
+                // isCheckingForIdenticalSortingOptions is used by the functionality to detect iterative visual glitches. It results in skipping this test.
+                // Reason: sortingComponents from scene do not have updated sorting options and the analysis of iterative glitches is filtering overlapping items by itself.
                 if (isCheckingForIdenticalSortingOptions &&
-                    (sortingComponentToCheck.OriginSortingLayer != sortingComponent.OriginSortingLayer ||
-                     sortingComponentToCheck.OriginSortingOrder != sortingComponent.OriginSortingOrder))
+                    !HasIdenticalSortingOptions(sortingComponentToCheck, sortingComponent))
                 {
                     continue;
                 }
@@ -598,6 +598,25 @@ namespace SpriteSortingPlugin.SpriteSorting.OverlappingSpriteDetection
             }
 
             return true;
+        }
+
+        private bool HasIdenticalSortingOptions(SortingComponent sortingComponentToCheck,
+            SortingComponent sortingComponent)
+        {
+            return sortingComponentToCheck.OriginSortingLayer == sortingComponent.OriginSortingLayer &&
+                   sortingComponentToCheck.OriginSortingOrder == sortingComponent.OriginSortingOrder;
+        }
+
+        private static bool HasSameSortingGroup(SortingComponent sortingComponentToCheck,
+            SortingComponent sortingComponent)
+        {
+            if (sortingComponentToCheck.SortingGroup == null &&
+                sortingComponent.SortingGroup == null)
+            {
+                return false;
+            }
+
+            return sortingComponentToCheck.SortingGroup == sortingComponent.SortingGroup;
         }
 
         private Bounds CreatePlaneBounds(Bounds originBounds)
