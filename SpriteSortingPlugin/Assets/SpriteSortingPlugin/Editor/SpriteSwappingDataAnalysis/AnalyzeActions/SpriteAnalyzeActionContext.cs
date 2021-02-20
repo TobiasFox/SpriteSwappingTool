@@ -58,7 +58,7 @@ namespace SpriteSortingPlugin.SpriteSwappingDataAnalysis.AnalyzeActions
                         spriteDataAnalyzer = new SpriteSharpnessAnalyzeAction();
                         break;
                     case SpriteAnalysisType.Lightness:
-                        spriteDataAnalyzer = new SpriteLightnessAnalyzeAction();
+                        spriteDataAnalyzer = new SpriteBrightnessAnalyzeAction();
                         break;
                     case SpriteAnalysisType.PrimaryColor:
                         spriteDataAnalyzer = new SpritePrimaryColorAnalyzeAction();

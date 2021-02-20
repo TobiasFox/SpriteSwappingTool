@@ -26,14 +26,14 @@ using SpriteSortingPlugin.SpriteSwappingDetector;
 
 namespace SpriteSortingPlugin.SortingGeneration.Criteria
 {
-    public class LightnessSortingCriterion : SortingCriterion
+    public class BrightnessSortingCriterion : SortingCriterion
     {
         private DefaultSortingCriterionData DefaultSortingCriterionData =>
             (DefaultSortingCriterionData) sortingCriterionData;
 
-        private LightnessAnalyzer lightnessAnalyzer;
+        private BrightnessAnalyzer brightnessAnalyzer;
 
-        public LightnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
+        public BrightnessSortingCriterion(DefaultSortingCriterionData sortingCriterionData) : base(
             sortingCriterionData)
         {
             sortingCriterionType = DefaultSortingCriterionData.sortingCriterionType;
@@ -41,26 +41,26 @@ namespace SpriteSortingPlugin.SortingGeneration.Criteria
 
         protected override void InternalSort(SortingComponent sortingComponent, SortingComponent otherSortingComponent)
         {
-            var perceivedLightness = autoSortingCalculationData.spriteData
+            var perceivedBrightness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[spriteDataItemValidator.AssetGuid]
                 .spriteAnalysisData.perceivedLightness;
 
-            var otherPerceivedLightness = autoSortingCalculationData.spriteData
+            var otherPerceivedBrightness = autoSortingCalculationData.spriteData
                 .spriteDataDictionary[otherSpriteDataItemValidator.AssetGuid]
                 .spriteAnalysisData.perceivedLightness;
 
-            if (lightnessAnalyzer == null)
+            if (brightnessAnalyzer == null)
             {
-                lightnessAnalyzer = new LightnessAnalyzer();
+                brightnessAnalyzer = new BrightnessAnalyzer();
             }
 
-            perceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(perceivedLightness,
+            perceivedBrightness = brightnessAnalyzer.ApplySpriteRendererColor(perceivedBrightness,
                 sortingComponent.SpriteRenderer.color);
 
-            otherPerceivedLightness = lightnessAnalyzer.ApplySpriteRendererColor(otherPerceivedLightness,
+            otherPerceivedBrightness = brightnessAnalyzer.ApplySpriteRendererColor(otherPerceivedBrightness,
                 otherSortingComponent.SpriteRenderer.color);
 
-            var isAutoSortingComponentIsLighter = perceivedLightness >= otherPerceivedLightness;
+            var isAutoSortingComponentIsLighter = perceivedBrightness >= otherPerceivedBrightness;
 
             if (DefaultSortingCriterionData.isSortingInForeground)
             {

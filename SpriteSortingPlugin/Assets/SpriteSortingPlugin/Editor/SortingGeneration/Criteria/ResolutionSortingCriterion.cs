@@ -44,14 +44,18 @@ namespace SpriteSortingPlugin.SortingGeneration.Criteria
 
             var hasAutoSortingComponentHigherResolution = spriteResolution >= otherSpriteResolution;
 
+            int index;
             if (ResolutionSortingCriterionData.isSortingInForeground)
             {
-                sortingResults[hasAutoSortingComponentHigherResolution ? 0 : 1]++;
+                index = hasAutoSortingComponentHigherResolution ? 0 : 1;
             }
             else
             {
-                sortingResults[!hasAutoSortingComponentHigherResolution ? 0 : 1]++;
+                index = !hasAutoSortingComponentHigherResolution ? 0 : 1;
             }
+
+            // distribute a point
+            sortingResults[index]++;
         }
 
         public override bool IsUsingSpriteData()

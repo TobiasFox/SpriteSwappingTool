@@ -32,88 +32,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
             return FinalSurveyStepList(surveyData);
         }
 
-        public List<SurveyStep> GenerateSurveySteps2(SurveyData surveyData)
-        {
-            var surveySteps = new List<SurveyStep>();
-
-            var introStep = new IntroSurveyStep("Intro");
-            // surveySteps.Add(introStep);
-
-            var evaluationAutoSortingSuggestionLabel =
-                "Evaluation of the functionality to generate sorting order suggestions";
-
-            var sortingSuggestionStepIntro = new SortingSuggestionStepIntro(evaluationAutoSortingSuggestionLabel);
-            var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel);
-            var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
-            // surveySteps.Add(sortingSuggestionStepIntro);
-            // surveySteps.Add(sortingSuggestionStep1);
-            // surveySteps.Add(sortingSuggestionStep2);
-
-            var manualSortingLabel = "Comparing manual approach and using the Sprite Swapping tool";
-            var manualSortingStep = new ManualSortingStep(manualSortingLabel);
-            var manualSortingStep2 = new ManualSortingStep2(manualSortingLabel);
-            // surveySteps.Add(manualSortingStep);
-            // surveySteps.Add(manualSortingStep2);
-
-            // var creatingSpriteData = new CreatingSpriteDataStep("Creating " + nameof(SpriteData) + " asset");
-            // surveySteps.Add(creatingSpriteData);
-
-            var pluginSorting1 = new PluginSorting1("Automatically detect visual glitches with the " +
-                                                    GeneralData.FullDetectorName);
-            var pluginSorting2 = new PluginSorting2("Automatically detect visual glitches with the " +
-                                                    GeneralData.FullDetectorName);
-            var pluginSortingIntro = new PluginSortingIntro("Automatically detect visual glitches with the " +
-                                                            GeneralData.FullDetectorName);
-            // surveySteps.Add(pluginSortingIntro);
-            // surveySteps.Add(pluginSorting1);
-            // surveySteps.Add(pluginSorting2);
-            // {
-            //     var list = new List<SurveyStep>() {pluginSorting1, pluginSorting2};
-            //     var group = new SurveyStepGroup(list, "");
-            //     surveySteps.Add(group);
-            // }
-            // surveySteps.Add(introStep2);
-
-
-            var generalQuestions1 = new GeneralQuestions("General Questions", surveyData.generalQuestionsData);
-            // surveySteps.Add(generalQuestions1);
-            // {
-            //     var list = new List<SurveyStep>() {generalQuestions1, generalQuestions2};
-            //     var group = new SurveyStepGroup(list, "");
-            //     surveySteps.Add(group);
-            // }
-
-            var usabilityQuestions1 = new UsabilityQuestions1("Usability", surveyData.usabilityData);
-            var usabilityQuestions2 = new UsabilityQuestions2("Usability", surveyData.usabilityData);
-
-            // surveySteps.Add(usabilityQuestions1);
-            // surveySteps.Add(usabilityQuestions2);
-            // {
-            //     var list = new List<SurveyStep>() {usabilityQuestions1, usabilityQuestions2};
-            //     var group = new SurveyStepGroup(list, "");
-            //     surveySteps.Add(group);
-            // }
-
-
-            // {
-            //     var list = new List<SurveyStep>() {new IntroSurveyStep("Intro"), new IntroSurveyStep2("Intro")};
-            //     var group = new SurveyStepGroup(list, "Intro");
-            //     surveySteps.Add(group);
-            // }
-            // {
-            //     var list = new List<SurveyStep>() {new IntroSurveyStep("Intro"), new IntroSurveyStep2("Intro")};
-            //     var group = new SurveyStepGroup(list, "Intro");
-            //     surveySteps.Add(group);
-            // }
-
-            var finishingStep = new FinishingSurvey("Finalizing");
-            // surveySteps.Add(finishingStep);
-
-            surveySteps.AddRange(FinalSurveyStepList(surveyData));
-
-            return surveySteps;
-        }
-
         private List<SurveyStep> FinalSurveyStepList(SurveyData surveyData)
         {
             var surveySteps = new List<SurveyStep>();
@@ -153,9 +71,7 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var pluginSortingLabel = "Automatically detect visual glitches with the " +
                                          GeneralData.FullDetectorName;
                 var pluginSortingIntro = new PluginSortingIntro(pluginSortingLabel);
-                // var pluginSorting1 = new PluginSorting1(pluginSortingLabel);
                 var pluginSorting2 = new PluginSorting2(pluginSortingLabel);
-                // var pluginSorting3 = new PluginSorting3(pluginSortingLabel);
                 var list = new List<SurveyStep> {pluginSortingIntro, pluginSorting2};
 
                 var group = new SurveyStepGroup(list, $"Part {groupCounter}");
@@ -163,14 +79,13 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 groupCounter++;
             }
 
-            //auto sorting
+            //sorting suggestion
             {
                 var evaluationAutoSortingSuggestionLabel =
                     "Evaluation of the functionality to generate sorting order suggestions";
 
                 var sortingSuggestionStepIntro = new SortingSuggestionStepIntro(evaluationAutoSortingSuggestionLabel);
                 var sortingSuggestionStep1 = new SortingSuggestionStep1(evaluationAutoSortingSuggestionLabel);
-                // var sortingSuggestionStep2 = new SortingSuggestionStep2(evaluationAutoSortingSuggestionLabel);
 
                 var list = new List<SurveyStep> {sortingSuggestionStepIntro, sortingSuggestionStep1};
                 var group = new SurveyStepGroup(list, $"Part {groupCounter}");
@@ -185,7 +100,6 @@ namespace SpriteSortingPlugin.Survey.UI.Wizard
                 var list = new List<SurveyStep>() {usabilityQuestions1, usabilityQuestions2};
                 var group = new SurveyStepGroup(list, $"Part {groupCounter}");
                 surveySteps.Add(group);
-                groupCounter++;
             }
 
             var finishingStep = new FinishingSurvey("Finalizing");

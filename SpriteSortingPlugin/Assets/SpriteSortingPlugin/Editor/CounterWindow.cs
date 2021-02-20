@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin
 {
-    public class TestWindow : EditorWindow
+    public class CounterWindow : EditorWindow
     {
         private int counter;
 
@@ -45,7 +45,7 @@ namespace SpriteSortingPlugin
         [MenuItem("Window/TestWindow %t")]
         public static void ShowWindow()
         {
-            var window = GetWindow<TestWindow>();
+            var window = GetWindow<CounterWindow>();
             window.Show();
         }
     }

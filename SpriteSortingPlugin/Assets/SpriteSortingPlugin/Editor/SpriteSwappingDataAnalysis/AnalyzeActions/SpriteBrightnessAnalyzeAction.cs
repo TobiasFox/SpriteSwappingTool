@@ -25,19 +25,19 @@ using UnityEngine;
 
 namespace SpriteSortingPlugin.SpriteSwappingDataAnalysis.AnalyzeActions
 {
-    public class SpriteLightnessAnalyzeAction : ISpriteDataAnalyzer
+    public class SpriteBrightnessAnalyzeAction : ISpriteDataAnalyzer
     {
-        private LightnessAnalyzer lightnessAnalyzer;
+        private BrightnessAnalyzer brightnessAnalyzer;
 
         public void Analyze(ref SpriteDataItem spriteDataItem, Sprite sprite,
             SpriteAnalyzeInputData spriteAnalyzeInputData)
         {
-            if (lightnessAnalyzer == null)
+            if (brightnessAnalyzer == null)
             {
-                lightnessAnalyzer = new LightnessAnalyzer();
+                brightnessAnalyzer = new BrightnessAnalyzer();
             }
 
-            spriteDataItem.spriteAnalysisData.perceivedLightness = lightnessAnalyzer.Analyze(sprite);
+            spriteDataItem.spriteAnalysisData.perceivedLightness = brightnessAnalyzer.Analyze(sprite);
         }
     }
 }

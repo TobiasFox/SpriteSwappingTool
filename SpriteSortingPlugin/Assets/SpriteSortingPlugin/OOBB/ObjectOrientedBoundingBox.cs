@@ -134,8 +134,7 @@ namespace SpriteSortingPlugin.OOBB
                 }
             }
 
-            var projection = new Projection(min, max);
-            return projection;
+            return new Projection(min, max);
         }
 
         public void UpdateBox(Transform transform)

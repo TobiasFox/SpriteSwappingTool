@@ -27,7 +27,7 @@ namespace SpriteSortingPlugin.SpriteAnalyzer
     /**
      * analysis is based on https://stackoverflow.com/a/56678483
      */
-    public class LightnessAnalyzer
+    public class BrightnessAnalyzer
     {
         private const float UnitScaleFactor = 100f;
 

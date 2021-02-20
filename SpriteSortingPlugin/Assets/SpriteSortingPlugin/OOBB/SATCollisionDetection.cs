@@ -26,28 +26,22 @@ namespace SpriteSortingPlugin.OOBB
 {
     public static class SATCollisionDetection
     {
-        public static bool IsOverlapping(ObjectOrientedBoundingBox oobb, ObjectOrientedBoundingBox otherOOBB)
+        public static bool IsColliding(ObjectOrientedBoundingBox oobb, ObjectOrientedBoundingBox otherOOBB)
         {
             if (oobb == null || otherOOBB == null)
             {
                 return false;
             }
 
-            // DrawOOBB(oobb, Color.blue);
-            // DrawOOBB(otherOOBB, Color.green);
-
-            return CheckAxisProjectionsOnOOBB(oobb, otherOOBB) && CheckAxisProjectionsOnOOBB(otherOOBB, oobb);
+            return IsIntersecting(oobb, otherOOBB) && IsIntersecting(otherOOBB, oobb);
         }
 
-        private static bool CheckAxisProjectionsOnOOBB(ObjectOrientedBoundingBox oobb,
+        private static bool IsIntersecting(ObjectOrientedBoundingBox oobb,
             ObjectOrientedBoundingBox otherOOBB)
         {
             var oobbAxes = oobb.Axes;
-            for (var i = 0; i < oobbAxes.Length; i++)
+            foreach (var axis in oobbAxes)
             {
-                var axis = oobbAxes[i];
-
-                // OOBB specific
                 // if (i == 0)
                 // {
                 //     DrawAxisAndPerp(oobb.Points[3], oobb.Points[0], axis);

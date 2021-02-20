@@ -45,7 +45,7 @@ namespace SpriteSortingPlugin.SpriteSwappingDataAnalysis.UI
         {
             "Assets",
             "SpriteSwappingPlugin",
-            "SpriteData"
+            "SpriteDataAssets"
         };
 
         private static readonly Array OutlinePrecisionTypes = Enum.GetValues(typeof(OutlinePrecision));
@@ -1022,8 +1022,11 @@ namespace SpriteSortingPlugin.SpriteSwappingDataAnalysis.UI
             LoadSpriteDataList();
             if (string.IsNullOrEmpty(lastSelectedSpriteDataItemGuid))
             {
-                reorderableSpriteList.index = 0;
-                OnSpriteSelected(reorderableSpriteList);
+                if (reorderableSpriteList.count > 0)
+                {
+                    reorderableSpriteList.index = 0;
+                    OnSpriteSelected(reorderableSpriteList);
+                }
             }
             else
             {

@@ -710,7 +710,7 @@ namespace SpriteSortingPlugin.OverlappingSpriteDetection
 
                     otherOOBB.UpdateBox(currentTransform);
 
-                    var isOverlapping = SATCollisionDetection.IsOverlapping(oobbToCheck, otherOOBB);
+                    var isOverlapping = SATCollisionDetection.IsColliding(oobbToCheck, otherOOBB);
                     return isOverlapping;
 
                 case OutlinePrecision.PixelPerfect:

@@ -146,7 +146,7 @@ namespace SpriteSortingPlugin.SortingGeneration
             {
                 sortingCriterionType = SortingCriterionType.Lightness, isSortingInForeground = true
             };
-            sortingCriteriaComponent.sortingCriterion = new LightnessSortingCriterion(sortingCriterionData);
+            sortingCriteriaComponent.sortingCriterion = new BrightnessSortingCriterion(sortingCriterionData);
             sortingCriteriaComponent.sortingCriterionData = sortingCriterionData;
         }
 

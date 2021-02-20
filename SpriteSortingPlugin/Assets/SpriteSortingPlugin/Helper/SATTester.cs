@@ -82,7 +82,7 @@ namespace SpriteSortingPlugin.Helper
             Debug.Log(spriteRenderers[1].name + " in " + spriteRenderers[0] + oobbs[0].Contains(oobbs[1]));
             Debug.Log(spriteRenderers[0].name + " in " + spriteRenderers[1] + oobbs[1].Contains(oobbs[0]));
 
-            Debug.Log("intersection: "+SATCollisionDetection.IsOverlapping(oobbs[0], oobbs[1]));
+            Debug.Log("intersection: "+SATCollisionDetection.IsColliding(oobbs[0], oobbs[1]));
         }
 
         public void Test2()
@@ -121,7 +121,7 @@ namespace SpriteSortingPlugin.Helper
 
         public void AnalyzeLightness()
         {
-            var lightnessAnalyzer = new LightnessAnalyzer();
+            var lightnessAnalyzer = new BrightnessAnalyzer();
 
             var lightness = lightnessAnalyzer.Analyze(spriteRenderers[0]);
             Debug.Log(lightness);
@@ -129,7 +129,7 @@ namespace SpriteSortingPlugin.Helper
 
         public void AnalyzeBrightness2()
         {
-            var lightnessAnalyzer = new LightnessAnalyzer();
+            var lightnessAnalyzer = new BrightnessAnalyzer();
 
             var lightness = lightnessAnalyzer.Analyze2(spriteRenderers[0]);
             var lightness2 = lightnessAnalyzer.Analyze(spriteRenderers[0]);
