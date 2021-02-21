@@ -1,0 +1,13 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/.idea.SpriteSwappingPlugin.iml
+/contentModel.xml
+/projectSettingsUpdater.xml
+# Datasource local storage ignored files
+/../../../../../../../../../:\HAW_Games\MA\SpriteSortingPlugin\SpriteSortingPlugin\SpriteSwappingPlugin\.idea\.idea.SpriteSwappingPlugin\.idea/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
