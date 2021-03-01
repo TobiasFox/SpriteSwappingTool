@@ -49,7 +49,7 @@ namespace SpriteSwappingPlugin.UI
         //IconFolderPath
         private static readonly string[] IconFolderPath = new string[]
         {
-            "Assets", "SpriteSortingPlugin", "UnityEditorIcons"
+            "Assets", "SpriteSwappingPlugin", "UnityEditorIcons"
         };
 
         //light

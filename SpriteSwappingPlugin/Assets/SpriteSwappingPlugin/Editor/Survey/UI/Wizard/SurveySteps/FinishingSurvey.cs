@@ -40,7 +40,7 @@ namespace SpriteSwappingPlugin.Survey.UI.Wizard
 
         private static readonly string[] FireworkFolder = new string[]
         {
-            "Assets", "SpriteSortingPlugin", "Editor", "Survey", "Resources"
+            "Assets", "SpriteSwappingPlugin", "Editor", "Survey", "Resources"
         };
 
         private static readonly string[] TestExampleScenesFolderPath = new string[]

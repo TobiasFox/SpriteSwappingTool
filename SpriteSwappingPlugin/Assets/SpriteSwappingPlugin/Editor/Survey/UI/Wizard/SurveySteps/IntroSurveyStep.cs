@@ -34,7 +34,7 @@ namespace SpriteSwappingPlugin.Survey.UI.Wizard
         private static readonly string[] PreviewPrefabPathAndName = new string[]
         {
             "Assets",
-            "SpriteSortingPlugin",
+            "SpriteSwappingPlugin",
             "Editor",
             "Survey",
             "Prefabs",

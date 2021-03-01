@@ -1025,7 +1025,7 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI
             CreateAndInitOverlappingItemSortingOrderAnalyzer();
             FillAutoSortingCalculationData();
 
-            var resultList = sortingGenerator.GenerateAutomaticSortingOrder(
+            var resultList = sortingGenerator.GenerateSortingOrder(
                 overlappingSpriteDetectionResult.baseItem, sortingComponents, autoSortingCalculationData,
                 out var skippedSortingCriteria);
 

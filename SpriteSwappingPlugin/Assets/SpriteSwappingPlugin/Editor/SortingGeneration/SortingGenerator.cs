@@ -48,7 +48,7 @@ namespace SpriteSwappingPlugin.SortingGeneration
             this.containmentSortingCriterion = containmentSortingCriterion;
         }
 
-        public List<AutoSortingComponent> GenerateAutomaticSortingOrder(SortingComponent baseItem,
+        public List<AutoSortingComponent> GenerateSortingOrder(SortingComponent baseItem,
             List<SortingComponent> overlappingSortingComponents, AutoSortingCalculationData autoSortingCalculationData,
             out List<SortingCriterionType> skippedSortingCriteria)
         {
