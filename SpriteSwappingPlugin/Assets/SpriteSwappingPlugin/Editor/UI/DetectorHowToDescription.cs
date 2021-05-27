@@ -1,10 +1,9 @@
-﻿using SpriteSwappingPlugin.UI;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSwappingPlugin.Survey.UI.Wizard
+namespace SpriteSwappingPlugin.UI
 {
-    public class HowToDescription
+    public class DetectorHowToDescription
     {
         private bool isFoldable;
         private bool isExpanded;
@@ -15,7 +14,7 @@ namespace SpriteSwappingPlugin.Survey.UI.Wizard
 
         public bool isBoldHeader = true;
 
-        public HowToDescription(bool isFoldable = true, bool isInitialExpanded = false)
+        public DetectorHowToDescription(bool isFoldable = true, bool isInitialExpanded = false)
         {
             this.isFoldable = isFoldable;
             if (isInitialExpanded)

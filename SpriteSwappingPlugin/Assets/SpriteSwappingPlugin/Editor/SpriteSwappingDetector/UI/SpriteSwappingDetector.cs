@@ -27,7 +27,6 @@ using SpriteSwappingPlugin.OverlappingSpriteDetection;
 using SpriteSwappingPlugin.SortingGeneration;
 using SpriteSwappingPlugin.SortingGeneration.Criteria;
 using SpriteSwappingPlugin.SortingGeneration.Data;
-using SpriteSwappingPlugin.SpriteSwappingDetector.Logging;
 using SpriteSwappingPlugin.SpriteSwappingDetector.UI.OverlappingSprites;
 using SpriteSwappingPlugin.SpriteSwappingDetector.UI.Preview;
 using SpriteSwappingPlugin.UI;
@@ -298,9 +297,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI
                             skippedSortingCriteriaList = null;
 
                             EndScrollRect();
-
-                            IncrementClearedFoundItems();
-                            ClearLastLog();
                             return;
                         }
                     }
@@ -410,9 +406,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI
                     {
                         ApplySortingOptions();
                         isConfirmButtonPressed = true;
-
-                        IncrementConfirmedSortingOrder();
-                        SaveLogFile();
 
                         if (isContinueSearching)
                         {
@@ -1011,9 +1004,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI
             preview.UpdateOverlappingItems(overlappingItems);
             preview.UpdateSpriteData(spriteData);
             reordableOverlappingItemList.InitReordableList(overlappingItems, preview);
-
-            AddSortingSuggestionLoggingData();
-            IncrementFoundGlitch();
         }
 
         private List<OverlappingItem> ApplyAutoSorting(
@@ -1127,7 +1117,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI
             preview.CleanUpPreview();
             PolygonColliderCacher.GetInstance().CleanUp();
             autoSortingOptionsUI.Cleanup();
-            ClearLastLog();
         }
 
         #region validation
@@ -1191,113 +1180,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI
             isUsingSpriteData |= isSpriteDataRequiredForAutoSorting;
 
             return isUsingSpriteData;
-        }
-
-        #endregion
-
-        #region logging
-
-        private void AddSortingSuggestionLoggingData()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var sortingOrderSuggestionLoggingData = new SortingSuggestionLoggingData();
-            var validSortingCriteria = autoSortingOptionsUI.GenerateSortingCriteriaDataArray();
-            sortingOrderSuggestionLoggingData.Init(overlappingItems.Items, validSortingCriteria);
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.AddSortingOrderSuggestionLoggingData(sortingOrderSuggestionLoggingData);
-        }
-
-        private void ClearLastLog()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.ClearLastLoggingData();
-        }
-
-        private void SaveLogFile()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.ConfirmSortingOrder();
-            var loggingDataJson = JsonUtility.ToJson(loggingData);
-
-            var tempCachePath = Path.Combine(Application.temporaryCachePath, Path.Combine(LogOutputPath));
-            var logDirectory = Path.Combine(tempCachePath, GeneralData.currentSurveyId, "LogFiles");
-            Directory.CreateDirectory(logDirectory);
-            var pathAndName = Path.Combine(logDirectory, loggingData.UniqueFileName);
-
-            File.WriteAllText(pathAndName, loggingDataJson);
-        }
-
-        private void IncrementConfirmedSortingOrder()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.CurrentFoundGlitchStatistic.totalConfirmedGlitches++;
-        }
-
-        private void IncrementClearedFoundItems()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.CurrentFoundGlitchStatistic.totalClearedGlitches++;
-        }
-
-        private void IncrementFoundGlitch()
-        {
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return;
-            }
-
-            if (!autoSortingOptionsUI.IsApplyingAutoSorting)
-            {
-                return;
-            }
-
-            var loggingData = LoggingManager.GetInstance().loggingData;
-            loggingData.CurrentFoundGlitchStatistic.totalFoundGlitches++;
         }
 
         #endregion

@@ -353,8 +353,6 @@ namespace SpriteSwappingPlugin.SortingGeneration
                 }
             }
 
-            // Debug.Log("result sum: [" + resultCounter[0] + "," + resultCounter[1] + "]");
-
             if (resultCounter[0] >= resultCounter[1])
             {
                 result.order = 1;
@@ -391,9 +389,6 @@ namespace SpriteSwappingPlugin.SortingGeneration
 
                 autoSortingComponent.containedByAutoSortingComponent =
                     autoSortingComponents[correspondingAutoSortingComponentIndex].sortingComponent;
-
-                // Debug.LogFormat("containment found: {0} in {1} ", containedSortingComponent.SpriteRenderer.name,
-                // autoSortingComponent.sortingComponent.SpriteRenderer.name);
             }
         }
 
