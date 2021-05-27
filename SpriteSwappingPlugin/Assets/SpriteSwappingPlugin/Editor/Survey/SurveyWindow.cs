@@ -438,18 +438,15 @@ namespace SpriteSwappingPlugin.Survey
                 return;
             }
 
-            // Debug.Log("start thread");
             var collectedDataPath = threadData.zipFolder;
             var zipName = threadData.isResult ? "ResultData" : ("ProgressData" + threadData.progress);
             var zipFilePath = Path.Combine(threadData.zipSaveFolder, zipName + ".zip");
 
             try
             {
-                // Debug.Log("start zipping file");
                 var fileZipper = new FileZipper();
                 var isSucceededZippingFiles =
                     fileZipper.GenerateZip(collectedDataPath, zipFilePath, out var adjustedOutputPath);
-                // Debug.Log("zipping succeeded: " + isSucceededZippingFiles);
 
 
                 if (!isSucceededZippingFiles)
@@ -482,8 +479,6 @@ namespace SpriteSwappingPlugin.Survey
 
         private void OnCompleted(TransmitResult transmitResult)
         {
-            // Debug.Log("mail sended");
-
             if (!(currentStep is FinishingSurvey finishingSurvey))
             {
                 return;

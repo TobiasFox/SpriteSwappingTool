@@ -77,9 +77,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
                 return result;
             }
 
-            // Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Count +
-            // " to " + filteredSortingComponents.Count);
-
             var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
             spriteDataItemValidatorCache.UpdateSpriteData(spriteDetectionData.spriteData);
 
@@ -88,7 +85,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
             {
                 if (DetectOverlappingSortingComponents(sortingComponent, out result.overlappingSortingComponents))
                 {
-                    // result.overlappingSortingComponents.Insert(0, result.baseItem);
                     result.baseItem = sortingComponent;
                     break;
                 }
@@ -127,8 +123,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
             {
                 return result;
             }
-            // Debug.Log("filtered spriteRenderers with SortingGroup with no parent: from " + spriteRenderers.Count +
-            // " to " + filteredSortingComponents.Count);
 
             var spriteDataItemValidatorCache = SpriteDataItemValidatorCache.GetInstance();
             spriteDataItemValidatorCache.UpdateSpriteData(spriteDetectionData.spriteData);
@@ -139,7 +133,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
             }
 
             result.baseItem = sortingComponentToCheck;
-            // result.overlappingSortingComponents.Insert(0, result.baseItem);
 
             DetectAllOverlappingSortingComponents(result.overlappingSortingComponents);
 
@@ -224,7 +217,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
             cachedOverlappingSortingComponentDictionaryForSurroundingSpriteAnalysis =
                 new Dictionary<SortingComponent, List<SortingComponent>>();
 
-            // Debug.Log("start recursion");
             AnalyzeSurroundingSpritesRecursive(baseSortingComponents, excludingSpriteRendererList,
                 ref sortingOptions);
 
@@ -260,7 +252,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
         private void AnalyzeSurroundingSpritesRecursive(List<SortingComponent> baseSortingComponents,
             List<SpriteRenderer> excludingSpriteRendererList, ref Dictionary<int, int> sortingOptions)
         {
-            // Debug.Log("basSorting Count " + baseSortingComponents.Count);
             if (baseSortingComponents.Count <= 0)
             {
                 return;
@@ -287,8 +278,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
                     sortingOptions.Add(baseSortingComponentInstanceId, currentBaseSortingOrder);
                 }
 
-                // Debug.Log("check overlapping sprites against " + baseSortingComponent.SpriteRenderer.name);
-
                 if (!cachedOverlappingSortingComponentDictionaryForSurroundingSpriteAnalysis.TryGetValue(
                     baseSortingComponent, out var foundOverlappingSprites))
                 {
@@ -304,7 +293,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
 
                 if (!hasOverlappingSortingComponents)
                 {
-                    // Debug.Log("found no overlapping");
                     continue;
                 }
 
@@ -312,15 +300,10 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
                 var overlappingSprites = ExcludeSortingComponents(foundOverlappingSprites, excludingSpriteRendererList);
                 SortOverlappingSortingComponents(ref overlappingSprites, currentBaseSortingOrder);
 
-                // Debug.Log("found overlapping sprites " + overlappingSprites.Count);
-
                 var newExcludingList = new List<SpriteRenderer>(excludingSpriteRendererList);
 
                 foreach (var overlappingSprite in overlappingSprites)
                 {
-                    // Debug.LogFormat("iteration {0}: check {1} against {2}", counter,
-                    // baseSortingComponent.spriteRenderer.name, overlappingSprite.spriteRenderer.name);
-
                     newExcludingList.Add(overlappingSprite.SpriteRenderer);
 
                     var currentSortingComponentInstanceId = overlappingSprite.GetInstanceId();
@@ -373,7 +356,6 @@ namespace SpriteSwappingPlugin.OverlappingSpriteDetection
                     }
 
                     sortingOptions[currentSortingComponentInstanceId] = newSortingOrder;
-                    // Debug.Log("go into recursion");
 
                     tempOverlappingSpriteDetector.AnalyzeSurroundingSpritesRecursive(overlappingSprites,
                         newExcludingList, ref sortingOptions);

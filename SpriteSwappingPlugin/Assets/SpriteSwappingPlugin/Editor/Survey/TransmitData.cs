@@ -40,30 +40,6 @@ namespace SpriteSwappingPlugin.Survey
 
         private static readonly MailData[] MailDataArray = new MailData[]
         {
-            new MailData()
-            {
-                mailAddress = "spriteswappingsurvey38@mail.de", password = "f3-A)zL[6*s57jW3",
-                host = "smtp.mail.de",
-                port = 587
-            },
-            new MailData()
-            {
-                mailAddress = "spriteswappingsurvey39@mail.de", password = "7NnF*ftH44#SU32",
-                host = "smtp.mail.de",
-                port = 587
-            },
-            new MailData()
-            {
-                mailAddress = "spriteswappingsurvey40@mail.de", password = "Qz#+ZrZV6wv4N-p",
-                host = "smtp.mail.de",
-                port = 587
-            },
-            new MailData()
-            {
-                mailAddress = "spriteswapping42@mail.de", password = "T99#KD+FS*9-Hc",
-                host = "smtp.mail.de",
-                port = 587
-            },
         };
 
         public delegate void OnMailSendCompleted(TransmitResult transmitResult);

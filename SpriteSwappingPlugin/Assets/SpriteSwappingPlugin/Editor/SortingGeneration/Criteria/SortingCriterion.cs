@@ -64,8 +64,6 @@ namespace SpriteSwappingPlugin.SortingGeneration.Criteria
                 weightedResult[i] = sortingResults[i] * sortingCriterionData.priority;
             }
 
-            // Debug.Log(GetType().Name + " sorted: [" + sortingResults[0] + "," + sortingResults[1] + "]");
-
             return weightedResult;
         }
 
