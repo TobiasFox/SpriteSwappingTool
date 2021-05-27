@@ -1,0 +1,50 @@
+﻿#region license
+
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//   under the License.
+//  -------------------------------------------------------------
+
+#endregion
+
+using UnityEditor;
+using UnityEngine;
+
+namespace SpriteSwappingPlugin.Helper
+{
+    public static class OwnGUIHelper
+    {
+        public static float DrawField(float value)
+        {
+            return EditorGUILayout.FloatField(nameof(value), value);
+        }
+
+        public static bool DrawField(bool value)
+        {
+            return EditorGUILayout.Toggle(nameof(value), value);
+        }
+
+        public static Color DrawField(Color color)
+        {
+            return EditorGUILayout.ColorField(nameof(color), color);
+        }
+
+        public static int DrawField(int value)
+        {
+            return EditorGUILayout.IntField(nameof(value), value);
+        }
+    }
+}
