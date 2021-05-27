@@ -34,7 +34,6 @@ sysinfo.txt
 
 # Builds
 *.apk
-*.unitypackage
 SpriteSortingPlugin/.idea/
 SpriteSortingPlugin/Assets/Plugins/Editor/JetBrains/
 SpriteSortingPlugin/Assets/Plugins/Editor/JetBrains.meta
