@@ -21,7 +21,6 @@
 #endregion
 
 using System;
-using SpriteSwappingPlugin.SpriteSwappingDetector.Logging;
 using SpriteSwappingPlugin.SpriteSwappingDetector.UI.Preview;
 using SpriteSwappingPlugin.UI;
 using UnityEditor;
@@ -87,7 +86,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI.OverlappingSprites
         {
             overlappingItems.ReOrderItem(newIndex);
             preview.UpdatePreviewEditor();
-            LogReorderChangeModification(oldIndex, newIndex);
         }
 
         //TODO: remember last focussed element before solution gets recompiled
@@ -216,8 +214,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI.OverlappingSprites
                 {
                     var modifiedLayerName = SortingLayerUtility.SortingLayerNames[element.sortingLayerDropDownIndex];
 
-                    LogSortingLayerChangeModification(index, element.sortingLayerName, modifiedLayerName);
-
                     element.sortingLayerName = modifiedLayerName;
                     overlappingItems.UpdateSortingLayer(index, out var newIndexInList);
                     reordableSpriteSortingList.index = newIndexInList;
@@ -246,7 +242,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI.OverlappingSprites
 
                 if (changeScope.changed)
                 {
-                    LogSortingOrderChangeModification(index, modifiedSortingOrder);
                     element.sortingOrder = modifiedSortingOrder;
                     isPreviewUpdating = true;
                     overlappingItems.UpdateSortingOrder(index);
@@ -257,7 +252,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI.OverlappingSprites
                 new Rect(rect.x + 135 + 10 + 120 + 10 + 25 + 10, rect.y, 25,
                     EditorGUIUtility.singleLineHeight), "-1"))
             {
-                LogSortingOrderChangeModification(index, element.sortingOrder - 1);
                 element.sortingOrder--;
                 isPreviewUpdating = true;
                 overlappingItems.UpdateSortingOrder(index);
@@ -267,7 +261,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI.OverlappingSprites
                 new Rect(rect.x + 135 + 10 + 120 + 10, rect.y, 25, EditorGUIUtility.singleLineHeight),
                 "+1"))
             {
-                LogSortingOrderChangeModification(index, element.sortingOrder + 1);
                 element.sortingOrder++;
                 isPreviewUpdating = true;
                 overlappingItems.UpdateSortingOrder(index);
@@ -322,80 +315,6 @@ namespace SpriteSwappingPlugin.SpriteSwappingDetector.UI.OverlappingSprites
             reordableSpriteSortingList.drawElementBackgroundCallback = null;
             reordableSpriteSortingList.onReorderCallbackWithDetails = null;
             reordableSpriteSortingList = null;
-        }
-
-
-        private void LogSortingLayerChangeModification(int currentIndex, string previousLayerName,
-            string modifiedLayerName)
-        {
-            if (!IsLoggingActive(out var loggingData))
-            {
-                return;
-            }
-
-            var modificationData = new SortingSuggestionModificationData()
-            {
-                type = ModificationType.ChangeSortingLayer,
-                itemIndex = currentIndex,
-                layerIndex = SortingLayerUtility.GetLayerNameIndex(previousLayerName),
-                modifiedLayerIndex = SortingLayerUtility.GetLayerNameIndex(modifiedLayerName)
-            };
-
-            var currentSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
-            currentSuggestionLoggingData?.AddModification(modificationData);
-        }
-
-        private void LogSortingOrderChangeModification(int currentIndex, int modifiedSortingOrder)
-        {
-            if (!IsLoggingActive(out var loggingData))
-            {
-                return;
-            }
-
-            var item = overlappingItems.Items[currentIndex];
-
-            var modificationData = new SortingSuggestionModificationData()
-            {
-                type = ModificationType.ChangeSortingOrder,
-                itemIndex = currentIndex,
-                order = item.sortingOrder,
-                isRelative = item.IsUsingRelativeSortingOrder,
-                modifiedOrder = modifiedSortingOrder,
-            };
-
-            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
-            sortingOrderSuggestionLoggingData?.AddModification(modificationData);
-        }
-
-        private void LogReorderChangeModification(int currentIndex, int modifiedIndex)
-        {
-            if (!IsLoggingActive(out var loggingData))
-            {
-                return;
-            }
-
-            var modificationData = new SortingSuggestionModificationData()
-            {
-                type = ModificationType.Reorder,
-                itemIndex = currentIndex,
-                modifiedItemIndex = modifiedIndex
-            };
-
-            var sortingOrderSuggestionLoggingData = loggingData.GetCurrentSuggestionLoggingData();
-            sortingOrderSuggestionLoggingData?.AddModification(modificationData);
-        }
-
-        private bool IsLoggingActive(out LoggingData loggingData)
-        {
-            loggingData = null;
-            if (!GeneralData.isSurveyActive || !GeneralData.isLoggingActive)
-            {
-                return false;
-            }
-
-            loggingData = LoggingManager.GetInstance().loggingData;
-
-            return loggingData.IsCurrentLoggingDataActive;
         }
     }
 }

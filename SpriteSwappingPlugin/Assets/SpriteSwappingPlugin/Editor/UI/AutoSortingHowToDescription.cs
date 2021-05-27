@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SpriteSwappingPlugin.Survey.UI.Wizard
+namespace SpriteSwappingPlugin.UI
 {
     public class AutoSortingHowToDescription
     {
