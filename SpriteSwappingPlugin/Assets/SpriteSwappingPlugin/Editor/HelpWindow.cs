@@ -20,7 +20,6 @@
 
 #endregion
 
-using SpriteSwappingPlugin.Survey.UI.Wizard;
 using SpriteSwappingPlugin.UI;
 using UnityEditor;
 using UnityEngine;
@@ -31,7 +30,7 @@ namespace SpriteSwappingPlugin
     {
         private bool isDetectorDescriptionExpanded = true;
         private bool isAnalyzeDescriptionExpanded;
-        private HowToDescription howToDescription;
+        private DetectorHowToDescription howToDescription;
         private AutoSortingHowToDescription autoSortingHowToDescription;
 
 
@@ -45,7 +44,7 @@ namespace SpriteSwappingPlugin
         private void Awake()
         {
             titleContent = new GUIContent("Sprite Swapping Tool Help");
-            howToDescription = new HowToDescription(true, true) { };
+            howToDescription = new DetectorHowToDescription(true, true) { };
             autoSortingHowToDescription = new AutoSortingHowToDescription() {isBoldHeader = false};
         }
 
